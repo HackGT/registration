@@ -1,0 +1,25 @@
+{
+  "name": "registration",
+  "version": "1.0.0",
+  "description": "TBD",
+  "main": "server/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/app.js"
+  },
+  "author": {
+    "name": "Ryan Petschek",
+    "email": "petschekr@gmail.com",
+    "url": "https://github.com/petschekr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HackGT/registration.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HackGT/registration/issues"
+  },
+  "homepage": "https://github.com/HackGT/registration#readme",
+  "private": true
+}
