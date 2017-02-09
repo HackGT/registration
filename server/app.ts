@@ -11,27 +11,7 @@ import * as compression from "compression";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as multer from "multer";
-let postParser = bodyParser.urlencoded({
-	extended: false
-});
-let uploadHandler = multer({
-	"storage": multer.diskStorage({
-		destination: function (req, file, cb) {
-			// The OS's default temporary directory
-			// Should be changed (or moved via fs.rename()) if the files are to be persisted
-			cb(null!, os.tmpdir());
-		},
-		filename: function (req, file, cb) {
-			cb(null!, `${file.fieldname}-${Date.now()}.${path.extname(file.originalname)}`);
-		}
-	}),
-	"limits": {
-		"fileSize": 50000000, // 50 MB
-		"files": 1
-	}
-});
-
-import * as mongoose from "mongoose";
+import * as morgan from "morgan";
 
 const PORT = parseInt(process.env.PORT) || 3000;
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost/";
@@ -42,6 +22,7 @@ const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../pa
 const VERSION_HASH = require("git-rev-sync").short();
 
 export let app = express();
+app.use(morgan("dev"));
 app.use(compression());
 let cookieParserInstance = cookieParser(undefined, {
 	"path": "/",
@@ -51,27 +32,14 @@ let cookieParserInstance = cookieParser(undefined, {
 });
 app.use(cookieParserInstance);
 
+import * as mongoose from "mongoose";
 (<any>mongoose).Promise = global.Promise;
 mongoose.connect(url.resolve(MONGO_URL, UNIQUE_APP_ID));
-export {mongoose}; // For future unit testing; see https://github.com/HackGT/Ultimate-Checkin/blob/master/test/api.ts#L11
+export {mongoose}; // For future unit testing and dependent routes; see https://github.com/HackGT/Ultimate-Checkin/blob/master/test/api.ts#L11
 
 import {
 	IUser, IUserMongoose, User
 } from "./schema";
-
-// Promise version of crypto.pbkdf2()
-export function pbkdf2Async (...params: any[]) {
-	return new Promise<Buffer>((resolve, reject) => {
-		params.push(function (err: Error, derivedKey: Buffer) {
-			if (err) {
-				reject(err);
-				return;
-			}
-			resolve(derivedKey);
-		});
-		crypto.pbkdf2.apply(null, params);
-	});
-}
 
 // Check for number of admin users and create default admin account if none
 const DEFAULT_EMAIL = "admin@hack.gt";
@@ -103,8 +71,42 @@ Created default admin user
 	`);
 })();
 
+// Promise version of crypto.pbkdf2()
+export function pbkdf2Async (...params: any[]) {
+	return new Promise<Buffer>((resolve, reject) => {
+		params.push(function (err: Error, derivedKey: Buffer) {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(derivedKey);
+		});
+		crypto.pbkdf2.apply(null, params);
+	});
+}
+
+export let postParser = bodyParser.urlencoded({
+	extended: false
+});
+export let uploadHandler = multer({
+	"storage": multer.diskStorage({
+		destination: function (req, file, cb) {
+			// The OS's default temporary directory
+			// Should be changed (or moved via fs.rename()) if the files are to be persisted
+			cb(null!, os.tmpdir());
+		},
+		filename: function (req, file, cb) {
+			cb(null!, `${file.fieldname}-${Date.now()}.${path.extname(file.originalname)}`);
+		}
+	}),
+	"limits": {
+		"fileSize": 50000000, // 50 MB
+		"files": 1
+	}
+});
+
 // For API endpoints
-let authenticateWithReject = async function (request: express.Request, response: express.Response, next: express.NextFunction) {
+export let authenticateWithReject = async function (request: express.Request, response: express.Response, next: express.NextFunction) {
 	let authKey = request.cookies.auth;
 	let user = await User.findOne({"auth_keys": authKey});
 	if (!user) {
@@ -118,7 +120,7 @@ let authenticateWithReject = async function (request: express.Request, response:
 	}
 };
 // For directly user facing endpoints
-let authenticateWithRedirect = async function (request: express.Request, response: express.Response, next: express.NextFunction) {
+export let authenticateWithRedirect = async function (request: express.Request, response: express.Response, next: express.NextFunction) {
 	let authKey = request.cookies.auth;
 	let user = await User.findOne({"auth_keys": authKey});
 	if (!user) {
@@ -132,6 +134,8 @@ let authenticateWithRedirect = async function (request: express.Request, respons
 
 let apiRouter = express.Router();
 // API routes go here
+import {userRoutes} from "./routes/user";
+apiRouter.use("/user", userRoutes);
 
 app.use("/api", apiRouter);
 
