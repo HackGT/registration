@@ -44,3 +44,11 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 
 	admin: Boolean
 }));
+
+// Handlebars templates
+export interface IIndexTemplate {
+	siteTitle: string;
+}
+export interface ILoginTemplate {
+	siteTitle: string;
+}

@@ -16,10 +16,10 @@ import * as morgan from "morgan";
 const PORT = parseInt(process.env.PORT) || 3000;
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost/";
 const UNIQUE_APP_ID = process.env.UNIQUE_APP_ID || "registration";
-const STATIC_ROOT = "../client";
 
-const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
-const VERSION_HASH = require("git-rev-sync").short();
+export const STATIC_ROOT = path.resolve(__dirname, "../client");
+export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
+export const VERSION_HASH = require("git-rev-sync").short();
 
 export let app = express();
 app.use(morgan("dev"));
@@ -139,12 +139,13 @@ apiRouter.use("/user", userRoutes);
 
 app.use("/api", apiRouter);
 
-app.route("/").get((request, response) => {
-	response.send("Rendered handlebars template here");
-});
+// User facing routes
+import {templateRoutes} from "./routes/templates";
+app.use("/", templateRoutes);
 
 app.use("/node_modules", serveStatic(path.resolve(__dirname, "../node_modules")));
-app.use("/", serveStatic(path.resolve(__dirname, STATIC_ROOT)));
+app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
+app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
 
 app.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);
