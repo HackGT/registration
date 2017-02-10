@@ -8,12 +8,24 @@
       "question_text":"Cell Number"
    },
    {
-      "type":"combo",
+      "type":"checkbox",
       "question_text":"Dietary Restrictions",
       "options":[
-         "Vegan",
-         "Vegetarian",
-         "Nut allergy"
+         {
+            "name":"diet1",
+            "value":"vegan",
+            "text": "vegan"
+         },
+         {
+            "name":"diet1",
+            "value":"Vegetarian",
+            "text": "Vegetarian"
+         },
+         {
+            "name":"diet1",
+            "value":"Nut Allergy",
+            "text": "Nut Allergy"
+         }
       ]
    },
    {
@@ -35,6 +47,7 @@
    {
       "type":"radio",
       "question_text":"What's your role?",
+      "name":"role",
       "options":[
          "hacker",
          "mentor"

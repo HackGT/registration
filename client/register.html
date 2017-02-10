@@ -16,9 +16,9 @@
 		<h1>Register</h1>
 
 		<form method="POST" action="/addentry">
-			{{#each (foo pieces)}}
+			{{#each (obtainTemp pieces)}}
 			    {{this.title}}: {{{this.html}}}
-			    <br>
+			    <br><br>
 			{{/each}}
 		</form>
 
