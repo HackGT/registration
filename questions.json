@@ -1,0 +1,43 @@
+[
+   {
+      "type":"text",
+      "question_text":"Full Name"
+   },
+   {
+      "type":"phone-number",
+      "question_text":"Cell Number"
+   },
+   {
+      "type":"combo",
+      "question_text":"Dietary Restrictions",
+      "options":[
+         "Vegan",
+         "Vegetarian",
+         "Nut allergy"
+      ]
+   },
+   {
+      "type":"date",
+      "question_text":"Birth Date"
+   },
+   {
+      "type":"url",
+      "question_text":"Github"
+   },
+   {
+      "type":"url",
+      "question_text":"Linkedin"
+   },
+   {
+      "type":"file",
+      "question_text":"Resume"
+   },
+   {
+      "type":"radio",
+      "question_text":"What's your role?",
+      "options":[
+         "hacker",
+         "mentor"
+      ]
+   }
+]
