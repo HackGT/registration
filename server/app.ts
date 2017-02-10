@@ -12,6 +12,7 @@ import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as multer from "multer";
 import * as morgan from "morgan";
+import * as ajv from "ajv";
 
 const PORT = parseInt(process.env.PORT) || 3000;
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost/";
@@ -129,6 +130,33 @@ export let authenticateWithRedirect = async function (request: express.Request, 
 	else {
 		response.locals.email = user.email;
 		next();
+	}
+};
+
+export function readFileAsync (filename: string) {
+	return new Promise<Buffer>((resolve, reject) => {
+		fs.readFile(filename, (err, data) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(data);
+			}
+		})
+	});
+}
+
+// validates and returns JSON object of questions
+export let validateQuestions = async function (qfile: string, schemafile: string) {
+	let questions = await readFileAsync(qfile);
+	let schema = await readFileAsync(schemafile);
+	let qjson = JSON.parse(questions.toString("utf8"));
+	let sjson = JSON.parse(schema.toString("utf8"));
+	let mrajv = new ajv();
+	let valid = mrajv.validate(sjson, qjson);
+	if (!valid) {
+		console.error(mrajv.errors);
+	} else {
+		return qjson;
 	}
 };
 
