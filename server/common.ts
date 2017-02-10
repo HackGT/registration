@@ -52,7 +52,7 @@ export let uploadHandler = multer({
 	}
 });
 // For API endpoints
-export let authenticateWithReject = async function (request: express.Request, response: express.Response, next: express.NextFunction) {
+export async function authenticateWithReject (request: express.Request, response: express.Response, next: express.NextFunction) {
 	let authKey = request.cookies.auth;
 	let user = await User.findOne({"auth_keys": authKey});
 	if (!user) {
@@ -66,7 +66,7 @@ export let authenticateWithReject = async function (request: express.Request, re
 	}
 };
 // For directly user facing endpoints
-export let authenticateWithRedirect = async function (request: express.Request, response: express.Response, next: express.NextFunction) {
+export async function authenticateWithRedirect (request: express.Request, response: express.Response, next: express.NextFunction) {
 	let authKey = request.cookies.auth;
 	let user = await User.findOne({"auth_keys": authKey});
 	if (!user) {
@@ -109,7 +109,7 @@ export function readFileAsync (filename: string): Promise<string> {
 // JSON schema validator
 //
 import * as ajv from "ajv";
-export let validateSchema = async function (questionsFile: string, schemaFile: string): Promise<any> {
+export async function validateSchema (questionsFile: string, schemaFile: string): Promise<any> {
 	let questions, schema;
 	try {
 		questions = JSON.parse(await readFileAsync(questionsFile));
