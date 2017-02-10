@@ -5,10 +5,9 @@ import * as Handlebars from "handlebars";
 
 import {
 	STATIC_ROOT,
-	mongoose,
 	authenticateWithReject,
 	authenticateWithRedirect
-} from "../app";
+} from "../common";
 import {
 	IUser, IUserMongoose, User,
 	IIndexTemplate, ILoginTemplate

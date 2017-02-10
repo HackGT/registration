@@ -3,8 +3,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import * as mongoose from "mongoose";
-import * as ajv from "ajv";
+import {mongoose} from "./common";
 
 // We need to find some way of integrating these static types with a config that
 // can be adapted with different questions and data in a JSON schema file
