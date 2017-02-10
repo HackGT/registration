@@ -133,30 +133,37 @@ export let authenticateWithRedirect = async function (request: express.Request, 
 	}
 };
 
-export function readFileAsync (filename: string) {
-	return new Promise<Buffer>((resolve, reject) => {
-		fs.readFile(filename, (err, data) => {
+export function readFileAsync (filename: string): Promise<string> {
+	return new Promise<string>((resolve, reject) => {
+		fs.readFile(filename, "utf8", (err, data) => {
 			if (err) {
 				reject(err);
-			} else {
-				resolve(data);
+				return;
 			}
+			resolve(data);
 		})
 	});
 }
 
-// validates and returns JSON object of questions
-export let validateQuestions = async function (qfile: string, schemafile: string) {
-	let questions = await readFileAsync(qfile);
-	let schema = await readFileAsync(schemafile);
-	let qjson = JSON.parse(questions.toString("utf8"));
-	let sjson = JSON.parse(schema.toString("utf8"));
-	let mrajv = new ajv();
-	let valid = mrajv.validate(sjson, qjson);
+// Validates and returns JSON object of questions
+export let validateQuestions = async function (questionsFile: string, schemaFile: string): Promise<any> {
+	let questions, schema;
+	try {
+		questions = JSON.parse(await readFileAsync(questionsFile));
+		schema = JSON.parse(await readFileAsync(schemaFile));
+	}
+	catch (err) {
+		// Invalid JSON or file read failed unexpectedly
+		return Promise.reject(err);
+	}
+
+	let validator = new ajv();
+	let valid = validator.validate(schema, questions);
 	if (!valid) {
-		console.error(mrajv.errors);
-	} else {
-		return qjson;
+		return Promise.reject(validator.errors);
+	}
+	else {
+		return questions;
 	}
 };
 
