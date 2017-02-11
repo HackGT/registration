@@ -2,11 +2,10 @@ import * as crypto from "crypto";
 import * as express from "express";
 import {
 	pbkdf2Async,
-	mongoose,
 	authenticateWithReject,
 	authenticateWithRedirect,
 	postParser
-} from "../app";
+} from "../common";
 import {
 	IUser, IUserMongoose, User
 } from "../schema";
