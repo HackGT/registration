@@ -8,5 +8,6 @@
 	},
 	"server": {
 		"isProduction": true
-	}
+	},
+	"admins": ["example@example.com"]
 }

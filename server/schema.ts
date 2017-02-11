@@ -16,7 +16,8 @@ export interface Config {
 	},
 	server: {
 		isProduction: boolean;
-	}
+	},
+	admins: string[]
 }
 
 // We need to find some way of integrating these static types with a config that

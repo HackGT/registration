@@ -69,6 +69,11 @@ passport.use(new GitHubStrategy({
 	async (accessToken, refreshToken, profile, done) => {
 		let email = profile.emails[0].value;
 		let user = await User.findOne({"email": email});
+		let isAdmin = false;
+		if (config && config.admins.indexOf(email) !== -1) {
+			isAdmin = true;
+			console.info(`Adding new admin: ${email}`);
+		}
 		if (!user) {
 			user = new User({
 				"email": email,
@@ -79,14 +84,24 @@ passport.use(new GitHubStrategy({
 					"profileUrl": profile.profileUrl
 				},
 				auth_keys: [],
-				admin: false
+				admin: isAdmin
 			});
 			await user.save();
-			console.log("Created a new user");
 			done(null, user);
 		}
 		else {
-			console.log("Got previously existing user");
+			if (!user.githubData) {
+				user.githubData = {
+					"id": profile.id,
+					"username": profile.username,
+					"profileUrl": profile.profileUrl
+				};
+				await user.save();
+			}
+			if (!user.admin && isAdmin) {
+				user.admin = true;
+				await user.save();
+			}
 			done(null, user);
 		}
 	}

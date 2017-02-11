@@ -25,20 +25,12 @@ app.use(compression());
 let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS);
 app.use(cookieParserInstance);
 
-// Check for number of admin users and create default admin account if none
-const DEFAULT_EMAIL = "admin@hack.gt";
-const DEFAULT_PASSWORD = "admin";
+// Check for number of admin users and warn if none
 (async () => {
 	let users = await User.find({"admin": true});
 	if (users.length !== 0)
 		return;
-
-	console.info(`
-Created default admin user
-	Username: ${DEFAULT_EMAIL}
-	Password: ${DEFAULT_PASSWORD}
-**Delete this user after you have used it to set up your account**
-	`);
+	console.warn("No admin users are configured; admins can be added in config.json");
 })();
 
 // Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
