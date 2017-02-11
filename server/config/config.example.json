@@ -1,0 +1,12 @@
+{
+	"secrets": {
+		"session": "",
+		"github": {
+			"id": "",
+			"secret": ""
+		}
+	},
+	"server": {
+		"isProduction": true
+	}
+}

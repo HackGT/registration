@@ -11,6 +11,12 @@ export const PORT = parseInt(process.env.PORT) || 3000;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
 export const VERSION_HASH = require("git-rev-sync").short();
+export const COOKIE_OPTIONS = {
+	"path": "/",
+	"maxAge": 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
+	"secure": false,
+	"httpOnly": true
+};
 
 //
 // Database connection
@@ -53,27 +59,21 @@ export let uploadHandler = multer({
 });
 // For API endpoints
 export async function authenticateWithReject (request: express.Request, response: express.Response, next: express.NextFunction) {
-	let authKey = request.cookies.auth;
-	let user = await User.findOne({"auth_keys": authKey});
-	if (!user) {
+	if (!request.isAuthenticated()) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
 		});
 	}
 	else {
-		response.locals.email = user.email;
 		next();
 	}
 };
 // For directly user facing endpoints
 export async function authenticateWithRedirect (request: express.Request, response: express.Response, next: express.NextFunction) {
-	let authKey = request.cookies.auth;
-	let user = await User.findOne({"auth_keys": authKey});
-	if (!user) {
+	if (!request.isAuthenticated()) {
 		response.redirect("/login");
 	}
 	else {
-		response.locals.email = user.email;
 		next();
 	}
 };

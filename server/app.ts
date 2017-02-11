@@ -8,27 +8,22 @@ import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
 import * as morgan from "morgan";
 
-// Set up Express and its middleware
-export let app = express();
-app.use(morgan("dev"));
-app.use(compression());
-let cookieParserInstance = cookieParser(undefined, {
-	"path": "/",
-	"maxAge": 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
-	"secure": false,
-	"httpOnly": true
-});
-app.use(cookieParserInstance);
-
 import {
 	// Functions
 	pbkdf2Async,
 	// Constants
-	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH
+	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS
 } from "./common";
 import {
 	IUser, IUserMongoose, User
 } from "./schema";
+
+// Set up Express and its middleware
+export let app = express();
+app.use(morgan("dev"));
+app.use(compression());
+let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS);
+app.use(cookieParserInstance);
 
 // Check for number of admin users and create default admin account if none
 const DEFAULT_EMAIL = "admin@hack.gt";
@@ -38,20 +33,6 @@ const DEFAULT_PASSWORD = "admin";
 	if (users.length !== 0)
 		return;
 
-	let salt = crypto.randomBytes(32);
-	let passwordHashed = await pbkdf2Async(DEFAULT_PASSWORD, salt, 500000, 128, "sha256");
-
-	let defaultUser = new User({
-		email: DEFAULT_EMAIL,
-		name: "Default Admin",
-		login: {
-			hash: passwordHashed.toString("hex"),
-			salt: salt.toString("hex")
-		},
-		auth_keys: [],
-		admin: true
-	});
-	await defaultUser.save();
 	console.info(`
 Created default admin user
 	Username: ${DEFAULT_EMAIL}
@@ -60,10 +41,12 @@ Created default admin user
 	`);
 })();
 
+// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
+import {authRoutes} from "./routes/auth";
+app.use("/auth", authRoutes);
+
 let apiRouter = express.Router();
 // API routes go here
-import {userRoutes} from "./routes/user";
-apiRouter.use("/user", userRoutes);
 
 app.use("/api", apiRouter);
 
