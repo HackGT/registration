@@ -105,7 +105,6 @@ passport.use(new GitHubStrategy({
 					"username": profile.username,
 					"profileUrl": profile.profileUrl
 				},
-				auth_keys: [],
 				admin: isAdmin
 			});
 			await user.save();
@@ -146,7 +145,6 @@ passport.use(new GoogleStrategy({
 				"googleData": {
 					"id": profile.id
 				},
-				auth_keys: [],
 				admin: isAdmin
 			});
 			await user.save();
@@ -189,7 +187,6 @@ passport.use(new FacebookStrategy({
 				"facebookData": {
 					"id": profile.id
 				},
-				auth_keys: [],
 				admin: isAdmin
 			});
 			await user.save();

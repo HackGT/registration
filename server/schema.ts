@@ -47,8 +47,6 @@ export interface IUser {
 		id?: string;
 	};
 
-	auth_keys: string[];
-
 	admin?: boolean;
 }
 export type IUserMongoose = IUser & mongoose.Document;
@@ -72,8 +70,6 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	facebookData: {
 		id: String
 	},
-
-	auth_keys: [String],
 
 	admin: Boolean
 }));
