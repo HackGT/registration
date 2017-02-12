@@ -45,7 +45,7 @@ templateRoutes.route("/login").get((request, response) => {
 	response.send(loginTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(async (request, response) => {
+templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
 	let questionData: any[];
 	try {
 		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
@@ -66,7 +66,8 @@ templateRoutes.route("/apply").get(async (request, response) => {
 	});
 	let templateData: IRegisterTemplate = {
 		siteTitle: "HackGT High School",
-		questionData: questionData 
+		questionData: questionData,
+		user: request.user
 	};
 	response.send(registerTemplate(templateData));
 });

@@ -85,4 +85,5 @@ export interface ILoginTemplate {
 export interface IRegisterTemplate {
 	siteTitle: string;
 	questionData: any; // Provide a type for this (generated from schema?)
+	user: IUser;
 }
