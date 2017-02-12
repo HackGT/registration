@@ -21,6 +21,11 @@ body, .row {
 
 	box-sizing: border-box;
 }
+#sidebar a, #sidebar {
+	text-align: center;
+	font-family: "Quicksand";
+	color: #333030;
+}
 #sidebar a {
 	display: flex;
 	justify-content: center;
@@ -38,9 +43,7 @@ body, .row {
 	white-space: nowrap;
 	text-decoration: none !important;
 	text-transform: uppercase;
-	color: #333030;
 	font-size: 1.8rem;
-	font-family: "Quicksand";
 }
 #sidebar a:hover {
 	-webkit-transition: all 60ms ease;
