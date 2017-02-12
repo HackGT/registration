@@ -51,7 +51,7 @@ export interface IIndexTemplate {
 export interface ILoginTemplate {
 	siteTitle: string;
 }
-
 export interface IRegisterTemplate {
-	obtainTemp: any;
+	siteTitle: string;
+	questionData: any; // Provide a type for this (generated from schema?)
 }

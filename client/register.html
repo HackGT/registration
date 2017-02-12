@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Register</title>
+		<title>Apply - {{siteTitle}}</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 		<!--<meta name="theme-color" content="#242424"/>-->
@@ -13,17 +13,21 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 	</head>
 	<body>
-		<h1>Register</h1>
-		<h1>Registration form Start</h1>
-		<form method="POST" action="/addentry">
-			{{#each (obtainTemp pieces)}}
-			    {{this.title}}: {{{this.html}}}
-			    <br><br>
+		<h1>Apply</h1>
+		
+		<form method="POST" action="/apply">
+			{{#each questionData}}
+				{{#if this.multi}}
+					{{#each this.options}}
+						<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
+						<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" />
+					{{/each}}
+				{{else}}
+			    	<label for="form-{{this.name}}">{{this.label}}</label>
+					<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" />
+				{{/if}}
+				<br />
 			{{/each}}
 		</form>
-		<h1>Registration form end</h1>
-		<h1>HACKGT stuff</h1>
-		<script src="/node_modules/material-components-web/dist/material-components-web.js"></script>
-		<!--<script src="/js/login.js"></script>-->
 	</body>
 </html>
