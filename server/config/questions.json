@@ -43,5 +43,14 @@
             "hacker",
             "mentor"
         ]
+    },
+    {
+        "name": "role2",
+        "type": "select",
+        "label": "What's your role again?",
+        "options": [
+            "Hacker",
+            "Mentor"
+        ]
     }
 ]

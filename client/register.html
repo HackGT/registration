@@ -18,10 +18,22 @@
 		<form method="POST" action="/apply">
 			{{#each questionData}}
 				{{#if this.multi}}
-					{{#each this.options}}
-						<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
-						<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" />
-					{{/each}}
+					{{#ifCond this.type "select"}}
+						<label for="form-{{this.name}}">{{this.label}}</label>
+						<select id="form-{{this.name}}" name="{{this.name}}">
+							{{#each this.options}}
+								<option>{{this}}</option>
+							{{/each}}
+						</select>
+					{{else}}
+						<fieldset>
+							<legend>{{this.label}}</legend>
+							{{#each this.options}}
+								<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" />
+								<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
+							{{/each}}
+						</fieldset>
+					{{/ifCond}}
 				{{else}}
 			    	<label for="form-{{this.name}}">{{this.label}}</label>
 					<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" />

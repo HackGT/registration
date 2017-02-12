@@ -22,6 +22,12 @@ let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.htm
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
+Handlebars.registerHelper("ifCond", function(v1, v2, options) {
+	if (v1 === v2) {
+		return options.fn(this);
+	}
+	return options.inverse(this);
+});
 
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
@@ -48,7 +54,7 @@ templateRoutes.route("/apply").get(async (request, response) => {
 		return;
 	}
 	questionData = questionData.map(question => {
-		if (question.type === "checkbox" || question.type === "radio") {
+		if (["checkbox", "radio", "select"].indexOf(question.type) !== -1) {
 			question.multi = true;
 		}
 		else {
