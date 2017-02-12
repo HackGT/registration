@@ -1,43 +1,56 @@
 [
-   {
-      "type":"text",
-      "question_text":"Full Name"
-   },
-   {
-      "type":"phone-number",
-      "question_text":"Cell Number"
-   },
-   {
-      "type":"combo",
-      "question_text":"Dietary Restrictions",
-      "options":[
-         "Vegan",
-         "Vegetarian",
-         "Nut allergy"
-      ]
-   },
-   {
-      "type":"date",
-      "question_text":"Birth Date"
-   },
-   {
-      "type":"url",
-      "question_text":"Github"
-   },
-   {
-      "type":"url",
-      "question_text":"Linkedin"
-   },
-   {
-      "type":"file",
-      "question_text":"Resume"
-   },
-   {
-      "type":"radio",
-      "question_text":"What's your role?",
-      "options":[
-         "hacker",
-         "mentor"
-      ]
-   }
+    {
+        "name": "name",
+        "type": "text",
+        "label": "Full Name"
+    },
+    {
+        "name": "phonenumber",
+        "type": "phone-number",
+        "label": "Cell Number"
+    },
+    {
+        "name": "dietaryrestrictions",
+        "type": "checkbox",
+        "label": "Dietary Restrictions",
+        "options": ["Vegan", "Vegetarian", "Nut Allergy"]
+    },
+    {
+        "name": "birthday",
+        "type": "date",
+        "label": "Birthday"
+    },
+    {
+        "name": "github",
+        "type": "url",
+        "label": "Github"
+    },
+    {
+        "name": "linkedin",
+        "type": "url",
+        "label": "Linkedin"
+    },
+    {
+        "name": "resume",
+        "type": "file",
+        "label": "Resume"
+    },
+    {
+        "name": "role",
+        "type": "radio",
+        "label": "What's your role?",
+        "options": [
+            "hacker",
+            "mentor"
+        ]
+    },
+    {
+        "name": "role2",
+        "type": "select",
+        "label": "What's your role again?",
+        "options": [
+            "Hacker",
+            "Mentor"
+        ]
+    }
 ]

@@ -109,11 +109,11 @@ export function readFileAsync (filename: string): Promise<string> {
 // JSON schema validator
 //
 import * as ajv from "ajv";
-export async function validateSchema (questionsFile: string, schemaFile: string): Promise<any> {
+export async function validateSchema (questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<any> {
 	let questions, schema;
 	try {
-		questions = JSON.parse(await readFileAsync(questionsFile));
-		schema = JSON.parse(await readFileAsync(schemaFile));
+		questions = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
+		schema = JSON.parse(await readFileAsync(path.resolve(__dirname, schemaFile)));
 	}
 	catch (err) {
 		// Invalid JSON or file read failed unexpectedly

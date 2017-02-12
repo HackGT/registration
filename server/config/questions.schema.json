@@ -1,168 +1,67 @@
 {
-   "type":"array",
-   "items":{
-      "oneOf":[
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "text"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               }
+    "type": "array",
+    "items": {
+        "oneOf": [
+            {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "text",
+                            "phone-number",
+                            "date",
+                            "url",
+                            "file"
+                        ]
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "placeholder": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "type",
+                    "label"
+                ]
             },
-            "required":[
-               "type",
-               "question_text"
-            ]
-         },
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "phone-number"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               }
-            },
-            "required":[
-               "type",
-               "question_text"
-            ]
-         },
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "combo"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               },
-               "options":{
-                  "type":"array",
-                  "items":{
-                     "type":"string"
-                  }
-               }
-            },
-            "required":[
-               "type",
-               "question_text",
-               "options"
-            ]
-         },
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "date"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               }
-            },
-            "required":[
-               "type",
-               "question_text"
-            ]
-         },
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "url"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               }
-            },
-            "required":[
-               "type",
-               "question_text"
-            ]
-         },
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "file"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               }
-            },
-            "required":[
-               "type",
-               "question_text"
-            ]
-         },
-         {
-            "type":"object",
-            "properties":{
-               "type":{
-                  "type":"string",
-                  "enum":[
-                     "radio"
-                  ]
-               },
-               "question_text":{
-                  "type":"string"
-               },
-               "special_hint":{
-                  "type":"string"
-               },
-               "options":{
-                  "type":"array",
-                  "items":{
-                     "type":"string"
-                  }
-               }
-            },
-            "required":[
-               "type",
-               "question_text",
-               "options"
-            ]
-         }
-      ]
-   }
+            {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "checkbox",
+                            "radio",
+                            "select"
+                        ]
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "type",
+                    "label",
+                    "options"
+                ]
+            }
+        ]
+    }
 }
