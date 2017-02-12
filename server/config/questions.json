@@ -1,56 +1,56 @@
 [
-   {
-      "type":"text",
-      "question_text":"Full Name"
-   },
-   {
-      "type":"phone-number",
-      "question_text":"Cell Number"
-   },
-   {
-      "type":"checkbox",
-      "question_text":"Dietary Restrictions",
-      "options":[
-         {
-            "name":"diet1",
-            "value":"vegan",
-            "text": "vegan"
-         },
-         {
-            "name":"diet1",
-            "value":"Vegetarian",
-            "text": "Vegetarian"
-         },
-         {
-            "name":"diet1",
-            "value":"Nut Allergy",
-            "text": "Nut Allergy"
-         }
-      ]
-   },
-   {
-      "type":"date",
-      "question_text":"Birth Date"
-   },
-   {
-      "type":"url",
-      "question_text":"Github"
-   },
-   {
-      "type":"url",
-      "question_text":"Linkedin"
-   },
-   {
-      "type":"file",
-      "question_text":"Resume"
-   },
-   {
-      "type":"radio",
-      "question_text":"What's your role?",
-      "name":"role",
-      "options":[
-         "hacker",
-         "mentor"
-      ]
-   }
+    {
+        "type": "text",
+        "question_text": "Full Name"
+    },
+    {
+        "type": "phone-number",
+        "question_text": "Cell Number"
+    },
+    {
+        "type": "checkbox",
+        "question_text": "Dietary Restrictions",
+        "options": [
+            {
+                "name": "diet1",
+                "value": "vegan",
+                "text": "vegan"
+            },
+            {
+                "name": "diet1",
+                "value": "Vegetarian",
+                "text": "Vegetarian"
+            },
+            {
+                "name": "diet1",
+                "value": "Nut Allergy",
+                "text": "Nut Allergy"
+            }
+        ]
+    },
+    {
+        "type": "date",
+        "question_text": "Birth Date"
+    },
+    {
+        "type": "url",
+        "question_text": "Github"
+    },
+    {
+        "type": "url",
+        "question_text": "Linkedin"
+    },
+    {
+        "type": "file",
+        "question_text": "Resume"
+    },
+    {
+        "type": "radio",
+        "question_text": "What's your role?",
+        "name": "role",
+        "options": [
+            "hacker",
+            "mentor"
+        ]
+    }
 ]
