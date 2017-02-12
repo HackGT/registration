@@ -82,12 +82,8 @@ passport.deserializeUser<IUser, string>((id, done) => {
 	});
 });
 
-passport.use(new GitHubStrategy({
-		clientID: GITHUB_CLIENT_ID,
-		clientSecret: GITHUB_CLIENT_SECRET,
-		callbackURL: `${BASE_URL}/${GITHUB_CALLBACK_HREF}`
-	},
-	async (accessToken, refreshToken, profile, done) => {
+function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: { clientID: string; clientSecret: string; callbackURL: string; profileFields?: string[] }) {
+	passport.use(new strategy(options, async (accessToken, refreshToken, profile, done) => {
 		let email = profile.emails[0].value;
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
@@ -100,21 +96,23 @@ passport.use(new GitHubStrategy({
 			user = new User({
 				"email": email,
 				"name": profile.displayName,
-				"githubData": {
-					"id": profile.id,
-					"username": profile.username,
-					"profileUrl": profile.profileUrl
-				},
-				admin: isAdmin
+				"admin": isAdmin
 			});
+			user[dataFieldName].id = profile.id;
+			if (dataFieldName === "githubData") {
+				user[dataFieldName].username = profile.username;
+				user[dataFieldName].profileUrl = profile.profileUrl;
+			}
 			await user.save();
 			done(null, user);
 		}
 		else {
-			if (!user.githubData.id || !user.githubData.username || !user.githubData.profileUrl) {
-				user.githubData.id = profile.id;
-				user.githubData.username = profile.username;
-				user.githubData.profileUrl = profile.profileUrl;
+			if (!user[dataFieldName].id) {
+				user[dataFieldName].id = profile.id;
+			}
+			if (dataFieldName === "githubData" && (!user.githubData.username || !user.githubData.profileUrl)) {
+				user[dataFieldName].username = profile.username;
+				user[dataFieldName].profileUrl = profile.profileUrl;
 			}
 			if (!user.admin && isAdmin) {
 				user.admin = true;
@@ -122,111 +120,42 @@ passport.use(new GitHubStrategy({
 			await user.save();
 			done(null, user);
 		}
-	}
-));
-passport.use(new GoogleStrategy({
-		clientID: GOOGLE_CLIENT_ID,
-		clientSecret: GOOGLE_CLIENT_SECRET,
-		callbackURL: `${BASE_URL}/${GOOGLE_CALLBACK_HREF}`
-	},
-	async (accessToken, refreshToken, profile, done) => {
-		let email = profile.emails[0].value;
-		let user = await User.findOne({"email": email});
-		let isAdmin = false;
-		if (config && config.admins.indexOf(email) !== -1) {
-			isAdmin = true;
-			if (!user || !user.admin)
-				console.info(`Adding new admin: ${email}`);
-		}
-		if (!user) {
-			user = new User({
-				"email": email,
-				"name": profile.displayName,
-				"googleData": {
-					"id": profile.id
-				},
-				admin: isAdmin
-			});
-			await user.save();
-			done(null, user);
-		}
-		else {
-			if (!user.googleData.id) {
-				user.googleData.id = profile.id;
-			}
-			if (!user.admin && isAdmin) {
-				user.admin = true;
-			}
-			await user.save();
-			done(null, user);
-		}
-	}
-));
-passport.use(new FacebookStrategy({
-		clientID: FACEBOOK_CLIENT_ID,
-		clientSecret: FACEBOOK_CLIENT_SECRET,
-		callbackURL: `${BASE_URL}/${FACEBOOK_CALLBACK_HREF}`,
-		profileFields: ["id", "displayName", "email"]
-	},
-	async (accessToken, refreshToken, profile, done) => {
-		if (!profile || !profile.emails || profile.emails.length === 0)
-			done(null, false);
+	}));
+}
 
-		let email = profile!.emails![0].value;
-		let user = await User.findOne({"email": email});
-		let isAdmin = false;
-		if (config && config.admins.indexOf(email) !== -1) {
-			isAdmin = true;
-			if (!user || !user.admin)
-				console.info(`Adding new admin: ${email}`);
-		}
-		if (!user) {
-			user = new User({
-				"email": email,
-				"name": profile.displayName,
-				"facebookData": {
-					"id": profile.id
-				},
-				admin: isAdmin
-			});
-			await user.save();
-			done(null, user);
-		}
-		else {
-			if (!user.facebookData.id) {
-				user.facebookData.id = profile.id;
-			}
-			if (!user.admin && isAdmin) {
-				user.admin = true;
-			}
-			await user.save();
-			done(null, user);
-		}
-	}
-));
+useLoginStrategy(GitHubStrategy, "githubData", {
+	clientID: GITHUB_CLIENT_ID,
+	clientSecret: GITHUB_CLIENT_SECRET,
+	callbackURL: `${BASE_URL}/${GITHUB_CALLBACK_HREF}`
+});
+useLoginStrategy(GoogleStrategy, "googleData", {
+	clientID: GOOGLE_CLIENT_ID,
+	clientSecret: GOOGLE_CLIENT_SECRET,
+	callbackURL: `${BASE_URL}/${GOOGLE_CALLBACK_HREF}`
+});
+useLoginStrategy(FacebookStrategy, "facebookData", {
+	clientID: FACEBOOK_CLIENT_ID,
+	clientSecret: FACEBOOK_CLIENT_SECRET,
+	callbackURL: `${BASE_URL}/${FACEBOOK_CALLBACK_HREF}`,
+	profileFields: ["id", "displayName", "email"]
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 export let authRoutes = express.Router();
 
-authRoutes.get("/github", passport.authenticate("github", { scope: [ "user:email" ] }));
-authRoutes.get("/github/callback", passport.authenticate("github", { failureRedirect: "/login" }), (request, response) => {
-	// Successful authentication, redirect home
-	response.redirect("/");
-});
+function addAuthenticationRoute(serviceName: string, scope: string[]) {
+	authRoutes.get(`/${serviceName}`, passport.authenticate(serviceName, { scope: scope }));
+	authRoutes.get(`/${serviceName}/callback`, passport.authenticate(serviceName, { failureRedirect: "/login" }), (request, response) => {
+		// Successful authentication, redirect home
+		response.redirect("/");
+	});
+}
 
-authRoutes.get("/google", passport.authenticate("google", { scope: ["email"] }));
-authRoutes.get("/google/callback", passport.authenticate("google", { failureRedirect: "/login" }), (request, response) => {
-	// Successful authentication, redirect home
-	response.redirect("/");
-});
-
-authRoutes.get("/facebook", passport.authenticate("facebook", { scope: [ "email" ] }));
-authRoutes.get("/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login" }), (request, response) => {
-	// Successful authentication, redirect home
-	response.redirect("/");
-});
+addAuthenticationRoute("github", ["user:email"]);
+addAuthenticationRoute("google", ["email"]);
+addAuthenticationRoute("facebook", ["email"]);
 
 authRoutes.all("/logout", (request, response) => {
 	request.logout();
