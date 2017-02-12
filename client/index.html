@@ -12,26 +12,8 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 	</head>
 	<body>
-		<div class="container">
-			<div class="row">
-				<aside id="sidebar" class="col-3">
-					<p>{{user.name}} ({{user.email}})</p>
-					
-					<a href="/">Dashboard</a>
-					<a href="#">Application</a>
-					{{#if user.accepted}}
-						<a href="#">Confirmation</a>
-					{{/if}}
-					<a href="#">Team</a>
-					{{#if user.admin}}
-						<a href="#">Admin</a>
-					{{/if}}
-					<a href="/auth/logout">Log out</a>
-				</aside>
-				<main class="col-9">
-					<h1 class="center">Dashboard</h1>
-				</main>
-			</div>
-		</div>
+		{{#> sidebar}}
+			<h1 class="center">Dashboard</h1>
+		{{/sidebar}}
 	</body>
 </html>

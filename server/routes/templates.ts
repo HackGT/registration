@@ -28,6 +28,7 @@ Handlebars.registerHelper("ifCond", function(v1, v2, options) {
 	}
 	return options.inverse(this);
 });
+Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
