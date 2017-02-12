@@ -37,6 +37,7 @@
     "morgan": "^1.8.0",
     "multer": "^1.2.1",
     "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
     "passport-github2": "^0.1.10",
     "serve-static": "^1.11.1"
   },
@@ -56,6 +57,7 @@
     "@types/multer": "0.0.32",
     "@types/node": "^7.0.0",
     "@types/passport": "^0.3.3",
+    "@types/passport-facebook": "^2.1.1",
     "@types/qwest": "^1.7.28",
     "@types/serve-static": "^1.7.31",
     "@types/supertest": "^2.0.0",

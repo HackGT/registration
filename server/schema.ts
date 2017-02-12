@@ -12,7 +12,11 @@ export interface Config {
 		github: {
 			id: string;
 			secret: string;
-		}
+		};
+		facebook: {
+			id: string;
+			secret: string;
+		};
 	},
 	server: {
 		isProduction: boolean;
@@ -27,10 +31,13 @@ export interface IUser {
 	email: string;
 	name?: string;
 
-	githubData?: {
-		id: string;
-		username: string;
-		profileUrl: string;	
+	githubData: {
+		id?: string;
+		username?: string;
+		profileUrl?: string;	
+	};
+	facebookData: {
+		id?: string;
 	};
 
 	auth_keys: string[];
@@ -51,6 +58,9 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		id: String,
 		username: String,
 		profileUrl: String
+	},
+	facebookData: {
+		id: String
 	},
 
 	auth_keys: [String],

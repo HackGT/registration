@@ -4,6 +4,10 @@
 		"github": {
 			"id": "",
 			"secret": ""
+		},
+		"facebook": {
+			"id": "",
+			"secret": ""
 		}
 	},
 	"server": {
