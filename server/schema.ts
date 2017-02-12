@@ -77,6 +77,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 // Handlebars templates
 export interface IIndexTemplate {
 	siteTitle: string;
+	user: IUser;
 }
 export interface ILoginTemplate {
 	siteTitle: string;

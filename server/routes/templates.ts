@@ -31,7 +31,8 @@ Handlebars.registerHelper("ifCond", function(v1, v2, options) {
 
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
-		siteTitle: "HackGT High School"
+		siteTitle: "HackGT High School",
+		user: request.user
 	};
 	response.send(indexTemplate(templateData));
 });
