@@ -34,14 +34,14 @@ const BASE_URL: string = (config && config.server.isProduction) ? "https://regis
 const GITHUB_CLIENT_ID: string | null = process.env.GITHUB_CLIENT_ID || (config && config.secrets.github.id);
 const GITHUB_CLIENT_SECRET: string | null = process.env.GITHUB_CLIENT_SECRET || (config && config.secrets.github.secret);
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-	throw new Error("GitHub client ID or secret not configured in secrets.json or environment variables");
+	throw new Error("GitHub client ID or secret not configured in config.json or environment variables");
 }
 const GITHUB_CALLBACK_HREF: string = "auth/github/callback";
 
 const FACEBOOK_CLIENT_ID: string | null = process.env.FACEBOOK_CLIENT_ID || (config && config.secrets.facebook.id);
 const FACEBOOK_CLIENT_SECRET: string | null = process.env.FACEBOOK_CLIENT_SECRET || (config && config.secrets.facebook.secret);
 if (!FACEBOOK_CLIENT_ID || !FACEBOOK_CLIENT_SECRET) {
-	throw new Error("Facebook client ID or secret not configured in secrets.json or environment variables");
+	throw new Error("Facebook client ID or secret not configured in config.json or environment variables");
 }
 const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 
