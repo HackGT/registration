@@ -17,7 +17,8 @@ import {
 
 // Passport authentication
 import {app} from "../app";
-const GitHubStrategy = require("passport-github2").Strategy; // No type definitions available yet for this module
+const GitHubStrategy = require("passport-github2").Strategy; // No type definitions available yet for this module (or for Google)
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 import {Strategy as FacebookStrategy} from "passport-facebook";
 
 let config: Config | null = null;
@@ -31,6 +32,7 @@ catch (err) {
 
 const BASE_URL: string = (config && config.server.isProduction) ? "https://registration.hack.gt" : `http://localhost:${PORT}`;
 
+// GitHub
 const GITHUB_CLIENT_ID: string | null = process.env.GITHUB_CLIENT_ID || (config && config.secrets.github.id);
 const GITHUB_CLIENT_SECRET: string | null = process.env.GITHUB_CLIENT_SECRET || (config && config.secrets.github.secret);
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
@@ -38,6 +40,15 @@ if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
 }
 const GITHUB_CALLBACK_HREF: string = "auth/github/callback";
 
+// Google
+const GOOGLE_CLIENT_ID: string | null = process.env.GOOGLE_CLIENT_ID || (config && config.secrets.google.id);
+const GOOGLE_CLIENT_SECRET: string | null = process.env.GOOGLE_CLIENT_SECRET || (config && config.secrets.google.secret);
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+	throw new Error("Google client ID or secret not configured in config.json or environment variables");
+}
+const GOOGLE_CALLBACK_HREF: string = "auth/google/callback";
+
+// Facebook
 const FACEBOOK_CLIENT_ID: string | null = process.env.FACEBOOK_CLIENT_ID || (config && config.secrets.facebook.id);
 const FACEBOOK_CLIENT_SECRET: string | null = process.env.FACEBOOK_CLIENT_SECRET || (config && config.secrets.facebook.secret);
 if (!FACEBOOK_CLIENT_ID || !FACEBOOK_CLIENT_SECRET) {
@@ -114,6 +125,45 @@ passport.use(new GitHubStrategy({
 		}
 	}
 ));
+passport.use(new GoogleStrategy({
+		clientID: GOOGLE_CLIENT_ID,
+		clientSecret: GOOGLE_CLIENT_SECRET,
+		callbackURL: `${BASE_URL}/${GOOGLE_CALLBACK_HREF}`
+	},
+	async (accessToken, refreshToken, profile, done) => {
+		let email = profile.emails[0].value;
+		let user = await User.findOne({"email": email});
+		let isAdmin = false;
+		if (config && config.admins.indexOf(email) !== -1) {
+			isAdmin = true;
+			if (!user || !user.admin)
+				console.info(`Adding new admin: ${email}`);
+		}
+		if (!user) {
+			user = new User({
+				"email": email,
+				"name": profile.displayName,
+				"googleData": {
+					"id": profile.id
+				},
+				auth_keys: [],
+				admin: isAdmin
+			});
+			await user.save();
+			done(null, user);
+		}
+		else {
+			if (!user.googleData.id) {
+				user.googleData.id = profile.id;
+			}
+			if (!user.admin && isAdmin) {
+				user.admin = true;
+			}
+			await user.save();
+			done(null, user);
+		}
+	}
+));
 passport.use(new FacebookStrategy({
 		clientID: FACEBOOK_CLIENT_ID,
 		clientSecret: FACEBOOK_CLIENT_SECRET,
@@ -165,6 +215,12 @@ export let authRoutes = express.Router();
 
 authRoutes.get("/github", passport.authenticate("github", { scope: [ "user:email" ] }));
 authRoutes.get("/github/callback", passport.authenticate("github", { failureRedirect: "/login" }), (request, response) => {
+	// Successful authentication, redirect home
+	response.redirect("/");
+});
+
+authRoutes.get("/google", passport.authenticate("google", { scope: ["email"] }));
+authRoutes.get("/google/callback", passport.authenticate("google", { failureRedirect: "/login" }), (request, response) => {
 	// Successful authentication, redirect home
 	response.redirect("/");
 });

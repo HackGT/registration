@@ -13,6 +13,10 @@ export interface Config {
 			id: string;
 			secret: string;
 		};
+		google: {
+			id: string;
+			secret: string;
+		}
 		facebook: {
 			id: string;
 			secret: string;
@@ -36,6 +40,9 @@ export interface IUser {
 		username?: string;
 		profileUrl?: string;	
 	};
+	googleData: {
+		id?: string;
+	};
 	facebookData: {
 		id?: string;
 	};
@@ -58,6 +65,9 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		id: String,
 		username: String,
 		profileUrl: String
+	},
+	googleData: {
+		id: String
 	},
 	facebookData: {
 		id: String

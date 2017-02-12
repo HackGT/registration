@@ -5,6 +5,10 @@
 			"id": "",
 			"secret": ""
 		},
+		"google": {
+			"id": "",
+			"secret": ""
+		},
 		"facebook": {
 			"id": "",
 			"secret": ""
