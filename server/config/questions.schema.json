@@ -12,10 +12,11 @@
                         "type": "string",
                         "enum": [
                             "text",
-                            "phone-number",
+                            "tel",
                             "date",
                             "url",
-                            "file"
+                            "file",
+                            "textarea"
                         ]
                     },
                     "label": {
@@ -23,6 +24,9 @@
                     },
                     "placeholder": {
                         "type": "string"
+                    },
+                    "required": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -53,6 +57,9 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "required": {
+                        "type": "boolean"
                     }
                 },
                 "required": [

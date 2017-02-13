@@ -3,24 +3,37 @@
 	<head>
 		<title>Login - {{siteTitle}}</title>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-		<!--<meta name="theme-color" content="#242424"/>-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<link rel="stylesheet" href="/node_modules/material-components-web/dist/material-components-web.css" />
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700" />
-		<!--<link rel="stylesheet" href="/css/default.css" />-->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
+		<link rel="stylesheet" href="/css/login.css" />
+		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 	</head>
 	<body>
-		<h1>Login</h1>
-		
-		<a href="/auth/github">Log in with GitHub</a>
-		<br />
-		<a href="/auth/google">Log in with Google</a>
-		<br />
-		<a href="/auth/facebook">Log in with Facebook</a>
+		<div class="container">
+			<h1 class="center">Login</h1>
 
-		<script src="/node_modules/material-components-web/dist/material-components-web.js"></script>
+			<div id="logins" class="row text-center">
+				<div class="col-4">
+					<a class="github btn" href="/auth/github">
+						<i class="fa fa-github" aria-hidden="true"></i>
+						Log in with GitHub
+					</a>
+				</div>
+				<div class="col-4">
+					<a class="google btn" href="/auth/google">
+						<i class="fa fa-google" aria-hidden="true"></i>
+						Log in with Google
+					</a>
+				</div>
+				<div class="col-4">
+					<a class="facebook btn" href="/auth/facebook">
+						<i class="fa fa-facebook-official" aria-hidden="true"></i>
+						Log in with Facebook
+					</a>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>

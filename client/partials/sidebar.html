@@ -1,0 +1,21 @@
+<div class="container">
+	<aside id="sidebar">
+		<h1>{{siteTitle}}</h1>
+		<nav id="sidebar-nav">
+			<a href="/">Dashboard</a>
+			<a href="/apply">Application</a>
+			{{#if user.accepted}}
+				<a href="#">Confirmation</a>
+			{{/if}}
+			<a href="#">Team</a>
+			{{#if user.admin}}
+				<a href="#">Admin</a>
+			{{/if}}
+			<a href="/auth/logout">Log out</a>
+		</nav>
+		<p>{{user.name}} ({{user.email}})</p>
+	</aside>
+	<main class="col-9">
+		{{> @partial-block }}
+	</main>
+</div>

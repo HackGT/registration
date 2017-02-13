@@ -3,20 +3,17 @@
 	<head>
 		<title>{{siteTitle}}</title>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-		<!--<meta name="theme-color" content="#242424"/>-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<link rel="stylesheet" href="/node_modules/material-components-web/dist/material-components-web.css" />
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700" />
-		<!--<link rel="stylesheet" href="/css/default.css" />-->
+		<link rel="stylesheet" href="/css/main.css" />
+		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 	</head>
 	<body>
-		<h1>Main page</h1>
-
-		<a href="/auth/logout">Log out</a>
-
-		<script src="/node_modules/material-components-web/dist/material-components-web.js"></script>
+		{{#> sidebar}}
+			<h1 class="center">Dashboard</h1>
+		{{/sidebar}}
 	</body>
 </html>

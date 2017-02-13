@@ -14,11 +14,12 @@ import {
 	IIndexTemplate, ILoginTemplate, 
 	IRegisterTemplate
 } from "../schema";
+const SITE_NAME = "HackGT Catalyst";
 
 export let templateRoutes = express.Router();
 
 // Load and compile Handlebars templates
-let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.html", "register.html"].map(file => {
+let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.html", "application.html"].map(file => {
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
@@ -28,22 +29,28 @@ Handlebars.registerHelper("ifCond", function(v1, v2, options) {
 	}
 	return options.inverse(this);
 });
+Handlebars.registerHelper("required", function (isRequired: boolean) {
+	// Adds the "required" form attribute if the element requests to be required
+	return isRequired ? "required" : "";
+});
+Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
-		siteTitle: "HackGT High School"
+		siteTitle: SITE_NAME,
+		user: request.user
 	};
 	response.send(indexTemplate(templateData));
 });
 
 templateRoutes.route("/login").get((request, response) => {
 	let templateData: ILoginTemplate = {
-		siteTitle: "HackGT High School"
+		siteTitle: SITE_NAME
 	};
 	response.send(loginTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(async (request, response) => {
+templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
 	let questionData: any[];
 	try {
 		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
@@ -63,8 +70,9 @@ templateRoutes.route("/apply").get(async (request, response) => {
 		return question;
 	});
 	let templateData: IRegisterTemplate = {
-		siteTitle: "HackGT High School",
-		questionData: questionData 
+		siteTitle: SITE_NAME,
+		questionData: questionData,
+		user: request.user
 	};
 	response.send(registerTemplate(templateData));
 });

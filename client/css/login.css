@@ -1,0 +1,19 @@
+h1 {
+	margin-bottom: 64px;
+}
+a > i {
+	margin-right: 10px;
+	transform: scale(1.5);
+}
+a.github {
+	color: white;
+	background-color: #444444;
+}
+a.google {
+	color: white;
+	background-color: #4285F4;
+}
+a.facebook {
+	color: white;
+	background-color: #3b5998;
+}
