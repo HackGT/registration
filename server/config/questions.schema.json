@@ -15,7 +15,8 @@
                             "phone-number",
                             "date",
                             "url",
-                            "file"
+                            "file",
+                            "textarea"
                         ]
                     },
                     "label": {

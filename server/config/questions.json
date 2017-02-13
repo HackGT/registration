@@ -52,5 +52,11 @@
             "Hacker",
             "Mentor"
         ]
+    },
+    {
+        "name": "essay",
+        "type": "textarea",
+        "label": "Write some stuff",
+        "placeholder": "Example placeholder"
     }
 ]

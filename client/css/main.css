@@ -60,3 +60,7 @@ body, .row {
 #sidebar a:focus {
 	outline: none;
 }
+#sidebar p {
+	overflow: hidden;
+    text-overflow: ellipsis;
+}

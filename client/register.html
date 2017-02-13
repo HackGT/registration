@@ -36,7 +36,11 @@
 						{{/ifCond}}
 					{{else}}
 						<label for="form-{{this.name}}">{{this.label}}</label>
-						<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" />
+						{{#ifCond this.type "textarea"}}
+							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}"></textarea>
+						{{else}}
+							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" />
+						{{/ifCond}}
 					{{/if}}
 					<br />
 				{{/each}}
