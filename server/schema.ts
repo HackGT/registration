@@ -5,17 +5,47 @@ import * as path from "path";
 
 import {mongoose} from "./common";
 
+// Secrets JSON file schema
+export interface Config {
+	secrets: {
+		session: string;
+		github: {
+			id: string;
+			secret: string;
+		};
+		google: {
+			id: string;
+			secret: string;
+		}
+		facebook: {
+			id: string;
+			secret: string;
+		};
+	},
+	server: {
+		isProduction: boolean;
+	},
+	admins: string[]
+}
+
 // We need to find some way of integrating these static types with a config that
 // can be adapted with different questions and data in a JSON schema file
 export interface IUser {
+	_id: string;
 	email: string;
 	name?: string;
 
-	login: {
-		hash: string;
-		salt: string;
+	githubData: {
+		id?: string;
+		username?: string;
+		profileUrl?: string;	
 	};
-	auth_keys: string[];
+	googleData: {
+		id?: string;
+	};
+	facebookData: {
+		id?: string;
+	};
 
 	admin?: boolean;
 }
@@ -29,17 +59,17 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	},
 	name: String,
 
-	login: {
-		hash: {
-			type: String,
-			required: true,
-		},
-		salt: {
-			type: String,
-			required: true,
-		}
+	githubData: {
+		id: String,
+		username: String,
+		profileUrl: String
 	},
-	auth_keys: [String],
+	googleData: {
+		id: String
+	},
+	facebookData: {
+		id: String
+	},
 
 	admin: Boolean
 }));

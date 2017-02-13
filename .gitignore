@@ -39,3 +39,4 @@ jspm_packages
 *.js
 *.js.map
 .vscode/
+server/config/config.json

@@ -1,0 +1,21 @@
+{
+	"secrets": {
+		"session": "",
+		"github": {
+			"id": "",
+			"secret": ""
+		},
+		"google": {
+			"id": "",
+			"secret": ""
+		},
+		"facebook": {
+			"id": "",
+			"secret": ""
+		}
+	},
+	"server": {
+		"isProduction": true
+	},
+	"admins": ["example@example.com"]
+}
