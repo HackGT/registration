@@ -31,7 +31,7 @@
 							<fieldset>
 								{{#each this.options}}
 									<div>
-										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" />
+										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} />
 										<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
 									</div>
 								{{/each}}
@@ -40,9 +40,9 @@
 					{{else}}
 						<label for="form-{{this.name}}">{{this.label}}</label>
 						{{#ifCond this.type "textarea"}}
-							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}"></textarea>
+							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}></textarea>
 						{{else}}
-							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" />
+							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />
 						{{/ifCond}}
 					{{/if}}
 					<br />

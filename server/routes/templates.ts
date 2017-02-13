@@ -29,6 +29,10 @@ Handlebars.registerHelper("ifCond", function(v1, v2, options) {
 	}
 	return options.inverse(this);
 });
+Handlebars.registerHelper("required", function (isRequired: boolean) {
+	// Adds the "required" form attribute if the element requests to be required
+	return isRequired ? "required" : "";
+});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {

@@ -2,12 +2,14 @@
     {
         "name": "name",
         "type": "text",
-        "label": "Full Name"
+        "label": "Full Name",
+        "required": true
     },
     {
         "name": "phonenumber",
         "type": "tel",
-        "label": "Cell Number"
+        "label": "Cell Number",
+        "required": true
     },
     {
         "name": "dietaryrestrictions",
@@ -18,7 +20,8 @@
     {
         "name": "birthday",
         "type": "date",
-        "label": "Birthday"
+        "label": "Birthday",
+        "required": true
     },
     {
         "name": "github",
@@ -42,7 +45,8 @@
         "options": [
             "hacker",
             "mentor"
-        ]
+        ],
+        "required": true
     },
     {
         "name": "role2",
@@ -51,12 +55,14 @@
         "options": [
             "Hacker",
             "Mentor"
-        ]
+        ],
+        "required": true
     },
     {
         "name": "essay",
         "type": "textarea",
         "label": "Write some stuff",
-        "placeholder": "Example placeholder"
+        "placeholder": "Example placeholder",
+        "required": true
     }
 ]

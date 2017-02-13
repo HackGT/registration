@@ -57,6 +57,9 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "required": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
