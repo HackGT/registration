@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import {mongoose} from "./common";
+import {Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export interface Config {
@@ -84,6 +85,6 @@ export interface ILoginTemplate {
 }
 export interface IRegisterTemplate {
 	siteTitle: string;
-	questionData: any; // Provide a type for this (generated from schema?)
+	questionData: Questions;
 	user: IUser;
 }

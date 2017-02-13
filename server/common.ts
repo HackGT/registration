@@ -109,8 +109,10 @@ export function readFileAsync (filename: string): Promise<string> {
 // JSON schema validator
 //
 import * as ajv from "ajv";
-export async function validateSchema (questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<any> {
-	let questions, schema;
+import {Questions} from "./config/questions.schema";
+export async function validateSchema (questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<Questions> {
+	let questions: Questions;
+	let schema: any;
 	try {
 		questions = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
 		schema = JSON.parse(await readFileAsync(path.resolve(__dirname, schemaFile)));

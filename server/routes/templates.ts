@@ -14,6 +14,7 @@ import {
 	IIndexTemplate, ILoginTemplate, 
 	IRegisterTemplate
 } from "../schema";
+import {Questions} from "../config/questions.schema";
 const SITE_NAME = "HackGT Catalyst";
 
 export let templateRoutes = express.Router();
@@ -51,7 +52,7 @@ templateRoutes.route("/login").get((request, response) => {
 });
 
 templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
-	let questionData: any[];
+	let questionData: Questions;
 	try {
 		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	}

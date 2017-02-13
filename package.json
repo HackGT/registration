@@ -5,6 +5,7 @@
   "main": "server/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node node_modules/json-schema-to-typescript/dist/cli.js server/config/questions.schema.json && tsc",
     "start": "node server/app.js"
   },
   "author": {
@@ -32,6 +33,7 @@
     "express-session": "^1.15.1",
     "git-rev-sync": "^1.8.0",
     "handlebars": "^4.0.6",
+    "json-schema-to-typescript": "^3.1.0",
     "material-components-web": "^0.2.0",
     "mongoose": "^4.7.6",
     "morgan": "^1.8.0",
