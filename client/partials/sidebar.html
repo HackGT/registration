@@ -1,8 +1,7 @@
 <div class="container">
-	<div class="row">
-		<aside id="sidebar" class="col-3">
-			<p>{{user.name}} ({{user.email}})</p>
-			
+	<aside id="sidebar">
+		<h1>{{siteTitle}}</h1>
+		<nav id="sidebar-nav">
 			<a href="/">Dashboard</a>
 			<a href="/apply">Application</a>
 			{{#if user.accepted}}
@@ -13,9 +12,10 @@
 				<a href="#">Admin</a>
 			{{/if}}
 			<a href="/auth/logout">Log out</a>
-		</aside>
-		<main class="col-9">
-			{{> @partial-block }}
-		</main>
-	</div>
+		</nav>
+		<p>{{user.name}} ({{user.email}})</p>
+	</aside>
+	<main class="col-9">
+		{{> @partial-block }}
+	</main>
 </div>

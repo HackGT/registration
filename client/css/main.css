@@ -5,34 +5,65 @@ body, .row {
 .container {
 	margin-bottom: 0;
 }
+main {
+	margin-bottom: 40px;
+}
 
-#sidebar {
+#sidebar > h1 {
+	margin: 15px 0 0 0;
+	text-align: center;
+	font-size: 2.5rem;
+}
+#sidebar >  p {
+	margin: 10px 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#sidebar-nav {
+	margin: 15px 0;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	justify-content: center;
 
 	color: #333030;
 	background: #fff;
-	border-right: 1px solid #333030;
 	font-family: inherit;
 	font-weight: 500;
-	height: 100vh;
 	overflow: hidden;
 
 	box-sizing: border-box;
+}
+@media screen and (max-width: 768px) {
+	#sidebar {
+		border-bottom: 1px solid #333030;
+		padding-bottom: 15px;
+	}
+	#sidebar-nav {
+		flex-direction: column;
+	}
+	#sidebar-nav > * {
+		border-right: none !important;
+	}
+}
+#sidebar-nav > * {
+	border-right: 1px solid #333030;
+	height: 20px;
+}
+#sidebar-nav > *:last-child {
+	border-right: none;
 }
 #sidebar a, #sidebar {
 	text-align: center;
 	font-family: "Quicksand";
 	color: #333030;
 }
-#sidebar a {
+#sidebar-nav a {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 40px;
 	
-	padding: 12px;
+	padding: 12px 20px;
 	cursor: pointer;
 	user-select: none;
 
@@ -45,22 +76,18 @@ body, .row {
 	text-transform: uppercase;
 	font-size: 1.8rem;
 }
-#sidebar a:hover {
+#sidebar-nav a:hover {
 	-webkit-transition: all 60ms ease;
 	transition: all 60ms ease;
 	opacity: .85;
 }
-#sidebar a:active {
+#sidebar-nav a:active {
 	-webkit-transition: all 60ms ease;
 	transition: all 60ms ease;
 	-webkit-transform: scale(0.97);
 			transform: scale(0.97);
 	opacity: .75;
 }
-#sidebar a:focus {
+#sidebar-nav a:focus {
 	outline: none;
-}
-#sidebar p {
-	overflow: hidden;
-    text-overflow: ellipsis;
 }

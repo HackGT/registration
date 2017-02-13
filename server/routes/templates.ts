@@ -14,6 +14,7 @@ import {
 	IIndexTemplate, ILoginTemplate, 
 	IRegisterTemplate
 } from "../schema";
+const SITE_NAME = "HackGT Catalyst";
 
 export let templateRoutes = express.Router();
 
@@ -32,7 +33,7 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
-		siteTitle: "HackGT High School",
+		siteTitle: SITE_NAME,
 		user: request.user
 	};
 	response.send(indexTemplate(templateData));
@@ -40,7 +41,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 
 templateRoutes.route("/login").get((request, response) => {
 	let templateData: ILoginTemplate = {
-		siteTitle: "HackGT High School"
+		siteTitle: SITE_NAME
 	};
 	response.send(loginTemplate(templateData));
 });
@@ -65,7 +66,7 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 		return question;
 	});
 	let templateData: IRegisterTemplate = {
-		siteTitle: "HackGT High School",
+		siteTitle: SITE_NAME,
 		questionData: questionData,
 		user: request.user
 	};
