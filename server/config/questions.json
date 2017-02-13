@@ -6,7 +6,7 @@
     },
     {
         "name": "phonenumber",
-        "type": "phone-number",
+        "type": "tel",
         "label": "Cell Number"
     },
     {

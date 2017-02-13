@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700" />
 		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/application.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 	</head>
@@ -26,11 +27,13 @@
 								{{/each}}
 							</select>
 						{{else}}
+							<label>{{this.label}}</label>
 							<fieldset>
-								<legend>{{this.label}}</legend>
 								{{#each this.options}}
-									<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" />
-									<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
+									<div>
+										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" />
+										<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
+									</div>
 								{{/each}}
 							</fieldset>
 						{{/ifCond}}
@@ -44,6 +47,7 @@
 					{{/if}}
 					<br />
 				{{/each}}
+				<input type="submit" class="center" value="Submit" />
 			</form>
 		{{/sidebar}}
 	</body>

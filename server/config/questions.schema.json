@@ -12,7 +12,7 @@
                         "type": "string",
                         "enum": [
                             "text",
-                            "phone-number",
+                            "tel",
                             "date",
                             "url",
                             "file",
@@ -24,6 +24,9 @@
                     },
                     "placeholder": {
                         "type": "string"
+                    },
+                    "required": {
+                        "type": "boolean"
                     }
                 },
                 "required": [

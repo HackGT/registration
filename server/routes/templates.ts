@@ -18,7 +18,7 @@ import {
 export let templateRoutes = express.Router();
 
 // Load and compile Handlebars templates
-let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.html", "register.html"].map(file => {
+let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.html", "application.html"].map(file => {
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
