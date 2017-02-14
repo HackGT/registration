@@ -57,7 +57,7 @@ userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), 
 			// Required field not filled in
 			errored = true;
 			response.status(400).json({
-				"error": `Required field '${question.name}' not present`
+				"error": `'${question.label}' is a required field`
 			});
 			return null;
 		}

@@ -34,7 +34,6 @@
     "git-rev-sync": "^1.8.0",
     "handlebars": "^4.0.6",
     "json-schema-to-typescript": "^3.1.0",
-    "material-components-web": "^0.2.0",
     "mongoose": "^4.7.6",
     "morgan": "^1.8.0",
     "multer": "^1.2.1",
@@ -42,10 +41,10 @@
     "passport-facebook": "^2.1.1",
     "passport-github2": "^0.1.10",
     "passport-google-oauth20": "^1.0.0",
-    "serve-static": "^1.11.1"
+    "serve-static": "^1.11.1",
+    "sweetalert2": "^6.4.1"
   },
   "devDependencies": {
-    "@types/ajv": "^1.0.0",
     "@types/body-parser": "0.0.33",
     "@types/chai": "^3.4.34",
     "@types/compression": "0.0.33",

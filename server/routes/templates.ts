@@ -36,6 +36,7 @@ Handlebars.registerHelper("required", function (isRequired: boolean) {
 });
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
+templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
 		siteTitle: SITE_NAME,

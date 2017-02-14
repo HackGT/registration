@@ -91,3 +91,7 @@ main {
 #sidebar-nav a:focus {
 	outline: none;
 }
+
+.swal2-modal {
+	font-family: "Open Sans";
+}
