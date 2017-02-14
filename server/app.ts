@@ -39,6 +39,8 @@ app.use("/auth", authRoutes);
 
 let apiRouter = express.Router();
 // API routes go here
+import {userRoutes} from "./routes/api/user";
+apiRouter.use("/user", userRoutes);
 
 app.use("/api", apiRouter);
 

@@ -16,7 +16,7 @@
 		{{#> sidebar}}
 			<h1 class="center">Apply</h1>
 			
-			<form method="POST" action="/apply">
+			<form method="POST" action="/api/user/application">
 				{{#each questionData}}
 					{{#if this.multi}}
 						{{#ifCond this.type "select"}}
