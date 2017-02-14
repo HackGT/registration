@@ -29,9 +29,6 @@
                     },
                     "required": {
                         "type": "boolean"
-                    },
-                    "multi": {
-                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -64,9 +61,6 @@
                         }
                     },
                     "required": {
-                        "type": "boolean"
-                    },
-                    "multi": {
                         "type": "boolean"
                     }
                 },

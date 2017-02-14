@@ -63,10 +63,10 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 	}
 	questionData = questionData.map(question => {
 		if (["checkbox", "radio", "select"].indexOf(question.type) !== -1) {
-			question.multi = true;
+			question["multi"] = true;
 		}
 		else {
-			question.multi = false;
+			question["multi"] = false;
 		}
 		return question;
 	});
