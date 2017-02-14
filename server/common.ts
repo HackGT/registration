@@ -9,6 +9,7 @@ import * as os from "os";
 //
 export const PORT = parseInt(process.env.PORT) || 3000;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
+export const UPLOAD_ROOT = path.resolve(__dirname, "../uploads"); // Should exist already
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
 export const VERSION_HASH = require("git-rev-sync").short();
 export const COOKIE_OPTIONS = {
@@ -49,16 +50,16 @@ export let uploadHandler = multer({
 			cb(null!, os.tmpdir());
 		},
 		filename: function (req, file, cb) {
-			cb(null!, `${file.fieldname}-${Date.now()}.${path.extname(file.originalname)}`);
+			cb(null!, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
 		}
 	}),
 	"limits": {
 		"fileSize": 50000000, // 50 MB
-		"files": 1
+		"files": 10 // Reasonable limit (real number is determined by the number of file questions in the config)
 	}
 });
 // For API endpoints
-export async function authenticateWithReject (request: express.Request, response: express.Response, next: express.NextFunction) {
+export function authenticateWithReject (request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
@@ -67,16 +68,16 @@ export async function authenticateWithReject (request: express.Request, response
 	else {
 		next();
 	}
-};
+}
 // For directly user facing endpoints
-export async function authenticateWithRedirect (request: express.Request, response: express.Response, next: express.NextFunction) {
+export function authenticateWithRedirect (request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
 		response.redirect("/login");
 	}
 	else {
 		next();
 	}
-};
+}
 
 //
 // Promisified APIs for use with async / await

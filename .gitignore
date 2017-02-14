@@ -39,5 +39,6 @@ jspm_packages
 *.js
 *.js.map
 .vscode/
+uploads/
 server/config/config.json
 server/config/questions\.schema\.d\.ts

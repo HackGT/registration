@@ -16,7 +16,7 @@
 		{{#> sidebar}}
 			<h1 class="center">Apply</h1>
 			
-			<form method="POST" action="/api/user/application">
+			<form method="post" action="/api/user/{{user._id}}/application" enctype="multipart/form-data">
 				{{#each questionData}}
 					{{#if this.multi}}
 						{{#ifCond this.type "select"}}
