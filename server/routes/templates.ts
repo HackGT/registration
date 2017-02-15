@@ -11,7 +11,7 @@ import {
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
-	IIndexTemplate, ILoginTemplate, 
+	IIndexTemplate, ILoginTemplate, IAdminTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate
 } from "../schema";
 import {QuestionBranches, Questions} from "../config/questions.schema";
@@ -19,7 +19,7 @@ import {QuestionBranches, Questions} from "../config/questions.schema";
 export let templateRoutes = express.Router();
 
 // Load and compile Handlebars templates
-let [indexTemplate, loginTemplate, preregisterTemplate, registerTemplate] = ["index.html", "login.html", "preapplication.html", "application.html"].map(file => {
+let [indexTemplate, loginTemplate, preregisterTemplate, registerTemplate, adminTemplate] = ["index.html", "login.html", "preapplication.html", "application.html", "admin.html"].map(file => {
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
@@ -173,4 +173,16 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		questionData: questionData
 	};
 	response.send(registerTemplate(templateData));
+});
+
+templateRoutes.route("/admin").get(authenticateWithRedirect, (request, response) => {
+	let user = request.user as IUser;
+	if (!user.admin) {
+		response.redirect("/");
+	}
+	let templateData: IAdminTemplate = {
+		siteTitle: SITE_NAME,
+		user: user
+	};
+	response.send(adminTemplate(templateData));
 });

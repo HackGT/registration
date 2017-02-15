@@ -137,3 +137,4 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 }
+export interface IAdminTemplate extends ICommonTemplate {}
