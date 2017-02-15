@@ -5,10 +5,11 @@ declare let sweetAlert: any; // FUCK IT SHIP IT (sweetalert's type declaration f
 let form = document.querySelector("form")!;
 let submitButton = document.querySelector("form input[type=submit]")! as HTMLInputElement;
 submitButton.addEventListener("click", e => {
-	e.preventDefault(); // Don't let the browser submit the form on its own
+	if (!form.checkValidity())
+		return;
 	submitButton.disabled = true;
 
-	qwest.post(form.action, 
+	qwest.post(form.dataset["action"], 
 		new FormData(form)
 	).then(async () => {
 		await sweetAlert("Awesome!", "Your application has been saved. Feel free to come back here and edit it at any time.", "success");
