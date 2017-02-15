@@ -48,8 +48,9 @@ userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), 
 	}
 	let errored: boolean = false; // Used because .map() can't be broken out of
 	let rawData: (IFormItem | null)[] = questionData.map(question => {
-		if (errored)
+		if (errored) {
 			return null;
+		}
 		// (Hackily) redefines the type of request.files because the default type is incorrect for multer's .any() handler
 		let files: Express.Multer.File[] = (<any> request.files) as Express.Multer.File[];
 		
@@ -66,8 +67,9 @@ userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), 
 			"value": request.body[question.name] || files.find(file => file.fieldname === question.name)
 		};
 	});
-	if (errored)
+	if (errored) {
 		return;
+	}
 	try {
 		let data = rawData as IFormItem[]; // nulls are only inserted when an error has occurred
 		// Move files to permanent, requested location

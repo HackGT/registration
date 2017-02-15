@@ -5,8 +5,9 @@ declare let sweetAlert: any; // FUCK IT SHIP IT (sweetalert's type declaration f
 let form = document.querySelector("form")!;
 let submitButton = document.querySelector("form input[type=submit]")! as HTMLInputElement;
 submitButton.addEventListener("click", e => {
-	if (!form.checkValidity())
+	if (!form.checkValidity()) {
 		return;
+	}
 	submitButton.disabled = true;
 
 	qwest.post(form.dataset["action"], 
