@@ -3,14 +3,24 @@
 		<h1>{{siteTitle}}</h1>
 		<nav id="sidebar-nav">
 			<a href="/">Dashboard</a>
+			<span class="divider"></span>
+
 			<a href="/apply">Application</a>
+			<span class="divider"></span>
+			
 			{{#if user.accepted}}
 				<a href="#">Confirmation</a>
+				<span class="divider"></span>
 			{{/if}}
+			
 			<a href="#">Team</a>
+			<span class="divider"></span>
+			
 			{{#if user.admin}}
 				<a href="#">Admin</a>
+				<span class="divider"></span>
 			{{/if}}
+			
 			<a href="/auth/logout">Log out</a>
 		</nav>
 		<p>{{user.name}} ({{user.email}})</p>
