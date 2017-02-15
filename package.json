@@ -5,7 +5,7 @@
   "main": "server/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node node_modules/json-schema-to-typescript/dist/cli.js server/config/questions.schema.json && tsc",
+    "build": "node node_modules/json-schema-to-typescript/dist/cli.js server/config/questions.schema.json && ./node_modules/typescript/bin/tsc",
     "start": "node server/app.js"
   },
   "author": {
@@ -65,6 +65,7 @@
     "@types/supertest": "^2.0.0",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "typescript": "^2.1.6"
   }
 }
