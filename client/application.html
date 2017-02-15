@@ -25,7 +25,7 @@
 							<label for="form-{{this.name}}">{{this.label}}</label>
 							<select id="form-{{this.name}}" name="{{this.name}}">
 								{{#each this.options}}
-									<option>{{this}}</option>
+									<option {{selected ../this.selected @index}}>{{this}}</option>
 								{{/each}}
 							</select>
 						{{else}}
@@ -33,7 +33,7 @@
 							<fieldset>
 								{{#each this.options}}
 									<div>
-										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} />
+										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} {{checked ../this.selected @index}} />
 										<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
 									</div>
 								{{/each}}
@@ -42,9 +42,9 @@
 					{{else}}
 						<label for="form-{{this.name}}">{{this.label}}</label>
 						{{#ifCond this.type "textarea"}}
-							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}></textarea>
+							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}>{{this.value}}</textarea>
 						{{else}}
-							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />
+							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} value="{{this.value}}" />
 						{{/ifCond}}
 					{{/if}}
 					<br />
