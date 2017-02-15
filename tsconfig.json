@@ -9,7 +9,7 @@
          "target": "es5",
          "strictNullChecks": true,
          "lib": [
-             "es2015.promise", "es5", "dom"
+             "es2015.promise", "es6", "dom"
          ],
          "sourceMap": true
     }

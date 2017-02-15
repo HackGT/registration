@@ -74,7 +74,7 @@ app.use(session({
 	saveUninitialized: true
 }));
 passport.serializeUser<IUser, string>((user, done) => {
-	done(null, user._id);
+	done(null, user._id.toString());
 });
 passport.deserializeUser<IUser, string>((id, done) => {
 	User.findById(id, (err, user) => {
@@ -96,23 +96,33 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			user = new User({
 				"email": email,
 				"name": profile.displayName,
+
+				"githubData": {},
+				"googleData": {},
+				"facebookData": {},
+
+				"applied": false,
+				"accepted": false,
+				"attending": false,
+				"applicationData": [],
+
 				"admin": isAdmin
 			});
-			user[dataFieldName].id = profile.id;
+			user[dataFieldName]!.id = profile.id;
 			if (dataFieldName === "githubData") {
-				user[dataFieldName].username = profile.username;
-				user[dataFieldName].profileUrl = profile.profileUrl;
+				user[dataFieldName]!.username = profile.username;
+				user[dataFieldName]!.profileUrl = profile.profileUrl;
 			}
 			await user.save();
 			done(null, user);
 		}
 		else {
-			if (!user[dataFieldName].id) {
-				user[dataFieldName].id = profile.id;
+			if (!user[dataFieldName]!.id) {
+				user[dataFieldName]!.id = profile.id;
 			}
-			if (dataFieldName === "githubData" && (!user.githubData.username || !user.githubData.profileUrl)) {
-				user[dataFieldName].username = profile.username;
-				user[dataFieldName].profileUrl = profile.profileUrl;
+			if (dataFieldName === "githubData" && (!user.githubData!.username || !user.githubData!.profileUrl)) {
+				user[dataFieldName]!.username = profile.username;
+				user[dataFieldName]!.profileUrl = profile.profileUrl;
 			}
 			if (!user.admin && isAdmin) {
 				user.admin = true;

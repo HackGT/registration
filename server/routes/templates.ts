@@ -14,6 +14,7 @@ import {
 	IIndexTemplate, ILoginTemplate, 
 	IRegisterTemplate
 } from "../schema";
+import {Questions} from "../config/questions.schema";
 const SITE_NAME = "HackGT Catalyst";
 
 export let templateRoutes = express.Router();
@@ -33,8 +34,17 @@ Handlebars.registerHelper("required", function (isRequired: boolean) {
 	// Adds the "required" form attribute if the element requests to be required
 	return isRequired ? "required" : "";
 });
+Handlebars.registerHelper("checked", function (selected: boolean[], index: number) {
+	// Adds the "checked" form attribute if the element was checked previously
+	return selected[index] ? "checked" : "";
+});
+Handlebars.registerHelper("selected", function (selected: boolean[], index: number) {
+	// Adds the "selected" form attribute if the element was selected previously
+	return selected[index] ? "selected" : "";
+});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
+templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
 		siteTitle: SITE_NAME,
@@ -51,8 +61,10 @@ templateRoutes.route("/login").get((request, response) => {
 });
 
 templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
-	let questionData: any[];
+	let user = request.user as IUser;
+	let questionData: Questions;
 	try {
+		// Path is relative to common.ts, where validateSchema function is implemented
 		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	}
 	catch (err) {
@@ -61,12 +73,26 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 		return;
 	}
 	questionData = questionData.map(question => {
-		if (["checkbox", "radio", "select"].indexOf(question.type) !== -1) {
-			question.multi = true;
+		let savedValue = user.applicationData.find(item => item.name === question.name);
+		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
+			question["multi"] = true;
+			question["selected"] = question.options.map(option => {
+				if (savedValue && Array.isArray(savedValue.value)) {
+					return savedValue.value.indexOf(option) !== -1;
+				}
+				else if (savedValue !== undefined) {
+					return option === savedValue.value;
+				}
+				return false;
+			});
 		}
 		else {
-			question.multi = false;
+			question["multi"] = false;
 		}
+		if (question.type === "file") {
+			savedValue = undefined;
+		}
+		question["value"] = savedValue ? savedValue.value : "";
 		return question;
 	});
 	let templateData: IRegisterTemplate = {

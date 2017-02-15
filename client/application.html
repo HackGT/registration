@@ -7,23 +7,29 @@
 
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700" />
+		<link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css" />
 		<link rel="stylesheet" href="/css/main.css" />
 		<link rel="stylesheet" href="/css/application.css" />
-		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
+		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+		<script src="/js/application.js" defer></script>
 	</head>
 	<body>
 		{{#> sidebar}}
 			<h1 class="center">Apply</h1>
-			
-			<form method="POST" action="/apply">
+
+			<!--
+				Set data-action and not action so that verification of the form still occurs but the form is actually submitted via an XHR.
+				Running event.preventDefault() in the submit button's click handler also disables validation for some reason
+			-->
+			<form method="post" data-action="/api/user/{{user._id}}/application">
 				{{#each questionData}}
 					{{#if this.multi}}
 						{{#ifCond this.type "select"}}
 							<label for="form-{{this.name}}">{{this.label}}</label>
 							<select id="form-{{this.name}}" name="{{this.name}}">
 								{{#each this.options}}
-									<option>{{this}}</option>
+									<option {{selected ../this.selected @index}}>{{this}}</option>
 								{{/each}}
 							</select>
 						{{else}}
@@ -31,7 +37,7 @@
 							<fieldset>
 								{{#each this.options}}
 									<div>
-										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} />
+										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} {{checked ../this.selected @index}} />
 										<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
 									</div>
 								{{/each}}
@@ -40,9 +46,9 @@
 					{{else}}
 						<label for="form-{{this.name}}">{{this.label}}</label>
 						{{#ifCond this.type "textarea"}}
-							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}></textarea>
+							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}>{{this.value}}</textarea>
 						{{else}}
-							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />
+							<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} value="{{this.value}}" />
 						{{/ifCond}}
 					{{/if}}
 					<br />

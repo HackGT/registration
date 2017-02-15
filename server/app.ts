@@ -28,8 +28,9 @@ app.use(cookieParserInstance);
 // Check for number of admin users and warn if none
 (async () => {
 	let users = await User.find({"admin": true});
-	if (users.length !== 0)
+	if (users.length !== 0) {
 		return;
+	}
 	console.warn("No admin users are configured; admins can be added in config.json");
 })();
 
@@ -39,6 +40,8 @@ app.use("/auth", authRoutes);
 
 let apiRouter = express.Router();
 // API routes go here
+import {userRoutes} from "./routes/api/user";
+apiRouter.use("/user/:id", userRoutes);
 
 app.use("/api", apiRouter);
 
