@@ -75,8 +75,11 @@ type OAuthStrategyOptions = {
 	profileFields?: string[]
 };
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-	passport.use(new strategy(options, async (accessToken, refreshToken, profile, done) => {
-		let email = profile.emails[0].value;
+    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: passport.Profile & {profileUrl?: string}, done: (err: Error | null, user: IUserMongoose | false) => void) => {
+		let email: string = "";
+		if (profile.emails && profile.emails.length > 0) {
+			email = profile.emails[0].value;
+		}
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
 		if (config.admins.indexOf(email) !== -1) {
@@ -103,7 +106,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				"admin": isAdmin
 			});
 			user[dataFieldName]!.id = profile.id;
-			if (dataFieldName === "githubData") {
+			if (dataFieldName === "githubData" && profile.username && profile.profileUrl) {
 				user[dataFieldName]!.username = profile.username;
 				user[dataFieldName]!.profileUrl = profile.profileUrl;
 			}
@@ -118,12 +121,14 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			done(null, user);
 		}
 		else {
-			if (!user[dataFieldName]!.id) {
-				user[dataFieldName]!.id = profile.id;
+			if (!user[dataFieldName] || !user[dataFieldName]!.id) {
+				user[dataFieldName] = {
+					id: profile.id
+				};
 			}
-			if (dataFieldName === "githubData" && (!user.githubData!.username || !user.githubData!.profileUrl)) {
-				user[dataFieldName]!.username = profile.username;
-				user[dataFieldName]!.profileUrl = profile.profileUrl;
+			if (dataFieldName === "githubData" && (!user.githubData || !user.githubData.username || !user.githubData.profileUrl) && (profile.username && profile.profileUrl)) {
+				user.githubData!.username = profile.username;
+				user.githubData!.profileUrl = profile.profileUrl;
 			}
 			if (!user.admin && isAdmin) {
 				user.admin = true;

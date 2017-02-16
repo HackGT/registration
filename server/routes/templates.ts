@@ -23,7 +23,7 @@ let [indexTemplate, loginTemplate, preregisterTemplate, registerTemplate, adminT
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
-Handlebars.registerHelper("ifCond", function(v1, v2, options) {
+Handlebars.registerHelper("ifCond", function(v1: any, v2: any, options: any) {
 	if (v1 === v2) {
 		return options.fn(this);
 	}
