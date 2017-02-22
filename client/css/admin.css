@@ -1,0 +1,8 @@
+nav.row > a {
+    width: 100%;
+}
+section > h2 {
+    text-align: center;
+    margin-top: 0.4em;
+    font-size: 4rem;
+}
