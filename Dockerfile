@@ -1,12 +1,15 @@
 FROM node:alpine
 MAINTAINER Ryan Petschek <petschekr@gmail.com>
 
-RUN mkdir -p /usr/src/registration
-WORKDIR /usr/src/checkin
+# Deis wants bash
+RUN apk update && apk add bash
 
 # Bundle app source
+WORKDIR /usr/src/checkin
 COPY . /usr/src/checkin
 RUN npm install
-RUN npm install -g typescript
-RUN tsc
+RUN npm run build
+
+# Deis wants EXPOSE and CMD
+EXPOSE 3000
 CMD ["npm", "start"]
