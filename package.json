@@ -66,6 +66,6 @@
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
     "supertest": "^3.0.0",
-    "typescript": "^2.1.6"
+    "typescript": "^2.2.1"
   }
 }
