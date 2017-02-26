@@ -28,29 +28,42 @@
 				<h2>Statistics</h2>
 				<table>
 					<thead>
-						<th colspan="2">Applications</th>
+						<th colspan="2">Users</th>
 					</thead>
 					<tbody>
 						<tr>
 							<td>Total users</td>
-							<td>{{numberFormat statistics.totalUsers}}</td>
+							<td>{{numberFormat applicationStatistics.totalUsers}}</td>
 						</tr>
 						<tr>
 							<td>Applied users</td>
-							<td>{{numberFormat statistics.appliedUsers}}</td>
+							<td>{{numberFormat applicationStatistics.appliedUsers}}</td>
 						</tr>
 						<tr>
 							<td>Admitted users</td>
-							<td>{{numberFormat statistics.admittedUsers}}</td>
+							<td>{{numberFormat applicationStatistics.admittedUsers}}</td>
 						</tr>
 						<tr>
 							<td>Attending users</td>
-							<td>{{numberFormat statistics.attendingUsers}}</td>
+							<td>{{numberFormat applicationStatistics.attendingUsers}}</td>
 						</tr>
 						<tr>
 							<td>Declined users</td>
-							<td>{{numberFormat statistics.declinedUsers}}</td>
+							<td>{{numberFormat applicationStatistics.declinedUsers}}</td>
 						</tr>
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						<th colspan="2">Applications</th>
+					</thead>
+					<tbody>
+						{{#each generalStatistics}}
+							<tr>
+								<td>{{this.title}}</td>
+								<td>{{numberFormat this.value}}</td>
+							</tr>
+						{{/each}}
 					</tbody>
 				</table>
 			</section>

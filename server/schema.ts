@@ -138,12 +138,17 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 }
-export interface IAdminTemplate extends ICommonTemplate {
-	statistics: {
+export interface IAdminTemplate {
+	applicationStatistics: {
 		totalUsers: number;
 		appliedUsers: number;
 		admittedUsers: number;
 		attendingUsers: number;
 		declinedUsers: number;
-	}
+	};
+	generalStatistics: Array<{
+		"title": string;
+		"value": number;
+	}>;
+	metrics: {};
 }

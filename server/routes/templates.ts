@@ -186,13 +186,55 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let templateData: IAdminTemplate = {
 		siteTitle: SITE_NAME,
 		user: user,
-		statistics: {
+		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
 			admittedUsers: await User.find({ "accepted": true }).count(),
 			attendingUsers: await User.find({ "attending": true }).count(),
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
-		}
+		},
+		generalStatistics: [],
+		metrics: {}
 	};
+	// Generate general statistics
+	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+	(await User.find({ "applied": true })).forEach(user => {
+		user.applicationData.forEach(question => {
+			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
+				if (question.value === null) return;
+				let values: string[];
+				if (!Array.isArray(question.value)) {
+					values = [question.value as string];
+				}
+				else {
+					values = question.value as string[];
+				}
+				for (let checkboxValue of values) {
+					let rawQuestion = rawQuestions.find(q => q.name === question.name);
+					let title = `${rawQuestion ? rawQuestion.label : question.name} → ${checkboxValue}`;
+					let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
+					if (index !== -1) {
+						templateData.generalStatistics[index].value++;
+					}
+					else {
+						templateData.generalStatistics.push({
+							"title": title,
+							"value": 1
+						});
+					}
+				}
+			}
+			else if (question.type === "date") {
+				// Categorize by date
+			}
+		});
+	});
+	// Sort general statistics alphabetically
+	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
+		if (a.title < b.title) return -1;
+		if (a.title > b.title) return 1;
+		return 0;
+	});
+
 	response.send(adminTemplate(templateData));
 });
