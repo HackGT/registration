@@ -72,6 +72,22 @@
 			</section>
 			<section id="settings">
 				<h2>Settings</h2>
+
+				<form method="post" data-action="/">
+					<div class="row">
+						<div class="col-6">
+							<label for="application-open">Applications open:</label>
+							<input id="application-open" type="datetime-local" value="{{settings.application.open}}" required />
+						</div>
+						<div class="col-6">
+							<label for="application-close">Applications close:</label>
+							<input id="application-close" type="datetime-local" value="{{settings.application.close}}" required />
+						</div>
+					</div>
+					<div class="row center">
+						<input type="submit" class="btn" value="Update" />
+					</div>
+				</form>
 			</section>
 		{{/sidebar}}
 	</body>

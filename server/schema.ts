@@ -120,6 +120,22 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	admin: Boolean
 }));
 
+export interface ISetting {
+	_id: mongoose.Types.ObjectId;
+	name: string;
+	value: any;
+}
+export type ISettingMongoose = ISetting & mongoose.Document;
+
+export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.Schema({
+	name: {
+		type: String,
+		required: true,
+		unique: true,
+	},
+	value: mongoose.Schema.Types.Mixed
+}));
+
 // Handlebars templates
 interface ICommonTemplate {
 	siteTitle: string;
@@ -151,4 +167,10 @@ export interface IAdminTemplate {
 		"value": number;
 	}>;
 	metrics: {};
+	settings: {
+		application: {
+			open: string;
+			close: string;
+		};
+	};
 }

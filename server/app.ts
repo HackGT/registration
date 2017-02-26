@@ -44,6 +44,8 @@ let apiRouter = express.Router();
 // API routes go here
 import {userRoutes} from "./routes/api/user";
 apiRouter.use("/user/:id", userRoutes);
+import {settingsRoutes} from "./routes/api/settings";
+apiRouter.use("/settings", settingsRoutes);
 
 app.use("/api", apiRouter);
 

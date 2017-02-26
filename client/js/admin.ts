@@ -1,3 +1,5 @@
+/// <reference path="../../node_modules/@types/qwest/index.d.ts" />
+/// <reference path="../../node_modules/sweetalert2/sweetalert2.d.ts" />
 class State {
     public id: string;
     private sectionElement: HTMLElement;
@@ -39,3 +41,28 @@ function readURLHash() {
 readURLHash();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);
+
+// Settings update
+function parseDateTime (dateTime: string) {
+    let digits = dateTime.split(/\D+/).map(num => parseInt(num));
+    return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
+}
+let settingsUpdateButton = document.querySelector("#settings input[type=submit]") as HTMLInputElement;
+let settingsForm = document.querySelector("#settings form") as HTMLFormElement;
+settingsUpdateButton.addEventListener("click", e => {
+    if (!settingsForm.checkValidity() || !settingsForm.dataset["action"]) {
+		return;
+	}
+	settingsUpdateButton.disabled = true;
+    
+	qwest.put("/api/settings/application_availability", {
+        "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
+        "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
+    }).then(async () => {
+		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
+	}).catch((err: Error, xhr: any, response: any) => {
+		sweetAlert("Oh no!", response.error, "error");
+	}).complete(() => {
+		settingsUpdateButton.disabled = false;
+	});
+});

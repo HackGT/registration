@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";
 import * as Handlebars from "handlebars";
+import * as moment from "moment";
 
 import {
 	STATIC_ROOT,
@@ -11,6 +12,7 @@ import {
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
+	ISetting, ISettingMongoose, Setting,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate
 } from "../schema";
@@ -194,7 +196,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
 		},
 		generalStatistics: [],
-		metrics: {}
+		metrics: {},
+		settings: {
+			application: {
+				open: moment((await Setting.findOne({ "name": "applicationOpen" })).value).format("Y-MM-DDTHH:mm:00"),
+				close: moment((await Setting.findOne({ "name": "applicationClose" })).value).format("Y-MM-DDTHH:mm:00"),
+			}
+		}
 	};
 	// Generate general statistics
 	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");

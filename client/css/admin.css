@@ -24,10 +24,42 @@ table td:last-child {
 table thead {
     border-bottom: 2px solid #333030;
 }
+#settings > .row {
+    text-align: center;
+}
 
 /* Make section button text smaller on small screens */
 @media (max-width: 550px) {
 	nav.row > a {
         font-size: 1.2rem;
     }
+}
+
+/* Extend Wing's input styles to cover additional types
+ * See https://github.com/KingPixil/wing/issues/8
+ */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+    font-family: 'Open Sans';
+}
+fieldset {
+	padding: 8px 20px;
+}
+textarea {
+	resize: vertical;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus,
+textarea:focus,
+textarea[type=text]:focus {
+    border: 1px solid #99b3ff;
+    border-radius: 4px;
 }
