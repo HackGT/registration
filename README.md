@@ -22,7 +22,6 @@ MONGO_URL | The URL to the MongoDB server (default: `mongodb://localhost/`)
 UNIQUE_APP_ID | The MongoDB database name to store data in (default: `registration`)
 VERSION_HASH | The Git short hash used to identify the current commit (default: parsed automatically from the `.git` folder)
 PRODUCTION | Set to `true` to set OAuth callbacks to production URLs (default: `false`)
-BASE_URL | The base URL (with no path) to use for OAuth callbacks (default: `https://registration.hack.gt` in production, `http://localhost:${PORT}` in development)
 SESSION_SECRET | The secret used to sign and validate session cookies (default: random 32 bytes regenerated on every start up)
 GITHUB_CLIENT_ID | OAuth client ID for GitHub *required*
 GITHUB_CLIENT_SECRET | OAuth client secret for GitHub *required*
