@@ -165,6 +165,7 @@ export interface IAdminTemplate {
 	generalStatistics: Array<{
 		"title": string;
 		"value": number;
+		"count"?: number;
 	}>;
 	metrics: {};
 	settings: {

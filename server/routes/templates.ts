@@ -208,8 +208,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	(await User.find({ "applied": true })).forEach(user => {
 		user.applicationData.forEach(question => {
+			if (question.value === null) return;
 			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
-				if (question.value === null) return;
 				let values: string[];
 				if (!Array.isArray(question.value)) {
 					values = [question.value as string];
@@ -234,8 +234,31 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			}
 			else if (question.type === "date") {
 				// Categorize by date
+				let years = moment().diff(moment(question.value as string), "years", true);
+
+				let rawQuestion = rawQuestions.find(q => q.name === question.name);
+				let title = `${rawQuestion ? rawQuestion.label : question.name} (average)`;
+				let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
+				if (index !== -1) {
+					templateData.generalStatistics[index].value += years;
+					templateData.generalStatistics[index].count = 1;
+				}
+				else {
+					templateData.generalStatistics.push({
+						"title": title,
+						"value": years,
+						"count": 1
+					});
+				}
 			}
 		});
+	});
+	// Finalize calculation of averages
+	templateData.generalStatistics = templateData.generalStatistics.map(stat => {
+		if (typeof stat.count === "number") {
+			stat.value /= stat.count;
+		}
+		return stat;
 	});
 	// Sort general statistics alphabetically
 	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
