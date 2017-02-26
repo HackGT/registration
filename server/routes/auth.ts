@@ -30,7 +30,10 @@ catch (err) {
 		throw err;
 }
 
-const BASE_URL: string = (config && config.server.isProduction) ? "https://registration.hack.gt" : `http://localhost:${PORT}`;
+const isProduction: boolean = (config && config.server.isProduction) || process.env.PRODUCTION === "true";
+const BASE_URL: string = isProduction
+	? process.env.BASE_URL || "https://registration.hack.gt"
+	: `http://localhost:${PORT}`;
 
 // GitHub
 const GITHUB_CLIENT_ID: string | null = process.env.GITHUB_CLIENT_ID || (config && config.secrets.github.id);
@@ -56,15 +59,17 @@ if (!FACEBOOK_CLIENT_ID || !FACEBOOK_CLIENT_SECRET) {
 }
 const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 
-
-if (!config || !config.server.isProduction) {
+if (!isProduction) {
 	console.warn("OAuth callback(s) running in development mode");
 }
-if (!config || !config.secrets.session) {
+const sessionSecretSet = (config && config.secrets.session) || process.env.SESSION_SECRET;
+if (!sessionSecretSet) {
 	console.warn("No session secret set; sessions won't carry over server restarts");
 }
 app.use(session({
-	secret: (config && config.secrets.session) || crypto.randomBytes(32).toString("hex"),
+	secret: sessionSecretSet 
+		? (config && config.secrets.session) || process.env.SESSION_SECRET
+		: crypto.randomBytes(32).toString("hex"),
 	cookie: COOKIE_OPTIONS,
 	resave: false,
 	store: new MongoStore({
