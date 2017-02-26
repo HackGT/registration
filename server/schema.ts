@@ -47,6 +47,7 @@ export interface IConfig {
 
 export interface IFormItem {
 	"name": string;
+	"type": string;
 	// String for most types, string array for checkbox groups, file for file uploads, null if optional field is not filled in
 	"value": string | string[] | Express.Multer.File | null;
 }
@@ -137,4 +138,12 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 }
-export interface IAdminTemplate extends ICommonTemplate {}
+export interface IAdminTemplate extends ICommonTemplate {
+	statistics: {
+		totalUsers: number;
+		appliedUsers: number;
+		admittedUsers: number;
+		attendingUsers: number;
+		declinedUsers: number;
+	}
+}

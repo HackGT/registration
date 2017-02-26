@@ -48,6 +48,9 @@ Handlebars.registerHelper("enabled", function (isEnabled: boolean) {
 Handlebars.registerHelper("slug", function (input: string): string {
 	return encodeURIComponent(input.toLowerCase());
 });
+Handlebars.registerHelper("numberFormat", function (n: number): string {
+	return n.toLocaleString();
+});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
@@ -175,14 +178,21 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 	response.send(registerTemplate(templateData));
 });
 
-templateRoutes.route("/admin").get(authenticateWithRedirect, (request, response) => {
+templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
 	if (!user.admin) {
 		response.redirect("/");
 	}
 	let templateData: IAdminTemplate = {
 		siteTitle: SITE_NAME,
-		user: user
+		user: user,
+		statistics: {
+			totalUsers: await User.find().count(),
+			appliedUsers: await User.find({ "applied": true }).count(),
+			admittedUsers: await User.find({ "accepted": true }).count(),
+			attendingUsers: await User.find({ "attending": true }).count(),
+			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
+		}
 	};
 	response.send(adminTemplate(templateData));
 });
