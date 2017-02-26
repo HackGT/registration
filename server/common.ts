@@ -11,7 +11,7 @@ export const PORT = parseInt(process.env.PORT) || 3000;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
 export const UPLOAD_ROOT = path.resolve(__dirname, "../uploads"); // Should exist already
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
-export const VERSION_HASH = require("git-rev-sync").short();
+export const VERSION_HASH = process.env.VERSION_HASH || require("git-rev-sync").short();
 export const COOKIE_OPTIONS = {
 	"path": "/",
 	"maxAge": 1000 * 60 * 60 * 24 * 30 * 6, // 6 months

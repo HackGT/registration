@@ -1,3 +1,5 @@
+import * as http from "http";
+import * as https from "https";
 import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
@@ -30,7 +32,7 @@ catch (err) {
 		throw err;
 }
 
-const BASE_URL: string = (config && config.server.isProduction) ? "https://registration.hack.gt" : `http://localhost:${PORT}`;
+const isProduction: boolean = (config && config.server.isProduction) || process.env.PRODUCTION === "true";
 
 // GitHub
 const GITHUB_CLIENT_ID: string | null = process.env.GITHUB_CLIENT_ID || (config && config.secrets.github.id);
@@ -56,15 +58,18 @@ if (!FACEBOOK_CLIENT_ID || !FACEBOOK_CLIENT_SECRET) {
 }
 const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 
-
-if (!config || !config.server.isProduction) {
+if (!isProduction) {
 	console.warn("OAuth callback(s) running in development mode");
 }
-if (!config || !config.secrets.session) {
+const sessionSecretSet: boolean = !!(config && config.secrets.session) || !!process.env.SESSION_SECRET;
+const sessionSecret: string = sessionSecretSet 
+	? (config && config.secrets.session) || process.env.SESSION_SECRET
+	: crypto.randomBytes(32).toString("hex");
+if (!sessionSecretSet) {
 	console.warn("No session secret set; sessions won't carry over server restarts");
 }
 app.use(session({
-	secret: (config && config.secrets.session) || crypto.randomBytes(32).toString("hex"),
+	secret: sessionSecret,
 	cookie: COOKIE_OPTIONS,
 	resave: false,
 	store: new MongoStore({
@@ -82,7 +87,7 @@ passport.deserializeUser<IUser, string>((id, done) => {
 	});
 });
 
-function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: { clientID: string; clientSecret: string; callbackURL: string; profileFields?: string[] }) {
+function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: { clientID: string; clientSecret: string; profileFields?: string[] }) {
 	passport.use(new strategy(options, async (accessToken, refreshToken, profile, done) => {
 		let email = profile.emails[0].value;
 		let user = await User.findOne({"email": email});
@@ -135,37 +140,91 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 
 useLoginStrategy(GitHubStrategy, "githubData", {
 	clientID: GITHUB_CLIENT_ID,
-	clientSecret: GITHUB_CLIENT_SECRET,
-	callbackURL: `${BASE_URL}/${GITHUB_CALLBACK_HREF}`
+	clientSecret: GITHUB_CLIENT_SECRET
 });
 useLoginStrategy(GoogleStrategy, "googleData", {
 	clientID: GOOGLE_CLIENT_ID,
-	clientSecret: GOOGLE_CLIENT_SECRET,
-	callbackURL: `${BASE_URL}/${GOOGLE_CALLBACK_HREF}`
+	clientSecret: GOOGLE_CLIENT_SECRET
 });
 useLoginStrategy(FacebookStrategy, "facebookData", {
 	clientID: FACEBOOK_CLIENT_ID,
 	clientSecret: FACEBOOK_CLIENT_SECRET,
-	callbackURL: `${BASE_URL}/${FACEBOOK_CALLBACK_HREF}`,
 	profileFields: ["id", "displayName", "email"]
 });
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 export let authRoutes = express.Router();
 
-function addAuthenticationRoute(serviceName: string, scope: string[]) {
-	authRoutes.get(`/${serviceName}`, passport.authenticate(serviceName, { scope: scope }));
-	authRoutes.get(`/${serviceName}/callback`, passport.authenticate(serviceName, { failureRedirect: "/login" }), (request, response) => {
+let validatedHostNames: string[] = [];
+function validateAndCacheHostName(request: express.Request, response: express.Response, next: express.NextFunction) {
+	// Basically checks to see if the server behind the hostname has the same session key by HMACing a random nonce
+	if (validatedHostNames.find(hostname => hostname === request.hostname)) {
+		next();
+		return;
+	}
+
+	let nonce = crypto.randomBytes(64).toString("hex");
+	function callback (message: http.IncomingMessage) {
+		if (message.statusCode !== 200) {
+			console.error(`Got non-OK status code when validating hostname: ${request.hostname}`);
+			message.resume();
+			return;
+		}
+		message.setEncoding("utf8");
+		let data = "";
+		message.on("data", (chunk) => data += chunk);
+		message.on("end", () => {
+			let localHMAC = crypto.createHmac("sha256", sessionSecret).update(nonce).digest().toString("hex");
+			if (localHMAC === data) {
+				validatedHostNames.push(request.hostname);
+				next();
+			}
+			else {
+				console.error(`Got invalid HMAC when validating hostname: ${request.hostname}`);
+			}
+		});
+	}
+	function onError (err: Error) {
+		console.error(`Error when validating hostname: ${request.hostname}`, err);
+	}
+	if (request.protocol === "http") {
+		http.get(`http://${request.hostname}:${PORT}/auth/validatehost/${nonce}`, callback).on("error", onError);
+	}
+	else {
+		https.get(`https://${request.hostname}:${PORT}/auth/validatehost/${nonce}`, callback).on("error", onError);
+	}
+}
+authRoutes.get("/validatehost/:nonce", (request, response) => {
+	let nonce: string = request.params.nonce || "";
+	response.send(crypto.createHmac("sha256", sessionSecret).update(nonce).digest().toString("hex"));
+});
+
+function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", scope: string[], callbackHref: string) {
+	authRoutes.get(`/${serviceName}`, validateAndCacheHostName, (request, response, next) => {
+		let callbackURL = `${request.protocol}://${request.hostname}:${PORT}/${callbackHref}`;
+		passport.authenticate(
+			serviceName,
+			<passport.AuthenticateOptions>{ scope: scope, callbackURL: callbackURL }
+		)(request, response, next);
+	});
+	authRoutes.get(`/${serviceName}/callback`, validateAndCacheHostName, (request, response, next) => {
+		let callbackURL = `${request.protocol}://${request.hostname}:${PORT}/${callbackHref}`;
+		passport.authenticate(
+			serviceName,
+			<passport.AuthenticateOptions>{ failureRedirect: "/login", callbackURL: callbackURL }
+		)(request, response, next);
+	}, (request, response) => {
 		// Successful authentication, redirect home
 		response.redirect("/");
 	});
 }
 
-addAuthenticationRoute("github", ["user:email"]);
-addAuthenticationRoute("google", ["email"]);
-addAuthenticationRoute("facebook", ["email"]);
+addAuthenticationRoute("github", ["user:email"], GITHUB_CALLBACK_HREF);
+addAuthenticationRoute("google", ["email"], GOOGLE_CALLBACK_HREF);
+addAuthenticationRoute("facebook", ["email"], FACEBOOK_CALLBACK_HREF);
 
 authRoutes.all("/logout", (request, response) => {
 	request.logout();
