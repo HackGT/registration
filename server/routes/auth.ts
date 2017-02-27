@@ -158,6 +158,19 @@ app.use(passport.session());
 
 export let authRoutes = express.Router();
 
+function getExternalPort(request: express.Request): number {
+	let host = request.headers.host;
+	// IPv6 literal support
+	let offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
+	let index = host.indexOf(":", offset);
+	if (index !== -1) {
+		return parseInt(host.substring(index + 1));
+	}
+	else {
+		// Default ports for HTTP and HTTPS
+		return request.protocol === "http" ? 80 : 443;
+	}
+}
 let validatedHostNames: string[] = [];
 function validateAndCacheHostName(request: express.Request, response: express.Response, next: express.NextFunction) {
 	// Basically checks to see if the server behind the hostname has the same session key by HMACing a random nonce
@@ -191,10 +204,10 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 		console.error(`Error when validating hostname: ${request.hostname}`, err);
 	}
 	if (request.protocol === "http") {
-		http.get(`http://${request.hostname}:${PORT}/auth/validatehost/${nonce}`, callback).on("error", onError);
+		http.get(`http://${request.hostname}:${getExternalPort(request)}/auth/validatehost/${nonce}`, callback).on("error", onError);
 	}
 	else {
-		https.get(`https://${request.hostname}:${PORT}/auth/validatehost/${nonce}`, callback).on("error", onError);
+		https.get(`https://${request.hostname}:${getExternalPort(request)}/auth/validatehost/${nonce}`, callback).on("error", onError);
 	}
 }
 authRoutes.get("/validatehost/:nonce", (request, response) => {
@@ -204,14 +217,14 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 
 function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", scope: string[], callbackHref: string) {
 	authRoutes.get(`/${serviceName}`, validateAndCacheHostName, (request, response, next) => {
-		let callbackURL = `${request.protocol}://${request.hostname}:${PORT}/${callbackHref}`;
+		let callbackURL = `${request.protocol}://${request.hostname}:${getExternalPort(request)}/${callbackHref}`;
 		passport.authenticate(
 			serviceName,
 			<passport.AuthenticateOptions>{ scope: scope, callbackURL: callbackURL }
 		)(request, response, next);
 	});
 	authRoutes.get(`/${serviceName}/callback`, validateAndCacheHostName, (request, response, next) => {
-		let callbackURL = `${request.protocol}://${request.hostname}:${PORT}/${callbackHref}`;
+		let callbackURL = `${request.protocol}://${request.hostname}:${getExternalPort(request)}/${callbackHref}`;
 		passport.authenticate(
 			serviceName,
 			<passport.AuthenticateOptions>{ failureRedirect: "/login", callbackURL: callbackURL }
