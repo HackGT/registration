@@ -95,6 +95,11 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
 	let branchName = request.params.branch as string;
+	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+		return;
+	}
+
 	let questionBranches: QuestionBranches;
 	try {
 		// Path is relative to common.ts, where validateSchema function is implemented
@@ -111,8 +116,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		return;
 	}
 	let questionData = questionBranch.questions.map(question => {
-		// TODO: rework how saved values are handled
-		/*let savedValue = user.applicationData.find(item => item.name === question.name);
+		let savedValue = user.applicationData.find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
 			question["selected"] = question.options.map(option => {
@@ -131,7 +135,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		if (question.type === "file") {
 			savedValue = undefined;
 		}
-		question["value"] = savedValue ? savedValue.value : "";*/
+		question["value"] = savedValue ? savedValue.value : "";
 		return question;
 	});
 	let templateData: IRegisterTemplate = {
