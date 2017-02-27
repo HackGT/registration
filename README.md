@@ -29,3 +29,4 @@ GOOGLE_CLIENT_ID | OAuth client ID for Google *required*
 GOOGLE_CLIENT_SECRET | OAuth client secret for Google *required*
 FACEBOOK_CLIENT_ID | OAuth client ID for Facebook *required*
 FACEBOOK_CLIENT_SECRET | OAuth client secret for Facebook *required*
+ADMIN_EMAILS | A comma delimited list (with no spaces) of the emails of users that you want promoted to admin status (default: none)

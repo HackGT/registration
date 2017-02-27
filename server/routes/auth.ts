@@ -92,7 +92,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 		let email = profile.emails[0].value;
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
-		if (config && config.admins.indexOf(email) !== -1) {
+		if ((config && config.admins && config.admins.indexOf(email) !== -1) || (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.split(",").indexOf(email) !== -1)) {
 			isAdmin = true;
 			if (!user || !user.admin)
 				console.info(`Adding new admin: ${email}`);
