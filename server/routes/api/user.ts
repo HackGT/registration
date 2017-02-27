@@ -129,3 +129,23 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 		});
 	}
 });
+
+userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
+	let user = await User.findById(request.params.id);
+	user.applied = false;
+	user.applicationBranch = "";
+	user.applicationData = [];
+	user.markModified("applicationData");
+	try {
+		await user.save();
+		response.status(200).json({
+			"success": true
+		});
+	}
+	catch (err) {
+		console.error(err);
+		response.status(500).json({
+			"error": "An error occurred while deleting the application"
+		});
+	}
+});

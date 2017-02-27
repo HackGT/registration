@@ -53,7 +53,14 @@
 					{{/if}}
 					<br />
 				{{/each}}
-				<input type="submit" class="center" value="Submit" />
+				<div class="center">
+					{{#if user.applied}}
+						<input type="submit" value="Update" />
+						<button id="delete" data-action="/api/user/{{user._id}}/application" style="background-color: #FF4136;">Delete</button>
+					{{else}}
+						<input type="submit" value="Submit" />
+					{{/if}}
+				</div>
 			</form>
 		{{/sidebar}}
 	</body>
