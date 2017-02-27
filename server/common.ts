@@ -113,10 +113,10 @@ export function readFileAsync (filename: string): Promise<string> {
 import * as ajv from "ajv";
 import {QuestionBranches, Questions} from "./config/questions.schema";
 export async function validateSchema (questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<QuestionBranches> {
-	let questions: QuestionBranches;
+	let questionBranches: QuestionBranches;
 	let schema: any;
 	try {
-		questions = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
+		questionBranches = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
 		schema = JSON.parse(await readFileAsync(path.resolve(__dirname, schemaFile)));
 	}
 	catch (err) {
@@ -125,11 +125,15 @@ export async function validateSchema (questionsFile: string, schemaFile: string 
 	}
 
 	let validator = new ajv();
-	let valid = validator.validate(schema, questions);
+	let valid = validator.validate(schema, questionBranches);
+	let branchNames = questionBranches.map(branch => branch.name);
 	if (!valid) {
 		return Promise.reject(validator.errors);
 	}
+	else if (new Set(branchNames).size !== branchNames.length) {
+		return Promise.reject(new Error("Application branch names are not unique"));
+	}
 	else {
-		return questions;
+		return questionBranches;
 	}
 };
