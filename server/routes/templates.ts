@@ -24,6 +24,9 @@ let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.htm
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
+Handlebars.registerHelper("attendStatus", function(stat, options){
+	
+});
 Handlebars.registerHelper("ifCond", function(v1, v2, options) {
 	if (v1 === v2) {
 		return options.fn(this);

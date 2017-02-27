@@ -14,6 +14,26 @@
 	<body>
 		{{#> sidebar}}
 			<h1 class="center">Dashboard</h1>
+			<p> Your Status:
+			{{#if user.attending}}
+				Going </p>
+				<button>View your current team</button>
+			    <button>Create or Join your team</button>
+			{{else if user.applied}}
+		    	{{#if user.inReview}}
+		    		In Review</p>
+		    	{{else if user.accepted}}
+		    		</p>
+			    	<button>Going</button>
+			    	<button>Not Going</button>
+			    {{else}}
+			    	RSVP expired</p>
+		    	{{/if}}
+		    	
+		  	{{else}}
+		    	Not Applied</p>
+		  	{{/if}}
+
 		{{/sidebar}}
 	</body>
 </html>

@@ -53,9 +53,10 @@ export interface IUser {
 
 	applied: boolean;
 	accepted: boolean;
+	inReview: boolean;
 	attending: boolean;
+	teamID: number,
 	applicationData: IFormItem[];
-
 	admin?: boolean;
 }
 export type IUserMongoose = IUser & mongoose.Document;
@@ -83,9 +84,10 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 
 	applied: Boolean,
 	accepted: Boolean,
+	inReview: Boolean,
 	attending: Boolean,
+	teamID: Number,
 	applicationData: [mongoose.Schema.Types.Mixed],
-
 	admin: Boolean
 }));
 
