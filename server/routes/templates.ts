@@ -66,7 +66,7 @@ templateRoutes.route("/login").get((request, response) => {
 templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
 	if (user.applied) {
-		// TODO: Redirect to the form that user filled out
+		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
 		return;
 	}
 
@@ -111,7 +111,8 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		return;
 	}
 	let questionData = questionBranch.questions.map(question => {
-		let savedValue = user.applicationData.find(item => item.name === question.name);
+		// TODO: rework how saved values are handled
+		/*let savedValue = user.applicationData.find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
 			question["selected"] = question.options.map(option => {
@@ -130,7 +131,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		if (question.type === "file") {
 			savedValue = undefined;
 		}
-		question["value"] = savedValue ? savedValue.value : "";
+		question["value"] = savedValue ? savedValue.value : "";*/
 		return question;
 	});
 	let templateData: IRegisterTemplate = {

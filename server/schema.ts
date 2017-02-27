@@ -54,9 +54,8 @@ export interface IUser {
 	applied: boolean;
 	accepted: boolean;
 	attending: boolean;
-	applicationData: {
-		[branchName: string]: IFormItem[];
-	};
+	applicationBranch: string;
+	applicationData: IFormItem[];
 
 	admin?: boolean;
 }
@@ -86,6 +85,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applied: Boolean,
 	accepted: Boolean,
 	attending: Boolean,
+	applicationBranch: String,
 	applicationData: [mongoose.Schema.Types.Mixed],
 
 	admin: Boolean

@@ -32,12 +32,19 @@ function isUserOrAdmin (request: express.Request, response: express.Response, ne
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
-userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response) => {
+userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response) => {
 	let user = await User.findById(request.params.id);
+	let branchName = request.params.branch as string;
+	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+		response.status(400).json({
+			"error": "You can only edit the application branch that you originally submitted"
+		});
+		return;
+	}
 
-	let questionData: QuestionBranches;
+	let questionBranches: QuestionBranches;
 	try {
-		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+		questionBranches = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	}
 	catch (err) {
 		console.error("validateSchema error:", err);
@@ -46,8 +53,16 @@ userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), 
 		});
 		return;
 	}
+	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	if (!questionBranch) {
+		response.status(400).json({
+			"error": "Invalid application branch"
+		});
+		return;
+	}
+
 	let errored: boolean = false; // Used because .map() can't be broken out of
-	let rawData: (IFormItem | null)[] = questionData.map(question => {
+	let rawData: (IFormItem | null)[] = questionBranch.questions.map(question => {
 		if (errored) {
 			return null;
 		}
@@ -98,6 +113,7 @@ userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), 
 		});
 
 		user.applied = true;
+		user.applicationBranch = questionBranch.name;
 		user.applicationData = data;
 		user.markModified("applicationData");
 
