@@ -54,7 +54,9 @@ export interface IUser {
 	applied: boolean;
 	accepted: boolean;
 	attending: boolean;
-	applicationData: IFormItem[];
+	applicationData: {
+		[branchName: string]: IFormItem[];
+	};
 
 	admin?: boolean;
 }

@@ -1,76 +1,95 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Questions",
+    "title": "Question branches",
     "type": "array",
     "items": {
-        "anyOf": [
-            {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "text",
-                            "tel",
-                            "date",
-                            "url",
-                            "file",
-                            "textarea"
-                        ]
-                    },
-                    "label": {
-                        "type": "string"
-                    },
-                    "placeholder": {
-                        "type": "string"
-                    },
-                    "required": {
-                        "type": "boolean"
-                    }
-                },
-                "required": [
-                    "name",
-                    "type",
-                    "label"
-                ]
+        "type": "object",
+        "required": [
+            "name",
+            "questions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "name": {
+                "type": "string"
             },
-            {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "checkbox",
-                            "radio",
-                            "select"
-                        ]
-                    },
-                    "label": {
-                        "type": "string"
-                    },
-                    "options": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
+            "questions": {
+                "title": "Questions",
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "text",
+                                        "tel",
+                                        "date",
+                                        "url",
+                                        "file",
+                                        "textarea"
+                                    ]
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "placeholder": {
+                                    "type": "string"
+                                },
+                                "required": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "type",
+                                "label"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "checkbox",
+                                        "radio",
+                                        "select"
+                                    ]
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "options": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "type",
+                                "label",
+                                "options"
+                            ]
                         }
-                    },
-                    "required": {
-                        "type": "boolean"
-                    }
-                },
-                "required": [
-                    "name",
-                    "type",
-                    "label",
-                    "options"
-                ]
+                    ]
+                }
             }
-        ]
+        }
     }
 }

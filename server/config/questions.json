@@ -1,68 +1,88 @@
 [
     {
-        "name": "name",
-        "type": "text",
-        "label": "Full Name",
-        "required": true
+        "name": "Participant",
+        "questions": [
+            {
+                "name": "name",
+                "type": "text",
+                "label": "Full Name",
+                "required": true
+            },
+            {
+                "name": "phonenumber",
+                "type": "tel",
+                "label": "Cell Number",
+                "required": true
+            },
+            {
+                "name": "dietaryrestrictions",
+                "type": "checkbox",
+                "label": "Dietary Restrictions",
+                "options": [
+                    "Vegan",
+                    "Vegetarian",
+                    "Nut Allergy"
+                ]
+            },
+            {
+                "name": "birthday",
+                "type": "date",
+                "label": "Birthday",
+                "required": true
+            },
+            {
+                "name": "github",
+                "type": "url",
+                "label": "Github"
+            },
+            {
+                "name": "linkedin",
+                "type": "url",
+                "label": "Linkedin"
+            },
+            {
+                "name": "resume",
+                "type": "file",
+                "label": "Resume"
+            },
+            {
+                "name": "role",
+                "type": "radio",
+                "label": "What's your role?",
+                "options": [
+                    "hacker",
+                    "mentor"
+                ],
+                "required": true
+            },
+            {
+                "name": "role2",
+                "type": "select",
+                "label": "What's your role again?",
+                "options": [
+                    "Hacker",
+                    "Mentor"
+                ],
+                "required": true
+            },
+            {
+                "name": "essay",
+                "type": "textarea",
+                "label": "Write some stuff",
+                "placeholder": "Example placeholder",
+                "required": true
+            }
+        ]
     },
     {
-        "name": "phonenumber",
-        "type": "tel",
-        "label": "Cell Number",
-        "required": true
-    },
-    {
-        "name": "dietaryrestrictions",
-        "type": "checkbox",
-        "label": "Dietary Restrictions",
-        "options": ["Vegan", "Vegetarian", "Nut Allergy"]
-    },
-    {
-        "name": "birthday",
-        "type": "date",
-        "label": "Birthday",
-        "required": true
-    },
-    {
-        "name": "github",
-        "type": "url",
-        "label": "Github"
-    },
-    {
-        "name": "linkedin",
-        "type": "url",
-        "label": "Linkedin"
-    },
-    {
-        "name": "resume",
-        "type": "file",
-        "label": "Resume"
-    },
-    {
-        "name": "role",
-        "type": "radio",
-        "label": "What's your role?",
-        "options": [
-            "hacker",
-            "mentor"
-        ],
-        "required": true
-    },
-    {
-        "name": "role2",
-        "type": "select",
-        "label": "What's your role again?",
-        "options": [
-            "Hacker",
-            "Mentor"
-        ],
-        "required": true
-    },
-    {
-        "name": "essay",
-        "type": "textarea",
-        "label": "Write some stuff",
-        "placeholder": "Example placeholder",
-        "required": true
+        "name": "Other",
+        "questions": [
+            {
+                "name": "name",
+                "type": "text",
+                "label": "Full Name",
+                "required": true
+            }
+        ]
     }
 ]
