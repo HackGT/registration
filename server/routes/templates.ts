@@ -12,15 +12,15 @@ import {
 import {
 	IUser, IUserMongoose, User,
 	IIndexTemplate, ILoginTemplate, 
-	IRegisterTemplate
+	IRegisterBranchChoiceTemplate, IRegisterTemplate
 } from "../schema";
-import {Questions} from "../config/questions.schema";
+import {QuestionBranches, Questions} from "../config/questions.schema";
 const SITE_NAME = "HackGT Catalyst";
 
 export let templateRoutes = express.Router();
 
 // Load and compile Handlebars templates
-let [indexTemplate, loginTemplate, registerTemplate] = ["index.html", "login.html", "application.html"].map(file => {
+let [indexTemplate, loginTemplate, preregisterTemplate, registerTemplate] = ["index.html", "login.html", "preapplication.html", "application.html"].map(file => {
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
@@ -42,6 +42,9 @@ Handlebars.registerHelper("selected", function (selected: boolean[], index: numb
 	// Adds the "selected" form attribute if the element was selected previously
 	return selected[index] ? "selected" : "";
 });
+Handlebars.registerHelper("slug", function (input: string): string {
+	return encodeURIComponent(input.toLowerCase());
+});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
@@ -62,17 +65,52 @@ templateRoutes.route("/login").get((request, response) => {
 
 templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
-	let questionData: Questions;
+	if (user.applied) {
+		// TODO: Redirect to the form that user filled out
+		return;
+	}
+
+	let questionBranches: QuestionBranches;
 	try {
 		// Path is relative to common.ts, where validateSchema function is implemented
-		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+		questionBranches = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	}
 	catch (err) {
 		console.error("validateSchema error:", err);
-		response.send("An error occurred while generating the application form");
+		response.status(500).send("An error occurred while generating the application options");
 		return;
 	}
-	questionData = questionData.map(question => {
+	// If there's only one path, redirect to that
+	if (questionBranches.length === 1) {
+		response.redirect(`/apply/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
+		return;
+	}
+	let templateData: IRegisterBranchChoiceTemplate = {
+		siteTitle: SITE_NAME,
+		user: user,
+		branches: questionBranches.map(branch => branch.name)
+	};
+	response.send(preregisterTemplate(templateData));
+});
+templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (request, response) => {
+	let user = request.user as IUser;
+	let branchName = request.params.branch as string;
+	let questionBranches: QuestionBranches;
+	try {
+		// Path is relative to common.ts, where validateSchema function is implemented
+		questionBranches = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+	}
+	catch (err) {
+		console.error("validateSchema error:", err);
+		response.status(500).send("An error occurred while generating the application form");
+		return;
+	}
+	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	if (!questionBranch) {
+		response.status(400).send("Invalid application branch");
+		return;
+	}
+	let questionData = questionBranch.questions.map(question => {
 		let savedValue = user.applicationData.find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
@@ -97,8 +135,9 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 	});
 	let templateData: IRegisterTemplate = {
 		siteTitle: SITE_NAME,
-		questionData: questionData,
-		user: request.user
+		user: request.user,
+		branch: questionBranch.name,
+		questionData: questionData
 	};
 	response.send(registerTemplate(templateData));
 });

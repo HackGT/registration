@@ -11,7 +11,7 @@ import {
 	IFormItem,
 	IUser, IUserMongoose, User,
 } from "../../schema";
-import {Questions} from "../../config/questions.schema";
+import {QuestionBranches, Questions} from "../../config/questions.schema";
 
 function isUserOrAdmin (request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
@@ -35,7 +35,7 @@ export let userRoutes = express.Router({ "mergeParams": true });
 userRoutes.post("/application", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response) => {
 	let user = await User.findById(request.params.id);
 
-	let questionData: Questions;
+	let questionData: QuestionBranches;
 	try {
 		questionData = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	}

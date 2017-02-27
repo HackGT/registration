@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import {mongoose} from "./common";
-import {Questions} from "./config/questions.schema";
+import {QuestionBranches, Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export interface Config {
@@ -92,15 +92,18 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 }));
 
 // Handlebars templates
-export interface IIndexTemplate {
+interface ICommonTemplate {
 	siteTitle: string;
 	user: IUser;
 }
+export interface IIndexTemplate extends ICommonTemplate {}
 export interface ILoginTemplate {
 	siteTitle: string;
 }
-export interface IRegisterTemplate {
-	siteTitle: string;
+export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
+	branches: string[];
+}
+export interface IRegisterTemplate extends ICommonTemplate {
+	branch: string;
 	questionData: Questions;
-	user: IUser;
 }
