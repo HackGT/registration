@@ -61,6 +61,9 @@ const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 if (!isProduction) {
 	console.warn("OAuth callback(s) running in development mode");
 }
+else {
+	app.enable("trust proxy");
+}
 const sessionSecretSet: boolean = !!(config && config.secrets.session) || !!process.env.SESSION_SECRET;
 const sessionSecret: string = sessionSecretSet 
 	? (config && config.secrets.session) || process.env.SESSION_SECRET
