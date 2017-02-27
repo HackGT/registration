@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import {mongoose} from "./common";
-import {Questions} from "./config/questions.schema";
+import {QuestionBranches, Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export interface Config {
@@ -54,6 +54,7 @@ export interface IUser {
 	applied: boolean;
 	accepted: boolean;
 	attending: boolean;
+	applicationBranch: string;
 	applicationData: IFormItem[];
 
 	admin?: boolean;
@@ -84,21 +85,25 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applied: Boolean,
 	accepted: Boolean,
 	attending: Boolean,
+	applicationBranch: String,
 	applicationData: [mongoose.Schema.Types.Mixed],
 
 	admin: Boolean
 }));
 
 // Handlebars templates
-export interface IIndexTemplate {
+interface ICommonTemplate {
 	siteTitle: string;
 	user: IUser;
 }
+export interface IIndexTemplate extends ICommonTemplate {}
 export interface ILoginTemplate {
 	siteTitle: string;
 }
-export interface IRegisterTemplate {
-	siteTitle: string;
+export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
+	branches: string[];
+}
+export interface IRegisterTemplate extends ICommonTemplate {
+	branch: string;
 	questionData: Questions;
-	user: IUser;
 }

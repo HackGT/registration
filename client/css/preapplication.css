@@ -1,0 +1,11 @@
+p {
+	text-align: center;
+}
+#selection {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+}
+#selection > a {
+	min-width: 25%;
+}
