@@ -34,21 +34,23 @@
 					</a>
 				</div>
 			</div>
+			<section id="error">{{error}}</section>
+			<section id="success">{{success}}</section>
 			<div class="row">
 				<div class="col-6 text-center">
 					<h3>Sign Up</h3>
 					<form action="/auth/signup" method="POST">
-						<input type="email" placeholder="Email" required />
-						<input type="password" placeholder="Password" required />
-						<input type="password" placeholder="Confirm password" required />
+						<input type="text" name="name" placeholder="Name" required />
+						<input type="email" name="email" placeholder="Email" required />
+						<input type="password" name="password" placeholder="Password" required />
 						<input type="submit" value="Sign up" />
 					</form>
 				</div>
 				<div class="col-6 text-center">
 					<h3>Log In</h3>
 					<form action="/auth/login" method="POST">
-						<input type="email" placeholder="Email" required />
-						<input type="password" placeholder="Password" required />
+						<input type="email" name="email" placeholder="Email" required />
+						<input type="password" name="password" placeholder="Password" required />
 						<input type="submit" value="Log in" />
 					</form>
 				</div>

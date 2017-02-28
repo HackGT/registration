@@ -38,7 +38,13 @@ export interface IUser {
 	_id: mongoose.Types.ObjectId;
 	email: string;
 	name?: string;
+	verifiedEmail: boolean;
 
+	localData?: {
+		hash: string;
+		salt: string;
+		verificationCode: string;
+	};
 	githubData?: {
 		id: string;
 		username: string;
@@ -69,7 +75,13 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		unique: true
 	},
 	name: String,
+	verifiedEmail: Boolean,
 
+	localData: {
+		hash: String,
+		salt: String,
+		verificationCode: String
+	},
 	githubData: {
 		id: String,
 		username: String,
@@ -99,6 +111,8 @@ interface ICommonTemplate {
 export interface IIndexTemplate extends ICommonTemplate {}
 export interface ILoginTemplate {
 	siteTitle: string;
+	error?: string;
+	success?: string;
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];

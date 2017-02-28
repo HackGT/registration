@@ -1,3 +1,6 @@
+h1 {
+    text-align: center;
+}
 /* Apply Wing's h5 styles to labels and legends */
 @media (min-width: 550px) {
 	label {

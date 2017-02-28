@@ -58,7 +58,9 @@ templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 
 templateRoutes.route("/login").get((request, response) => {
 	let templateData: ILoginTemplate = {
-		siteTitle: SITE_NAME
+		siteTitle: SITE_NAME,
+		error: request.flash("error"),
+		success: request.flash("success")
 	};
 	response.send(loginTemplate(templateData));
 });

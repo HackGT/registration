@@ -7,6 +7,7 @@ import * as serveStatic from "serve-static";
 import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
 import * as morgan from "morgan";
+import flash = require("connect-flash");
 
 import {
 	// Functions
@@ -24,6 +25,7 @@ app.use(morgan("dev"));
 app.use(compression());
 let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS);
 app.use(cookieParserInstance);
+app.use(flash());
 
 // Check for number of admin users and warn if none
 (async () => {
