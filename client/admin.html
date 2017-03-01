@@ -113,6 +113,12 @@
 							<input id="application-close" type="datetime-local" value="{{settings.application.close}}" required />
 						</div>
 					</div>
+					<div class="row">
+						<div class="col-12">
+							<label for="teams-enabled">Enable teams?</label>
+							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />
+						</div>
+					</div>
 					<div class="row center">
 						<input type="submit" class="btn" value="Update" />
 					</div>

@@ -36,6 +36,12 @@ export async function setDefaultSettings() {
 			"value": new Date()
 		}).save();
 	}
+	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
+		await new Setting({
+			"name": "teamsEnabled",
+			"value": true
+		}).save();
+	}
 }
 setDefaultSettings();
 
@@ -83,6 +89,38 @@ settingsRoutes.route("/application_availability")
 			console.error(err);
 			response.status(500).json({
 				"error": "An error occurred while updating the application availability"
+			});
+		}
+    });
+
+settingsRoutes.route("/teams_enabled")
+    .get(async (request, response) => {
+		let enabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
+		response.json({
+			"enabled": enabled
+		});
+    })
+    .put(isAdmin, postParser, async (request, response) => {
+		let rawEnabled = request.body.enabled;
+		if (!rawEnabled || (rawEnabled !== "true" && rawEnabled !== "false")) {
+			response.status(400).json({
+				"error": "Invalid value for enabling or disabling teams"
+			});
+			return;
+		}
+		let enable = await Setting.findOne({ "name": "teamsEnabled" });
+		enable.value = rawEnabled === "true";
+		enable.markModified("value");
+		try {
+			await enable.save();
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while enabling or disabling teams"
 			});
 		}
     });

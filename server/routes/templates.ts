@@ -13,7 +13,7 @@ import {
 import {
 	IUser, IUserMongoose, User,
 	ISetting, ISettingMongoose, Setting,
-	IIndexTemplate, ILoginTemplate, IAdminTemplate,
+	ICommonTemplate, IIndexTemplate, ILoginTemplate, IAdminTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate
 } from "../schema";
 import {QuestionBranches, Questions} from "../config/questions.schema";
@@ -56,10 +56,13 @@ Handlebars.registerHelper("numberFormat", function (n: number): string {
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
-templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
+templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
-		user: request.user
+		user: request.user,
+		settings: {
+			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+		}
 	};
 	response.send(indexTemplate(templateData));
 });
@@ -98,6 +101,9 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 	let templateData: IRegisterBranchChoiceTemplate = {
 		siteTitle: config.eventName,
 		user: user,
+		settings: {
+			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+		},
 		branches: questionBranches.map(branch => branch.name)
 	};
 	response.send(preregisterTemplate(templateData));
@@ -174,6 +180,9 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
+		settings: {
+			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+		},
 		branch: questionBranch.name,
 		questionData: questionData
 	};
@@ -185,6 +194,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	if (!user.admin) {
 		response.redirect("/");
 	}
+	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user: user,
@@ -235,7 +245,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			application: {
 				open: moment((await Setting.findOne({ "name": "applicationOpen" })).value).format("Y-MM-DDTHH:mm:00"),
 				close: moment((await Setting.findOne({ "name": "applicationClose" })).value).format("Y-MM-DDTHH:mm:00"),
-			}
+			},
+			teamsEnabled: teamsEnabled,
+			teamsEnabledChecked: teamsEnabled ? "checked" : ""
 		}
 	};
 	// Generate general statistics

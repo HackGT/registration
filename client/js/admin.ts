@@ -58,8 +58,13 @@ settingsUpdateButton.addEventListener("click", e => {
 	qwest.put("/api/settings/application_availability", {
         "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
         "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
+    }).then(() => {
+        return qwest.put("/api/settings/teams_enabled", {
+            "enabled": (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false"
+        });
     }).then(async () => {
 		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
+        window.location.reload();
 	}).catch((err: Error, xhr: any, response: any) => {
 		sweetAlert("Oh no!", response.error, "error");
 	}).complete(() => {

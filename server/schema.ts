@@ -143,9 +143,12 @@ export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.
 }));
 
 // Handlebars templates
-interface ICommonTemplate {
+export interface ICommonTemplate {
 	siteTitle: string;
 	user: IUser;
+	settings: {
+		teamsEnabled: boolean;
+	};
 }
 export interface IIndexTemplate extends ICommonTemplate {}
 export interface ILoginTemplate {
@@ -180,5 +183,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 			open: string;
 			close: string;
 		};
+		teamsEnabled: boolean;
+		teamsEnabledChecked: string;
 	};
 }

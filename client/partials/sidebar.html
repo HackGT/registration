@@ -13,8 +13,10 @@
 				<span class="divider"></span>
 			{{/if}}
 			
-			<a href="#">Team</a>
-			<span class="divider"></span>
+			{{#if settings.teamsEnabled}}
+				<a href="#">Team</a>
+				<span class="divider"></span>
+			{{/if}}
 			
 			{{#if user.admin}}
 				<a href="/admin">Admin</a>
