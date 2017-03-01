@@ -10,10 +10,9 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, config
+	config, mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, emailTransporter
 } from "../common";
 import {
-	IConfig,
 	IUser, IUserMongoose, User
 } from "../schema";
 
@@ -108,7 +107,14 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				user[dataFieldName]!.username = profile.username;
 				user[dataFieldName]!.profileUrl = profile.profileUrl;
 			}
-			await user.save();
+			try {
+				await user.save();
+			}
+			catch (err) {
+				done(err);
+				return;
+			}
+
 			done(null, user);
 		}
 		else {
@@ -197,8 +203,33 @@ passport.use(new LocalStrategy({
 
 			"admin": isAdmin
 		});
-		await user.save();
-		done(null, user);
+		try {
+			await user.save();
+		}
+		catch (err) {
+			done(err);
+			return;
+		}
+		// Send verification email (hostname validated by previous middleware)
+		let link = `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/auth/verify/${user.localData!.verificationCode}`;
+		let text = 
+`Hi ${user.name},
+
+Thanks for signing up for ${config.eventName}! To verify your email, please click the following link: ${link}
+
+Thanks, The ${config.eventName} Team.`
+		emailTransporter.sendMail({
+			from: config.email.from,
+			to: email,
+			subject: `[${config.eventName}] - Verify your email`,
+			text: text // TODO: Add HTML email template
+		}, (err, info) => {
+			if (err) {
+				done(err);
+				return;
+			}
+			done(null, user);
+		});
 	}
 	else {
 		// Log the user in
@@ -303,13 +334,25 @@ function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", s
 addAuthenticationRoute("github", ["user:email"], GITHUB_CALLBACK_HREF);
 addAuthenticationRoute("google", ["email"], GOOGLE_CALLBACK_HREF);
 addAuthenticationRoute("facebook", ["email"], FACEBOOK_CALLBACK_HREF);
-authRoutes.post("/signup", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), (request, response) => {
+authRoutes.post("/signup", validateAndCacheHostName, postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), (request, response) => {
 	// User is logged in automatically by Passport but we want them to verify their email first
 	request.logout();
 	request.flash("success", "Account created successfully. Please verify your email before logging in.");
 	response.redirect("/login");
 });
 authRoutes.post("/login", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true, successRedirect: "/" }));
+authRoutes.get("/verify/:code", async (request, response) => {
+	let user = await User.findOne({ "localData.verificationCode": request.params.code });
+	if (!user) {
+		request.flash("error", "Invalid email verification code");
+	}
+	else {
+		user.verifiedEmail = true;
+		await user.save();
+		request.flash("success", "Thanks for verifying your email. You can now log in.");
+	}
+	response.redirect("/login");
+});
 
 authRoutes.all("/logout", (request, response) => {
 	request.logout();

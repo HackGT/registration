@@ -309,3 +309,17 @@ export async function validateSchema (questionsFile: string, schemaFile: string 
 		return questionBranches;
 	}
 };
+
+//
+// Email
+//
+import * as nodemailer from "nodemailer";
+export let emailTransporter = nodemailer.createTransport({
+	host: config.email.host,
+	port: config.email.port,
+	secure: true,
+	auth: {
+		user: config.email.username,
+		pass: config.email.password
+	}
+});
