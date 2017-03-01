@@ -7,42 +7,48 @@ import {mongoose} from "./common";
 import {QuestionBranches, Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
-export interface IConfig {
-	secrets?: {
-		session?: string;
-		github?: {
+export namespace IConfig {
+	export interface Secrets {
+		session: string;
+		github: {
 			id: string;
 			secret: string;
 		};
-		google?: {
+		google: {
 			id: string;
 			secret: string;
 		};
-		facebook?: {
+		facebook: {
 			id: string;
 			secret: string;
 		};
-	};
-	email?: {
-		from?: string;
-		host?: string;
-		username?: string;
-		password?: string;
-		port?: number;
-	};
-	server?: {
-		isProduction?: boolean;
-		port?: number;
-		versionHash?: string;
-		workflowReleaseCreatedAt?: string | null;
-		workflowReleaseSummary?: string | null;
-		cookieMaxAge?: number;
-		cookieSecureOnly?: boolean;
-		mongoURL?: string;
-		uniqueAppID?: string;
-	};
-	admins?: string[];
-	eventName?: string;
+	}
+	export interface Email {
+		from: string;
+		host: string;
+		username: string;
+		password: string;
+		port: number;
+	}
+	export interface Server {
+		isProduction: boolean;
+		port: number;
+		versionHash: string;
+		workflowReleaseCreatedAt: string | null;
+		workflowReleaseSummary: string | null;
+		cookieMaxAge: number;
+		cookieSecureOnly: boolean;
+		mongoURL: string;
+		uniqueAppID: string;
+	}
+
+	export interface Main {
+		secrets: Secrets;
+		email: Email;
+		server: Server;
+		admins: string[];
+		eventName: string;
+	}
 }
 
 export interface IFormItem {
@@ -154,7 +160,7 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 }
-export interface IAdminTemplate {
+export interface IAdminTemplate extends ICommonTemplate {
 	applicationStatistics: {
 		totalUsers: number;
 		appliedUsers: number;

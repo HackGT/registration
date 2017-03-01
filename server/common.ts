@@ -8,8 +8,8 @@ import * as os from "os";
 // Config
 //
 import { IConfig } from "./schema";
-class Config implements IConfig {
-	public secrets = {
+class Config implements IConfig.Main {
+	public secrets: IConfig.Secrets = {
 		"session": crypto.randomBytes(32).toString("hex"),
 		"github": {
 			"id": "",
@@ -24,14 +24,14 @@ class Config implements IConfig {
 			"secret": ""
 		}
 	};
-	public email = {
+	public email: IConfig.Email = {
 		from: "HackGT Team <hello@hackgt.com>",
 		host: "",
 		username: "",
 		password: "",
 		port: 465
 	};
-	public server = {
+	public server: IConfig.Server = {
 		isProduction: false,
 		port: 3000,
 		versionHash: fs.existsSync(".git") ? require("git-rev-sync").short() : "",
@@ -52,7 +52,7 @@ class Config implements IConfig {
 		this.loadFromEnv();
 	}
 	protected loadFromJSON(fileName: string): void {
-		let config: IConfig | null = null;
+		let config: IConfig.Main | null = null;
 		try {
 			config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config", fileName), "utf8"));
 		}
@@ -63,17 +63,17 @@ class Config implements IConfig {
 		}
 		if (!config) return;
 		if (config.secrets) {
-			for (let key of Object.keys(config.secrets)) {
+			for (let key of Object.keys(config.secrets) as (keyof IConfig.Secrets)[]) {
 				this.secrets[key] = config.secrets[key];
 			}
 		}
 		if (config.email) {
-			for (let key of Object.keys(config.email)) {
+			for (let key of Object.keys(config.email) as (keyof IConfig.Email)[]) {
 				this.email[key] = config.email[key];
 			}
 		}
 		if (config.server) {
-			for (let key of Object.keys(config.server)) {
+			for (let key of Object.keys(config.server) as (keyof IConfig.Server)[]) {
 				this.server[key] = config.server[key];
 			}
 		}

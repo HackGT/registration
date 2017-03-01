@@ -186,7 +186,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		response.redirect("/");
 	}
 	let templateData: IAdminTemplate = {
-		siteTitle: SITE_NAME,
+		siteTitle: config.eventName,
 		user: user,
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
@@ -218,8 +218,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = rawQuestions.find(q => q.name === question.name);
-					let title = `${rawQuestion ? rawQuestion.label : question.name} → ${checkboxValue}`;
+					let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
+					let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} → ${checkboxValue}`;
 					let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
 					if (index !== -1) {
 						templateData.generalStatistics[index].value++;
@@ -236,8 +236,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				// Categorize by date
 				let years = moment().diff(moment(question.value as string), "years", true);
 
-				let rawQuestion = rawQuestions.find(q => q.name === question.name);
-				let title = `${rawQuestion ? rawQuestion.label : question.name} (average)`;
+				let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
+				let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
 				let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
 				if (index !== -1) {
 					templateData.generalStatistics[index].value += years;

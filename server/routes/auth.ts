@@ -75,7 +75,7 @@ type OAuthStrategyOptions = {
 	profileFields?: string[]
 };
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: passport.Profile & {profileUrl?: string}, done: (err: Error | null, user: IUserMongoose | false) => void) => {
+    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: passport.Profile & {profileUrl?: string}, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
 		let email: string = "";
 		if (profile.emails && profile.emails.length > 0) {
 			email = profile.emails[0].value;
