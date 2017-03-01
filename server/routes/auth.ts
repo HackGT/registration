@@ -10,10 +10,10 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser
+	mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, config
 } from "../common";
 import {
-	Config,
+	IConfig,
 	IUser, IUserMongoose, User
 } from "../schema";
 
@@ -24,56 +24,35 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 import {Strategy as FacebookStrategy} from "passport-facebook";
 import {Strategy as LocalStrategy} from "passport-local";
 
-let config: Config | null = null;
-try {
-	config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config", "config.json"), "utf8"));
-}
-catch (err) {
-	if (err.code !== "ENOENT")
-		throw err;
-}
-
-const isProduction: boolean = (config && config.server.isProduction) || process.env.PRODUCTION === "true";
-
 // GitHub
-const GITHUB_CLIENT_ID: string | null = process.env.GITHUB_CLIENT_ID || (config && config.secrets.github.id);
-const GITHUB_CLIENT_SECRET: string | null = process.env.GITHUB_CLIENT_SECRET || (config && config.secrets.github.secret);
-if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+if (!config.secrets.github.id || !config.secrets.github.secret) {
 	throw new Error("GitHub client ID or secret not configured in config.json or environment variables");
 }
 const GITHUB_CALLBACK_HREF: string = "auth/github/callback";
 
 // Google
-const GOOGLE_CLIENT_ID: string | null = process.env.GOOGLE_CLIENT_ID || (config && config.secrets.google.id);
-const GOOGLE_CLIENT_SECRET: string | null = process.env.GOOGLE_CLIENT_SECRET || (config && config.secrets.google.secret);
-if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+if (!config.secrets.google.id || !config.secrets.google.secret) {
 	throw new Error("Google client ID or secret not configured in config.json or environment variables");
 }
 const GOOGLE_CALLBACK_HREF: string = "auth/google/callback";
 
 // Facebook
-const FACEBOOK_CLIENT_ID: string | null = process.env.FACEBOOK_CLIENT_ID || (config && config.secrets.facebook.id);
-const FACEBOOK_CLIENT_SECRET: string | null = process.env.FACEBOOK_CLIENT_SECRET || (config && config.secrets.facebook.secret);
-if (!FACEBOOK_CLIENT_ID || !FACEBOOK_CLIENT_SECRET) {
+if (!config.secrets.facebook.id || !config.secrets.facebook.secret) {
 	throw new Error("Facebook client ID or secret not configured in config.json or environment variables");
 }
 const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 
-if (!isProduction) {
+if (!config.server.isProduction) {
 	console.warn("OAuth callback(s) running in development mode");
 }
 else {
 	app.enable("trust proxy");
 }
-const sessionSecretSet: boolean = !!(config && config.secrets.session) || !!process.env.SESSION_SECRET;
-const sessionSecret: string = sessionSecretSet 
-	? (config && config.secrets.session) || process.env.SESSION_SECRET
-	: crypto.randomBytes(32).toString("hex");
-if (!sessionSecretSet) {
+if (!config.sessionSecretSet) {
 	console.warn("No session secret set; sessions won't carry over server restarts");
 }
 app.use(session({
-	secret: sessionSecret,
+	secret: config.secrets.session,
 	cookie: COOKIE_OPTIONS,
 	resave: false,
 	store: new MongoStore({
@@ -101,7 +80,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 		let email = profile.emails[0].value;
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
-		if ((config && config.admins && config.admins.indexOf(email) !== -1) || (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.split(",").indexOf(email) !== -1)) {
+		if (config.admins.indexOf(email) !== -1) {
 			isAdmin = true;
 			if (!user || !user.admin)
 				console.info(`Adding new admin: ${email}`);
@@ -150,16 +129,16 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 }
 
 useLoginStrategy(GitHubStrategy, "githubData", {
-	clientID: GITHUB_CLIENT_ID,
-	clientSecret: GITHUB_CLIENT_SECRET
+	clientID: config.secrets.github.id,
+	clientSecret: config.secrets.github.secret
 });
 useLoginStrategy(GoogleStrategy, "googleData", {
-	clientID: GOOGLE_CLIENT_ID,
-	clientSecret: GOOGLE_CLIENT_SECRET
+	clientID: config.secrets.google.id,
+	clientSecret: config.secrets.google.secret
 });
 useLoginStrategy(FacebookStrategy, "facebookData", {
-	clientID: FACEBOOK_CLIENT_ID,
-	clientSecret: FACEBOOK_CLIENT_SECRET,
+	clientID: config.secrets.facebook.id,
+	clientSecret: config.secrets.github.secret,
 	profileFields: ["id", "displayName", "email"]
 });
 
@@ -190,7 +169,7 @@ passport.use(new LocalStrategy({
 			return;
 		}
 		let isAdmin = false;
-		if ((config && config.admins && config.admins.indexOf(email) !== -1) || (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.split(",").indexOf(email) !== -1)) {
+		if (config.admins.indexOf(email) !== -1) {
 			isAdmin = true;
 			if (!user || !user.admin)
 				console.info(`Adding new admin: ${email}`);
@@ -276,7 +255,7 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 		let data = "";
 		message.on("data", (chunk) => data += chunk);
 		message.on("end", () => {
-			let localHMAC = crypto.createHmac("sha256", sessionSecret).update(nonce).digest().toString("hex");
+			let localHMAC = crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex");
 			if (localHMAC === data) {
 				validatedHostNames.push(request.hostname);
 				next();
@@ -298,7 +277,7 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 }
 authRoutes.get("/validatehost/:nonce", (request, response) => {
 	let nonce: string = request.params.nonce || "";
-	response.send(crypto.createHmac("sha256", sessionSecret).update(nonce).digest().toString("hex"));
+	response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
 });
 
 function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", scope: string[], callbackHref: string) {

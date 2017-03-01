@@ -7,26 +7,41 @@ import {mongoose} from "./common";
 import {QuestionBranches, Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
-export interface Config {
-	secrets: {
-		session: string;
-		github: {
+export interface IConfig {
+	secrets?: {
+		session?: string;
+		github?: {
 			id: string;
 			secret: string;
 		};
-		google: {
-			id: string;
-			secret: string;
-		}
-		facebook: {
+		google?: {
 			id: string;
 			secret: string;
 		};
-	},
-	server: {
-		isProduction: boolean;
-	},
-	admins: string[]
+		facebook?: {
+			id: string;
+			secret: string;
+		};
+	};
+	email?: {
+		from?: string;
+		host?: string;
+		username?: string;
+		password?: string;
+		port?: number;
+	};
+	server?: {
+		isProduction?: boolean;
+		port?: number;
+		versionHash?: string;
+		workflowReleaseCreatedAt?: string | null;
+		workflowReleaseSummary?: string | null;
+		cookieMaxAge?: number;
+		cookieSecureOnly?: boolean;
+		mongoURL?: string;
+		uniqueAppID?: string;
+	};
+	admins?: string[];
 }
 
 export interface IFormItem {

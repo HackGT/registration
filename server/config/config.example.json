@@ -14,8 +14,16 @@
 			"secret": ""
 		}
 	},
+	"email": {
+		"from": "",
+		"host": "",
+		"username": "",
+		"password": "",
+		"port": 465
+	},
 	"server": {
-		"isProduction": true
+		"isProduction": true,
+		"port": 3000
 	},
 	"admins": ["example@example.com"]
 }
