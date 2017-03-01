@@ -1,0 +1,31 @@
+h1 {
+	margin-bottom: 35px;
+}
+.main {
+    padding: 40px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.row:first-of-type h2, .row:first-of-type h4 {
+	margin: 0;
+}
+.row:first-of-type > .col-6 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.row:first-of-type > .col-6:last-child {
+	text-transform: uppercase;
+}
+p:first-of-type {
+	text-align: center;
+}
+p {
+	font-size: 1.6rem;
+}
+.btn {
+	display: block;
+	margin: 0 auto;
+}

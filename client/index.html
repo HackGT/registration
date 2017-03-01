@@ -8,12 +8,49 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700" />
 		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/index.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 	</head>
 	<body>
 		{{#> sidebar}}
 			<h1 class="center">Dashboard</h1>
+
+			<section class="main">
+				<div class="row">
+					<div class="col-6">
+						<h2>Your status:</h2>
+					</div>
+					<div class="col-6">
+						{{#if user.attending}}
+							<h4>Attending</h4>
+						{{else if user.accepted}}
+							<h4>Accepted</h4>
+						{{else if user.applied}}
+							<h4>Submitted</h4>
+						{{else}}
+							<h4>Incomplete</h4>
+						{{/if}}
+					</div>
+				</div>
+				<div class="row">
+					<p>Welcome back, {{user.name}}!</p>
+					{{#if user.attending}}
+						<p></p>
+					{{else if user.accepted}}
+						<p></p>
+					{{else if user.applied}}
+						<p>You've applied to be a <b>{{user.applicationBranch}}</b>!</p>
+						<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
+						<p>Admission will be determined by our team and a random lottery. Please make sure your information is accurate before registration is closed!</p>
+						<a class="btn" href="/apply">Edit your application</a>
+					{{else}}
+						<p>You still need to complete your application!</p>
+						<p>If you do not complete your application before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
+						<a class="btn" href="/apply">Complete your application</a>
+					{{/if}}
+				</div>
+			</section>
 		{{/sidebar}}
 	</body>
 </html>
