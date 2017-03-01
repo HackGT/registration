@@ -150,7 +150,9 @@ export interface ICommonTemplate {
 		teamsEnabled: boolean;
 	};
 }
-export interface IIndexTemplate extends ICommonTemplate {}
+export interface IIndexTemplate extends ICommonTemplate {
+	applicationClose: string;
+}
 export interface ILoginTemplate {
 	siteTitle: string;
 	error?: string;
