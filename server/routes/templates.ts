@@ -139,7 +139,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 			if (question.hasOther && savedValue) {
 				if (!Array.isArray(savedValue.value)) {
 					// Select / radio buttons
-					if (question.options.indexOf(savedValue.value as string) === -1) {
+					if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
 						question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
 						question["otherSelected"] = true;
 						question["otherValue"] = savedValue.value;

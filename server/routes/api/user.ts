@@ -82,6 +82,12 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 			request.body[question.name] = request.body[question.name].pop();
 		}
 		else if (question.type === "checkbox" && question.hasOther) {
+			if (!request.body[question.name]) {
+				request.body[question.name] = [];
+			}
+			if (!Array.isArray(request.body[question.name])) {
+				request.body[question.name] = [request.body[question.name]];
+			}
 			// Filter out "other" option
 			request.body[question.name] = (request.body[question.name] as string[]).filter(value => value !== "Other");
 		}
