@@ -42,6 +42,7 @@ export interface IConfig {
 		uniqueAppID?: string;
 	};
 	admins?: string[];
+	eventName?: string;
 }
 
 export interface IFormItem {

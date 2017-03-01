@@ -43,6 +43,8 @@ class Config implements IConfig {
 		uniqueAppID: "registration"
 	};
 	public admins: string[] = [];
+	public eventName: string = "Untitled Event";
+
 	public sessionSecretSet: boolean = false;
 
 	constructor(fileName: string = "config.json") {
@@ -55,8 +57,9 @@ class Config implements IConfig {
 			config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config", fileName), "utf8"));
 		}
 		catch (err) {
-			if (err.code !== "ENOENT")
+			if (err.code !== "ENOENT") {
 				throw err;
+			}
 		}
 		if (!config) return;
 		if (config.secrets) {
@@ -76,6 +79,9 @@ class Config implements IConfig {
 		}
 		if (config.admins) {
 			this.admins = config.admins;
+		}
+		if (config.eventName) {
+			this.eventName = config.eventName;
 		}
 		if (config.secrets && config.secrets.session) {
 			this.sessionSecretSet = true;
@@ -164,6 +170,10 @@ class Config implements IConfig {
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
 			this.admins = process.env.ADMIN_EMAILS.split(",");
+		}
+		// Event name
+		if (process.env.EVENT_NAME) {
+			this.eventName = process.env.EVENT_NAME;
 		}
 	}
 }

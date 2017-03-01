@@ -25,5 +25,6 @@
 		"isProduction": true,
 		"port": 3000
 	},
-	"admins": ["example@example.com"]
+	"admins": ["example@example.com"],
+	"eventName": "My Hackathon"
 }
