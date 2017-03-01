@@ -77,6 +77,14 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 			});
 			return null;
 		}
+		if ((question.type === "select" || question.type === "radio") && Array.isArray(request.body[question.name]) && question.hasOther) {
+			// "Other" option selected
+			request.body[question.name] = request.body[question.name].pop();
+		}
+		else if (question.type === "checkbox" && question.hasOther) {
+			// Filter out "other" option
+			request.body[question.name] = (request.body[question.name] as string[]).filter(value => value !== "Other");
+		}
 		return {
 			"name": question.name,
 			"value": request.body[question.name] || files.find(file => file.fieldname === question.name)

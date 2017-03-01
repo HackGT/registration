@@ -33,7 +33,7 @@
 								{{/each}}
 							</select>
 							{{#if this.hasOther}}
-								<input type="text" name="{{this.name}}" placeholder="Other" disabled {{required this.required}} />
+								<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
 							{{/if}}
 						{{else}}
 							<label>{{this.label}}</label>
@@ -46,7 +46,7 @@
 								{{/each}}
 								{{#if this.hasOther}}
 									<div>
-										<input type="text" name="{{this.name}}" placeholder="Other" disabled {{required this.required}} />
+										<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
 									</div>
 								{{/if}}
 							</fieldset>
