@@ -149,7 +149,7 @@ useLoginStrategy(GoogleStrategy, "googleData", {
 });
 useLoginStrategy(FacebookStrategy, "facebookData", {
 	clientID: config.secrets.facebook.id,
-	clientSecret: config.secrets.github.secret,
+	clientSecret: config.secrets.facebook.secret,
 	profileFields: ["id", "displayName", "email"]
 });
 
