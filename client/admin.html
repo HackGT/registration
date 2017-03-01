@@ -12,6 +12,7 @@
 		<link rel="stylesheet" href="/css/admin.css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 		<script src="/js/admin.js" defer></script>
 	</head>
 	<body>
@@ -69,6 +70,34 @@
 			</section>
 			<section id="users">
 				<h2>Users</h2>
+				<table>
+					<thead>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Status</th>
+						<th>Log in method</th>
+					</thead>
+					<tbody>
+						{{#each users}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>
+									{{this.email}}
+									{{#if this.verifiedEmail}}
+										<i class="fa fa-check" aria-hidden="true"></i>
+									{{else}}
+										<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+									{{/if}}
+									{{#if this.admin}}
+										<i class="fa fa-asterisk" aria-hidden="true"></i>
+									{{/if}}
+								</td>
+								<td>{{this.status}}</td>
+								<td>{{this.loginMethods}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
 			</section>
 			<section id="settings">
 				<h2>Settings</h2>

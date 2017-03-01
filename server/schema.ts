@@ -60,7 +60,7 @@ export interface IFormItem {
 export interface IUser {
 	_id: mongoose.Types.ObjectId;
 	email: string;
-	name?: string;
+	name: string;
 	verifiedEmail: boolean;
 
 	localData?: {
@@ -173,6 +173,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 		"value": number;
 		"count"?: number;
 	}>;
+	users: any[];
 	metrics: {};
 	settings: {
 		application: {

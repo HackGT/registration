@@ -196,6 +196,40 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
 		},
 		generalStatistics: [],
+		users: (await User.find()).sort((a, b) => {
+			if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+			if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+			return 0;
+		}).map(user => {
+			let loginMethods: string[] = [];
+			if (user.githubData && user.githubData.id) {
+				loginMethods.push("GitHub");
+			}
+			if (user.googleData && user.googleData.id) {
+				loginMethods.push("Google");
+			}
+			if (user.facebookData && user.facebookData.id) {
+				loginMethods.push("Facebook");
+			}
+			if (user.localData && user.localData.hash) {
+				loginMethods.push("Local");
+			}
+			let status: string = "Signed up";
+			if (user.applied) {
+				status = "Applied";
+			}
+			if (user.accepted) {
+				status = "Accepted";
+			}
+			if (user.attending) {
+				status = "Attending";
+			}
+			return {
+				...user.toObject(),
+				"status": status,
+				"loginMethods": loginMethods.join(", ")
+			};
+		}),
 		metrics: {},
 		settings: {
 			application: {
@@ -262,8 +296,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	});
 	// Sort general statistics alphabetically
 	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
-		if (a.title < b.title) return -1;
-		if (a.title > b.title) return 1;
+		if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
+		if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
 		return 0;
 	});
 
