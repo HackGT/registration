@@ -7,10 +7,13 @@
             "node_modules/@types"
          ],
          "target": "es5",
-         "strictNullChecks": true,
          "lib": [
              "es2015.promise", "es6", "dom"
          ],
-         "sourceMap": true
+         "sourceMap": true,
+         "alwaysStrict": true,
+         "strictNullChecks": true,
+         "noImplicitAny": true,
+         "noImplicitReturns": true
     }
 }

@@ -93,6 +93,7 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 		}
 		return {
 			"name": question.name,
+			"type": question.type,
 			"value": request.body[question.name] || files.find(file => file.fieldname === question.name)
 		};
 	});

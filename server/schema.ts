@@ -7,53 +7,60 @@ import {mongoose} from "./common";
 import {QuestionBranches, Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
-export interface IConfig {
-	secrets?: {
-		session?: string;
-		github?: {
+export namespace IConfig {
+	export interface Secrets {
+		session: string;
+		github: {
 			id: string;
 			secret: string;
 		};
-		google?: {
+		google: {
 			id: string;
 			secret: string;
 		};
-		facebook?: {
+		facebook: {
 			id: string;
 			secret: string;
 		};
-	};
-	email?: {
-		from?: string;
-		host?: string;
-		username?: string;
-		password?: string;
-		port?: number;
-	};
-	server?: {
-		isProduction?: boolean;
-		port?: number;
-		versionHash?: string;
-		workflowReleaseCreatedAt?: string | null;
-		workflowReleaseSummary?: string | null;
-		cookieMaxAge?: number;
-		cookieSecureOnly?: boolean;
-		mongoURL?: string;
-		uniqueAppID?: string;
-	};
-	admins?: string[];
-	eventName?: string;
+	}
+	export interface Email {
+		from: string;
+		host: string;
+		username: string;
+		password: string;
+		port: number;
+	}
+	export interface Server {
+		isProduction: boolean;
+		port: number;
+		versionHash: string;
+		workflowReleaseCreatedAt: string | null;
+		workflowReleaseSummary: string | null;
+		cookieMaxAge: number;
+		cookieSecureOnly: boolean;
+		mongoURL: string;
+		uniqueAppID: string;
+	}
+
+	export interface Main {
+		secrets: Secrets;
+		email: Email;
+		server: Server;
+		admins: string[];
+		eventName: string;
+	}
 }
 
 export interface IFormItem {
 	"name": string;
+	"type": string;
 	// String for most types, string array for checkbox groups, file for file uploads, null if optional field is not filled in
 	"value": string | string[] | Express.Multer.File | null;
 }
 export interface IUser {
 	_id: mongoose.Types.ObjectId;
 	email: string;
-	name?: string;
+	name: string;
 	verifiedEmail: boolean;
 
 	localData?: {
@@ -119,10 +126,29 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	admin: Boolean
 }));
 
+export interface ISetting {
+	_id: mongoose.Types.ObjectId;
+	name: string;
+	value: any;
+}
+export type ISettingMongoose = ISetting & mongoose.Document;
+
+export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.Schema({
+	name: {
+		type: String,
+		required: true,
+		unique: true,
+	},
+	value: mongoose.Schema.Types.Mixed
+}));
+
 // Handlebars templates
-interface ICommonTemplate {
+export interface ICommonTemplate {
 	siteTitle: string;
 	user: IUser;
+	settings: {
+		teamsEnabled: boolean;
+	};
 }
 export interface IIndexTemplate extends ICommonTemplate {}
 export interface ILoginTemplate {
@@ -136,4 +162,28 @@ export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
+}
+export interface IAdminTemplate extends ICommonTemplate {
+	applicationStatistics: {
+		totalUsers: number;
+		appliedUsers: number;
+		admittedUsers: number;
+		attendingUsers: number;
+		declinedUsers: number;
+	};
+	generalStatistics: Array<{
+		"title": string;
+		"value": number;
+		"count"?: number;
+	}>;
+	users: any[];
+	metrics: {};
+	settings: {
+		application: {
+			open: string;
+			close: string;
+		};
+		teamsEnabled: boolean;
+		teamsEnabledChecked: string;
+	};
 }

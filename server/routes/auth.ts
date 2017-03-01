@@ -75,8 +75,11 @@ type OAuthStrategyOptions = {
 	profileFields?: string[]
 };
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-	passport.use(new strategy(options, async (accessToken, refreshToken, profile, done) => {
-		let email = profile.emails[0].value;
+    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: passport.Profile & {profileUrl?: string}, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
+		let email: string = "";
+		if (profile.emails && profile.emails.length > 0) {
+			email = profile.emails[0].value;
+		}
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
 		if (config.admins.indexOf(email) !== -1) {
@@ -103,7 +106,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				"admin": isAdmin
 			});
 			user[dataFieldName]!.id = profile.id;
-			if (dataFieldName === "githubData") {
+			if (dataFieldName === "githubData" && profile.username && profile.profileUrl) {
 				user[dataFieldName]!.username = profile.username;
 				user[dataFieldName]!.profileUrl = profile.profileUrl;
 			}
@@ -118,12 +121,14 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			done(null, user);
 		}
 		else {
-			if (!user[dataFieldName]!.id) {
-				user[dataFieldName]!.id = profile.id;
+			if (!user[dataFieldName] || !user[dataFieldName]!.id) {
+				user[dataFieldName] = {
+					id: profile.id
+				};
 			}
-			if (dataFieldName === "githubData" && (!user.githubData!.username || !user.githubData!.profileUrl)) {
-				user[dataFieldName]!.username = profile.username;
-				user[dataFieldName]!.profileUrl = profile.profileUrl;
+			if (dataFieldName === "githubData" && (!user.githubData || !user.githubData.username || !user.githubData.profileUrl) && (profile.username && profile.profileUrl)) {
+				user.githubData!.username = profile.username;
+				user.githubData!.profileUrl = profile.profileUrl;
 			}
 			if (!user.admin && isAdmin) {
 				user.admin = true;
@@ -174,12 +179,7 @@ passport.use(new LocalStrategy({
 			done(null, false, { "message": "Missing email, name, or password" });
 			return;
 		}
-		let isAdmin = false;
-		if (config.admins.indexOf(email) !== -1) {
-			isAdmin = true;
-			if (!user || !user.admin)
-				console.info(`Adding new admin: ${email}`);
-		}
+		let isAdmin = false; // Only set this after they have verified their email
 		let salt = crypto.randomBytes(32);
 		let hash = await pbkdf2Async(password, salt, PBKDF2_ROUNDS, 128, "sha256");
 		user = new User({
@@ -348,6 +348,11 @@ authRoutes.get("/verify/:code", async (request, response) => {
 	}
 	else {
 		user.verifiedEmail = true;
+		// Possibly promote to admin status
+		if (config.admins.indexOf(user.email) !== -1) {
+			user.admin = true;
+			console.info(`Adding new admin: ${user.email}`);
+		}
 		await user.save();
 		request.flash("success", "Thanks for verifying your email. You can now log in.");
 	}

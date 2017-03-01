@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Admin - {{siteTitle}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,700" />
+		<link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css" />
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/admin.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
+		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
+		<script src="/js/admin.js" defer></script>
+	</head>
+	<body>
+		{{#> sidebar}}
+			<h1 class="center">Admin Panel</h1>
+
+			<nav class="row center">
+				<a href="#statistics" class="btn">Statistics</a>
+				<a href="#users" class="btn">Users</a>
+				<a href="#settings" class="btn">Settings</a>
+			</nav>
+
+			<section id="statistics">
+				<h2>Statistics</h2>
+				<table>
+					<thead>
+						<th colspan="2">Users</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Total users</td>
+							<td>{{numberFormat applicationStatistics.totalUsers}}</td>
+						</tr>
+						<tr>
+							<td>Applied users</td>
+							<td>{{numberFormat applicationStatistics.appliedUsers}}</td>
+						</tr>
+						<tr>
+							<td>Admitted users</td>
+							<td>{{numberFormat applicationStatistics.admittedUsers}}</td>
+						</tr>
+						<tr>
+							<td>Attending users</td>
+							<td>{{numberFormat applicationStatistics.attendingUsers}}</td>
+						</tr>
+						<tr>
+							<td>Declined users</td>
+							<td>{{numberFormat applicationStatistics.declinedUsers}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<table>
+					<thead>
+						<th colspan="2">Applications</th>
+					</thead>
+					<tbody>
+						{{#each generalStatistics}}
+							<tr>
+								<td>{{this.title}}</td>
+								<td>{{numberFormat this.value}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</section>
+			<section id="users">
+				<h2>Users</h2>
+				<table>
+					<thead>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Status</th>
+						<th>Log in method</th>
+					</thead>
+					<tbody>
+						{{#each users}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>
+									{{this.email}}
+									{{#if this.verifiedEmail}}
+										<i class="fa fa-check" aria-hidden="true"></i>
+									{{else}}
+										<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+									{{/if}}
+									{{#if this.admin}}
+										<i class="fa fa-asterisk" aria-hidden="true"></i>
+									{{/if}}
+								</td>
+								<td>{{this.status}}</td>
+								<td>{{this.loginMethods}}</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</section>
+			<section id="settings">
+				<h2>Settings</h2>
+
+				<form method="post" data-action="/">
+					<div class="row">
+						<div class="col-6">
+							<label for="application-open">Applications open:</label>
+							<input id="application-open" type="datetime-local" value="{{settings.application.open}}" required />
+						</div>
+						<div class="col-6">
+							<label for="application-close">Applications close:</label>
+							<input id="application-close" type="datetime-local" value="{{settings.application.close}}" required />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<label for="teams-enabled">Enable teams?</label>
+							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />
+						</div>
+					</div>
+					<div class="row center">
+						<input type="submit" class="btn" value="Update" />
+					</div>
+				</form>
+			</section>
+		{{/sidebar}}
+	</body>
+</html>
