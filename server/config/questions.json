@@ -156,6 +156,14 @@
                 "hasOther": true
             },
             {
+                "name": "gender",
+                "label": "Gender",
+                "type": "radio",
+                "options": ["Male", "Female"],
+                "hasOther": true,
+                "required": true
+            },
+            {
                 "name": "tshirt-size",
                 "label": "What is your T-shirt size?",
                 "type": "radio",
