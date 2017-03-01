@@ -7,7 +7,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithReject,
 	authenticateWithRedirect,
-	validateSchema
+	validateSchema, config
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -15,7 +15,6 @@ import {
 	IRegisterBranchChoiceTemplate, IRegisterTemplate
 } from "../schema";
 import {QuestionBranches, Questions} from "../config/questions.schema";
-const SITE_NAME = "HackGT Catalyst";
 
 export let templateRoutes = express.Router();
 
@@ -50,7 +49,7 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 	let templateData: IIndexTemplate = {
-		siteTitle: SITE_NAME,
+		siteTitle: config.eventName,
 		user: request.user
 	};
 	response.send(indexTemplate(templateData));
@@ -58,7 +57,9 @@ templateRoutes.route("/").get(authenticateWithRedirect, (request, response) => {
 
 templateRoutes.route("/login").get((request, response) => {
 	let templateData: ILoginTemplate = {
-		siteTitle: SITE_NAME
+		siteTitle: config.eventName,
+		error: request.flash("error"),
+		success: request.flash("success")
 	};
 	response.send(loginTemplate(templateData));
 });
@@ -86,7 +87,7 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 		return;
 	}
 	let templateData: IRegisterBranchChoiceTemplate = {
-		siteTitle: SITE_NAME,
+		siteTitle: config.eventName,
 		user: user,
 		branches: questionBranches.map(branch => branch.name)
 	};
@@ -139,7 +140,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		return question;
 	});
 	let templateData: IRegisterTemplate = {
-		siteTitle: SITE_NAME,
+		siteTitle: config.eventName,
 		user: request.user,
 		branch: questionBranch.name,
 		questionData: questionData

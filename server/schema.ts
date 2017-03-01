@@ -7,26 +7,42 @@ import {mongoose} from "./common";
 import {QuestionBranches, Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
-export interface Config {
-	secrets: {
-		session: string;
-		github: {
+export interface IConfig {
+	secrets?: {
+		session?: string;
+		github?: {
 			id: string;
 			secret: string;
 		};
-		google: {
-			id: string;
-			secret: string;
-		}
-		facebook: {
+		google?: {
 			id: string;
 			secret: string;
 		};
-	},
-	server: {
-		isProduction: boolean;
-	},
-	admins: string[]
+		facebook?: {
+			id: string;
+			secret: string;
+		};
+	};
+	email?: {
+		from?: string;
+		host?: string;
+		username?: string;
+		password?: string;
+		port?: number;
+	};
+	server?: {
+		isProduction?: boolean;
+		port?: number;
+		versionHash?: string;
+		workflowReleaseCreatedAt?: string | null;
+		workflowReleaseSummary?: string | null;
+		cookieMaxAge?: number;
+		cookieSecureOnly?: boolean;
+		mongoURL?: string;
+		uniqueAppID?: string;
+	};
+	admins?: string[];
+	eventName?: string;
 }
 
 export interface IFormItem {
@@ -38,7 +54,13 @@ export interface IUser {
 	_id: mongoose.Types.ObjectId;
 	email: string;
 	name?: string;
+	verifiedEmail: boolean;
 
+	localData?: {
+		hash: string;
+		salt: string;
+		verificationCode: string;
+	};
 	githubData?: {
 		id: string;
 		username: string;
@@ -69,7 +91,13 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		unique: true
 	},
 	name: String,
+	verifiedEmail: Boolean,
 
+	localData: {
+		hash: String,
+		salt: String,
+		verificationCode: String
+	},
 	githubData: {
 		id: String,
 		username: String,
@@ -99,6 +127,8 @@ interface ICommonTemplate {
 export interface IIndexTemplate extends ICommonTemplate {}
 export interface ILoginTemplate {
 	siteTitle: string;
+	error?: string;
+	success?: string;
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];

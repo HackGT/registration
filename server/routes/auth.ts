@@ -10,10 +10,9 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	mongoose, PORT, COOKIE_OPTIONS
+	config, mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, emailTransporter
 } from "../common";
 import {
-	Config,
 	IUser, IUserMongoose, User
 } from "../schema";
 
@@ -22,57 +21,37 @@ import {app} from "../app";
 const GitHubStrategy = require("passport-github2").Strategy; // No type definitions available yet for this module (or for Google)
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 import {Strategy as FacebookStrategy} from "passport-facebook";
-
-let config: Config | null = null;
-try {
-	config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config", "config.json"), "utf8"));
-}
-catch (err) {
-	if (err.code !== "ENOENT")
-		throw err;
-}
-
-const isProduction: boolean = (config && config.server.isProduction) || process.env.PRODUCTION === "true";
+import {Strategy as LocalStrategy} from "passport-local";
 
 // GitHub
-const GITHUB_CLIENT_ID: string | null = process.env.GITHUB_CLIENT_ID || (config && config.secrets.github.id);
-const GITHUB_CLIENT_SECRET: string | null = process.env.GITHUB_CLIENT_SECRET || (config && config.secrets.github.secret);
-if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+if (!config.secrets.github.id || !config.secrets.github.secret) {
 	throw new Error("GitHub client ID or secret not configured in config.json or environment variables");
 }
 const GITHUB_CALLBACK_HREF: string = "auth/github/callback";
 
 // Google
-const GOOGLE_CLIENT_ID: string | null = process.env.GOOGLE_CLIENT_ID || (config && config.secrets.google.id);
-const GOOGLE_CLIENT_SECRET: string | null = process.env.GOOGLE_CLIENT_SECRET || (config && config.secrets.google.secret);
-if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+if (!config.secrets.google.id || !config.secrets.google.secret) {
 	throw new Error("Google client ID or secret not configured in config.json or environment variables");
 }
 const GOOGLE_CALLBACK_HREF: string = "auth/google/callback";
 
 // Facebook
-const FACEBOOK_CLIENT_ID: string | null = process.env.FACEBOOK_CLIENT_ID || (config && config.secrets.facebook.id);
-const FACEBOOK_CLIENT_SECRET: string | null = process.env.FACEBOOK_CLIENT_SECRET || (config && config.secrets.facebook.secret);
-if (!FACEBOOK_CLIENT_ID || !FACEBOOK_CLIENT_SECRET) {
+if (!config.secrets.facebook.id || !config.secrets.facebook.secret) {
 	throw new Error("Facebook client ID or secret not configured in config.json or environment variables");
 }
 const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 
-if (!isProduction) {
+if (!config.server.isProduction) {
 	console.warn("OAuth callback(s) running in development mode");
 }
 else {
 	app.enable("trust proxy");
 }
-const sessionSecretSet: boolean = !!(config && config.secrets.session) || !!process.env.SESSION_SECRET;
-const sessionSecret: string = sessionSecretSet 
-	? (config && config.secrets.session) || process.env.SESSION_SECRET
-	: crypto.randomBytes(32).toString("hex");
-if (!sessionSecretSet) {
+if (!config.sessionSecretSet) {
 	console.warn("No session secret set; sessions won't carry over server restarts");
 }
 app.use(session({
-	secret: sessionSecret,
+	secret: config.secrets.session,
 	cookie: COOKIE_OPTIONS,
 	resave: false,
 	store: new MongoStore({
@@ -90,12 +69,17 @@ passport.deserializeUser<IUser, string>((id, done) => {
 	});
 });
 
-function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: { clientID: string; clientSecret: string; profileFields?: string[] }) {
+type OAuthStrategyOptions = {
+	clientID: string;
+	clientSecret: string;
+	profileFields?: string[]
+};
+function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
 	passport.use(new strategy(options, async (accessToken, refreshToken, profile, done) => {
 		let email = profile.emails[0].value;
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
-		if ((config && config.admins && config.admins.indexOf(email) !== -1) || (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.split(",").indexOf(email) !== -1)) {
+		if (config.admins.indexOf(email) !== -1) {
 			isAdmin = true;
 			if (!user || !user.admin)
 				console.info(`Adding new admin: ${email}`);
@@ -104,7 +88,9 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			user = new User({
 				"email": email,
 				"name": profile.displayName,
+				"verifiedEmail": true,
 
+				"localData": {},
 				"githubData": {},
 				"googleData": {},
 				"facebookData": {},
@@ -121,7 +107,14 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				user[dataFieldName]!.username = profile.username;
 				user[dataFieldName]!.profileUrl = profile.profileUrl;
 			}
-			await user.save();
+			try {
+				await user.save();
+			}
+			catch (err) {
+				done(err);
+				return;
+			}
+
 			done(null, user);
 		}
 		else {
@@ -142,18 +135,118 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 }
 
 useLoginStrategy(GitHubStrategy, "githubData", {
-	clientID: GITHUB_CLIENT_ID,
-	clientSecret: GITHUB_CLIENT_SECRET
+	clientID: config.secrets.github.id,
+	clientSecret: config.secrets.github.secret
 });
 useLoginStrategy(GoogleStrategy, "googleData", {
-	clientID: GOOGLE_CLIENT_ID,
-	clientSecret: GOOGLE_CLIENT_SECRET
+	clientID: config.secrets.google.id,
+	clientSecret: config.secrets.google.secret
 });
 useLoginStrategy(FacebookStrategy, "facebookData", {
-	clientID: FACEBOOK_CLIENT_ID,
-	clientSecret: FACEBOOK_CLIENT_SECRET,
+	clientID: config.secrets.facebook.id,
+	clientSecret: config.secrets.github.secret,
 	profileFields: ["id", "displayName", "email"]
 });
+
+const PBKDF2_ROUNDS: number = 300000;
+passport.use(new LocalStrategy({
+	usernameField: "email",
+	passwordField: "password",
+	passReqToCallback: true
+}, async (request, email, password, done) => {
+	let user = await User.findOne({ "email": email });
+	if (user && request.path.match(/\/signup$/i)) {
+		done(null, false, { "message": "That email address is already in use" });
+	}
+	else if (user && !user.localData!.hash && (user.githubData!.id || user.googleData!.id || user.facebookData!.id)) {
+		done(null, false, { "message": "Please log back in with GitHub, Google, or Facebook" });
+	}
+	else if (!user || !user.localData) {
+		// User hasn't signed up yet
+		if (!request.path.match(/\/signup$/i)) {
+			// Only create the user when targeting /signup
+			done(null, false, { "message": "Incorrect email or password" });
+			return;
+		}
+		let name: string = request.body.name || "";
+		name = name.trim();
+		if (!name || !email || !password) {
+			done(null, false, { "message": "Missing email, name, or password" });
+			return;
+		}
+		let isAdmin = false;
+		if (config.admins.indexOf(email) !== -1) {
+			isAdmin = true;
+			if (!user || !user.admin)
+				console.info(`Adding new admin: ${email}`);
+		}
+		let salt = crypto.randomBytes(32);
+		let hash = await pbkdf2Async(password, salt, PBKDF2_ROUNDS, 128, "sha256");
+		user = new User({
+			"email": email,
+			"name": request.body.name,
+			"verifiedEmail": false,
+
+			"localData": {
+				"hash": hash.toString("hex"),
+				"salt": salt.toString("hex"),
+				"verificationCode": crypto.randomBytes(32).toString("hex")
+			},
+			"githubData": {},
+			"googleData": {},
+			"facebookData": {},
+
+			"applied": false,
+			"accepted": false,
+			"attending": false,
+			"applicationData": [],
+
+			"admin": isAdmin
+		});
+		try {
+			await user.save();
+		}
+		catch (err) {
+			done(err);
+			return;
+		}
+		// Send verification email (hostname validated by previous middleware)
+		let link = `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/auth/verify/${user.localData!.verificationCode}`;
+		let text = 
+`Hi ${user.name},
+
+Thanks for signing up for ${config.eventName}! To verify your email, please click the following link: ${link}
+
+Thanks, The ${config.eventName} Team.`
+		emailTransporter.sendMail({
+			from: config.email.from,
+			to: email,
+			subject: `[${config.eventName}] - Verify your email`,
+			text: text // TODO: Add HTML email template
+		}, (err, info) => {
+			if (err) {
+				done(err);
+				return;
+			}
+			done(null, user);
+		});
+	}
+	else {
+		// Log the user in
+		let hash = await pbkdf2Async(password, Buffer.from(user.localData.salt, "hex"), PBKDF2_ROUNDS, 128, "sha256");
+		if (hash.toString("hex") === user.localData.hash) {
+			if (user.verifiedEmail) {
+				done(null, user);
+			}
+			else {
+				done(null, false, { "message": "You must verify your email before you can sign in" });
+			}
+		}
+		else {
+			done(null, false, { "message": "Incorrect email or password" });
+		}
+	}
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -193,7 +286,7 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 		let data = "";
 		message.on("data", (chunk) => data += chunk);
 		message.on("end", () => {
-			let localHMAC = crypto.createHmac("sha256", sessionSecret).update(nonce).digest().toString("hex");
+			let localHMAC = crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex");
 			if (localHMAC === data) {
 				validatedHostNames.push(request.hostname);
 				next();
@@ -215,7 +308,7 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 }
 authRoutes.get("/validatehost/:nonce", (request, response) => {
 	let nonce: string = request.params.nonce || "";
-	response.send(crypto.createHmac("sha256", sessionSecret).update(nonce).digest().toString("hex"));
+	response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
 });
 
 function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", scope: string[], callbackHref: string) {
@@ -241,6 +334,25 @@ function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", s
 addAuthenticationRoute("github", ["user:email"], GITHUB_CALLBACK_HREF);
 addAuthenticationRoute("google", ["email"], GOOGLE_CALLBACK_HREF);
 addAuthenticationRoute("facebook", ["email"], FACEBOOK_CALLBACK_HREF);
+authRoutes.post("/signup", validateAndCacheHostName, postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), (request, response) => {
+	// User is logged in automatically by Passport but we want them to verify their email first
+	request.logout();
+	request.flash("success", "Account created successfully. Please verify your email before logging in.");
+	response.redirect("/login");
+});
+authRoutes.post("/login", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true, successRedirect: "/" }));
+authRoutes.get("/verify/:code", async (request, response) => {
+	let user = await User.findOne({ "localData.verificationCode": request.params.code });
+	if (!user) {
+		request.flash("error", "Invalid email verification code");
+	}
+	else {
+		user.verifiedEmail = true;
+		await user.save();
+		request.flash("success", "Thanks for verifying your email. You can now log in.");
+	}
+	response.redirect("/login");
+});
 
 authRoutes.all("/logout", (request, response) => {
 	request.logout();

@@ -14,8 +14,17 @@
 			"secret": ""
 		}
 	},
-	"server": {
-		"isProduction": true
+	"email": {
+		"from": "",
+		"host": "",
+		"username": "",
+		"password": "",
+		"port": 465
 	},
-	"admins": ["example@example.com"]
+	"server": {
+		"isProduction": true,
+		"port": 3000
+	},
+	"admins": ["example@example.com"],
+	"eventName": "My Hackathon"
 }
