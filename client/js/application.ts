@@ -52,3 +52,45 @@ if (deleteButton) {
 		});
 	});
 }
+
+let selectsWithOther = document.querySelectorAll(`[data-hasother-select="true"]`) as NodeListOf<HTMLSelectElement>;
+let inputsWithOther = document.querySelectorAll(`[data-hasother-fieldset="true"] input:not([type="text"])`) as NodeListOf<HTMLInputElement>;
+for (let i = 0; i < selectsWithOther.length; i++) {
+	selectsWithOther[i].addEventListener("change", e => {
+		let target = e.target as HTMLSelectElement;
+		let otherField = document.querySelector(`input[name="${target.name}"]`) as HTMLInputElement | null;
+		if (!otherField) return;
+		if (target.value === "Other") {
+			otherField.disabled = false;
+			otherField.focus();
+		}
+		else {
+			otherField.disabled = true;
+		}
+	});
+}
+for (let i = 0; i < inputsWithOther.length; i++) {
+	inputsWithOther[i].addEventListener("change", e => {
+		let target = e.target as HTMLInputElement;
+		let otherField = (<HTMLFieldSetElement> (<HTMLDivElement> target.parentElement).parentElement).querySelector(`input[type="text"]`) as HTMLInputElement | null;
+		if (!otherField) return;
+		if (target.type === "radio") {
+			if (target.value === "Other") {
+				otherField.disabled = false;
+				otherField.focus();
+			}
+			else {
+				otherField.disabled = true;
+			}
+		}
+		else if (target.type === "checkbox") {
+			if (target.value === "Other" && target.checked) {
+				otherField.disabled = false;
+				otherField.focus();
+			}
+			else if (target.value === "Other" && !target.checked) {
+				otherField.disabled = true;
+			}
+		}
+	});
+}

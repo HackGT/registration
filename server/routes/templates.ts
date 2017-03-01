@@ -41,6 +41,10 @@ Handlebars.registerHelper("selected", function (selected: boolean[], index: numb
 	// Adds the "selected" form attribute if the element was selected previously
 	return selected[index] ? "selected" : "";
 });
+Handlebars.registerHelper("enabled", function (isEnabled: boolean) {
+	// Adds the "disabled" form attribute if the element should be disabled
+	return !isEnabled ? "disabled" : "";
+});
 Handlebars.registerHelper("slug", function (input: string): string {
 	return encodeURIComponent(input.toLowerCase());
 });
@@ -120,6 +124,9 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 		let savedValue = user.applicationData.find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
+			if (question.hasOther) {
+				question.options.push("Other");
+			}
 			question["selected"] = question.options.map(option => {
 				if (savedValue && Array.isArray(savedValue.value)) {
 					return savedValue.value.indexOf(option) !== -1;
@@ -129,6 +136,26 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 				}
 				return false;
 			});
+			if (question.hasOther && savedValue) {
+				if (!Array.isArray(savedValue.value)) {
+					// Select / radio buttons
+					if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
+						question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
+						question["otherSelected"] = true;
+						question["otherValue"] = savedValue.value;
+					}
+				}
+				else {
+					// Checkboxes
+					for (let value of savedValue.value as string[]) {
+						if (question.options.indexOf(value) === -1) {
+							question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
+							question["otherSelected"] = true;
+							question["otherValue"] = value;
+						}
+					}
+				}
+			}
 		}
 		else {
 			question["multi"] = false;

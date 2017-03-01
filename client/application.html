@@ -27,20 +27,28 @@
 					{{#if this.multi}}
 						{{#ifCond this.type "select"}}
 							<label for="form-{{this.name}}">{{this.label}}</label>
-							<select id="form-{{this.name}}" name="{{this.name}}">
+							<select id="form-{{this.name}}" name="{{this.name}}" data-hasother-select="{{this.hasOther}}">
 								{{#each this.options}}
 									<option {{selected ../this.selected @index}}>{{this}}</option>
 								{{/each}}
 							</select>
+							{{#if this.hasOther}}
+								<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
+							{{/if}}
 						{{else}}
 							<label>{{this.label}}</label>
-							<fieldset>
+							<fieldset data-hasother-fieldset="{{this.hasOther}}">
 								{{#each this.options}}
 									<div>
 										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} {{checked ../this.selected @index}} />
 										<label for="form-{{@index}}-{{../this.name}}">{{this}}</label>
 									</div>
 								{{/each}}
+								{{#if this.hasOther}}
+									<div>
+										<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
+									</div>
+								{{/if}}
 							</fieldset>
 						{{/ifCond}}
 					{{else}}
