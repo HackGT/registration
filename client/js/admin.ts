@@ -53,6 +53,7 @@ settingsUpdateButton.addEventListener("click", e => {
     if (!settingsForm.checkValidity() || !settingsForm.dataset["action"]) {
 		return;
 	}
+    e.preventDefault();
 	settingsUpdateButton.disabled = true;
     
 	qwest.put("/api/settings/application_availability", {

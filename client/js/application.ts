@@ -8,6 +8,7 @@ submitButton.addEventListener("click", e => {
 	if (!form.checkValidity() || !form.dataset["action"]) {
 		return;
 	}
+	e.preventDefault();
 	submitButton.disabled = true;
 
 	qwest.post(form.dataset["action"]!, 
