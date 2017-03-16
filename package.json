@@ -46,7 +46,8 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
     "serve-static": "^1.11.1",
-    "sweetalert2": "^6.4.1"
+    "sweetalert2": "^6.4.1",
+    "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "@types/body-parser": "0.0.33",
@@ -69,6 +70,7 @@
     "@types/passport-local": "^1.0.29",
     "@types/serve-static": "^1.7.31",
     "@types/supertest": "^2.0.0",
+    "@types/whatwg-fetch": "0.0.33",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
     "supertest": "^3.0.0",

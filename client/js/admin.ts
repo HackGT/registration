@@ -59,26 +59,27 @@ settingsUpdateButton.addEventListener("click", e => {
 	}
     e.preventDefault();
 	settingsUpdateButton.disabled = true;
-    
-	axios.put("/api/settings/application_availability", {
-        "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
-        "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
-    }).then(() => {
-        return axios.put("/api/settings/teams_enabled", {
-            "enabled": (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false"
+
+    fetch("/api/settings/application_availability", {
+		credentials: "same-origin",
+		method: "PUT",
+		body: JSON.stringify({
+            "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
+            "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
+        })
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/teams_enabled", {
+            credentials: "same-origin",
+            method: "PUT",
+            body: JSON.stringify({
+                "enabled": (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false"
+            })
         });
-    }).then(async () => {
-		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
+    }).then(checkStatus).then(parseJSON).then(async () => {
+        await sweetAlert("Awesome!", "Settings successfully updated.", "success");
         window.location.reload();
-	}).catch(async (err: any) => {
-		let errorText: string;
-		if (err.response) {
-			errorText = err.response.data.error;
-		}
-		else {
-			errorText = err.message;
-		}
-		await sweetAlert("Oh no!", errorText, "error");
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", err.message, "error");
 		submitButton.disabled = false;
 	});
 });

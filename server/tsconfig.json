@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "module": "commonjs",
+        "types": [],
         "typeRoots": [
             "../node_modules/@types"
         ],
@@ -15,5 +16,9 @@
         "strictNullChecks": true,
         "noImplicitAny": true,
         "noImplicitReturns": true
-    }
+    },
+    "exclude": [
+        "../node_modules/@types/whatwg-fetch/index.d.ts",
+        "../node_modules/@types/whatwg-streams/index.d.ts"
+    ]
 }
