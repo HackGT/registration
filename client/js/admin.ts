@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/@types/qwest/index.d.ts" />
-/// <reference path="../../node_modules/sweetalert2/sweetalert2.d.ts" />
 class State {
     public id: string;
     private sectionElement: HTMLElement;
@@ -29,7 +27,13 @@ const states: State[] = ["statistics", "users", "settings"].map(id => new State(
 
 // Set the correct state on page load
 function readURLHash() {
-    let urlState = states.find(state => state.id === window.location.hash.substr(1));
+    let urlState: State | null = null;
+    for (let i = 0; i < states.length; i++) {
+        if (states[i].id === window.location.hash.substr(1)) {
+            urlState = states[i];
+            break;
+        }
+    }
     if (urlState) {
         urlState.show();
     }
@@ -56,19 +60,25 @@ settingsUpdateButton.addEventListener("click", e => {
     e.preventDefault();
 	settingsUpdateButton.disabled = true;
     
-	qwest.put("/api/settings/application_availability", {
+	axios.put("/api/settings/application_availability", {
         "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
         "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
     }).then(() => {
-        return qwest.put("/api/settings/teams_enabled", {
+        return axios.put("/api/settings/teams_enabled", {
             "enabled": (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false"
         });
     }).then(async () => {
 		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
         window.location.reload();
-	}).catch((err: Error, xhr: any, response: any) => {
-		sweetAlert("Oh no!", response.error, "error");
-	}).complete(() => {
-		settingsUpdateButton.disabled = false;
+	}).catch(async (err: any) => {
+		let errorText: string;
+		if (err.response) {
+			errorText = err.response.data.error;
+		}
+		else {
+			errorText = err.message;
+		}
+		await sweetAlert("Oh no!", errorText, "error");
+		submitButton.disabled = false;
 	});
 });

@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"typeRoots": [
+			"../node_modules/*"
+		],
+		"target": "es5",
+		"lib": [
+			"es5",
+			"es2015.promise",
+			"dom"
+		],
+		"sourceMap": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true
+	},
+	"include": [
+		"js/*.ts"
+	]
+}

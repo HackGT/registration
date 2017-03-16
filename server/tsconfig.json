@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "typeRoots": [
+            "../node_modules/@types"
+        ],
+        "target": "es6",
+        "lib": [
+            "es6",
+            "es2015.promise",
+            "dom"
+        ],
+        "sourceMap": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true
+    }
+}
