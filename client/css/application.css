@@ -11,7 +11,7 @@ label {
 	display: inline;
     font-size: 1.8rem;
     line-height: 1.5;
-    letter-spacing: -.05rem;
+    letter-spacing: 0;
     font-weight: 300;
     font-family: Quicksand;
 }
