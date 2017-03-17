@@ -1,6 +1,17 @@
-/// <reference path="../../node_modules/@types/qwest/index.d.ts" />
-/// <reference path="../../node_modules/sweetalert2/sweetalert2.d.ts" />
-declare let sweetAlert: any; // FUCK IT SHIP IT (sweetalert's type declaration file isn't working for some reason)
+declare const sweetAlert: any;
+
+// Fetch helper functions
+async function checkStatus(response: Response) {
+	if (response.status >= 200 && response.status < 300) {
+		return response;
+	}
+	else {
+		return new Error((await response.json()).error);
+	}
+}
+function parseJSON(response: Response) {
+	return response.json()
+}
 
 let form = document.querySelector("form")!;
 let submitButton = document.querySelector("form input[type=submit]")! as HTMLInputElement;
@@ -11,14 +22,15 @@ submitButton.addEventListener("click", e => {
 	e.preventDefault();
 	submitButton.disabled = true;
 
-	qwest.post(form.dataset["action"]!, 
-		new FormData(form)
-	).then(async () => {
+	fetch(form.dataset["action"]!, {
+		credentials: "same-origin",
+		method: "POST",
+		body: new FormData(form)
+	}).then(checkStatus).then(parseJSON).then(async () => {
 		await sweetAlert("Awesome!", "Your application has been saved. Feel free to come back here and edit it at any time.", "success");
 		window.location.assign("/");
-	}).catch((err: Error, xhr: any, response: any) => {
-		sweetAlert("Oh no!", response.error, "error");
-	}).complete(() => {
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", err.message, "error");
 		submitButton.disabled = false;
 	});
 });
@@ -44,12 +56,15 @@ if (deleteButton) {
 			deleteButton.disabled = false;
 			return;
 		}
-		qwest.delete(deleteButton.dataset["action"]!).then(async () => {
+
+		fetch(deleteButton.dataset["action"]!, {
+			credentials: "same-origin",
+			method: "DELETE"
+		}).then(checkStatus).then(parseJSON).then(async () => {
 			window.location.assign("/apply");
-		}).catch((err: Error, xhr: any, response: any) => {
-			sweetAlert("Oh no!", response.error, "error");
-		}).complete(() => {
-			deleteButton!.disabled = false;
+		}).catch(async (err: Error) => {
+			await sweetAlert("Oh no!", err.message, "error");
+			submitButton.disabled = false;
 		});
 	});
 }

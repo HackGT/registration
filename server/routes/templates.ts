@@ -3,6 +3,7 @@ import * as path from "path";
 import * as express from "express";
 import * as Handlebars from "handlebars";
 import * as moment from "moment";
+import * as bowser from "bowser";
 
 import {
 	STATIC_ROOT,
@@ -20,8 +21,46 @@ import {QuestionBranches, Questions} from "../config/questions.schema";
 
 export let templateRoutes = express.Router();
 
+// Block IE
+templateRoutes.use(async (request, response, next) => {
+	// Only block requests for rendered pages
+	if (path.extname(request.url) !== "") {
+		next();
+		return;
+	}
+
+	let userAgent = request.headers["user-agent"];
+	const minBrowser = {
+		msie: "12", // Microsoft Edge+ (no support for IE)
+		safari: "7.1" // v7 released 2013
+	};
+	if (bowser.isUnsupportedBrowser(minBrowser, false, userAgent)) {
+		let templateData = {
+			siteTitle: config.eventName
+		};
+		response.send(unsupportedTemplate(templateData));
+	}
+	else {
+		next();
+	}
+});
+
 // Load and compile Handlebars templates
-let [indexTemplate, loginTemplate, preregisterTemplate, registerTemplate, adminTemplate] = ["index.html", "login.html", "preapplication.html", "application.html", "admin.html"].map(file => {
+let [
+	indexTemplate,
+	loginTemplate,
+	preregisterTemplate,
+	registerTemplate,
+	adminTemplate,
+	unsupportedTemplate
+] = [
+	"index.html",
+	"login.html",
+	"preapplication.html",
+	"application.html",
+	"admin.html",
+	"unsupported.html"
+].map(file => {
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
