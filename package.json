@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node node_modules/json-schema-to-typescript/dist/cli.js server/config/questions.schema.json && ./node_modules/typescript/bin/tsc -p server/ && ./node_modules/typescript/bin/tsc -p client/",
-    "start": "node server/app.js"
+    "start": "node server/app.js",
+    "build-start": "npm run build && npm start"
   },
   "author": {
     "name": "Ryan Petschek",
@@ -31,6 +32,7 @@
     "connect-flash": "^0.1.1",
     "connect-mongo": "^1.3.2",
     "cookie-parser": "^1.4.3",
+    "es6-promise": "git+https://github.com/stefanpenner/es6-promise.git",
     "express": "^4.14.0",
     "express-session": "^1.15.1",
     "git-rev-sync": "^1.8.0",
