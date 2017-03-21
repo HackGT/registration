@@ -134,7 +134,7 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 			text =
 `Hi!
 
-Thank you for singing up to be a mentor at ${config.eventName}. For background check forms, please send us these forms (https://drive.google.com/open?id=0B8MqIMxG0xUJcmU5RFppWUNhWUE) completed as soon as possible -- they must be processed and confirmed prior to the event. Once we receive the forms, you will receive a link to sign up for a training session. If you have any questions, please don't hesitate to reply to this email.
+Thank you for singing up to be a mentor at ${config.eventName}. Please send us these completed background check forms (https://drive.google.com/open?id=0B8MqIMxG0xUJcmU5RFppWUNhWUE) as soon as possible. Once we receive the forms, you will receive a link to sign up for a training session. If you have any questions, please don't hesitate to contact us by replying to this email.
 
 Sincerely,
 
