@@ -266,13 +266,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			}
 			let status: string = "Signed up";
 			if (user.applied) {
-				status = "Applied";
+				status = `Applied (${user.applicationBranch})`;
 			}
 			if (user.accepted) {
-				status = "Accepted";
+				status = `Accepted (${user.applicationBranch})`;
 			}
 			if (user.attending) {
-				status = "Attending";
+				status = `Attending (${user.applicationBranch})`;
 			}
 			return {
 				...user.toObject(),
