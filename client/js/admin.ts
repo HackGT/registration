@@ -60,20 +60,21 @@ settingsUpdateButton.addEventListener("click", e => {
     e.preventDefault();
 	settingsUpdateButton.disabled = true;
 
+    let applicationAvailabilityData = new FormData();
+    applicationAvailabilityData.append("open", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
+    applicationAvailabilityData.append("close", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
+    let teamsEnabledData = new FormData();
+    teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
+
     fetch("/api/settings/application_availability", {
 		credentials: "same-origin",
 		method: "PUT",
-		body: JSON.stringify({
-            "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
-            "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
-        })
+		body: applicationAvailabilityData
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/teams_enabled", {
             credentials: "same-origin",
             method: "PUT",
-            body: JSON.stringify({
-                "enabled": (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false"
-            })
+            body: teamsEnabledData
         });
     }).then(checkStatus).then(parseJSON).then(async () => {
         await sweetAlert("Awesome!", "Settings successfully updated.", "success");

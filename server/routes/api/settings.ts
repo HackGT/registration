@@ -4,7 +4,7 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-    postParser, uploadHandler
+    uploadHandler
 } from "../../common";
 import {
 	IUser, IUserMongoose, User,
@@ -56,7 +56,7 @@ settingsRoutes.route("/application_availability")
 			"close": close.toISOString()
 		});
     })
-    .put(isAdmin, postParser, async (request, response) => {
+    .put(isAdmin, uploadHandler.any(), async (request, response) => {
 		let rawOpen = request.body.open;
 		let rawClose = request.body.close;
 		if (!rawOpen || !rawClose) {
@@ -100,7 +100,7 @@ settingsRoutes.route("/teams_enabled")
 			"enabled": enabled
 		});
     })
-    .put(isAdmin, postParser, async (request, response) => {
+    .put(isAdmin, uploadHandler.any(), async (request, response) => {
 		let rawEnabled = request.body.enabled;
 		if (!rawEnabled || (rawEnabled !== "true" && rawEnabled !== "false")) {
 			response.status(400).json({
