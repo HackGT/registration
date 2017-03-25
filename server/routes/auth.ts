@@ -10,7 +10,7 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	config, mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, emailTransporter
+	config, mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync
 } from "../common";
 import {
 	IUser, IUserMongoose, User
@@ -217,19 +217,22 @@ passport.use(new LocalStrategy({
 
 Thanks for signing up for ${config.eventName}! To verify your email, please click the following link: ${link}
 
-Thanks, The ${config.eventName} Team.`
-		emailTransporter.sendMail({
-			from: config.email.from,
-			to: email,
-			subject: `[${config.eventName}] - Verify your email`,
-			text: text // TODO: Add HTML email template
-		}, (err, info) => {
-			if (err) {
-				done(err);
-				return;
-			}
-			done(null, user);
-		});
+Sincerely,
+
+The ${config.eventName} Team.`;
+		try {
+			await sendMailAsync({
+				from: config.email.from,
+				to: email,
+				subject: `[${config.eventName}] - Verify your email`,
+				text: text // TODO: Add HTML email template
+			});
+		}
+		catch (err) {
+			done(err);
+			return;
+		}
+		done(null, user);
 	}
 	else {
 		// Log the user in

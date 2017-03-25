@@ -5,6 +5,7 @@ import * as express from "express";
 import {
 	UPLOAD_ROOT,
     postParser, uploadHandler,
+	config, sendMailAsync,
 	validateSchema
 } from "../../common";
 import {
@@ -126,6 +127,39 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 			}
 			return item;
 		});
+		// Email the applicant to confirm
+		// TODO: Make the content of these emails admin-configurable
+		let text: string;
+		if (questionBranch.name.toLowerCase() === "mentor") {
+			text =
+`Hi!
+
+Thank you for singing up to be a mentor at ${config.eventName}. Please send us these completed background check forms (https://drive.google.com/open?id=0B8MqIMxG0xUJcmU5RFppWUNhWUE) as soon as possible. Once we receive the forms, you will receive a link to sign up for a training session. If you have any questions, please don't hesitate to contact us by replying to this email.
+
+Sincerely,
+
+The ${config.eventName} Team`;
+		}
+		else {
+			text =
+`Hi!
+
+Thank you for applying to be a ${questionBranch.name} at ${config.eventName}! Feel free to go back and update your application any time before registration closes.
+
+If you have any questions please don't hesitate to contact us by replying to this email.
+
+Sincerely,
+
+The ${config.eventName} Team`;
+		}
+		if (!user.applied) {
+			await sendMailAsync({
+				from: config.email.from,
+				to: user.email,
+				subject: `[${config.eventName}] - Thank you for appying!`,
+				text: text // TODO: Add HTML email template
+			});
+		}
 
 		user.applied = true;
 		user.applicationBranch = questionBranch.name;
