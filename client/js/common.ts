@@ -1,4 +1,5 @@
 declare const sweetAlert: any;
+declare const moment: any;
 
 // Fetch helper functions
 async function checkStatus(response: Response) {

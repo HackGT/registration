@@ -283,8 +283,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		metrics: {},
 		settings: {
 			application: {
-				open: moment((await Setting.findOne({ "name": "applicationOpen" })).value).format("Y-MM-DDTHH:mm:00"),
-				close: moment((await Setting.findOne({ "name": "applicationClose" })).value).format("Y-MM-DDTHH:mm:00"),
+				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
+				close: (await Setting.findOne({ "name": "applicationClose" })).value,
 			},
 			teamsEnabled: teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : ""

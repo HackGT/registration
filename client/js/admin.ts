@@ -46,6 +46,12 @@ readURLHash();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);
 
+// Load timezone-correct values for the application open / close time
+let timeInputs = document.querySelectorAll('input[type="datetime-local"]') as NodeListOf<HTMLInputElement>;
+for (let i = 0; i < timeInputs.length; i++) {
+    timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
+}
+
 // Settings update
 function parseDateTime (dateTime: string) {
     let digits = dateTime.split(/\D+/).map(num => parseInt(num));
