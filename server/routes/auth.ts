@@ -126,6 +126,10 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 					id: profile.id
 				};
 			}
+			if (!user.verifiedEmail) {
+				// We trust our OAuth provider to have verified the user's email for us
+				user.verifiedEmail = true;
+			}
 			if (dataFieldName === "githubData" && (!user.githubData || !user.githubData.username || !user.githubData.profileUrl) && (profile.username && profile.profileUrl)) {
 				user.githubData!.username = profile.username;
 				user.githubData!.profileUrl = profile.profileUrl;
