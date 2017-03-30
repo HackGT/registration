@@ -1,3 +1,5 @@
+/// <reference path="application.ts" />
+
 class State {
     public id: string;
     private sectionElement: HTMLElement;
@@ -23,7 +25,22 @@ class State {
     }
 }
 
-const states: State[] = ["statistics", "users", "settings"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "settings", "applicants"].map(id => new State(id));
+
+// async function checkStatus(response: Response) {
+//     if (response.status >= 200 && response.status < 300) {
+//         return response;
+//     }
+//     else {
+//         return new Error((await response.json()).error);
+//     }
+// }
+// function parseJSON(response: Response) {
+//     return response.json()
+// }
+
+// declare const sweetAlert: any;
+
 
 // Set the correct state on page load
 function readURLHash() {
@@ -87,6 +104,44 @@ settingsUpdateButton.addEventListener("click", e => {
         window.location.reload();
 	}).catch(async (err: Error) => {
 		await sweetAlert("Oh no!", err.message, "error");
-		submitButton.disabled = false;
+		settingsUpdateButton.disabled = false;
 	});
 });
+
+
+let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton");
+
+for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
+
+    let statusUpdateButton = applicationStatusUpdateButtons[i] as HTMLInputElement;
+    console.log("Hurray");
+
+    statusUpdateButton.addEventListener("click", e => {
+        
+        var eventTarget = e.target as HTMLInputElement;
+        console.log(eventTarget.id);
+
+        e.preventDefault();
+        eventTarget.disabled = true;
+
+        let adminId = eventTarget.getAttribute('data-admin');
+        let userId = eventTarget.getAttribute('data-user');
+        let currentCondition = eventTarget.getAttribute('data-accepted') === "true";
+
+        var formData = new FormData();
+        formData.append("id", userId);
+        formData.append("status", !currentCondition);
+
+        fetch("/api/user/" + adminId + "/status/", {
+            credentials: "same-origin",
+            method: "POST",
+            body: formData
+        }).then(checkStatus).then(parseJSON).then(async () => {
+            await sweetAlert("Awesome!", "Settings successfully updated.", "success");
+            window.location.reload();
+        }).catch(async (err: Error) => {
+            await sweetAlert("Oh no!", err.message, "error");
+            eventTarget.disabled = false;
+        });
+    });   
+}

@@ -25,6 +25,7 @@
 				<a href="#statistics" class="btn">Statistics</a>
 				<a href="#users" class="btn">Users</a>
 				<a href="#settings" class="btn">Settings</a>
+				<a href="#applicants" class="btn">Applicants</a>
 			</nav>
 
 			<section id="statistics">
@@ -125,6 +126,52 @@
 						<input type="submit" class="btn" value="Update" />
 					</div>
 				</form>
+			</section>
+			<section id="applicants">
+				<h2>Applicants {{user._id}}</h2>
+				<table>
+					<thead>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Accepted?</th>
+						<th>Button</th>
+					</thead>
+					<tbody>
+						{{#each users}}
+							{{#if this.applied}}
+								<!--maybe query for each applied instead-->
+								<tr>
+									<td>{{this.name}}</td>
+									<td>
+										{{this.email}}
+										<!-- {{#if this.verifiedEmail}}
+											<i class="fa fa-check" aria-hidden="true"></i>
+										{{else}}
+											<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+										{{/if}} -->
+									</td>
+									{{#if this.accepted}}
+										<td>Accepted</td>
+									{{else}}
+										<td>Not Accepted</td>
+									{{/if}}
+									<td>
+										<!--not sure if there's a better way to do it than bind id to button id-->
+										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton">
+											
+											{{#if this.accepted}}
+												Un-Accept
+											{{else}}
+												Accept
+											{{/if}}
+
+										</button>
+									</td>
+								</tr>
+							{{/if}}
+						{{/each}}
+					</tbody>
+				</table>
 			</section>
 		{{/sidebar}}
 	</body>

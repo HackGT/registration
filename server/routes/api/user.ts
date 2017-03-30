@@ -4,7 +4,7 @@ import * as express from "express";
 
 import {
 	UPLOAD_ROOT,
-    postParser, uploadHandler,
+    postParser, jsonParser, uploadHandler,
 	config, sendMailAsync,
 	validateSchema
 } from "../../common";
@@ -22,6 +22,24 @@ function isUserOrAdmin (request: express.Request, response: express.Response, ne
 		});
 	}
 	else if (user._id.toString() !== request.params.id && !user.admin) {
+		response.status(403).json({
+			"error": "You are not permitted to access this endpoint"
+		});
+	}
+	else {
+		next();
+	}
+}
+
+function isAdmin (request: express.Request, response: express.Response, next: express.NextFunction) {
+	let user = request.user as IUser;
+	if (!request.isAuthenticated()) {
+		response.status(401).json({
+			"error": "You must log in to access this endpoint"
+		});
+	}
+	else if (user._id.toString() !== request.params.id || !user.admin) {
+		//review this, I might've fudged it up
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"
 		});
@@ -198,5 +216,35 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
 		response.status(500).json({
 			"error": "An error occurred while deleting the application"
 		});
+	}
+});
+
+//set a user's status to accepted or not
+
+//'id' and 'status' params in post body
+//'status' is true or false, for accepted or not accepted
+userRoutes.route("/status/").post(isAdmin, uploadHandler.any(), async (request, response) => {
+
+	let status = request.body.status;
+	let uid = request.body.id;
+	console.log(uid);
+	console.log(status);
+	let user = await User.findById(uid);
+
+	if (!user) {
+
+		response.status(400).json({
+			"error": "No such user with id " + uid
+		});
+
+	} else {
+
+		user.accepted = status;
+		await user.save();
+
+		response.status(200).json({
+			"success": true
+		});
+
 	}
 });
