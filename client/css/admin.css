@@ -63,3 +63,15 @@ textarea[type=text]:focus {
     border: 1px solid #99b3ff;
     border-radius: 4px;
 }
+.applicantData {
+    text-align: left;
+    margin-left: 2em;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.accepted-true {
+    background-color: #e74c3c;
+}
+.accepted-false {
+    background-color: #27ae60;
+}

@@ -133,26 +133,24 @@
 					<thead>
 						<th>Name</th>
 						<th>Email</th>
-						<th>Accepted?</th>
-						<th>Button</th>
+						<th>Applicant Type</th>
+						<th>Accept / Un-accept</th>
 					</thead>
 					<tbody>
 						{{#each users}}
 							{{#if this.applied}}
 								<!--maybe query for each applied instead-->
 								<tr>
-									<td>{{this.name}}</td>
+									<td><b>{{this.name}}</b></td>
 									<td>
 										{{this.email}}
 									</td>
-									{{#if this.accepted}}
-										<td>Accepted</td>
-									{{else}}
-										<td>Not Accepted</td>
-									{{/if}}
+									<td>
+										{{this.applicationBranch}}
+									</td>
 									<td>
 										<!--not sure if there's a better way to do it than bind id to button id-->
-										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton">
+										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton accepted-{{this.accepted}}">
 											
 											{{#if this.accepted}}
 												Un-Accept
@@ -163,6 +161,17 @@
 										</button>
 									</td>
 								</tr>
+								  <tr>
+								  	<td colspan="4">
+								  		<div class="applicantData">
+								  			{{#each this.applicationData}}
+								  				<p><b>{{this.name}}</b> - {{this.value}}</p>
+								  			{{/each}}
+								  		</div>
+								  		<hr />
+								  	</td>
+								  </tr>
+								
 							{{/if}}
 						{{/each}}
 					</tbody>
