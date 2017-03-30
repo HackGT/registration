@@ -38,7 +38,7 @@ function isAdmin (request: express.Request, response: express.Response, next: ex
 			"error": "You must log in to access this endpoint"
 		});
 	}
-	else if (user._id.toString() !== request.params.id || !user.admin) {
+	else if (!user.admin) {
 		//review this, I might've fudged it up
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"

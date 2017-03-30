@@ -130,7 +130,7 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
         formData.append("id", userId);
         formData.append("status", !currentCondition);
 
-        fetch("/api/user/" + adminId + "/status/", {
+        fetch("/api/user/" + userId + "/status/", {
             credentials: "same-origin",
             method: "POST",
             body: formData
