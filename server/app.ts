@@ -52,6 +52,13 @@ app.use("/api", apiRouter);
 // User facing routes
 import {templateRoutes} from "./routes/templates";
 app.use("/", templateRoutes);
+app.route("/version").get((request, response) => {
+	response.json({
+		"version": VERSION_NUMBER,
+		"hash": VERSION_HASH,
+		"node": process.version
+	});
+});
 
 app.use("/node_modules", serveStatic(path.resolve(__dirname, "../node_modules")));
 app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
