@@ -17,9 +17,13 @@ table th, table td {
     vertical-align: middle;
     padding: 12px 4px;
 }
-table td:last-child {
+#users table td:last-child {
     text-align: center;
     width: 50px;
+}
+#applicants table td:last-child {
+    text-align: center;
+    width: 140px;
 }
 table thead {
     border-bottom: 2px solid #333030;
@@ -73,5 +77,5 @@ textarea[type=text]:focus {
     background-color: #e74c3c;
 }
 .accepted-false {
-    background-color: #27ae60;
+    background-color: #333030;
 }
