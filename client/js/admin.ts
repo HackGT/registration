@@ -91,6 +91,29 @@ settingsUpdateButton.addEventListener("click", e => {
 	});
 });
 
+let branchFilter = document.querySelector("#branchFilter") as HTMLInputElement;
+branchFilter.addEventListener('change', e => {
+    console.log(branchFilter.value);
+
+    revealDivByClass(branchFilter.value);
+});
+
+function revealDivByClass(branchType: string) {
+    let elements = document.querySelectorAll(".applicantDiv") as NodeListOf<HTMLElement>;
+    for (let i = 0; i < elements.length; i++) {
+        let element = elements[i];
+        console.log(element);
+
+        if (element.classList.contains(branchType) || branchType == "*") {
+            element.style.display = "";
+            console.log("yay", element.classList.contains(branchType), branchType == "*");
+        } else {
+            element.style.display = "none";
+            console.log("booo");
+        }
+
+    }
+}
 
 let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
 

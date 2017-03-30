@@ -135,12 +135,22 @@
 						<th>Email</th>
 						<th>Applicant Type</th>
 						<th>Accept / Un-accept</th>
+						<th>
+							<select id="branchFilter">
+								<!--todo, make this prettier-->
+								<option value="*">Show All</option>
+								{{#each branchNames}}
+									<option value="{{this}}">{{this}}</span>
+
+								{{/each}}
+							</select>
+						</th>
 					</thead>
 					<tbody>
 						{{#each users}}
 							{{#if this.applied}}
 								<!--maybe query for each applied instead-->
-								<tr>
+								<tr class="{{this.applicationBranch}} applicantDiv">
 									<td><b>{{this.name}}</b></td>
 									<td>
 										{{this.email}}
@@ -161,16 +171,16 @@
 										</button>
 									</td>
 								</tr>
-								  <tr>
-								  	<td colspan="4">
-								  		<div class="applicantData">
-								  			{{#each this.applicationData}}
-								  				<p><b>{{this.name}}</b> - {{this.value}}</p>
-								  			{{/each}}
-								  		</div>
-								  		<hr />
-								  	</td>
-								  </tr>
+								<tr class="{{this.applicationBranch}} applicantDiv">
+									<td colspan="4">
+										<div class="applicantData">
+											{{#each this.applicationData}}
+												<p><b>{{this.name}}</b> - {{this.value}}</p>
+											{{/each}}
+										</div>
+										<hr />
+									</td>
+								</tr>
 								
 							{{/if}}
 						{{/each}}

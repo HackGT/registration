@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithReject,
 	authenticateWithRedirect,
-	validateSchema, config
+	validateSchema, config, readFileAsync
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -229,15 +229,28 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 	response.send(registerTemplate(templateData));
 });
 
+let questionsFile = "../config/questions.json";//assuming this location is constant
+
 templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
 	if (!user.admin) {
 		response.redirect("/");
 	}
+
+	let branchNames: string[] = [];
+
+	try {
+		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
+		branchNames = questionBranches.map(branch => branch.name);
+	} catch (err) {
+		console.log(err);
+	}
+
 	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user: user,
+		branchNames: branchNames,
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
