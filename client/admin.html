@@ -128,7 +128,7 @@
 				</form>
 			</section>
 			<section id="applicants">
-				<h2>Applicants {{user._id}}</h2>
+				<h2>Applicants</h2>
 				<table>
 					<thead>
 						<th>Name</th>
@@ -144,11 +144,6 @@
 									<td>{{this.name}}</td>
 									<td>
 										{{this.email}}
-										<!-- {{#if this.verifiedEmail}}
-											<i class="fa fa-check" aria-hidden="true"></i>
-										{{else}}
-											<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-										{{/if}} -->
 									</td>
 									{{#if this.accepted}}
 										<td>Accepted</td>

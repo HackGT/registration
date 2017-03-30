@@ -114,12 +114,10 @@ let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton");
 for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 
     let statusUpdateButton = applicationStatusUpdateButtons[i] as HTMLInputElement;
-    console.log("Hurray");
 
     statusUpdateButton.addEventListener("click", e => {
         
         var eventTarget = e.target as HTMLInputElement;
-        console.log(eventTarget.id);
 
         e.preventDefault();
         eventTarget.disabled = true;
