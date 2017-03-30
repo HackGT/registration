@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";
 import * as Handlebars from "handlebars";
-import * as moment from "moment";
+import * as moment from "moment-timezone";
 import * as bowser from "bowser";
 
 import {
@@ -283,8 +283,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		metrics: {},
 		settings: {
 			application: {
-				open: moment((await Setting.findOne({ "name": "applicationOpen" })).value).format("Y-MM-DDTHH:mm:00"),
-				close: moment((await Setting.findOne({ "name": "applicationClose" })).value).format("Y-MM-DDTHH:mm:00"),
+				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
+				close: (await Setting.findOne({ "name": "applicationClose" })).value,
 			},
 			teamsEnabled: teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : ""

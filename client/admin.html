@@ -12,7 +12,9 @@
 		<script src="/node_modules/es6-promise/dist/es6-promise.auto.min.js"></script>
 		<script src="/node_modules/whatwg-fetch/fetch.js"></script>
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
+		<script src="/js/common.js"></script>
 		<script src="/js/admin.js" defer></script>
 	</head>
 	<body>
@@ -106,11 +108,11 @@
 					<div class="row">
 						<div class="col-6">
 							<label for="application-open">Applications open:</label>
-							<input id="application-open" type="datetime-local" value="{{settings.application.open}}" required />
+							<input id="application-open" type="datetime-local" data-raw-value="{{settings.application.open}}" required />
 						</div>
 						<div class="col-6">
 							<label for="application-close">Applications close:</label>
-							<input id="application-close" type="datetime-local" value="{{settings.application.close}}" required />
+							<input id="application-close" type="datetime-local" data-raw-value="{{settings.application.close}}" required />
 						</div>
 					</div>
 					<div class="row">

@@ -46,6 +46,12 @@ readURLHash();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);
 
+// Load timezone-correct values for the application open / close time
+let timeInputs = document.querySelectorAll('input[type="datetime-local"]') as NodeListOf<HTMLInputElement>;
+for (let i = 0; i < timeInputs.length; i++) {
+    timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
+}
+
 // Settings update
 function parseDateTime (dateTime: string) {
     let digits = dateTime.split(/\D+/).map(num => parseInt(num));
@@ -60,20 +66,21 @@ settingsUpdateButton.addEventListener("click", e => {
     e.preventDefault();
 	settingsUpdateButton.disabled = true;
 
+    let applicationAvailabilityData = new FormData();
+    applicationAvailabilityData.append("open", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
+    applicationAvailabilityData.append("close", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
+    let teamsEnabledData = new FormData();
+    teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
+
     fetch("/api/settings/application_availability", {
 		credentials: "same-origin",
 		method: "PUT",
-		body: JSON.stringify({
-            "open": parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString(),
-            "close": parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString()
-        })
+		body: applicationAvailabilityData
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/teams_enabled", {
             credentials: "same-origin",
             method: "PUT",
-            body: JSON.stringify({
-                "enabled": (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false"
-            })
+            body: teamsEnabledData
         });
     }).then(checkStatus).then(parseJSON).then(async () => {
         await sweetAlert("Awesome!", "Settings successfully updated.", "success");
