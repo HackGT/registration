@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";
 import * as Handlebars from "handlebars";
-import * as moment from "moment";
+import * as moment from "moment-timezone";
 import * as bowser from "bowser";
 
 import {
