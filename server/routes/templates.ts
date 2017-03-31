@@ -102,6 +102,18 @@ Handlebars.registerHelper("numberFormat", (n: number): string => {
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
+Handlebars.registerHelper("roleSelected", function (roles: { noop: string[]; applicationBranches: string[];	confirmationBranches: string[];	}, role: string, branchName: string): string {
+	if (role === "noop" && roles.noop.indexOf(branchName) !== -1) {
+		return "selected";
+	}
+	if (role === "application" && roles.applicationBranches.indexOf(branchName) !== -1) {
+		return "selected";
+	}
+	if (role === "confirmation" && roles.confirmationBranches.indexOf(branchName) !== -1) {
+		return "selected";
+	}
+	return "";
+});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
@@ -298,6 +310,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 
 	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
+	let applicationBranches = (await Setting.findOne({ "name": "applicationBranches" })).value as string[];
+	let confirmationBranches = (await Setting.findOne({ "name": "confirmationBranches" })).value as string[];
 
 	let teamIDNameMap: {
 		[id: string]: string;
@@ -407,8 +421,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
 				close: (await Setting.findOne({ "name": "applicationClose" })).value
 			},
-			teamsEnabled,
-			teamsEnabledChecked: teamsEnabled ? "checked" : ""
+			teamsEnabled: teamsEnabled,
+			teamsEnabledChecked: teamsEnabled ? "checked" : "",
+			branchRoles: {
+				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
+				"applicationBranches": applicationBranches,
+				"confirmationBranches": confirmationBranches
+			}
 		}
 	};
 	// Generate general statistics

@@ -2,7 +2,7 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-	uploadHandler
+    uploadHandler, validateSchema
 } from "../../common";
 import {
 	IUser, Setting
@@ -37,6 +37,18 @@ export async function setDefaultSettings() {
 		await new Setting({
 			"name": "teamsEnabled",
 			"value": true
+		}).save();
+	}
+	if (await Setting.find({ "name": "applicationBranches" }).count() === 0) {
+		await new Setting({
+			"name": "applicationBranches",
+			"value": []
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationBranches" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationBranches",
+			"value": []
 		}).save();
 	}
 }
@@ -120,6 +132,55 @@ settingsRoutes.route("/teams_enabled")
 			console.error(err);
 			response.status(500).json({
 				"error": "An error occurred while enabling or disabling teams"
+			});
+		}
+	});
+
+settingsRoutes.route("/branch_roles")
+	.get(async (request, response) => {
+		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
+		let applicationBranches = (await Setting.findOne({ "name": "applicationBranches" })).value as string[];
+		let confirmationBranches = (await Setting.findOne({ "name": "confirmationBranches" })).value as string[];
+		response.json({
+			"noop": branchNames.filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
+			"applicationBranches": applicationBranches,
+			"confirmationBranches": confirmationBranches
+		});
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
+		let applicationBranches = [];
+		let confirmationBranches = [];
+		if ((new Set(Object.keys(request.body))).size !== Object.keys(request.body).length) {
+			response.status(400).json({
+				"error": "Each branch can only be used once"
+			});
+			return;
+		}
+		for (let branchName of Object.keys(request.body)) {
+			if (request.body[branchName] === "application") {
+				applicationBranches.push(branchName);
+			}
+			if (request.body[branchName] === "confirmation") {
+				confirmationBranches.push(branchName);
+			}
+		}
+		try {
+			let applicationBranchesSetting = await Setting.findOne({ "name": "applicationBranches" });
+			applicationBranchesSetting.value = applicationBranches;
+			await applicationBranchesSetting.save();
+			let confirmationBranchesSetting = await Setting.findOne({ "name": "confirmationBranches" });
+			confirmationBranchesSetting.value = confirmationBranches;
+			await confirmationBranchesSetting.save();
+
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting branch roles"
 			});
 		}
 	});

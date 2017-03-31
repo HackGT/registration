@@ -207,6 +207,18 @@
 							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />
 						</div>
 					</div>
+					<div class="row">
+						{{#each branchNames}}
+							<div class="col-4 branch-role" data-name="{{this}}">
+								<h4>{{this}}</h4>
+								<select>
+									<option value="noop" {{roleSelected ../settings.branchRoles "noop" this}}>Not used</option>
+									<option value="application" {{roleSelected ../settings.branchRoles "application" this}}>Application</option>
+									<option value="confirmation" {{roleSelected ../settings.branchRoles "confirmation" this}}>Confirmation</option>
+								</select>
+							</div>
+						{{/each}}
+					</div>
 					<div class="row center">
 						<input type="submit" class="btn" value="Update" />
 					</div>

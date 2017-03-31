@@ -236,5 +236,10 @@ export interface IAdminTemplate extends ICommonTemplate {
 		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
+		branchRoles: {
+			noop: string[];
+			applicationBranches: string[];
+			confirmationBranches: string[];
+		};
 	};
 }
