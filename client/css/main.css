@@ -14,10 +14,11 @@ main {
 	text-align: center;
 	font-size: 2.5rem;
 }
-#sidebar >  p {
+#sidebar > p {
 	margin: 10px 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	font-size: 1.5rem;
 }
 
 #sidebar-nav {

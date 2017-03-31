@@ -74,8 +74,12 @@ type OAuthStrategyOptions = {
 	clientSecret: string;
 	profileFields?: string[]
 };
+type Profile = passport.Profile & {
+	profileUrl?: string;
+	_json: any;
+};
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: passport.Profile & {profileUrl?: string}, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
+    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
 		let email: string = "";
 		if (profile.emails && profile.emails.length > 0) {
 			email = profile.emails[0].value;
@@ -125,6 +129,10 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				user[dataFieldName] = {
 					id: profile.id
 				};
+			}
+			if (!user.verifiedEmail) {
+				// We trust our OAuth provider to have verified the user's email for us
+				user.verifiedEmail = true;
 			}
 			if (dataFieldName === "githubData" && (!user.githubData || !user.githubData.username || !user.githubData.profileUrl) && (profile.username && profile.profileUrl)) {
 				user.githubData!.username = profile.username;
@@ -335,7 +343,7 @@ function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", s
 }
 
 addAuthenticationRoute("github", ["user:email"], GITHUB_CALLBACK_HREF);
-addAuthenticationRoute("google", ["email"], GOOGLE_CALLBACK_HREF);
+addAuthenticationRoute("google", ["email", "profile"], GOOGLE_CALLBACK_HREF);
 addAuthenticationRoute("facebook", ["email"], FACEBOOK_CALLBACK_HREF);
 authRoutes.post("/signup", validateAndCacheHostName, postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), (request, response) => {
 	// User is logged in automatically by Passport but we want them to verify their email first
