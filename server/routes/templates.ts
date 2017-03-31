@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithReject,
 	authenticateWithRedirect,
-	validateSchema, config, readFileAsync
+	validateSchema, config
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -234,21 +234,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	if (!user.admin) {
 		response.redirect("/");
 	}
-
-	let branchNames: string[] = [];
-
-	try {
-		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
-		branchNames = questionBranches.map(branch => branch.name);
-	} catch (err) {
-		console.log(err);
-	}
+	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 
 	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user: user,
-		branchNames: branchNames,
+		branchNames: rawQuestions.map(branch => branch.name),
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
@@ -302,7 +294,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		}
 	};
 	// Generate general statistics
-	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	(await User.find({ "applied": true })).forEach(user => {
 		user.applicationData.forEach(question => {
 			if (question.value === null) return;
