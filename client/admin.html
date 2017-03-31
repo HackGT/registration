@@ -173,8 +173,8 @@
 								<tr class="{{this.applicationBranch}} applicantDiv">
 									<td colspan="4">
 										<div class="applicantData">
-											{{#each this.applicationData}}
-												<p><b>{{this.name}}</b> - {{this.value}}</p>
+											{{#each this.applicationDataFormatted}}
+												<p><b>{{this.label}}</b> &rarr; {{this.value}}</p>
 											{{/each}}
 										</div>
 										<hr />
