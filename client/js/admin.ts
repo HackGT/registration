@@ -26,7 +26,7 @@ class State {
 	}
 }
 
-const states: State[] = ["statistics", "users", "settings", "applicants"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "applicants", "settings"].map(id => new State(id));
 
 // Set the correct state on page load
 function readURLHash() {

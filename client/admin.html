@@ -26,8 +26,8 @@
 			<nav class="row center">
 				<a href="#statistics" class="btn">Statistics</a>
 				<a href="#users" class="btn">Users</a>
-				<a href="#settings" class="btn">Settings</a>
 				<a href="#applicants" class="btn">Applicants</a>
+				<a href="#settings" class="btn">Settings</a>
 			</nav>
 
 			<section id="statistics">
@@ -111,31 +111,6 @@
 					</tbody>
 				</table>
 			</section>
-			<section id="settings">
-				<h2>Settings</h2>
-
-				<form method="post" data-action="/">
-					<div class="row">
-						<div class="col-6">
-							<label for="application-open">Applications open:</label>
-							<input id="application-open" type="datetime-local" data-raw-value="{{settings.application.open}}" required />
-						</div>
-						<div class="col-6">
-							<label for="application-close">Applications close:</label>
-							<input id="application-close" type="datetime-local" data-raw-value="{{settings.application.close}}" required />
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<label for="teams-enabled">Enable teams?</label>
-							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />
-						</div>
-					</div>
-					<div class="row center">
-						<input type="submit" class="btn" value="Update" />
-					</div>
-				</form>
-			</section>
 			<section id="applicants">
 				<h2>Applicants</h2>
 				<div class="center">
@@ -211,6 +186,31 @@
 						{{/each}}
 					</tbody>
 				</table>
+			</section>
+			<section id="settings">
+				<h2>Settings</h2>
+
+				<form method="post" data-action="/">
+					<div class="row">
+						<div class="col-6">
+							<label for="application-open">Applications open:</label>
+							<input id="application-open" type="datetime-local" data-raw-value="{{settings.application.open}}" required />
+						</div>
+						<div class="col-6">
+							<label for="application-close">Applications close:</label>
+							<input id="application-close" type="datetime-local" data-raw-value="{{settings.application.close}}" required />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<label for="teams-enabled">Enable teams?</label>
+							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />
+						</div>
+					</div>
+					<div class="row center">
+						<input type="submit" class="btn" value="Update" />
+					</div>
+				</form>
 			</section>
 		{{/sidebar}}
 	</body>
