@@ -23,7 +23,7 @@ class State {
     }
 }
 
-const states: State[] = ["statistics", "users", "settings"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "settings", "applicants"].map(id => new State(id));
 
 // Set the correct state on page load
 function readURLHash() {
@@ -87,6 +87,69 @@ settingsUpdateButton.addEventListener("click", e => {
         window.location.reload();
 	}).catch(async (err: Error) => {
 		await sweetAlert("Oh no!", err.message, "error");
-		submitButton.disabled = false;
+		settingsUpdateButton.disabled = false;
 	});
 });
+
+let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
+branchFilter.addEventListener("change", e => {
+    revealDivByClass(branchFilter.value);
+});
+
+function revealDivByClass(branchType: string) {
+    let elements = document.querySelectorAll(".applicantDiv") as NodeListOf<HTMLElement>;
+    for (let i = 0; i < elements.length; i++) {
+        let element = elements[i];
+
+        if (element.classList.contains(branchType) || branchType == "*") {
+            element.style.display = "";
+        }
+		else {
+            element.style.display = "none";
+        }
+    }
+}
+
+let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
+
+for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
+    let statusUpdateButton = applicationStatusUpdateButtons[i];
+
+    statusUpdateButton.addEventListener("click", e => {
+        let eventTarget = e.target as HTMLInputElement;
+
+        e.preventDefault();
+        eventTarget.disabled = true;
+
+        let userId = eventTarget.dataset.user;
+        let currentCondition = eventTarget.dataset.accepted === "true";
+
+        var formData = new FormData();
+        formData.append("status", !currentCondition);
+
+        fetch(`/api/user/${userId}/status`, {
+            credentials: "same-origin",
+            method: "POST",
+            body: formData
+        }).then(checkStatus).then(parseJSON).then(async () => {
+            eventTarget.disabled = false;
+            if (!currentCondition) {
+                // Set to Un-Accept
+                eventTarget.classList.remove("accepted-false");
+                eventTarget.classList.add("accepted-true");
+                eventTarget.dataset.accepted = "true";
+                eventTarget.textContent = "Un-Accept";
+            }
+            else {
+                // Set to Accept
+                eventTarget.classList.remove("accepted-true");
+                eventTarget.classList.add("accepted-false");
+                eventTarget.dataset.accepted = "false";
+                eventTarget.textContent = "Accept";
+            }
+        }).catch(async (err: Error) => {
+            await sweetAlert("Oh no!", err.message, "error");
+            eventTarget.disabled = false;
+        });
+    });   
+}

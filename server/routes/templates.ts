@@ -234,10 +234,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	if (!user.admin) {
 		response.redirect("/");
 	}
+	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+
 	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user: user,
+		branchNames: rawQuestions.map(branch => branch.name),
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
@@ -274,10 +277,43 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			if (user.attending) {
 				status = `Attending (${user.applicationBranch})`;
 			}
+			let questionsFromBranch = rawQuestions.find(branch => branch.name === user.applicationBranch);
+			let applicationDataFormatted: {"label": string; "value": string}[] = [];
+			if (questionsFromBranch) {
+				applicationDataFormatted = user.applicationData.map(question => {
+					let rawQuestion = questionsFromBranch!.questions.find(rawQuestion => rawQuestion.name === question.name);
+					let value: string;
+					if (typeof question.value === "string") {
+						value = question.value;
+					}
+					else if (Array.isArray(question.value)) {
+						value = question.value.join(", ");
+					}
+					else if (question.value === null) {
+						value = "N/A";
+					}
+					else {
+						// Multer file
+						value = "[file]";
+					}
+					if (!rawQuestion) {
+						// No schema information for this question so return the raw name as the label
+						return {
+							"label": question.name,
+							"value": value
+						};
+					}
+					return {
+						"label": rawQuestion.label,
+						"value": value
+					}
+				});
+			}
 			return {
 				...user.toObject(),
 				"status": status,
-				"loginMethods": loginMethods.join(", ")
+				"loginMethods": loginMethods.join(", "),
+				"applicationDataFormatted": applicationDataFormatted
 			};
 		}),
 		metrics: {},
@@ -291,7 +327,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		}
 	};
 	// Generate general statistics
-	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 	(await User.find({ "applied": true })).forEach(user => {
 		user.applicationData.forEach(question => {
 			if (question.value === null) return;

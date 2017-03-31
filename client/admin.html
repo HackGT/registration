@@ -25,6 +25,7 @@
 				<a href="#statistics" class="btn">Statistics</a>
 				<a href="#users" class="btn">Users</a>
 				<a href="#settings" class="btn">Settings</a>
+				<a href="#applicants" class="btn">Applicants</a>
 			</nav>
 
 			<section id="statistics">
@@ -125,6 +126,64 @@
 						<input type="submit" class="btn" value="Update" />
 					</div>
 				</form>
+			</section>
+			<section id="applicants">
+				<h2>Applicants</h2>
+				<table>
+					<thead>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Applicant Type</th>
+						<th>
+							<select id="branchFilter">
+								<!--todo, make this prettier-->
+								<option value="*">Show All</option>
+								{{#each branchNames}}
+									<option value="{{this}}">{{this}}</span>
+
+								{{/each}}
+							</select>
+						</th>
+					</thead>
+					<tbody>
+						{{#each users}}
+							{{#if this.applied}}
+								<!--maybe query for each applied instead-->
+								<tr class="{{this.applicationBranch}} applicantDiv">
+									<td><b>{{this.name}}</b></td>
+									<td>
+										{{this.email}}
+									</td>
+									<td>
+										{{this.applicationBranch}}
+									</td>
+									<td>
+										<!--not sure if there's a better way to do it than bind id to button id-->
+										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton accepted-{{this.accepted}}">
+											
+											{{#if this.accepted}}
+												Un-Accept
+											{{else}}
+												Accept
+											{{/if}}
+
+										</button>
+									</td>
+								</tr>
+								<tr class="{{this.applicationBranch}} applicantDiv">
+									<td colspan="4">
+										<div class="applicantData">
+											{{#each this.applicationDataFormatted}}
+												<p><b>{{this.label}}</b> &rarr; {{this.value}}</p>
+											{{/each}}
+										</div>
+									</td>
+								</tr>
+								
+							{{/if}}
+						{{/each}}
+					</tbody>
+				</table>
 			</section>
 		{{/sidebar}}
 	</body>

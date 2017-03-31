@@ -31,6 +31,23 @@ function isUserOrAdmin (request: express.Request, response: express.Response, ne
 	}
 }
 
+function isAdmin (request: express.Request, response: express.Response, next: express.NextFunction) {
+	let user = request.user as IUser;
+	if (!request.isAuthenticated()) {
+		response.status(401).json({
+			"error": "You must log in to access this endpoint"
+		});
+	}
+	else if (!user.admin) {
+		response.status(403).json({
+			"error": "You are not permitted to access this endpoint"
+		});
+	}
+	else {
+		next();
+	}
+}
+
 export let userRoutes = express.Router({ "mergeParams": true });
 
 userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response) => {
@@ -197,6 +214,32 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
 		console.error(err);
 		response.status(500).json({
 			"error": "An error occurred while deleting the application"
+		});
+	}
+});
+
+userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response) => {
+	let user = await User.findById(request.params.id);
+	let status = request.body.status === "true";
+
+	if (!user) {
+		response.status(400).json({
+			"error": `No such user with id ${request.params.id}`
+		});
+		return;
+	}
+	user.accepted = status;
+
+	try {
+		await user.save();
+		response.status(200).json({
+			"success": true
+		});
+	}
+	catch (err) {
+		console.error(err);
+		response.status(500).json({
+			"error": "An error occurred while accepting or rejecting the user"
 		});
 	}
 });

@@ -18,8 +18,20 @@ table th, table td {
     padding: 12px 4px;
 }
 table td:last-child {
-    text-align: center;
     width: 50px;
+    text-align: center;
+}
+#applicants table td:last-child {
+    width: 140px;
+}
+#applicants table th:last-child {
+    width: 140px;
+}
+#applicants table > tbody > tr:nth-child(2n) {
+    border-bottom: 1px solid #333030;
+}
+#applicants table > tbody > tr:last-child {
+    border-bottom: none;
 }
 table thead {
     border-bottom: 2px solid #333030;
@@ -62,4 +74,16 @@ textarea:focus,
 textarea[type=text]:focus {
     border: 1px solid #99b3ff;
     border-radius: 4px;
+}
+.applicantData {
+    text-align: left;
+    margin-left: 2em;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.accepted-true {
+    background-color: #e74c3c;
+}
+.accepted-false {
+    background-color: #333030;
 }

@@ -166,6 +166,7 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	questionData: Questions;
 }
 export interface IAdminTemplate extends ICommonTemplate {
+	branchNames: string[];
 	applicationStatistics: {
 		totalUsers: number;
 		appliedUsers: number;
