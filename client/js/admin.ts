@@ -91,10 +91,8 @@ settingsUpdateButton.addEventListener("click", e => {
 	});
 });
 
-let branchFilter = document.querySelector("#branchFilter") as HTMLInputElement;
-branchFilter.addEventListener('change', e => {
-    console.log(branchFilter.value);
-
+let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
+branchFilter.addEventListener("change", e => {
     revealDivByClass(branchFilter.value);
 });
 
@@ -102,16 +100,13 @@ function revealDivByClass(branchType: string) {
     let elements = document.querySelectorAll(".applicantDiv") as NodeListOf<HTMLElement>;
     for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
-        console.log(element);
 
         if (element.classList.contains(branchType) || branchType == "*") {
             element.style.display = "";
-            console.log("yay", element.classList.contains(branchType), branchType == "*");
-        } else {
-            element.style.display = "none";
-            console.log("booo");
         }
-
+		else {
+            element.style.display = "none";
+        }
     }
 }
 
@@ -130,7 +125,6 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
         let currentCondition = eventTarget.dataset.accepted === "true";
 
         var formData = new FormData();
-        formData.append("id", userId);
         formData.append("status", !currentCondition);
 
         fetch(`/api/user/${userId}/status`, {

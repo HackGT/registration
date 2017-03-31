@@ -229,8 +229,6 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (requ
 	response.send(registerTemplate(templateData));
 });
 
-let questionsFile = "../config/questions.json";//assuming this location is constant
-
 templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
 	if (!user.admin) {

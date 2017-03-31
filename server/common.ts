@@ -214,9 +214,6 @@ import * as bodyParser from "body-parser";
 export let postParser = bodyParser.urlencoded({
 	extended: false
 });
-
-export let jsonParser = bodyParser.json();
-
 import * as multer from "multer";
 export let uploadHandler = multer({
 	"storage": multer.diskStorage({
