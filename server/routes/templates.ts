@@ -102,7 +102,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		settings: {
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},
-		applicationClose: moment((await Setting.findOne({ "name": "applicationClose" })).value).format("dddd, MMMM Do YYYY [at] h:mm:ss a")
+		applicationClose: moment((await Setting.findOne({ "name": "applicationClose" })).value).tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z")
 	};
 	response.send(indexTemplate(templateData));
 });
