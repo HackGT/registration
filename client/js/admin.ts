@@ -93,21 +93,55 @@ settingsUpdateButton.addEventListener("click", e => {
 
 let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
 branchFilter.addEventListener("change", e => {
-    revealDivByClass(branchFilter.value);
+    revealDivByClasses([branchFilter.value, getAcceptedFilterValue()]);
 });
 
-function revealDivByClass(branchType: string) {
+function getBranchFilterValue() {
+    return branchFilter.value;
+}
+
+let acceptedFilter = document.getElementById("acceptedFilter") as HTMLInputElement;
+acceptedFilter.addEventListener("change", e => {
+    revealDivByClasses([getBranchFilterValue(), acceptedFilter.value]);
+});
+
+function getAcceptedFilterValue() {
+    return acceptedFilter.value;
+}
+
+function updateFilterView() {
+    revealDivByClasses([getBranchFilterValue(), getAcceptedFilterValue()]);
+}
+
+function revealDivByClasses(classes: string[]) {
     let elements = document.querySelectorAll(".applicantDiv") as NodeListOf<HTMLElement>;
     for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
+        let containsClasses: boolean = true;
+        for (let j = 0; j < classes.length; j++) {
+            let currentClass = classes[j];
+            if (currentClass != "*") {
+                //if the class is a *, we ignore it, which makes filtering easier
+                if (!element.classList.contains(currentClass)) {
+                    containsClasses = false;
+                }
+            }
+        }
 
-        if (element.classList.contains(branchType) || branchType == "*") {
+        if (containsClasses) {
             element.style.display = "";
         }
-		else {
+        else {
             element.style.display = "none";
         }
     }
+}
+
+//if an element has a class called accepted-true, for instance, and you want to toggle
+//it, you'd call flipClassValue(yourElement, "accepted", true)
+function flipClassValue(el: Element, className: string, currentValue: boolean) {
+    el.classList.remove(className + "-" + currentValue);
+    el.classList.add(className + "-" + !currentValue);
 }
 
 let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
@@ -135,21 +169,37 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
             eventTarget.disabled = false;
             if (!currentCondition) {
                 // Set to Un-Accept
-                eventTarget.classList.remove("accepted-false");
-                eventTarget.classList.add("accepted-true");
+                flipClassValue(eventTarget, "accepted-btn", false);
+                // eventTarget.classList.remove("accepted-btn-false");
+                // eventTarget.classList.add("accepted-btn-true");
                 eventTarget.dataset.accepted = "true";
                 eventTarget.textContent = "Un-Accept";
+                flipClassValue(eventTarget!.parentElement!.parentElement!, "accepted", false);
+                flipClassValue(eventTarget!.parentElement!.parentElement!.nextElementSibling!, "accepted", false);
+                // eventTarget!.parentElement!.parentElement!.classList.remove("accepted-false");
+                // eventTarget!.parentElement!.parentElement!.classList.add("accepted-true");
             }
             else {
                 // Set to Accept
-                eventTarget.classList.remove("accepted-true");
-                eventTarget.classList.add("accepted-false");
+                flipClassValue(eventTarget, "accepted-btn", true);
+                // eventTarget.classList.remove("accepted-btn-true");
+                // eventTarget.classList.add("accepted-btn-false");
                 eventTarget.dataset.accepted = "false";
                 eventTarget.textContent = "Accept";
+                // eventTarget!.parentElement!.parentElement!.classList.remove("accepted-true");
+                // eventTarget!.parentElement!.parentElement!.classList.add("accepted-false");
+                flipClassValue(eventTarget!.parentElement!.parentElement!, "accepted", true);
+                flipClassValue(eventTarget!.parentElement!.parentElement!.nextElementSibling!, "accepted", true);
             }
+
+            updateFilterView();
+            //because we've added a class that implies the element should be removed, but haven't actually removed the element yet
+
         }).catch(async (err: Error) => {
             await sweetAlert("Oh no!", err.message, "error");
             eventTarget.disabled = false;
         });
-    });   
+    });
 }
+
+updateFilterView();//so whatever the default filter options are set at, it'll show accordingly

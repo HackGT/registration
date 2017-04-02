@@ -137,11 +137,19 @@
 						<th>
 							<select id="branchFilter">
 								<!--todo, make this prettier-->
-								<option value="*">Show All</option>
+								<option value="*">Show All Applicant Types</option>
 								{{#each branchNames}}
 									<option value="{{this}}">{{this}}</span>
 
 								{{/each}}
+							</select>
+						</th>
+						<th>
+							<select id="acceptedFilter">
+								<!--todo, make this prettier-->
+								<option value="accepted-false">Show Not-Accepted</option>
+								<option value="*">Show All</option>
+								<option value="accepted-true">Show Accepted</option>
 							</select>
 						</th>
 					</thead>
@@ -149,7 +157,7 @@
 						{{#each users}}
 							{{#if this.applied}}
 								<!--maybe query for each applied instead-->
-								<tr class="{{this.applicationBranch}} applicantDiv">
+								<tr class="{{this.applicationBranch}} accepted-{{this.accepted}} applicantDiv">
 									<td><b>{{this.name}}</b></td>
 									<td>
 										{{this.email}}
@@ -157,9 +165,10 @@
 									<td>
 										{{this.applicationBranch}}
 									</td>
+									<td></td>
 									<td>
 										<!--not sure if there's a better way to do it than bind id to button id-->
-										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton accepted-{{this.accepted}}">
+										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton accepted-btn-{{this.accepted}}">
 											
 											{{#if this.accepted}}
 												Un-Accept
@@ -170,8 +179,8 @@
 										</button>
 									</td>
 								</tr>
-								<tr class="{{this.applicationBranch}} applicantDiv">
-									<td colspan="4">
+								<tr class="{{this.applicationBranch}} accepted-{{this.accepted}} applicantDiv">
+									<td colspan="5">
 										<div class="applicantData">
 											{{#each this.applicationDataFormatted}}
 												<p><b>{{this.label}}</b> &rarr; {{this.value}}</p>
