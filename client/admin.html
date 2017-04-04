@@ -133,23 +133,22 @@
 					<thead>
 						<th>Name</th>
 						<th>Email</th>
-						<th>Applicant Type</th>
+						<th>Applicant type</th>
 						<th>
 							<select id="branchFilter">
 								<!--todo, make this prettier-->
-								<option value="*">Show All Applicant Types</option>
+								<option value="*">All types</option>
 								{{#each branchNames}}
 									<option value="{{this}}">{{this}}</span>
-
 								{{/each}}
 							</select>
 						</th>
 						<th>
 							<select id="acceptedFilter">
 								<!--todo, make this prettier-->
-								<option value="accepted-false">Show Not-Accepted</option>
-								<option value="*">Show All</option>
-								<option value="accepted-true">Show Accepted</option>
+								<option value="accepted-false">Not accepted</option>
+								<option value="accepted-true">Accepted</option>
+								<option value="*">All</option>
 							</select>
 						</th>
 					</thead>
@@ -165,8 +164,7 @@
 									<td>
 										{{this.applicationBranch}}
 									</td>
-									<td></td>
-									<td>
+									<td colspan="2">
 										<!--not sure if there's a better way to do it than bind id to button id-->
 										<button data-admin="{{../user.id}}" data-user="{{this._id}}" data-accepted="{{this.accepted}}" class="statusButton accepted-btn-{{this.accepted}}">
 											

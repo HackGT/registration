@@ -24,7 +24,7 @@ table td:last-child {
 #applicants table td:last-child {
     width: 140px;
 }
-#applicants table th:last-child {
+#applicants table th:nth-child(n - 1), #applicants table th:last-child {
     width: 140px;
 }
 #applicants table > tbody > tr:nth-child(2n) {
