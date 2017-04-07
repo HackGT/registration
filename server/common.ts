@@ -3,6 +3,8 @@ import * as crypto from "crypto";
 import * as path from "path";
 import * as url from "url";
 import * as os from "os";
+import * as passport from "passport";
+
 
 //
 // Config
