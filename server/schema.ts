@@ -175,6 +175,15 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 }
+export interface ResponseCount {
+	"response": string;
+	"count": number;
+}
+export interface StatisticEntry {
+	"questionName": string;
+	"branch": string;
+	"responses"?: ResponseCount[];
+}
 export interface IAdminTemplate extends ICommonTemplate {
 	branchNames: string[];
 	applicationStatistics: {
@@ -184,11 +193,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 		attendingUsers: number;
 		declinedUsers: number;
 	};
-	generalStatistics: Array<{
-		"title": string;
-		"value": number;
-		"count"?: number;
-	}>;
+	generalStatistics: StatisticEntry[];
 	users: any[];
 	metrics: {};
 	settings: {

@@ -16,7 +16,7 @@ import {
 	IUser, IUserMongoose, User,
 	ISetting, ISettingMongoose, Setting,
 	ICommonTemplate, IIndexTemplate, ILoginTemplate, IAdminTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, ResponseCount, StatisticEntry
 } from "../schema";
 import {QuestionBranches, Questions} from "../config/questions.schema";
 
@@ -92,6 +92,9 @@ Handlebars.registerHelper("slug", function (input: string): string {
 });
 Handlebars.registerHelper("numberFormat", function (n: number): string {
 	return n.toLocaleString();
+});
+Handlebars.registerHelper("toJSONString", function (stat: StatisticEntry): string {
+	return JSON.stringify(stat);
 });
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
@@ -347,6 +350,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	};
 	// Generate general statistics
 	(await User.find({ "applied": true })).forEach(user => {
+		let branchQuestions = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions;
 		user.applicationData.forEach(question => {
 			if (question.value === null) return;
 			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
@@ -358,54 +362,69 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
-					let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} → ${checkboxValue}`;
-					let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
-					if (index !== -1) {
-						templateData.generalStatistics[index].value++;
+
+					let rawQuestion = branchQuestions.find(q => q.name === question.name);
+
+
+					let index = templateData.generalStatistics.findIndex(entry => rawQuestion!.label === entry.questionName);
+
+					if (index === -1) {
+						index = templateData.generalStatistics.push({
+							"questionName": rawQuestion!.label,
+							"branch": user.applicationBranch,
+							"responses": []
+						}) - 1;
+
 					}
-					else {
-						templateData.generalStatistics.push({
-							"title": title,
-							"value": 1
+					// templateData.generalStatistics[index].count++;
+					let specificResponseIndex = templateData!.generalStatistics[index]!.responses!.findIndex(response => response.response === checkboxValue);
+
+					if (specificResponseIndex !== -1) {
+						templateData!.generalStatistics![index]!.responses![specificResponseIndex]!.count++;
+					} else {
+						templateData!.generalStatistics![index]!.responses!.push({
+							"response": checkboxValue,
+							"count": 1
 						});
 					}
+					
 				}
 			}
-			else if (question.type === "date") {
-				// Categorize by date
-				let years = moment().diff(moment(question.value as string), "years", true);
+			// else if (question.type === "date") {
+			// 	// Categorize by date
+			// 	let years = moment().diff(moment(question.value as string), "years", true);
 
-				let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
-				let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
-				let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
-				if (index !== -1) {
-					templateData.generalStatistics[index].value += years;
-					templateData.generalStatistics[index].count = 1;
-				}
-				else {
-					templateData.generalStatistics.push({
-						"title": title,
-						"value": years,
-						"count": 1
-					});
-				}
-			}
+			// 	let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
+			// 	let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
+			// 	let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
+			// 	if (index !== -1) {
+			// 		templateData.generalStatistics[index].value += years;
+			// 		templateData.generalStatistics[index].count = 1;
+			// 	}
+			// 	else {
+			// 		templateData.generalStatistics.push({
+			// 			"title": title,
+			// 			"value": years,
+			// 			"count": 1
+			// 		});
+			// 	}
+			// }
 		});
 	});
+	console.log(templateData.generalStatistics, "done");
 	// Finalize calculation of averages
-	templateData.generalStatistics = templateData.generalStatistics.map(stat => {
-		if (typeof stat.count === "number") {
-			stat.value /= stat.count;
-		}
-		return stat;
-	});
+	// templateData.generalStatistics = templateData.generalStatistics.map(stat => {
+	// 	if (typeof stat.count === "number") {
+	// 		stat.value /= stat.count;
+	// 	}
+	// 	return stat;
+	// });
 	// Sort general statistics alphabetically
-	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
-		if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
-		if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
-		return 0;
-	});
+	// templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
+	// 	if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
+	// 	if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
+	// 	return 0;
+	// });
 
 	response.send(adminTemplate(templateData));
 });

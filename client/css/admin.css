@@ -87,3 +87,19 @@ textarea[type=text]:focus {
 .accepted-btn-false {
     background-color: #333030;
 }
+
+.axis {
+    font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+rect.bar {
+    cursor: pointer;
+}
+rect.bar:hover {
+    opacity: .85;
+}
