@@ -99,7 +99,24 @@ textarea[type=text]:focus {
 }
 rect.bar {
     cursor: pointer;
+    transition: 0.25s all;
+    transform-origin: center bottom;
 }
 rect.bar:hover {
     opacity: .85;
+    animation-timing-function: cubic-bezier(.72,.18,1,1);
+    animation-name: barBounce;
+    animation-duration: 0.15s;
+    animation-direction: alternate;
+    animation-iteration-count: 2;
+}
+
+@keyframes barBounce {
+    from {
+        transform: scaleY(1);
+    }
+    to {
+        transform: scaleY(1.05);
+    }
+
 }
