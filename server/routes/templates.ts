@@ -9,6 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithReject,
 	authenticateWithRedirect,
+	timeLimited,
 	validateSchema, config
 } from "../common";
 import {
@@ -116,7 +117,7 @@ templateRoutes.route("/login").get((request, response) => {
 	response.send(loginTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
+templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async (request, response) => {
 	let user = request.user as IUser;
 	if (user.applied) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
@@ -148,7 +149,7 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 	};
 	response.send(preregisterTemplate(templateData));
 });
-templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (request, response) => {
+templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, async (request, response) => {
 	let user = request.user as IUser;
 	let branchName = request.params.branch as string;
 	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
