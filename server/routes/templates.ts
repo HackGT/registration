@@ -97,13 +97,24 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
+	let [openDate, closeDate] = (await Promise.all<ISetting>([
+		Setting.findOne({ "name": "applicationOpen" }),
+		Setting.findOne({ "name": "applicationClose" })
+	])).map(setting => moment(setting.value as Date));
+
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},
-		applicationClose: moment((await Setting.findOne({ "name": "applicationClose" })).value).tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z")
+		applicationOpen: openDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
+		applicationClose: closeDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
+		applicationStatus: {
+			areOpen: moment().isBetween(openDate, closeDate),
+			beforeOpen: moment().isBefore(openDate),
+			afterClose: moment().isAfter(closeDate)
+		}
 	};
 	response.send(indexTemplate(templateData));
 });

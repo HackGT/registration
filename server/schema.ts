@@ -151,7 +151,13 @@ export interface ICommonTemplate {
 	};
 }
 export interface IIndexTemplate extends ICommonTemplate {
+	applicationOpen: string;
 	applicationClose: string;
+	applicationStatus: {
+		areOpen: boolean;
+		beforeOpen: boolean;
+		afterClose: boolean;
+	};
 }
 export interface ILoginTemplate {
 	siteTitle: string;
