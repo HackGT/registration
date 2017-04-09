@@ -9,6 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithReject,
 	authenticateWithRedirect,
+	timeLimited,
 	validateSchema, config
 } from "../common";
 import {
@@ -96,13 +97,24 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
+	let [openDate, closeDate] = (await Promise.all<ISetting>([
+		Setting.findOne({ "name": "applicationOpen" }),
+		Setting.findOne({ "name": "applicationClose" })
+	])).map(setting => moment(setting.value as Date));
+
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},
-		applicationClose: moment((await Setting.findOne({ "name": "applicationClose" })).value).tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z")
+		applicationOpen: openDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
+		applicationClose: closeDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
+		applicationStatus: {
+			areOpen: moment().isBetween(openDate, closeDate),
+			beforeOpen: moment().isBefore(openDate),
+			afterClose: moment().isAfter(closeDate)
+		}
 	};
 	response.send(indexTemplate(templateData));
 });
@@ -116,7 +128,7 @@ templateRoutes.route("/login").get((request, response) => {
 	response.send(loginTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, response) => {
+templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async (request, response) => {
 	let user = request.user as IUser;
 	if (user.applied) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
@@ -148,7 +160,7 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, async (request, res
 	};
 	response.send(preregisterTemplate(templateData));
 });
-templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, async (request, response) => {
+templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, async (request, response) => {
 	let user = request.user as IUser;
 	let branchName = request.params.branch as string;
 	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {

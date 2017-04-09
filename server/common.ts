@@ -203,7 +203,8 @@ mongoose.connect(url.resolve(config.server.mongoURL, config.server.uniqueAppID))
 export {mongoose};
 
 import {
-	IUser, IUserMongoose, User
+	IUser, IUserMongoose, User,
+	ISetting, ISettingMongoose, Setting
 } from "./schema";
 
 //
@@ -250,6 +251,53 @@ export function authenticateWithRedirect (request: express.Request, response: ex
 	else {
 		next();
 	}
+}
+import * as Handlebars from "handlebars";
+import * as moment from "moment-timezone";
+import { ICommonTemplate } from "./schema";
+export async function timeLimited (request: express.Request, response: express.Response, next: express.NextFunction) {
+	let [openDate, closeDate] = (await Promise.all<ISetting>([
+		Setting.findOne({ "name": "applicationOpen" }),
+		Setting.findOne({ "name": "applicationClose" })
+	])).map(setting => moment(setting.value as Date));
+
+	if (moment().isBetween(openDate, closeDate)) {
+		next();
+		return;
+	}
+
+	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm:ss a z";
+	interface IClosedTemplate extends ICommonTemplate {
+		open: {
+			time: string;
+			verb: string;
+		};
+		close: {
+			time: string;
+			verb: string;
+		}
+		contactEmail: string;
+	}
+	let template = Handlebars.compile(await readFileAsync(path.resolve(STATIC_ROOT, "closed.html")));
+	let emailParsed = config.email.from.match(/<(.*?)>/);
+	let templateData: IClosedTemplate = {
+		siteTitle: config.eventName,
+		user: request.user,
+		settings: {
+			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+		},
+
+		open: {
+			time: openDate.tz(moment.tz.guess()).format(TIME_FORMAT),
+			verb: moment().isBefore(openDate) ? "will open" : "opened"
+		},
+		close: {
+			time: closeDate.tz(moment.tz.guess()).format(TIME_FORMAT),
+			verb: moment().isBefore(closeDate) ? "will close" : "closed"
+		},
+		contactEmail: emailParsed ? emailParsed[1] : config.email.from
+	};
+	response.send(template(templateData));
 }
 
 //

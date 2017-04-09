@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Application Closed - {{siteTitle}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
+		<link rel="stylesheet" href="/css/main.css" />
+	</head>
+	<body>
+		{{#> sidebar}}
+			<h1 class="center">Application Closed</h1>
+				
+			<p>Sorry, applications are currently closed.</p>
+			<p>Applications {{open.verb}} on {{open.time}} and {{close.verb}} on {{close.time}}.</p>
+			<p>If you have any questions, please email the {{siteTitle}} team at <a href="mailto:{{contactEmail}}">{{contactEmail}}</a>.</p>
+		{{/sidebar}}
+	</body>
+</html>

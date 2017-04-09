@@ -40,12 +40,25 @@
 						<p></p>
 					{{else if user.applied}}
 						<p>You've applied to be a <b>{{user.applicationBranch}}</b>!</p>
-						<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
-						<a class="btn" href="/apply">Edit your application</a>
+						{{#if applicationStatus.areOpen}}
+							<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
+							<a class="btn" href="/apply">Edit your application</a>
+						{{else}}
+							<p>Applications closed on {{applicationClose}}.</p>
+						{{/if}}
 					{{else}}
-						<p>You still need to complete your application!</p>
-						<p>If you do not complete your application before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
-						<a class="btn" href="/apply">Complete your application</a>
+						{{#if applicationStatus.areOpen}}
+							<p>You still need to complete your application!</p>
+							<p>If you do not complete your application before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
+							<a class="btn" href="/apply">Complete your application</a>
+						{{else}}
+							{{#if applicationStatus.beforeOpen}}
+								<p>Applications are currently closed and will open on {{applicationOpen}}.</p>
+							{{/if}}
+							{{#if applicationStatus.afterClose}}
+								<p>Applications closed on {{applicationClose}}. Unfortunately, because you did not submit an application, you will not be eligible for {{siteTitle}}.</p>
+							{{/if}}
+						{{/if}}
 					{{/if}}
 				</div>
 			</section>
