@@ -229,6 +229,13 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 		question["value"] = savedValue ? savedValue.value : "";
 		return question;
 	});
+
+	let thisUser: IUserMongoose = await User.findById(user._id);
+	thisUser.applicationStartTime = new Date();
+	thisUser.markModified("applicationStartTime");
+	thisUser.save();
+
+
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
