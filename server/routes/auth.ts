@@ -106,6 +106,9 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				"accepted": false,
 				"attending": false,
 				"applicationData": [],
+				"applicationStartTime": undefined,
+				"applicationSubmitTime": undefined,
+
 
 				"admin": isAdmin
 			});
@@ -208,6 +211,8 @@ passport.use(new LocalStrategy({
 			"accepted": false,
 			"attending": false,
 			"applicationData": [],
+			"applicationStartTime": undefined,
+			"applicationSubmitTime": undefined,
 
 			"admin": isAdmin
 		});

@@ -85,6 +85,8 @@ export interface IUser {
 	attending: boolean;
 	applicationBranch: string;
 	applicationData: IFormItem[];
+	applicationStartTime?: Date;
+	applicationSubmitTime?: Date;
 
 	admin?: boolean;
 }
@@ -122,6 +124,8 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	attending: Boolean,
 	applicationBranch: String,
 	applicationData: [mongoose.Schema.Types.Mixed],
+	applicationStartTime: Date,
+	applicationSubmitTime: Date,
 
 	admin: Boolean
 }));

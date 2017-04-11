@@ -184,6 +184,8 @@ The ${config.eventName} Team`;
 		user.applicationBranch = questionBranch.name;
 		user.applicationData = data;
 		user.markModified("applicationData");
+		user.applicationSubmitTime = new Date();
+		user.markModified("applicationSubmitTime");
 
 		await user.save();
 		response.status(200).json({
@@ -204,6 +206,11 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
 	user.applicationBranch = "";
 	user.applicationData = [];
 	user.markModified("applicationData");
+	user.applicationSubmitTime = undefined;
+	user.markModified("applicationSubmitTime");
+	user.applicationStartTime = undefined;
+	user.markModified("applicationStartTime");
+
 	try {
 		await user.save();
 		response.status(200).json({
