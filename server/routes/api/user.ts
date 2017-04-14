@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
+import * as archiver from "archiver";
 
 import {
 	UPLOAD_ROOT,
@@ -254,21 +255,42 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 
 userRoutes.route("/export").get(isAdmin, async (request, response) => {
 	try {
-		// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
-		// TODO: Change this to { "accepted": true }
-		let attendingUsers: IUserMongoose[] = await User.find({ "applied": true });
-		let csvData = attendingUsers.map(user => {
-			// TODO: Replace with more robust schema-agnostic version
-			let nameFormItem = user.applicationData.find(item => item.name === "name");
-			return {
-				"name": nameFormItem && typeof nameFormItem.value === "string" ? nameFormItem.value : user.name,
-				"email": user.email
-			};
-		});
+		let questionBranches: QuestionBranches;
+		try {
+			questionBranches = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+		}
+		catch (err) {
+			console.error("validateSchema error:", err);
+			response.status(500).json({
+				"error": "An error occurred while validating question structure"
+			});
+			return;
+		}
 
-		response.status(200).type("text/csv").attachment("export.csv");
-		response.write(json2csv({ data: csvData, fields: Object.keys(csvData[0]) }));
-		response.end();
+		let branchNames: string[] = questionBranches.map(branch => branch.name);
+		let archive = archiver("zip", {
+			store: true
+		});
+		response.status(200).type("application/zip");
+		archive.pipe(response);
+		
+		for (let branchName of branchNames) {
+			// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
+			// TODO: Change this to { "accepted": true }
+			let attendingUsers: IUserMongoose[] = await User.find({ "applied": true, "applicationBranch": branchName });
+			if (attendingUsers.length === 0) continue;
+
+			let csvData = attendingUsers.map(user => {
+				// TODO: Replace with more robust schema-agnostic version
+				let nameFormItem = user.applicationData.find(item => item.name === "name");
+				return {
+					"name": nameFormItem && typeof nameFormItem.value === "string" ? nameFormItem.value : user.name,
+					"email": user.email
+				};
+			});
+			archive.append(json2csv({ data: csvData, fields: Object.keys(csvData[0]) }), { "name": branchName + ".csv" });
+		}
+		archive.finalize();
 	}
 	catch (err) {
 		console.error(err);

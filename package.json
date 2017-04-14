@@ -26,6 +26,7 @@
   "private": true,
   "dependencies": {
     "ajv": "^4.11.5",
+    "archiver": "^1.3.0",
     "body-parser": "^1.17.1",
     "bowser": "^1.6.0",
     "compression": "^1.6.2",
@@ -54,6 +55,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "@types/archiver": "^0.15.37",
     "@types/body-parser": "1.16.0",
     "@types/chai": "^3.4.35",
     "@types/compression": "0.0.33",
