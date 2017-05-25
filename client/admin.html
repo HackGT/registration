@@ -61,12 +61,15 @@
 				</table>
 				<table>
 					<thead>
-						<th colspan="2">Applications</th>
+						<th colspan="2">Application Statistics</th>
 					</thead>
 						{{#each generalStatistics}}
 							<tr>
 								<td>
-									<div id="chart-{{@index}}"></div>
+									<div id="chart-{{@index}}">
+										<h5>{{this.questionName}} ({{this.branch}})</h5>
+
+									</div>
 
 									<script>
 										drawBarGraph({{{toJSONString this}}}, "chart-{{@index}}");

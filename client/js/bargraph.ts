@@ -12,10 +12,10 @@ function drawBarGraph(statistics: StatisticEntry, divId: string) {
 	let data: ResponseCount[] = (statistics.responses)!;
 
 	let margin = {
-	    top: 80,
-	    right: 180,
+	    top: 20,
+	    right: 40,
 	    bottom: 80,
-	    left: 180
+	    left: 40
 	};
 
 	let x = d3.scale.ordinal()
@@ -48,11 +48,6 @@ function drawBarGraph(statistics: StatisticEntry, divId: string) {
 	y.domain([0, d3.max(data, function(d: ResponseCount) {
 	    return d.count;
 	})]);
-
-	svg.append("text")
-	    .attr("class", "title")
-	    .attr("y", -26)
-	    .text(statistics.questionName + " (" + statistics.branch + ")");
 
 	svg.append("g")
 	    .attr("class", "x axis")
