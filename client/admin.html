@@ -14,8 +14,10 @@
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
+		<script src="https://d3js.org/d3.v3.min.js"></script>
 		<script src="/js/common.js"></script>
 		<script src="/js/admin.js" defer></script>
+		<script src="/js/bargraph.js"></script>
 	</head>
 	<body>
 		{{#> sidebar}}
@@ -59,16 +61,23 @@
 				</table>
 				<table>
 					<thead>
-						<th colspan="2">Applications</th>
+						<th colspan="2">Application Statistics</th>
 					</thead>
-					<tbody>
 						{{#each generalStatistics}}
 							<tr>
-								<td>{{this.title}}</td>
-								<td>{{numberFormat this.value}}</td>
+								<td>
+									<div id="chart-{{@index}}">
+										<h5>{{this.questionName}} ({{this.branch}})</h5>
+
+									</div>
+
+									<script>
+										drawBarGraph({{{toJSONString this}}}, "chart-{{@index}}");
+									</script>
+
+								</td>
 							</tr>
 						{{/each}}
-					</tbody>
 				</table>
 			</section>
 			<section id="users">
