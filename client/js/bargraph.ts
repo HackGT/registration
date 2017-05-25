@@ -7,15 +7,14 @@ import * as d3 from "d3";
 
 function drawBarGraph(statistics: StatisticEntry, divId: string) {
 	let height = Math.max(window.innerHeight / 3, 200	);
-	let width = window.innerWidth / 2;
+	let width = (document.getElementById("statistics") as HTMLElement).getBoundingClientRect().width;
 
 	let data: ResponseCount[] = (statistics.responses)!;
 
-	let margin = {
+	const margin = {
 	    top: 20,
-	    right: 40,
-	    bottom: 80,
-	    left: 40
+	    side: 40,
+	    bottom: 80
 	};
 
 	let x = d3.scale.ordinal()
@@ -37,10 +36,10 @@ function drawBarGraph(statistics: StatisticEntry, divId: string) {
 	    }));
 
 	let svg = d3.select("#" + divId).append("svg")
-	    .attr("width", width + margin.left + margin.right)
+	    .attr("width", width)
 	    .attr("height", height + margin.top + margin.bottom)
 	    .append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    .attr("transform", "translate(" + margin.side + "," + margin.top + ")");
 
 	x.domain(data.map(function(d) {
 	    return d.response;
