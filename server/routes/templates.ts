@@ -198,6 +198,10 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async 
 		response.status(500).send("An error occurred while generating the application options");
 		return;
 	}
+	// Filter to only show application branches
+	let applicationBranches = (await Setting.findOne({ "name": "applicationBranches" })).value as string[];
+	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
+
 	// If there's only one path, redirect to that
 	if (questionBranches.length === 1) {
 		response.redirect(`/apply/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
