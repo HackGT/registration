@@ -33,6 +33,18 @@ export async function setDefaultSettings() {
 			"value": new Date()
 		}).save();
 	}
+	if (await Setting.find({ "name": "confirmationOpen" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationOpen",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationClose" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationClose",
+			"value": new Date()
+		}).save();
+	}
 	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
 		await new Setting({
 			"name": "teamsEnabled",
@@ -59,38 +71,59 @@ setDefaultSettings().catch(err => {
 export let settingsRoutes = express.Router();
 
 settingsRoutes.route("/application_availability")
-	.get(async (request, response) => {
-		let open = (await Setting.findOne({ "name": "applicationOpen" })).value as Date;
-		let close = (await Setting.findOne({ "name": "applicationClose" })).value as Date;
+    .get(async (request, response) => {
+		let applicationOpen = (await Setting.findOne({ "name": "applicationOpen" })).value as Date;
+		let applicationClose = (await Setting.findOne({ "name": "applicationClose" })).value as Date;
+		let confirmationOpen = (await Setting.findOne({ "name": "confirmationOpen" })).value as Date;
+		let confirmationClose = (await Setting.findOne({ "name": "confirmationClose" })).value as Date;
 		response.json({
-			"open": open.toISOString(),
-			"close": close.toISOString()
+			"applicationOpen": applicationOpen.toISOString(),
+			"applicationClose": applicationClose.toISOString(),
+			"confirmationOpen": confirmationOpen.toISOString(),
+			"confirmationClose": confirmationClose.toISOString()
 		});
-	})
-	.put(isAdmin, uploadHandler.any(), async (request, response) => {
-		let rawOpen = request.body.open;
-		let rawClose = request.body.close;
-		if (!rawOpen || !rawClose) {
+    })
+    .put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let rawApplicationOpen = request.body.applicationOpen;
+		let rawApplicationClose = request.body.applicationClose;
+		let rawConfirmationOpen = request.body.confirmationOpen;
+		let rawConfirmationClose = request.body.confirmationClose;
+		if (!rawApplicationOpen || !rawApplicationClose || !rawConfirmationOpen || !rawConfirmationClose) {
 			response.status(400).json({
-				"error": "Application open or close datetime not specified"
+				"error": "Application or confirmation open or close datetime not specified"
 			});
 			return;
 		}
-		if (moment(rawOpen).isAfter(moment(rawClose))) {
+		if (moment(rawApplicationOpen).isAfter(moment(rawApplicationClose))) {
 			response.status(400).json({
 				"error": "Application open must come before application close"
 			});
 			return;
 		}
-		let open = await Setting.findOne({ "name": "applicationOpen" });
-		let close = await Setting.findOne({ "name": "applicationClose" });
-		open.value = new Date(rawOpen);
-		close.value = new Date(rawClose);
-		open.markModified("value");
-		close.markModified("value");
+		if (moment(rawConfirmationOpen).isAfter(moment(rawConfirmationClose))) {
+			response.status(400).json({
+				"error": "Confirmation open must come before confirmation close"
+			});
+			return;
+		}
+		let applicationOpen = await Setting.findOne({ "name": "applicationOpen" });
+		let applicationClose = await Setting.findOne({ "name": "applicationClose" });
+		let confirmationOpen = await Setting.findOne({ "name": "confirmationOpen" });
+		let confirmationClose = await Setting.findOne({ "name": "confirmationClose" });
+		applicationOpen.value = new Date(rawApplicationOpen);
+		applicationClose.value = new Date(rawApplicationClose);
+		confirmationOpen.value = new Date(rawConfirmationOpen);
+		confirmationClose.value = new Date(rawConfirmationClose);
+		applicationOpen.markModified("value");
+		applicationClose.markModified("value");
+		confirmationOpen.markModified("value");
+		confirmationClose.markModified("value");
 		try {
 			await Promise.all([
-				open.save(), close.save()
+				applicationOpen.save(),
+				applicationClose.save(),
+				confirmationOpen.save(),
+				confirmationClose.save()
 			]);
 			response.json({
 				"success": true

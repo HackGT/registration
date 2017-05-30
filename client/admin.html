@@ -202,6 +202,16 @@
 						</div>
 					</div>
 					<div class="row">
+						<div class="col-6">
+							<label for="confirmation-open">Confirmations open:</label>
+							<input id="confirmation-open" type="datetime-local" data-raw-value="{{settings.confirmation.open}}" required />
+						</div>
+						<div class="col-6">
+							<label for="confirmation-close">Confirmations close:</label>
+							<input id="confirmation-close" type="datetime-local" data-raw-value="{{settings.confirmation.close}}" required />
+						</div>
+					</div>
+					<div class="row">
 						<div class="col-12">
 							<label for="teams-enabled">Enable teams?</label>
 							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />

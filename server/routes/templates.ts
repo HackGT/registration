@@ -425,6 +425,10 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
 				close: (await Setting.findOne({ "name": "applicationClose" })).value
 			},
+			confirmation: {
+				open: (await Setting.findOne({ "name": "confirmationOpen" })).value,
+				close: (await Setting.findOne({ "name": "confirmationClose" })).value
+			},
 			teamsEnabled: teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
 			branchRoles: {

@@ -234,6 +234,10 @@ export interface IAdminTemplate extends ICommonTemplate {
 			open: string;
 			close: string;
 		};
+		confirmation: {
+			open: string;
+			close: string;
+		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
 		branchRoles: {

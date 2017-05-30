@@ -182,8 +182,10 @@ settingsUpdateButton.addEventListener("click", e => {
 	settingsUpdateButton.disabled = true;
 
     let applicationAvailabilityData = new FormData();
-    applicationAvailabilityData.append("open", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
-    applicationAvailabilityData.append("close", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
+    applicationAvailabilityData.append("applicationOpen", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
+    applicationAvailabilityData.append("applicationClose", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
+    applicationAvailabilityData.append("confirmationOpen", parseDateTime((document.getElementById("confirmation-open") as HTMLInputElement).value).toISOString());
+    applicationAvailabilityData.append("confirmationClose", parseDateTime((document.getElementById("confirmation-close") as HTMLInputElement).value).toISOString());
 
     let teamsEnabledData = new FormData();
     teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
