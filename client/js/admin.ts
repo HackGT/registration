@@ -154,7 +154,9 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 	});
 }
 
-updateFilterView();//so whatever the default filter options are set at, it'll show accordingly
+// So whatever the default filter options are set at, it'll show accordingly
+updateFilterView();
+
 //
 // Settings
 //

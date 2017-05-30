@@ -450,24 +450,24 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = branchQuestions.find(q => q.name === question.name);
-					let index = templateData.generalStatistics.findIndex(entry => rawQuestion!.label === entry.questionName);
+					let rawQuestion = branchQuestions.find(q => q.name === question.name)!;
+					let entry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label);
 
-					if (index === -1) {
-						index = templateData.generalStatistics.push({
+					if (!entry) {
+						entry = {
 							"questionName": rawQuestion!.label,
 							"branch": statisticUser.applicationBranch,
 							"responses": []
-						}) - 1;
-
+						};
+						templateData.generalStatistics.push(entry);
 					}
-					let specificResponseIndex = templateData.generalStatistics[index].responses.findIndex(resp => resp.response === checkboxValue);
 
-					if (specificResponseIndex !== -1) {
-						templateData.generalStatistics[index].responses[specificResponseIndex].count++;
+					let responsesIndex = entry.responses.findIndex(resp => resp.response === checkboxValue);
+					if (responsesIndex !== -1) {
+						entry.responses[responsesIndex].count++;
 					}
 					else {
-						templateData.generalStatistics[index].responses.push({
+						entry.responses.push({
 							"response": checkboxValue,
 							"count": 1
 						});
