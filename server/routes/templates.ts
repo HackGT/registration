@@ -14,8 +14,9 @@ import {
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
+	ITeam, ITeamMongoose, Team,
 	ISetting, ISettingMongoose, Setting,
-	ICommonTemplate, IIndexTemplate, ILoginTemplate, IAdminTemplate,
+	ICommonTemplate, IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, ResponseCount, StatisticEntry
 } from "../schema";
 import {QuestionBranches, Questions} from "../config/questions.schema";
@@ -53,14 +54,16 @@ let [
 	preregisterTemplate,
 	registerTemplate,
 	adminTemplate,
-	unsupportedTemplate
+	unsupportedTemplate,
+	teamTemplate
 ] = [
 	"index.html",
 	"login.html",
 	"preapplication.html",
 	"application.html",
 	"admin.html",
-	"unsupported.html"
+	"unsupported.html",
+	"team.html"
 ].map(file => {
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
@@ -129,6 +132,34 @@ templateRoutes.route("/login").get((request, response) => {
 		success: request.flash("success")
 	};
 	response.send(loginTemplate(templateData));
+});
+
+templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
+
+	let team, membersAsUsers, teamLeaderAsUser;
+
+	if (request.user.teamId) {
+		team = await Team.findById(request.user.teamId) as ITeamMongoose;
+		membersAsUsers = await User.find({
+			_id: {
+				$in: team.members
+			}
+		});
+		teamLeaderAsUser = await User.findById(team.teamLeader);
+	}
+
+
+	let templateData: ITeamTemplate = {
+		siteTitle: config.eventName,
+		user: request.user,
+		team: team,
+		membersAsUsers: membersAsUsers,
+		teamLeaderAsUser: teamLeaderAsUser,
+		settings: {
+			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+		},
+	};
+	response.send(teamTemplate(templateData));
 });
 
 templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async (request, response) => {

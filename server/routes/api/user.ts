@@ -3,6 +3,8 @@ import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
+import {mongoose} from "../../common";
+
 
 import {
 	UPLOAD_ROOT,
@@ -12,7 +14,7 @@ import {
 } from "../../common";
 import {
 	IFormItem,
-	IUser, IUserMongoose, User,
+	IUser, IUserMongoose, User, ITeam, ITeamMongoose, Team
 } from "../../schema";
 import {QuestionBranches, Questions} from "../../config/questions.schema";
 
@@ -298,4 +300,158 @@ userRoutes.route("/export").get(isAdmin, async (request, response) => {
 			"error": "An error occurred while exporting data"
 		});
 	}
+});
+
+async function removeUserFromAllTeams(user: IUserMongoose) {
+
+	if (!user.teamId) {
+		return true;
+	}
+
+	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+
+	if (!currentUserTeam) {
+		return false;
+	}
+
+	if (currentUserTeam.teamLeader.toString() == user._id.toString()) {
+		//if we're team leader, remove everybody from group
+
+		await Team.findByIdAndRemove(currentUserTeam._id);
+
+		await User.update({
+			teamId: user.teamId
+		}, {
+			$unset: {
+				teamId: 1
+			}
+		}, {
+			multi: true
+		});
+
+		return true;
+	} else {
+		await Team.update({
+			_id: user.teamId
+		}, {
+			$pull: {
+				members: user._id
+			}
+		});
+		//remove us from the current team we're in
+
+		await User.update({
+			_id: user._id
+		}, {
+			$unset: {
+				teamId: 1
+			}
+		});
+
+		return true;
+	}
+}
+
+userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) => {
+	/*
+		first, check if there is already a team that has this user as captain
+			if so, just re-assign the user's teamid to that one
+		else if the user's in a team, take them out of it
+		else make them a new team
+
+
+	 */
+	let user = await User.findOne({_id: mongoose.Types.ObjectId(request.params.id)});
+
+	if (user.teamId) {
+		//if the user's in a team
+		let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+
+		if (currentUserTeam.teamLeader == user._id) {
+			//the user is in the team they made already
+			//ideally this will never happen if we do some validation client side
+			return response.status(400).json({
+				"success": false
+			});
+		}
+
+		await removeUserFromAllTeams(user);
+	}
+
+	let query = {
+		teamLeader: request.user._id,
+		members: {
+			$in: [user._id]
+		}
+	};
+
+	let options = {
+		upsert: true,
+		new: true,
+		setDefaultsOnInsert: true
+	};
+
+	let team: ITeamMongoose = await Team.findOneAndUpdate(query, {}, options);
+
+	user.teamId = team._id;
+	await user.save();
+
+	return response.status(200).json({
+		"success": true
+	});
+});
+
+userRoutes.route("/team/join/:teamId").post(isUserOrAdmin, async (request, response) => {
+	let user = await User.findOne({_id: mongoose.Types.ObjectId(request.params.id)});
+	let requestedTeamId = request.params.teamId;
+
+	if (user.teamId) {
+		//remove them from any teams they're in
+		await removeUserFromAllTeams(user);
+	}
+
+	if (!requestedTeamId) {
+		//no team to join smh
+		return response.status(400).json({
+			"success": false,
+			"message": "No team provided"
+		});
+	}
+
+	if (! (await Team.findOne({_id: mongoose.Types.ObjectId(requestedTeamId)}))) {
+		//if the team they tried to join isn't real...
+		return response.status(400).json({
+			"success": false,
+			"message": "No such team!"
+		});
+	}
+
+	await Team.update({
+		_id: requestedTeamId
+	}, {
+		$addToSet: {
+			members: user._id
+		}
+	});
+
+	user.teamId = requestedTeamId
+
+	await user.save()
+
+	return response.status(200).json({
+		"success": true
+	});
+
+});
+
+userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response) => {
+
+	let user = await User.findOne({_id: mongoose.Types.ObjectId(request.params.id)});
+	console.log("Our user is ", user)
+	await removeUserFromAllTeams(user);
+
+	return response.status(200).json({
+		"success": true
+	});
+
 });

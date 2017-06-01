@@ -57,6 +57,24 @@ export interface IFormItem {
 	// String for most types, string array for checkbox groups, file for file uploads, null if optional field is not filled in
 	"value": string | string[] | Express.Multer.File | null;
 }
+
+export interface ITeam {
+	_id: mongoose.Types.ObjectId;
+	teamLeader: mongoose.Types.ObjectId;
+	members: mongoose.Types.ObjectId[];
+}
+
+export type ITeamMongoose = ITeam & mongoose.Document;
+
+export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
+	teamLeader: {
+		type: mongoose.Schema.Types.ObjectId
+	},
+	members: [{
+		type: mongoose.Schema.Types.ObjectId
+	}]
+}));
+
 export interface IUser {
 	_id: mongoose.Types.ObjectId;
 	email: string;
@@ -89,6 +107,8 @@ export interface IUser {
 	applicationSubmitTime?: Date;
 
 	admin?: boolean;
+
+	teamId?: mongoose.Types.ObjectId;
 }
 export type IUserMongoose = IUser & mongoose.Document;
 
@@ -127,7 +147,11 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
 
-	admin: Boolean
+	admin: Boolean,
+
+	teamId: {
+		type: mongoose.Schema.Types.ObjectId
+	},
 }));
 
 export interface ISetting {
@@ -162,6 +186,11 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+}
+export interface ITeamTemplate extends ICommonTemplate {
+	team?: ITeamMongoose,
+	membersAsUsers?: IUserMongoose[],
+	teamLeaderAsUser?: IUserMongoose
 }
 export interface ILoginTemplate {
 	siteTitle: string;

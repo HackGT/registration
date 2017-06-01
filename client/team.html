@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Team Management - {{siteTitle}}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
+    <link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/application.css" />
+    <script src="/node_modules/es6-promise/dist/es6-promise.auto.min.js"></script>
+    <script src="/node_modules/whatwg-fetch/fetch.js"></script>
+    <script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/team.js" defer></script>
+</head>
+<body>
+{{#> sidebar}}
+    <h1>Team Management</h1>
+    {{#if user.teamId}}
+        <h4>Members of {{teamLeaderAsUser.name}}'s Team</h4>
+        <ul>
+            <li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) - Team Leader</li>
+        {{#each membersAsUsers}}
+            <li>{{name}} ({{email}})</li>
+        {{else}}
+            <p>There are no members in this team other than you!</p>
+        {{/each}}
+        </ul>
+        <p>Tell your friends to enter <b>{{user.teamId}}</b> at their join team menu</p>
+        <button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/">Leave Team</button>
+    {{else}}
+        <h3>Let's get you in a team</h3>
+
+        <div class="row">
+
+            <div class="col">
+                <h4>Join A Team</h4>
+                <p>Ask your friend for their team ID</p>
+                <input type="text" id="joinTeamInput" placeholder="The ID of the Team To Join"/>
+                <button id="joinTeam" action="/api/user/{{user._id}}/team/join"/>Join Team</button>
+            </div>
+            <div class="col">
+                <h4>Create A Team</h4>
+                <button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
+            </div>
+        </div>
+
+
+
+    {{/if}}
+{{/sidebar}}
+</body>
+</html>
