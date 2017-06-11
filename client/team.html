@@ -19,7 +19,7 @@
 {{#> sidebar}}
     <h1>Team Management</h1>
     {{#if user.teamId}}
-        <h4>Members of {{teamLeaderAsUser.name}}'s Team</h4>
+        <h4>Members of Team <b class="teamName">{{team.teamName}}</b></h4>
         <ul>
             <li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) - Team Leader</li>
         {{#each membersAsUsers}}
@@ -28,7 +28,7 @@
             <p>There are no members in this team other than you!</p>
         {{/each}}
         </ul>
-        <p>Tell your friends to enter <b>{{user.teamId}}</b> at their join team menu</p>
+        <p>Tell your friends to enter <b class="teamName">{{team.teamName}}</b> at their join team menu</p>
         <button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/">Leave Team</button>
     {{else}}
         <h3>Let's get you in a team</h3>
@@ -37,12 +37,13 @@
 
             <div class="col">
                 <h4>Join A Team</h4>
-                <p>Ask your friend for their team ID</p>
-                <input type="text" id="joinTeamInput" placeholder="The ID of the Team To Join"/>
-                <button id="joinTeam" action="/api/user/{{user._id}}/team/join"/>Join Team</button>
+                <p>Ask your friend for their team name</p>
+                <input type="text" id="joinTeamInput" placeholder="The name of the team To Join"/>
+                <button id="joinTeam" action="/api/user/{{user._id}}/team/join/"/>Join Team</button>
             </div>
             <div class="col">
                 <h4>Create A Team</h4>
+                <input type="text" id="teamNameInput" placeholder="The name of your team"/>
                 <button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
             </div>
         </div>

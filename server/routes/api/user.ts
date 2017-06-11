@@ -350,7 +350,7 @@ async function removeUserFromAllTeams(user: IUserMongoose) {
 	}
 }
 
-userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) => {
+userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, response) => {
 	/*
 		first, check if there is already a team that has this user as captain
 			if so, just re-assign the user's teamid to that one
@@ -360,9 +360,22 @@ userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) =
 
 	 */
 	let user = await User.findById(request.params.id);
+	let decodedTeamName = decodeURI(request.params.teamName);
 
+	let existingTeam = await Team.findOne({teamName: decodedTeamName})
+
+	if (existingTeam) {
+		//someone else has a team with this name
+		return response.status(400).json({
+			"success": false,
+			"message": "Someone else has a team called "
+				+ decodeURI(request.params.teamName)
+				+ " - please pick a different name"
+		});
+	}
+
+	//if the user's in a team, remove them from their current team unless they're the team leader
 	if (user.teamId) {
-		//if the user's in a team
 		let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
 
 		if (currentUserTeam.teamLeader == user._id) {
@@ -380,7 +393,8 @@ userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) =
 		teamLeader: request.user._id,
 		members: {
 			$in: [user._id]
-		}
+		},
+		teamName: decodedTeamName
 	};
 
 	let options = {
@@ -399,24 +413,25 @@ userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) =
 	});
 });
 
-userRoutes.route("/team/join/:teamId").post(isUserOrAdmin, async (request, response) => {
+userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response) => {
 	let user = await User.findById(request.params.id);
-	let requestedTeamId = request.params.teamId;
+
+	let decodedTeamName = decodeURI(request.params.teamName);
 
 	if (user.teamId) {
 		//remove them from any teams they're in
 		await removeUserFromAllTeams(user);
 	}
 
-	if (!requestedTeamId) {
+	if (!decodedTeamName) {
 		//no team to join smh
 		return response.status(400).json({
 			"success": false,
-			"message": "No team provided"
+			"message": "Please enter the team name you want to join"
 		});
 	}
 
-	if (! (await Team.findById(requestedTeamId))) {
+	if (! (await Team.findOne({teamName: decodedTeamName}))) {
 		//if the team they tried to join isn't real...
 		return response.status(400).json({
 			"success": false,
@@ -425,14 +440,16 @@ userRoutes.route("/team/join/:teamId").post(isUserOrAdmin, async (request, respo
 	}
 
 	await Team.update({
-		_id: requestedTeamId
+		teamName: decodedTeamName
 	}, {
 		$addToSet: {
 			members: user._id
 		}
 	});
 
-	user.teamId = requestedTeamId
+	user.teamId = (await Team.findOne({teamName: decodedTeamName}))._id
+
+	console.log(user.teamId)
 
 	await user.save()
 

@@ -62,6 +62,7 @@ export interface ITeam {
 	_id: mongoose.Types.ObjectId;
 	teamLeader: mongoose.Types.ObjectId;
 	members: mongoose.Types.ObjectId[];
+	teamName: string;
 }
 
 export type ITeamMongoose = ITeam & mongoose.Document;
@@ -72,7 +73,10 @@ export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
 	},
 	members: [{
 		type: mongoose.Schema.Types.ObjectId
-	}]
+	}],
+	teamName: {
+		type: mongoose.Schema.Types.String
+	}
 }));
 
 export interface IUser {
