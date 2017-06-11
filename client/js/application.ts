@@ -1,10 +1,10 @@
-let form = document.querySelector("form")!;
-let submitButton = document.querySelector("form input[type=submit]")! as HTMLInputElement;
+let form = document.querySelector("form") as HTMLFormElement | null;
+let submitButton = document.querySelector("form input[type=submit]") as HTMLInputElement;
 submitButton.addEventListener("click", e => {
-	if (!form.checkValidity() || !form.dataset.action) {
+	e.preventDefault();
+	if (!form || !form.checkValidity() || !form.dataset.action) {
 		return;
 	}
-	e.preventDefault();
 	submitButton.disabled = true;
 
 	fetch(form.dataset.action!, {
@@ -12,7 +12,11 @@ submitButton.addEventListener("click", e => {
 		method: "POST",
 		body: new FormData(form)
 	}).then(checkStatus).then(parseJSON).then(async () => {
-		await sweetAlert("Awesome!", "Your application has been saved. Feel free to come back here and edit it at any time.", "success");
+		let successMessage: string = window.location.pathname.match(/^\/apply/) ?
+			"Your application has been saved. Feel free to come back here and edit it at any time." :
+			"Your RSVP has been saved. Feel free to come back here and edit it at any time. We look forward to seeing you!";
+
+		await sweetAlert("Awesome!", successMessage, "success");
 		window.location.assign("/");
 	}).catch(async (err: Error) => {
 		await sweetAlert("Oh no!", err.message, "error");
@@ -24,14 +28,19 @@ let deleteButton = document.querySelector("#delete") as HTMLButtonElement | null
 if (deleteButton) {
 	deleteButton.addEventListener("click", async e => {
 		e.preventDefault();
-		if (!deleteButton || !deleteButton.dataset.action) {
+		if (!deleteButton || !form || !form.dataset.action) {
 			return;
 		}
 		deleteButton.disabled = true;
+
 		try {
+			let confirmMessage: string = window.location.pathname.match(/^\/apply/) ?
+				"This will allow you to submit a different application type but your current data will be lost forever." :
+				"Your current data will be lost forever and we'll mark you as not attending. You can still RSVP again if you change your mind.";
+
 			await sweetAlert({
 				title: "Are you sure?",
-				text: "This will allow you to submit a different application type but your current data will be lost forever.",
+				text: confirmMessage,
 				type: "warning",
 				confirmButtonColor: "#FF4136",
 				confirmButtonText: "Delete",
@@ -44,7 +53,7 @@ if (deleteButton) {
 			return;
 		}
 
-		fetch(deleteButton.dataset.action!, {
+		fetch(form.dataset.action!, {
 			credentials: "same-origin",
 			method: "DELETE"
 		}).then(checkStatus).then(parseJSON).then(async () => {

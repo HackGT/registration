@@ -8,6 +8,7 @@ import {
 	UPLOAD_ROOT,
 	postParser, uploadHandler,
 	config, sendMailAsync,
+	ApplicationType,
 	validateSchema
 } from "../../common";
 import {
@@ -53,12 +54,27 @@ function isAdmin(request: express.Request, response: express.Response, next: exp
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
-userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response): Promise<void> => {
+userRoutes.route("/application/:branch")
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
+userRoutes.route("/confirmation/:branch")
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
+
+async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
+	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
+
 	let user = await User.findById(request.params.id);
 	let branchName = request.params.branch as string;
-	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.status(400).json({
 			"error": "You can only edit the application branch that you originally submitted"
+		});
+		return;
+	}
+	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+		response.status(400).json({
+			"error": "You can only edit the confirmation branch that you originally submitted"
 		});
 		return;
 	}
@@ -174,21 +190,37 @@ Sincerely,
 
 The ${config.eventName} Team`;
 		}
-		if (!user.applied) {
-			await sendMailAsync({
-				from: config.email.from,
-				to: user.email,
-				subject: `[${config.eventName}] - Thank you for appying!`,
-				text // TODO: Add HTML email template
-			});
-		}
 
-		user.applied = true;
-		user.applicationBranch = questionBranch.name;
-		user.applicationData = data;
-		user.markModified("applicationData");
-		user.applicationSubmitTime = new Date();
-		user.markModified("applicationSubmitTime");
+		if (requestType === ApplicationType.Application) {
+			if (!user.applied) {
+				await sendMailAsync({
+					from: config.email.from,
+					to: user.email,
+					subject: `[${config.eventName}] - Thank you for appying!`,
+					text: text // TODO: Add HTML email template
+				});
+			}
+			user.applied = true;
+			user.applicationBranch = questionBranch.name;
+			user.applicationData = data;
+			user.markModified("applicationData");
+			user.applicationSubmitTime = new Date();
+		}
+		else if (requestType === ApplicationType.Confirmation) {
+			if (!user.attending) {
+				await sendMailAsync({
+					from: config.email.from,
+					to: user.email,
+					subject: `[${config.eventName}] - Thank you for RSVPing!`,
+					text: text // TODO: Add HTML email template
+				});
+			}
+			user.attending = true;
+			user.confirmationBranch = questionBranch.name;
+			user.confirmationData = data;
+			user.markModified("confirmationData");
+			user.confirmationSubmitTime = new Date();
+		}
 
 		await user.save();
 		response.status(200).json({
@@ -198,21 +230,31 @@ The ${config.eventName} Team`;
 	catch (err) {
 		console.error(err);
 		response.status(500).json({
-			"error": "An error occurred while saving the application"
+			"error": "An error occurred while saving your application"
 		});
 	}
-});
+}
 
-userRoutes.delete("/application", isUserOrAdmin, async (request, response): Promise<void> => {
+async function deleteApplicationBranchHandler(request: express.Request, response: express.Response) {
+	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
+
 	let user = await User.findById(request.params.id);
-	user.applied = false;
-	user.applicationBranch = "";
-	user.applicationData = [];
-	user.markModified("applicationData");
-	user.applicationSubmitTime = undefined;
-	user.markModified("applicationSubmitTime");
-	user.applicationStartTime = undefined;
-	user.markModified("applicationStartTime");
+	if (requestType === ApplicationType.Application) {
+		user.applied = false;
+		user.applicationBranch = "";
+		user.applicationData = [];
+		user.markModified("applicationData");
+		user.applicationSubmitTime = undefined;
+		user.applicationStartTime = undefined;
+	}
+	else if (requestType === ApplicationType.Confirmation) {
+		user.attending = false;
+		user.confirmationBranch = "";
+		user.confirmationData = [];
+		user.markModified("confirmationData");
+		user.confirmationSubmitTime = undefined;
+		user.confirmationStartTime = undefined;
+	}
 
 	try {
 		await user.save();
@@ -226,7 +268,7 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response): Prom
 			"error": "An error occurred while deleting the application"
 		});
 	}
-});
+}
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);

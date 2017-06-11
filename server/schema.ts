@@ -108,6 +108,11 @@ export interface IUser {
 	applicationData: IFormItem[];
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
+	
+	confirmationBranch: string;
+	confirmationData: IFormItem[];
+	confirmationStartTime?: Date;
+	confirmationSubmitTime?: Date;
 
 	admin?: boolean;
 
@@ -141,6 +146,10 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	facebookData: {
 		id: String
 	},
+	
+	teamId: {
+		type: mongoose.Schema.Types.ObjectId
+	},
 
 	applied: Boolean,
 	accepted: Boolean,
@@ -150,11 +159,12 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
 
-	admin: Boolean,
+	confirmationBranch: String,
+	confirmationData: [mongoose.Schema.Types.Mixed],
+	confirmationStartTime: Date,
+	confirmationSubmitTime: Date,
 
-	teamId: {
-		type: mongoose.Schema.Types.ObjectId
-	}
+	admin: Boolean
 }));
 
 export interface ISetting {

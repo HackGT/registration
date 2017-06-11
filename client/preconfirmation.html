@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Confirm - {{siteTitle}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/preapplication.css" />
+	</head>
+	<body>
+		{{#> sidebar}}
+			<h1 class="center">Confirm Attendance</h1>
+
+			<p>Choose what you want to RSVP as:</p>
+			<section id="selection">
+				{{#each branches}}
+					<a href="/confirm/{{slug this}}" class="btn">{{this}}</a>
+				{{/each}}
+			</section>
+		{{/sidebar}}
+	</body>
+</html>

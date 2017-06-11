@@ -266,10 +266,26 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 import * as Handlebars from "handlebars";
 import * as moment from "moment-timezone";
 import { ICommonTemplate } from "./schema";
+export enum ApplicationType {
+	Application, Confirmation
+}
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
+	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+
+	let openKey: string;
+	let closeKey: string;
+	if (requestType === ApplicationType.Application) {
+		openKey = "applicationOpen";
+		closeKey = "applicationClose";
+	}
+	else {
+		openKey = "confirmationOpen";
+		closeKey = "confirmationClose";
+	}
+
 	let [openDate, closeDate] = (await Promise.all<ISetting>([
-		Setting.findOne({ "name": "applicationOpen" }),
-		Setting.findOne({ "name": "applicationClose" })
+		Setting.findOne({ "name": openKey }),
+		Setting.findOne({ "name": closeKey })
 	])).map(setting => moment(setting.value as Date));
 
 	if (moment().isBetween(openDate, closeDate)) {
@@ -279,6 +295,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 
 	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm:ss a z";
 	interface IClosedTemplate extends ICommonTemplate {
+		type: string;
 		open: {
 			time: string;
 			verb: string;
@@ -298,6 +315,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},
 
+		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",
 		open: {
 			time: openDate.tz(moment.tz.guess()).format(TIME_FORMAT),
 			verb: moment().isBefore(openDate) ? "will open" : "opened"

@@ -8,7 +8,7 @@ import * as bowser from "bowser";
 import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
-	timeLimited,
+	timeLimited, ApplicationType,
 	validateSchema, config
 } from "../common";
 import {
@@ -99,10 +99,13 @@ Handlebars.registerHelper("slug", (input: string): string => {
 Handlebars.registerHelper("numberFormat", (n: number): string => {
 	return n.toLocaleString();
 });
+Handlebars.registerHelper("toLowerCase", (n: number): string => {
+	return n.toString().toLowerCase();
+});
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
-Handlebars.registerHelper("roleSelected", function (roles: { noop: string[]; applicationBranches: string[];	confirmationBranches: string[];	}, role: string, branchName: string): string {
+Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationBranches: string[];	confirmationBranches: string[];	}, role: string, branchName: string): string => {
 	if (role === "noop" && roles.noop.indexOf(branchName) !== -1) {
 		return "selected";
 	}
@@ -150,7 +153,6 @@ templateRoutes.route("/login").get((request, response) => {
 });
 
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
-
 	let team: ITeamMongoose | null = null;
 	let membersAsUsers: IUserMongoose[] | null = null;
 	let teamLeaderAsUser: IUserMongoose | null = null;
@@ -181,10 +183,27 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 	response.send(teamTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async (request, response) => {
+templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, applicationHandler);
+templateRoutes.route("/confirm").get(authenticateWithRedirect, timeLimited, applicationHandler);
+
+async function applicationHandler(request: express.Request, response: express.Response) {
+	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+
 	let user = request.user as IUser;
-	if (user.applied) {
+	if (requestType === ApplicationType.Application && user.accepted) {
+		response.redirect("/confirm");
+		return;
+	}
+	if (requestType === ApplicationType.Confirmation && !user.accepted) {
+		response.redirect("/apply");
+		return;
+	}
+	if (requestType === ApplicationType.Application && user.applied) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+		return;
+	}
+	else if (requestType === ApplicationType.Confirmation && user.attending) {
+		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 		return;
 	}
 
@@ -198,13 +217,13 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async 
 		response.status(500).send("An error occurred while generating the application options");
 		return;
 	}
-	// Filter to only show application branches
-	let applicationBranches = (await Setting.findOne({ "name": "applicationBranches" })).value as string[];
+	// Filter to only show application / confirmation branches
+	let applicationBranches = (await Setting.findOne({ "name": requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches" })).value as string[];
 	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
 
 	// If there's only one path, redirect to that
 	if (questionBranches.length === 1) {
-		response.redirect(`/apply/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
+		response.redirect(`/${requestType === ApplicationType.Application ? "apply" : "confirm"}/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
 		return;
 	}
 	let templateData: IRegisterBranchChoiceTemplate = {
@@ -215,13 +234,23 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async 
 		},
 		branches: questionBranches.map(branch => branch.name)
 	};
-	response.send(preregisterTemplate(templateData));
-});
-templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, async (request, response) => {
+	response.send(requestType === ApplicationType.Application ? preregisterTemplate(templateData) : preconfirmTemplate(templateData));
+}
+
+templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
+templateRoutes.route("/confirm/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
+
+async function applicationBranchHandler(request: express.Request, response: express.Response) {
+	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+
 	let user = request.user as IUser;
 	let branchName = request.params.branch as string;
-	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+		return;
+	}
+	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 		return;
 	}
 
@@ -242,7 +271,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 	}
 	// tslint:disable:no-string-literal
 	let questionData = questionBranch.questions.map(question => {
-		let savedValue = user.applicationData.find(item => item.name === question.name);
+		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
 			if (question.hasOther) {
@@ -290,9 +319,13 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 	// tslint:enable:no-string-literal
 
 	let thisUser: IUserMongoose = await User.findById(user._id);
-	thisUser.applicationStartTime = new Date();
-	thisUser.markModified("applicationStartTime");
-	await thisUser.save();
+	if (requestType === ApplicationType.Application) {
+		thisUser.applicationStartTime = new Date();
+	}
+	else if (requestType === ApplicationType.Confirmation) {
+		thisUser.confirmationStartTime = new Date();
+	}
+	thisUser.save();
 
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
@@ -303,8 +336,9 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 		branch: questionBranch.name,
 		questionData
 	};
-	response.send(registerTemplate(templateData));
-});
+
+	response.send(requestType === ApplicationType.Application ? registerTemplate(templateData) : confirmTemplate(templateData));
+}
 
 templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
@@ -375,7 +409,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				status = `Accepted (${statisticUser.applicationBranch})`;
 			}
 			if (statisticUser.attending) {
-				status = `Attending (${statisticUser.applicationBranch})`;
+				status = `Accepted (${user.applicationBranch}) / Attending (${user.confirmationBranch})`;
 			}
 			let questionsFromBranch = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch);
 			let applicationDataFormatted: {"label": string; "value": string}[] = [];
