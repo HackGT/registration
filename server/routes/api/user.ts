@@ -3,8 +3,6 @@ import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
-import {mongoose} from "../../common";
-
 
 import {
 	UPLOAD_ROOT,
@@ -361,7 +359,7 @@ userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) =
 
 
 	 */
-	let user = await User.findOne({_id: mongoose.Types.ObjectId(request.params.id)});
+	let user = await User.findById(request.params.id);
 
 	if (user.teamId) {
 		//if the user's in a team
@@ -402,7 +400,7 @@ userRoutes.route("/team/create").post(isUserOrAdmin, async (request, response) =
 });
 
 userRoutes.route("/team/join/:teamId").post(isUserOrAdmin, async (request, response) => {
-	let user = await User.findOne({_id: mongoose.Types.ObjectId(request.params.id)});
+	let user = await User.findById(request.params.id);
 	let requestedTeamId = request.params.teamId;
 
 	if (user.teamId) {
@@ -418,7 +416,7 @@ userRoutes.route("/team/join/:teamId").post(isUserOrAdmin, async (request, respo
 		});
 	}
 
-	if (! (await Team.findOne({_id: mongoose.Types.ObjectId(requestedTeamId)}))) {
+	if (! (await Team.findById(requestedTeamId))) {
 		//if the team they tried to join isn't real...
 		return response.status(400).json({
 			"success": false,
@@ -446,7 +444,7 @@ userRoutes.route("/team/join/:teamId").post(isUserOrAdmin, async (request, respo
 
 userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response) => {
 
-	let user = await User.findOne({_id: mongoose.Types.ObjectId(request.params.id)});
+	let user = await User.findById(request.params.id);
 	console.log("Our user is ", user)
 	await removeUserFromAllTeams(user);
 

@@ -1,12 +1,12 @@
-const joinTeamButton = document.getElementById('joinTeam');
-const joinTeamInput = document.getElementById('joinTeamInput') as HTMLInputElement;
-const createTeamButton = document.getElementById('createTeam');
-const leaveTeamButton = document.getElementById('leaveTeam');
+const joinTeamButton = document.getElementById("joinTeam") as HTMLInputElement;
+const joinTeamInput = document.getElementById("joinTeamInput") as HTMLInputElement;
+const createTeamButton = document.getElementById("createTeam") as HTMLInputElement;
+const leaveTeamButton = document.getElementById("leaveTeam") as HTMLInputElement;
 
 joinTeamButton && joinTeamButton.addEventListener("click", e => {
     e.preventDefault();
 
-    fetch(joinTeamButton!.getAttribute('action')! + "/" + joinTeamInput!.value, {
+    fetch(joinTeamButton.getAttribute("action")! + "/" + joinTeamInput.value, {
         credentials: "same-origin",
         method: "POST",
     }).then(checkStatus).then(parseJSON).then(async () => {
@@ -22,7 +22,7 @@ joinTeamButton && joinTeamButton.addEventListener("click", e => {
 leaveTeamButton && leaveTeamButton.addEventListener("click", e => {
     e.preventDefault();
 
-    fetch(leaveTeamButton!.getAttribute('action')!, {
+    fetch(leaveTeamButton.getAttribute("action")!, {
         credentials: "same-origin",
         method: "POST"
     }).then(checkStatus).then(parseJSON).then(async () => {
@@ -38,7 +38,7 @@ leaveTeamButton && leaveTeamButton.addEventListener("click", e => {
 createTeamButton && createTeamButton.addEventListener("click", e => {
     e.preventDefault();
 
-    fetch(createTeamButton!.getAttribute('action')!, {
+    fetch(createTeamButton.getAttribute("action")!, {
         credentials: "same-origin",
         method: "POST"
     }).then(checkStatus).then(parseJSON).then(async () => {
