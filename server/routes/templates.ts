@@ -34,7 +34,7 @@ templateRoutes.use(async (request, response, next) => {
 	let userAgent = request.headers["user-agent"];
 	const minBrowser = {
 		msie: "12", // Microsoft Edge+ (no support for IE)
-		safari: "7.1" // v7 released 2013
+		safari: "7.1" // Safari v7 was released in 2013
 	};
 	if (bowser.isUnsupportedBrowser(minBrowser, false, userAgent)) {
 		let templateData = {
@@ -68,35 +68,39 @@ let [
 	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
 	return Handlebars.compile(data);
 });
+
+// tslint:disable-next-line:no-any
 Handlebars.registerHelper("ifCond", function(v1: any, v2: any, options: any) {
 	if (v1 === v2) {
+		// tslint:disable-next-line:no-invalid-this
 		return options.fn(this);
 	}
+	// tslint:disable-next-line:no-invalid-this
 	return options.inverse(this);
 });
-Handlebars.registerHelper("required", function (isRequired: boolean) {
+Handlebars.registerHelper("required", (isRequired: boolean) => {
 	// Adds the "required" form attribute if the element requests to be required
 	return isRequired ? "required" : "";
 });
-Handlebars.registerHelper("checked", function (selected: boolean[], index: number) {
+Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	// Adds the "checked" form attribute if the element was checked previously
 	return selected[index] ? "checked" : "";
 });
-Handlebars.registerHelper("selected", function (selected: boolean[], index: number) {
+Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
 	return selected[index] ? "selected" : "";
 });
-Handlebars.registerHelper("enabled", function (isEnabled: boolean) {
+Handlebars.registerHelper("enabled", (isEnabled: boolean) => {
 	// Adds the "disabled" form attribute if the element should be disabled
 	return !isEnabled ? "disabled" : "";
 });
-Handlebars.registerHelper("slug", function (input: string): string {
+Handlebars.registerHelper("slug", (input: string): string => {
 	return encodeURIComponent(input.toLowerCase());
 });
-Handlebars.registerHelper("numberFormat", function (n: number): string {
+Handlebars.registerHelper("numberFormat", (n: number): string => {
 	return n.toLocaleString();
 });
-Handlebars.registerHelper("toJSONString", function (stat: StatisticEntry): string {
+Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
@@ -136,31 +140,32 @@ templateRoutes.route("/login").get((request, response) => {
 
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
 
-	let team, membersAsUsers, teamLeaderAsUser;
+	let team: ITeamMongoose | null = null;
+	let membersAsUsers: IUserMongoose[] | null = null;
+	let teamLeaderAsUser: IUserMongoose | null = null;
 	let isCurrentUserTeamLeader = false;
 
 	if (request.user.teamId) {
-		team = await Team.findById(request.user.teamId) as ITeamMongoose;
+		team = await Team.findById(request.user.teamId);
 		membersAsUsers = await User.find({
 			_id: {
 				$in: team.members
 			}
 		});
 		teamLeaderAsUser = await User.findById(team.teamLeader);
-		isCurrentUserTeamLeader = teamLeaderAsUser._id.toString() == request.user._id.toString();
+		isCurrentUserTeamLeader = teamLeaderAsUser._id.toString() === request.user._id.toString();
 	}
-
 
 	let templateData: ITeamTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
-		team: team,
-		membersAsUsers: membersAsUsers,
-		teamLeaderAsUser: teamLeaderAsUser,
-		isCurrentUserTeamLeader: isCurrentUserTeamLeader,
+		team,
+		membersAsUsers,
+		teamLeaderAsUser,
+		isCurrentUserTeamLeader,
 		settings: {
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
-		},
+		}
 	};
 	response.send(teamTemplate(templateData));
 });
@@ -189,7 +194,7 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async 
 	}
 	let templateData: IRegisterBranchChoiceTemplate = {
 		siteTitle: config.eventName,
-		user: user,
+		user,
 		settings: {
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},
@@ -223,10 +228,12 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 	let questionData = questionBranch.questions.map(question => {
 		let savedValue = user.applicationData.find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
+			// tslint:disable-next-line:no-string-literal
 			question["multi"] = true;
 			if (question.hasOther) {
 				question.options.push("Other");
 			}
+			// tslint:disable-next-line:no-string-literal
 			question["selected"] = question.options.map(option => {
 				if (savedValue && Array.isArray(savedValue.value)) {
 					return savedValue.value.indexOf(option) !== -1;
@@ -240,8 +247,11 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 				if (!Array.isArray(savedValue.value)) {
 					// Select / radio buttons
 					if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
+						// tslint:disable-next-line:no-string-literal
 						question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
+						// tslint:disable-next-line:no-string-literal
 						question["otherSelected"] = true;
+						// tslint:disable-next-line:no-string-literal
 						question["otherValue"] = savedValue.value;
 					}
 				}
@@ -249,8 +259,11 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 					// Checkboxes
 					for (let value of savedValue.value as string[]) {
 						if (question.options.indexOf(value) === -1) {
+							// tslint:disable-next-line:no-string-literal
 							question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
+							// tslint:disable-next-line:no-string-literal
 							question["otherSelected"] = true;
+							// tslint:disable-next-line:no-string-literal
 							question["otherValue"] = value;
 						}
 					}
@@ -258,11 +271,13 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 			}
 		}
 		else {
+			// tslint:disable-next-line:no-string-literal
 			question["multi"] = false;
 		}
 		if (question.type === "file") {
 			savedValue = undefined;
 		}
+		// tslint:disable-next-line:no-string-literal
 		question["value"] = savedValue ? savedValue.value : "";
 		return question;
 	});
@@ -272,7 +287,6 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 	thisUser.markModified("applicationStartTime");
 	thisUser.save();
 
-
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
@@ -280,7 +294,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},
 		branch: questionBranch.name,
-		questionData: questionData
+		questionData
 	};
 	response.send(registerTemplate(templateData));
 });
@@ -294,14 +308,16 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 
 	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
 
-	let teamIdToNameMap: {[key:string]:string;} = {};
-	(await Team.find()).forEach((e: ITeamMongoose) => {
-		teamIdToNameMap[e._id.toString()] = e.teamName;
+	let teamIDNameMap: {
+		[id: string]: string;
+	} = {};
+	(await Team.find()).forEach((team: ITeamMongoose) => {
+		teamIDNameMap[team._id.toString()] = team.teamName;
 	});
 
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
-		user: user,
+		user,
 		branchNames: rawQuestions.map(branch => branch.name),
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
@@ -310,49 +326,45 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			attendingUsers: await User.find({ "attending": true }).count(),
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
 		},
-		generalStatistics: [],
+		generalStatistics: [] as StatisticEntry[],
 		users: (await User.find()).sort((a, b) => {
-			
-			if (!a.teamId || !b.teamId || a.teamId == b.teamId) {
+			if (!a.teamId || !b.teamId || a.teamId === b.teamId) {
 				if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
 				if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-			} else if (a.teamId.toString().toLowerCase() < b.teamId.toString().toLowerCase()) {
-				return -1
-			} else if (a.teamId.toString().toLowerCase() > b.teamId.toString().toLowerCase()) {
-				return 1
 			}
+			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() < teamIDNameMap[b.teamId.toString()].toLowerCase()) return -1;
+			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() > teamIDNameMap[b.teamId.toString()].toLowerCase()) return 1;
 
 			return 0;
-			
-		}).map(user => {
+		}).map(statisticUser => {
 			let loginMethods: string[] = [];
-			if (user.githubData && user.githubData.id) {
+			if (statisticUser.githubData && statisticUser.githubData.id) {
 				loginMethods.push("GitHub");
 			}
-			if (user.googleData && user.googleData.id) {
+			if (statisticUser.googleData && statisticUser.googleData.id) {
 				loginMethods.push("Google");
 			}
-			if (user.facebookData && user.facebookData.id) {
+			if (statisticUser.facebookData && statisticUser.facebookData.id) {
 				loginMethods.push("Facebook");
 			}
-			if (user.localData && user.localData.hash) {
+			if (statisticUser.localData && statisticUser.localData.hash) {
 				loginMethods.push("Local");
 			}
 			let status: string = "Signed up";
-			if (user.applied) {
-				status = `Applied (${user.applicationBranch})`;
+			if (statisticUser.applied) {
+				status = `Applied (${statisticUser.applicationBranch})`;
 			}
-			if (user.accepted) {
-				status = `Accepted (${user.applicationBranch})`;
+			if (statisticUser.accepted) {
+				status = `Accepted (${statisticUser.applicationBranch})`;
 			}
-			if (user.attending) {
-				status = `Attending (${user.applicationBranch})`;
+			if (statisticUser.attending) {
+				status = `Attending (${statisticUser.applicationBranch})`;
 			}
-			let questionsFromBranch = rawQuestions.find(branch => branch.name === user.applicationBranch);
+			let questionsFromBranch = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch);
 			let applicationDataFormatted: {"label": string; "value": string}[] = [];
 			if (questionsFromBranch) {
-				applicationDataFormatted = user.applicationData.map(question => {
-					let rawQuestion = questionsFromBranch!.questions.find(rawQuestion => rawQuestion.name === question.name);
+				applicationDataFormatted = statisticUser.applicationData.map(question => {
+					let rawQuestion = questionsFromBranch!.questions.find(q => q.name === question.name);
 					let value: string;
 					if (typeof question.value === "string") {
 						value = question.value;
@@ -374,35 +386,36 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 							"value": value
 						};
 					}
+
 					return {
 						"label": rawQuestion.label,
 						"value": value
-					}
+					};
 				});
 			}
 
 			return {
-				...user.toObject(),
+				...statisticUser.toObject(),
 				"status": status,
 				"loginMethods": loginMethods.join(", "),
 				"applicationDataFormatted": applicationDataFormatted,
-				"teamName": user.teamId ? teamIdToNameMap[user.teamId.toString()] : undefined
+				"teamName": statisticUser.teamId ? teamIDNameMap[statisticUser.teamId.toString()] : undefined
 			};
 		}),
 		metrics: {},
 		settings: {
 			application: {
 				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
-				close: (await Setting.findOne({ "name": "applicationClose" })).value,
+				close: (await Setting.findOne({ "name": "applicationClose" })).value
 			},
-			teamsEnabled: teamsEnabled,
+			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : ""
 		}
 	};
 	// Generate general statistics
-	(await User.find({ "applied": true })).forEach(user => {
-		let branchQuestions = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions;
-		user.applicationData.forEach(question => {
+	(await User.find({ "applied": true })).forEach(statisticUser => {
+		let branchQuestions = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch)!.questions;
+		statisticUser.applicationData.forEach(question => {
 			if (question.value === null) return;
 			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 				let values: string[];
@@ -413,53 +426,49 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-
 					let rawQuestion = branchQuestions.find(q => q.name === question.name);
-
-
 					let index = templateData.generalStatistics.findIndex(entry => rawQuestion!.label === entry.questionName);
 
 					if (index === -1) {
 						index = templateData.generalStatistics.push({
 							"questionName": rawQuestion!.label,
-							"branch": user.applicationBranch,
+							"branch": statisticUser.applicationBranch,
 							"responses": []
 						}) - 1;
 
 					}
-					// templateData.generalStatistics[index].count++;
-					let specificResponseIndex = templateData!.generalStatistics[index]!.responses!.findIndex(response => response.response === checkboxValue);
+					let specificResponseIndex = templateData.generalStatistics[index].responses.findIndex(resp => resp.response === checkboxValue);
 
 					if (specificResponseIndex !== -1) {
-						templateData!.generalStatistics![index]!.responses![specificResponseIndex]!.count++;
-					} else {
-						templateData!.generalStatistics![index]!.responses!.push({
+						templateData.generalStatistics[index].responses[specificResponseIndex].count++;
+					}
+					else {
+						templateData.generalStatistics[index].responses.push({
 							"response": checkboxValue,
 							"count": 1
 						});
 					}
-					
 				}
 			}
-			// else if (question.type === "date") {
-			// 	// Categorize by date
-			// 	let years = moment().diff(moment(question.value as string), "years", true);
+			/*else if (question.type === "date") {
+				// Categorize by date
+				let years = moment().diff(moment(question.value as string), "years", true);
 
-			// 	let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
-			// 	let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
-			// 	let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
-			// 	if (index !== -1) {
-			// 		templateData.generalStatistics[index].value += years;
-			// 		templateData.generalStatistics[index].count = 1;
-			// 	}
-			// 	else {
-			// 		templateData.generalStatistics.push({
-			// 			"title": title,
-			// 			"value": years,
-			// 			"count": 1
-			// 		});
-			// 	}
-			// }
+				let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
+				let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
+				let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
+				if (index !== -1) {
+					templateData.generalStatistics[index].value += years;
+					templateData.generalStatistics[index].count = 1;
+				}
+				else {
+					templateData.generalStatistics.push({
+						"title": title,
+						"value": years,
+						"count": 1
+					});
+				}
+			}*/
 		});
 	});
 

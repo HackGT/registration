@@ -7,73 +7,70 @@ const renameTeamButton = document.getElementById("renameTeam") as HTMLInputEleme
 const renameTeamInput = document.getElementById("renameTeamInput") as HTMLInputElement;
 
 joinTeamButton && joinTeamButton.addEventListener("click", e => {
-    e.preventDefault();
+	e.preventDefault();
 
-    if (joinTeamInput.value === "") {
-        return sweetAlert("Whoops!", "Please enter a team name!", "error");
-    }
+	if (joinTeamInput.value === "") {
+		return sweetAlert("Whoops!", "Please enter a team name!", "error");
+	}
 
-    fetch(joinTeamButton.getAttribute("action") + encodeURI(joinTeamInput.value), {
-        credentials: "same-origin",
-        method: "POST",
-    }).then(checkStatus).then(parseJSON).then(async () => {
-        await sweetAlert("Awesome!", "You successfully joined your new team.", "success");
-        window.location.assign("/team");
-    }).catch(async (err: Error) => {
-        await sweetAlert("Oh no!", "No such team", "error");
-    });
+	fetch(joinTeamButton.getAttribute("action") + encodeURI(joinTeamInput.value), {
+		credentials: "same-origin",
+		method: "POST",
+	}).then(checkStatus).then(parseJSON).then(async () => {
+		await sweetAlert("Awesome!", "You successfully joined your new team.", "success");
+		window.location.assign("/team");
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", "No such team", "error");
+	});
 
 });
 
 leaveTeamButton && leaveTeamButton.addEventListener("click", e => {
-    e.preventDefault();
+	e.preventDefault();
 
-    fetch(leaveTeamButton.getAttribute("action")!, {
-        credentials: "same-origin",
-        method: "POST"
-    }).then(checkStatus).then(parseJSON).then(async () => {
-        await sweetAlert("Bye!", "You successfully left your team.", "success");
-        window.location.assign("/team");
-    }).catch(async (err: Error) => {
-        await sweetAlert("Oh no!", "Can't leave team", "error");
-    });
-
+	fetch(leaveTeamButton.getAttribute("action")!, {
+		credentials: "same-origin",
+		method: "POST"
+	}).then(checkStatus).then(parseJSON).then(async () => {
+		await sweetAlert("Bye!", "You successfully left your team.", "success");
+		window.location.assign("/team");
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", "Can't leave team", "error");
+	});
 });
 
 renameTeamButton && renameTeamButton.addEventListener("click", e => {
-    e.preventDefault();
+	e.preventDefault();
 
-    if (renameTeamInput.value === "") {
-        return sweetAlert("Whoops!", "Please enter a team name!", "error");
-    }
+	if (renameTeamInput.value === "") {
+		return sweetAlert("Whoops!", "Please enter a team name!", "error");
+	}
 
-    fetch(renameTeamButton.getAttribute("action") + encodeURI(renameTeamInput.value), {
-        credentials: "same-origin",
-        method: "POST"
-    }).then(checkStatus).then(parseJSON).then(async () => {
-        await sweetAlert("Nice!", "You renamed your team!", "success");
-        window.location.assign("/team");
-    }).catch(async (err: Error) => {
-        await sweetAlert("Oh no!", "Someone has a team with that name already!", "error");
-    });
-
+	fetch(renameTeamButton.getAttribute("action") + encodeURI(renameTeamInput.value), {
+		credentials: "same-origin",
+		method: "POST"
+	}).then(checkStatus).then(parseJSON).then(async () => {
+		await sweetAlert("Nice!", "You renamed your team!", "success");
+		window.location.assign("/team");
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", "Someone has a team with that name already!", "error");
+	});
 });
 
 createTeamButton && createTeamButton.addEventListener("click", e => {
-    e.preventDefault();
+	e.preventDefault();
 
-    if (teamNameButton.value === "") {
-        return sweetAlert("Whoops!", "Please enter a team name!", "error");
-    }
+	if (teamNameButton.value === "") {
+		return sweetAlert("Whoops!", "Please enter a team name!", "error");
+	}
 
-    fetch(createTeamButton.getAttribute("action") + encodeURI(teamNameButton.value), {
-        credentials: "same-origin",
-        method: "POST"
-    }).then(checkStatus).then(parseJSON).then(async () => {
-        await sweetAlert("Nice!", "You successfully created a team.", "success");
-        window.location.assign("/team");
-    }).catch(async (err: Error) => {
-        await sweetAlert("Oh no!", "A team with this name already exists!", "error");
-    });
-
+	fetch(createTeamButton.getAttribute("action") + encodeURI(teamNameButton.value), {
+		credentials: "same-origin",
+		method: "POST"
+	}).then(checkStatus).then(parseJSON).then(async () => {
+		await sweetAlert("Nice!", "You successfully created a team.", "success");
+		window.location.assign("/team");
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", "A team with this name already exists!", "error");
+	});
 });

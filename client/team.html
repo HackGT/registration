@@ -1,63 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Team Management - {{siteTitle}}</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<head>
+		<title>Team Management - {{siteTitle}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
-    <link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css" />
-    <link rel="stylesheet" href="/css/main.css" />
-    <link rel="stylesheet" href="/css/application.css" />
-    <script src="/node_modules/es6-promise/dist/es6-promise.auto.min.js"></script>
-    <script src="/node_modules/whatwg-fetch/fetch.js"></script>
-    <script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-    <script src="/js/common.js"></script>
-    <script src="/js/team.js" defer></script>
-</head>
-<body>
-{{#> sidebar}}
-    <h1>Team Management</h1>
-    {{#if user.teamId}}
-        <h4>Members of Team <b class="teamName">{{team.teamName}}</b></h4>
-        <ul>
-            <li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) - Team Leader</li>
-        {{#each membersAsUsers}}
-            <li>{{name}} ({{email}})</li>
-        {{else}}
-            <p>There are no members in this team other than you!</p>
-        {{/each}}
-        </ul>
-        <p>Tell your friends to enter <b class="teamName">{{team.teamName}}</b> at their join team menu</p>
+		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
+		<link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css" />
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/application.css" />
+		<script src="/node_modules/es6-promise/dist/es6-promise.auto.min.js"></script>
+		<script src="/node_modules/whatwg-fetch/fetch.js"></script>
+		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
+		<script src="/js/common.js"></script>
+		<script src="/js/team.js" defer></script>
+	</head>
+	<body>
+		{{#> sidebar}}
+			<h1>Team Management</h1>
+			{{#if user.teamId}}
+				<h4>Members of Team <b class="teamName">{{team.teamName}}</b></h4>
+				<ul>
+					<li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) - Team Leader</li>
+					{{#each membersAsUsers}}
+						<li>{{name}} ({{email}})</li>
+					{{else}}
+						<p>There are no members in this team other than you!</p>
+					{{/each}}
+				</ul>
+				<p>Tell your friends to enter <b class="teamName">{{team.teamName}}</b> at their join team menu</p>
 
-        {{#if isCurrentUserTeamLeader}}
-            <p>Rename your team</p>
-            <input id="renameTeamInput" placeholder="New team name">
-            <button id="renameTeam" action="/api/user/{{user._id}}/team/rename/">Rename</button>
-        {{/if}}
+				{{#if isCurrentUserTeamLeader}}
+					<p>Rename your team</p>
+					<input id="renameTeamInput" placeholder="New team name">
+					<button id="renameTeam" action="/api/user/{{user._id}}/team/rename">Rename</button>
+				{{/if}}
 
-        <button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/">Leave Team</button>
-    {{else}}
-        <h3>Let's get you in a team</h3>
+				<button id="leaveTeam" action="/api/user/{{user._id}}/team/leave">Leave Team</button>
+			{{else}}
+				<h3>Let's get you in a team</h3>
 
-        <div class="row">
-
-            <div class="col">
-                <h4>Join A Team</h4>
-                <p>Ask your friend for their team name</p>
-                <input type="text" id="joinTeamInput" placeholder="The name of the team To Join"/>
-                <button id="joinTeam" action="/api/user/{{user._id}}/team/join/"/>Join Team</button>
-            </div>
-            <div class="col">
-                <h4>Create A Team</h4>
-                <input type="text" id="teamNameInput" placeholder="The name of your team"/>
-                <button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
-            </div>
-        </div>
-
-
-
-    {{/if}}
-{{/sidebar}}
-</body>
+				<div class="row">
+					<div class="col">
+						<h4>Join A Team</h4>
+						<p>Ask your friend for their team name</p>
+						<input type="text" id="joinTeamInput" placeholder="The name of the team To Join"/>
+						<button id="joinTeam" action="/api/user/{{user._id}}/team/join"/>Join Team</button>
+					</div>
+					<div class="col">
+						<h4>Create A Team</h4>
+						<input type="text" id="teamNameInput" placeholder="The name of your team"/>
+						<button id="createTeam" action="/api/user/{{user._id}}/team/create">Create Team</button>
+					</div>
+				</div>
+			{{/if}}
+		{{/sidebar}}
+	</body>
 </html>

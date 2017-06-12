@@ -1,3 +1,4 @@
+// tslint:disable:interface-name variable-name
 // The database schema used by Mongoose
 // Exports TypeScript interfaces to be used for type checking and Mongoose models derived from these interfaces
 import * as fs from "fs";
@@ -93,7 +94,7 @@ export interface IUser {
 	githubData?: {
 		id: string;
 		username: string;
-		profileUrl: string;	
+		profileUrl: string;
 	};
 	googleData?: {
 		id: string;
@@ -155,7 +156,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 
 	teamId: {
 		type: mongoose.Schema.Types.ObjectId
-	},
+	}
 }));
 
 export interface ISetting {
@@ -169,7 +170,7 @@ export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.
 	name: {
 		type: String,
 		required: true,
-		unique: true,
+		unique: true
 	},
 	value: mongoose.Schema.Types.Mixed
 }));
@@ -192,10 +193,10 @@ export interface IIndexTemplate extends ICommonTemplate {
 	};
 }
 export interface ITeamTemplate extends ICommonTemplate {
-	team?: ITeamMongoose,
-	membersAsUsers?: IUserMongoose[],
-	teamLeaderAsUser?: IUserMongoose,
-	isCurrentUserTeamLeader: boolean
+	team?: ITeamMongoose | null;
+	membersAsUsers?: IUserMongoose[] | null;
+	teamLeaderAsUser?: IUserMongoose | null;
+	isCurrentUserTeamLeader: boolean;
 }
 export interface ILoginTemplate {
 	siteTitle: string;
@@ -216,7 +217,7 @@ export interface ResponseCount {
 export interface StatisticEntry {
 	"questionName": string;
 	"branch": string;
-	"responses"?: ResponseCount[];
+	"responses": ResponseCount[];
 }
 export interface IAdminTemplate extends ICommonTemplate {
 	branchNames: string[];
