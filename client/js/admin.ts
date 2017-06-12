@@ -159,7 +159,7 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
         let currentCondition = eventTarget.dataset.accepted === "true";
 
         var formData = new FormData();
-        formData.append("status", !currentCondition);
+        formData.append("status", (!currentCondition).toString());
 
         fetch(`/api/user/${userId}/status`, {
             credentials: "same-origin",
