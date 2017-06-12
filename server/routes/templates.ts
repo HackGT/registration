@@ -290,6 +290,12 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 
 	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
+
+	let teamIdToNameMap: {[key:string]:string;} = {};
+	(await Team.find()).forEach((e: ITeamMongoose) => {
+		teamIdToNameMap[e._id.toString()] = e.teamName;
+	});
+
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user: user,
@@ -303,9 +309,18 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		},
 		generalStatistics: [],
 		users: (await User.find()).sort((a, b) => {
-			if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-			if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+			
+			if (!a.teamId || !b.teamId || a.teamId == b.teamId) {
+				if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+				if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+			} else if (a.teamId.toString().toLowerCase() < b.teamId.toString().toLowerCase()) {
+				return -1
+			} else if (a.teamId.toString().toLowerCase() > b.teamId.toString().toLowerCase()) {
+				return 1
+			}
+
 			return 0;
+			
 		}).map(user => {
 			let loginMethods: string[] = [];
 			if (user.githubData && user.githubData.id) {
@@ -362,11 +377,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					}
 				});
 			}
+
 			return {
 				...user.toObject(),
 				"status": status,
 				"loginMethods": loginMethods.join(", "),
-				"applicationDataFormatted": applicationDataFormatted
+				"applicationDataFormatted": applicationDataFormatted,
+				"teamName": user.teamId ? teamIdToNameMap[user.teamId.toString()] : undefined
 			};
 		}),
 		metrics: {},
@@ -442,20 +459,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			// }
 		});
 	});
-	console.log(templateData.generalStatistics, "done");
-	// Finalize calculation of averages
-	// templateData.generalStatistics = templateData.generalStatistics.map(stat => {
-	// 	if (typeof stat.count === "number") {
-	// 		stat.value /= stat.count;
-	// 	}
-	// 	return stat;
-	// });
-	// Sort general statistics alphabetically
-	// templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
-	// 	if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
-	// 	if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
-	// 	return 0;
-	// });
 
 	response.send(adminTemplate(templateData));
 });

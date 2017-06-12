@@ -144,6 +144,7 @@
 				<table>
 					<thead>
 						<th>Name</th>
+						<th>Team</th>
 						<th>Email</th>
 						<th>Applicant type</th>
 						<th>
@@ -170,6 +171,13 @@
 								<!--maybe query for each applied instead-->
 								<tr class="{{this.applicationBranch}} accepted-{{this.accepted}} applicantDiv">
 									<td><b>{{this.name}}</b></td>
+									<td>
+										{{#if this.teamName}}
+											<b class="teamName">{{this.teamName}}</b>
+										{{else}}
+											No Team
+										{{/if}}
+									</td>
 									<td>
 										{{this.email}}
 									</td>
