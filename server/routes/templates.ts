@@ -137,6 +137,7 @@ templateRoutes.route("/login").get((request, response) => {
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
 
 	let team, membersAsUsers, teamLeaderAsUser;
+	let isCurrentUserTeamLeader = false;
 
 	if (request.user.teamId) {
 		team = await Team.findById(request.user.teamId) as ITeamMongoose;
@@ -146,6 +147,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 			}
 		});
 		teamLeaderAsUser = await User.findById(team.teamLeader);
+		isCurrentUserTeamLeader = teamLeaderAsUser._id.toString() == request.user._id.toString();
 	}
 
 
@@ -155,6 +157,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		team: team,
 		membersAsUsers: membersAsUsers,
 		teamLeaderAsUser: teamLeaderAsUser,
+		isCurrentUserTeamLeader: isCurrentUserTeamLeader,
 		settings: {
 			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
 		},

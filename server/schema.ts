@@ -194,7 +194,8 @@ export interface IIndexTemplate extends ICommonTemplate {
 export interface ITeamTemplate extends ICommonTemplate {
 	team?: ITeamMongoose,
 	membersAsUsers?: IUserMongoose[],
-	teamLeaderAsUser?: IUserMongoose
+	teamLeaderAsUser?: IUserMongoose,
+	isCurrentUserTeamLeader: boolean
 }
 export interface ILoginTemplate {
 	siteTitle: string;

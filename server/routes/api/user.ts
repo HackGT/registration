@@ -449,8 +449,6 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 
 	user.teamId = (await Team.findOne({teamName: decodedTeamName}))._id
 
-	console.log(user.teamId)
-
 	await user.save()
 
 	return response.status(200).json({
@@ -462,8 +460,57 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response) => {
 
 	let user = await User.findById(request.params.id);
-	console.log("Our user is ", user)
 	await removeUserFromAllTeams(user);
+
+	return response.status(200).json({
+		"success": true
+	});
+
+});
+
+userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response) => {
+
+	let user = await User.findById(request.params.id);
+
+	if (!user.teamId) {
+		return response.status(400).json({
+			"success": false
+		});
+	}
+
+	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+
+	if (!currentUserTeam) {
+		//user tried to change their team name even though they don't have a team
+		return response.status(400).json({
+			"success": false,
+			"message": "You don't belong to a team!"
+		});
+	}
+
+	if (currentUserTeam.teamLeader.toString() != user._id.toString()) {
+		//the user isn't the team captain
+		return response.status(400).json({
+			"success": false,
+			"message": "You're not the leader of this team!"
+		});
+	}
+
+	let decodedTeamName = decodeURI(request.params.newTeamName);
+
+	if (await Team.findOne({teamName: decodedTeamName})) {
+		//if there is a team with that name already
+		return response.status(400).json({
+			"success": false,
+			"message": "Team with that name exists!"
+		});
+	}
+
+	await Team.findOneAndUpdate({_id: user.teamId}, {
+		$set: {
+			teamName: decodedTeamName
+		}
+	});
 
 	return response.status(200).json({
 		"success": true

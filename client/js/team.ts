@@ -3,6 +3,8 @@ const joinTeamInput = document.getElementById("joinTeamInput") as HTMLInputEleme
 const createTeamButton = document.getElementById("createTeam") as HTMLInputElement;
 const teamNameButton = document.getElementById("teamNameInput") as HTMLInputElement;
 const leaveTeamButton = document.getElementById("leaveTeam") as HTMLInputElement;
+const renameTeamButton = document.getElementById("renameTeam") as HTMLInputElement;
+const renameTeamInput = document.getElementById("renameTeamInput") as HTMLInputElement;
 
 joinTeamButton && joinTeamButton.addEventListener("click", e => {
     e.preventDefault();
@@ -34,6 +36,25 @@ leaveTeamButton && leaveTeamButton.addEventListener("click", e => {
         window.location.assign("/team");
     }).catch(async (err: Error) => {
         await sweetAlert("Oh no!", "Can't leave team", "error");
+    });
+
+});
+
+renameTeamButton && renameTeamButton.addEventListener("click", e => {
+    e.preventDefault();
+
+    if (renameTeamInput.value === "") {
+        return sweetAlert("Whoops!", "Please enter a team name!", "error");
+    }
+
+    fetch(renameTeamButton.getAttribute("action") + encodeURI(renameTeamInput.value), {
+        credentials: "same-origin",
+        method: "POST"
+    }).then(checkStatus).then(parseJSON).then(async () => {
+        await sweetAlert("Nice!", "You renamed your team!", "success");
+        window.location.assign("/team");
+    }).catch(async (err: Error) => {
+        await sweetAlert("Oh no!", "Someone has a team with that name already!", "error");
     });
 
 });

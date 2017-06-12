@@ -29,6 +29,13 @@
         {{/each}}
         </ul>
         <p>Tell your friends to enter <b class="teamName">{{team.teamName}}</b> at their join team menu</p>
+
+        {{#if isCurrentUserTeamLeader}}
+            <p>Rename your team</p>
+            <input id="renameTeamInput" placeholder="New team name">
+            <button id="renameTeam" action="/api/user/{{user._id}}/team/rename/">Rename</button>
+        {{/if}}
+
         <button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/">Leave Team</button>
     {{else}}
         <h3>Let's get you in a team</h3>
