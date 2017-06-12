@@ -33,10 +33,10 @@
 				{{#if isCurrentUserTeamLeader}}
 					<p>Rename your team</p>
 					<input id="renameTeamInput" placeholder="New team name">
-					<button id="renameTeam" action="/api/user/{{user._id}}/team/rename">Rename</button>
+					<button id="renameTeam" action="/api/user/{{user._id}}/team/rename/">Rename</button>
 				{{/if}}
 
-				<button id="leaveTeam" action="/api/user/{{user._id}}/team/leave">Leave Team</button>
+				<button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/">Leave Team</button>
 			{{else}}
 				<h3>Let's get you in a team</h3>
 
@@ -45,12 +45,12 @@
 						<h4>Join A Team</h4>
 						<p>Ask your friend for their team name</p>
 						<input type="text" id="joinTeamInput" placeholder="The name of the team To Join"/>
-						<button id="joinTeam" action="/api/user/{{user._id}}/team/join"/>Join Team</button>
+						<button id="joinTeam" action="/api/user/{{user._id}}/team/join/"/>Join Team</button>
 					</div>
 					<div class="col">
 						<h4>Create A Team</h4>
 						<input type="text" id="teamNameInput" placeholder="The name of your team"/>
-						<button id="createTeam" action="/api/user/{{user._id}}/team/create">Create Team</button>
+						<button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
 					</div>
 				</div>
 			{{/if}}

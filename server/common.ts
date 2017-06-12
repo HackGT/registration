@@ -45,6 +45,7 @@ class Config implements IConfig.Main {
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
+	public maxTeamSize: number = 4;
 
 	public sessionSecretSet: boolean = false;
 
@@ -86,6 +87,10 @@ class Config implements IConfig.Main {
 		}
 		if (config.secrets && config.secrets.session) {
 			this.sessionSecretSet = true;
+		}
+
+		if (config.maxTeamSize) {
+			this.maxTeamSize = config.maxTeamSize;
 		}
 	}
 	protected loadFromEnv(): void {
@@ -175,6 +180,10 @@ class Config implements IConfig.Main {
 		// Event name
 		if (process.env.EVENT_NAME) {
 			this.eventName = process.env.EVENT_NAME;
+		}
+
+		if (process.env.MAX_TEAM_SIZE) {
+			this.maxTeamSize = process.env.MAX_TEAM_SIZE;
 		}
 	}
 }

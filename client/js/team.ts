@@ -20,7 +20,7 @@ joinTeamButton && joinTeamButton.addEventListener("click", e => {
 		await sweetAlert("Awesome!", "You successfully joined your new team.", "success");
 		window.location.assign("/team");
 	}).catch(async (err: Error) => {
-		await sweetAlert("Oh no!", "No such team", "error");
+		await sweetAlert("Oh no!", err.message, "error");
 	});
 
 });
@@ -35,7 +35,7 @@ leaveTeamButton && leaveTeamButton.addEventListener("click", e => {
 		await sweetAlert("Bye!", "You successfully left your team.", "success");
 		window.location.assign("/team");
 	}).catch(async (err: Error) => {
-		await sweetAlert("Oh no!", "Can't leave team", "error");
+		await sweetAlert("Oh no!", err.message, "error");
 	});
 });
 
@@ -53,7 +53,7 @@ renameTeamButton && renameTeamButton.addEventListener("click", e => {
 		await sweetAlert("Nice!", "You renamed your team!", "success");
 		window.location.assign("/team");
 	}).catch(async (err: Error) => {
-		await sweetAlert("Oh no!", "Someone has a team with that name already!", "error");
+		await sweetAlert("Oh no!", err.message, "error");
 	});
 });
 
@@ -71,6 +71,6 @@ createTeamButton && createTeamButton.addEventListener("click", e => {
 		await sweetAlert("Nice!", "You successfully created a team.", "success");
 		window.location.assign("/team");
 	}).catch(async (err: Error) => {
-		await sweetAlert("Oh no!", "A team with this name already exists!", "error");
+		await sweetAlert("Oh no!", err.message, "error");
 	});
 });

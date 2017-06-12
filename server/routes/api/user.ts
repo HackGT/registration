@@ -358,12 +358,12 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 	let existingTeam = await Team.findOne({ teamName: decodedTeamName });
 
 	if (existingTeam) {
+
 		// Someone else has a team with this name
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false,
 			"message": `Someone else has a team called ${decodedTeamName}. Please pick a different name.`
 		});
-		return;
 	}
 
 	// If the user is in a team, remove them from their current team unless they're the team leader
@@ -401,7 +401,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 	user.teamId = team._id;
 	await user.save();
 
-	response.json({
+	return response.json({
 		"success": true
 	});
 });
@@ -417,20 +417,29 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 
 	if (!decodedTeamName) {
 		// No team to join smh
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false,
 			"message": "Please enter the team name you want to join"
 		});
-		return;
 	}
 
-	if (!(await Team.findOne({ teamName: decodedTeamName }))) {
+	let teamToJoin: ITeamMongoose = await Team.findOne({ teamName: decodedTeamName });
+
+	if (!teamToJoin) {
 		// If the team they tried to join isn't real...
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false,
 			"message": "No such team!"
 		});
-		return;
+	}
+
+	//teamToJoin.members.length plus 2; 1 for the team leader, and 1 for the prospective user
+	//if the maxTeamSize is set as a value that requires teams of 0 size, no team max size
+	if (teamToJoin.members.length + 2 > config.maxTeamSize && config.maxTeamSize > 0) {
+		return response.status(400).json({
+			"success": false,
+			"message": "This team is full!"
+		});
 	}
 
 	await Team.update({
@@ -445,7 +454,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 
 	await user.save();
 
-	response.json({
+	return response.json({
 		"success": true
 	});
 
@@ -466,40 +475,36 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 	let user = await User.findById(request.params.id);
 
 	if (!user.teamId) {
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false
 		});
-		return;
 	}
 
 	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
 
 	if (!currentUserTeam) {
 		// User tried to change their team name even though they don't have a team
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false,
 			"message": "You don't belong to a team!"
 		});
-		return;
 	}
 
 	if (currentUserTeam.teamLeader.toString() !== user._id.toString()) {
 		// The user isn't the team captain
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false,
 			"message": "You're not the leader of this team!"
 		});
-		return;
 	}
 
 	let decodedTeamName = decodeURI(request.params.newTeamName);
 	if (await Team.findOne({teamName: decodedTeamName})) {
 		// If there is a team with that name already
-		response.status(400).json({
+		return response.status(400).json({
 			"success": false,
-			"message": "Team with that name exists!"
+			"message": "Team with that name already exists!"
 		});
-		return;
 	}
 
 	await Team.findOneAndUpdate({_id: user.teamId}, {
@@ -508,7 +513,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		}
 	});
 
-	response.json({
+	return response.json({
 		"success": true
 	});
 });
