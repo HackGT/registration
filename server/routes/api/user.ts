@@ -361,8 +361,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 
 		// Someone else has a team with this name
 		return response.status(400).json({
-			"success": false,
-			"message": `Someone else has a team called ${decodedTeamName}. Please pick a different name.`
+			"error": `Someone else has a team called ${decodedTeamName}. Please pick a different name.`
 		});
 	}
 
@@ -374,7 +373,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 			// The user is in the team they made already
 			// Ideally this will never happen if we do some validation client side
 			response.status(400).json({
-				"success": false
+				"error": "You're already the leader of this team"
 			});
 			return;
 		}
@@ -418,8 +417,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 	if (!decodedTeamName) {
 		// No team to join smh
 		return response.status(400).json({
-			"success": false,
-			"message": "Please enter the team name you want to join"
+			"error": "Please enter the team name you want to join"
 		});
 	}
 
@@ -428,8 +426,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 	if (!teamToJoin) {
 		// If the team they tried to join isn't real...
 		return response.status(400).json({
-			"success": false,
-			"message": "No such team!"
+			"error": "No such team!"
 		});
 	}
 
@@ -437,8 +434,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 	//if the maxTeamSize is set as a value that requires teams of 0 size, no team max size
 	if (teamToJoin.members.length + 2 > config.maxTeamSize && config.maxTeamSize > 0) {
 		return response.status(400).json({
-			"success": false,
-			"message": "This team is full!"
+			"error": "This team is full!"
 		});
 	}
 
@@ -476,7 +472,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 
 	if (!user.teamId) {
 		return response.status(400).json({
-			"success": false
+			"error": "You're not in a team"
 		});
 	}
 
@@ -485,16 +481,14 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 	if (!currentUserTeam) {
 		// User tried to change their team name even though they don't have a team
 		return response.status(400).json({
-			"success": false,
-			"message": "You don't belong to a team!"
+			"error": "You don't belong to a team!"
 		});
 	}
 
 	if (currentUserTeam.teamLeader.toString() !== user._id.toString()) {
 		// The user isn't the team captain
 		return response.status(400).json({
-			"success": false,
-			"message": "You're not the leader of this team!"
+			"error": "You're not the leader of this team!"
 		});
 	}
 
@@ -502,8 +496,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 	if (await Team.findOne({teamName: decodedTeamName})) {
 		// If there is a team with that name already
 		return response.status(400).json({
-			"success": false,
-			"message": "Team with that name already exists!"
+			"error": "Team with that name already exists!"
 		});
 	}
 

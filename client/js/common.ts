@@ -7,7 +7,7 @@ async function checkStatus(response: Response) {
 		return response;
 	}
 	else {
-		throw new Error((await response.json()).message);
+		throw new Error((await response.json()).error);
 	}
 }
 function parseJSON(response: Response) {
