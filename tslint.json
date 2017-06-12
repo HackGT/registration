@@ -1,0 +1,157 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "indent": [
+            true,
+            "tabs"
+        ],
+        "array-type": [
+            true,
+            "array"
+        ],
+        "arrow-parens": false,
+        "curly": [
+            true,
+            "ignore-same-line"
+        ],
+        "no-any": false,
+        "max-line-length": [
+            false
+        ],
+        "prefer-for-of": false,
+        "forin": true,
+        "no-conditional-assignment": true,
+        "no-console": [
+            false
+        ],
+        "no-debugger": true,
+        "no-duplicate-super": true,
+        "no-empty": true,
+        "no-eval": true,
+        "no-for-in-array": true,
+        "no-floating-promises": true,
+        "no-invalid-template-strings": true,
+        "no-invalid-this": [
+            true,
+            "check-function-in-method"
+        ],
+        "no-misused-new": true,
+        "no-null-keyword": false,
+        "no-sparse-arrays": true,
+        "no-string-literal": true,
+        "no-string-throw": true,
+        "no-switch-case-fall-through": true,
+        "no-unsafe-finally": true,
+        "no-unused-expression": [
+            true,
+            "allow-fast-null-checks",
+            "allow-new"
+        ],
+        "no-var-keyword": true,
+        "no-unused-variable": true,
+        "no-use-before-declare": true,
+        "prefer-conditional-expression": false,
+        "prefer-object-spread": true,
+        "radix": true,
+        "restrict-plus-operands": true,
+        "strict-boolean-expressions": false,
+        "triple-equals": [
+            true,
+            "allow-null-check",
+            "allow-undefined-check"
+        ],
+        "use-isnan": true,
+        "typeof-compare": true,
+        "deprecation": true,
+        "eofline": true,
+        "linebreak-style": [
+            false
+        ],
+        "max-file-line-count": [
+            false
+        ],
+        "object-literal-sort-keys": false,
+        "prefer-const": false,
+        "trailing-comma": [
+            true,
+            {
+                "multiline": "never",
+                "singleline": "never"
+            }
+        ],
+        "arrow-return-shorthand": true,
+        "class-name": true,
+        "comment-format": [
+            true,
+            "check-space",
+            "check-uppercase"
+        ],
+        "encoding": true,
+        "interface-name": [
+            true,
+            "always-prefix"
+        ],
+        "new-parens": true,
+        "no-angle-bracket-type-assertion": true,
+        "no-boolean-literal-compare": true,
+        "no-consecutive-blank-lines": [
+            true,
+            1
+        ],
+        "no-trailing-whitespace": true,
+        "no-unnecessary-callback-wrapper": true,
+        "number-literal-format": true,
+        "object-literal-key-quotes": [
+            true,
+            "consistent"
+        ],
+        "one-line": [
+            true,
+            "check-open-brace",
+            "check-whitespace"
+        ],
+        "one-variable-per-declaration": [
+            true,
+            "ignore-for-loop"
+        ],
+        "prefer-switch": false,
+        "prefer-template": [
+            true,
+            "allow-single-concat"
+        ],
+        "quotemark": [
+            "double",
+            "avoid-template"
+        ],
+        "return-undefined": true,
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "type-literal-delimiter": true,
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format"
+        ],
+        "whitespace": [
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type",
+            "check-typecast",
+            "check-preblock"
+        ],
+        "ordered-imports": [
+            false
+        ],
+        "member-ordering": [
+            true,
+            "fields-first"
+        ],
+        "no-namespace": [
+            false
+        ]
+    }
+}
