@@ -73,7 +73,6 @@ createTeamButton && createTeamButton.addEventListener("click", e => {
         await sweetAlert("Nice!", "You successfully created a team.", "success");
         window.location.assign("/team");
     }).catch(async (err: Error) => {
-        console.log(err)
         await sweetAlert("Oh no!", "A team with this name already exists!", "error");
     });
 
