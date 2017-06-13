@@ -85,6 +85,7 @@
     "mocha": "^3.2.0",
     "supertest": "^3.0.0",
     "tslint": "^5.4.3",
+    "tslint-language-service": "^0.9.6",
     "typescript": "^2.3.4"
   }
 }

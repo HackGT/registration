@@ -48,7 +48,7 @@
             "allow-new"
         ],
         "no-var-keyword": true,
-        "no-unused-variable": true,
+        "no-unused-variable": false,
         "no-use-before-declare": true,
         "prefer-conditional-expression": false,
         "prefer-object-spread": true,
@@ -132,7 +132,8 @@
         "variable-name": [
             true,
             "ban-keywords",
-            "check-format"
+            "check-format",
+            "allow-pascal-case"
         ],
         "whitespace": [
             "check-branch",
