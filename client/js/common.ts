@@ -11,5 +11,5 @@ async function checkStatus(response: Response) {
 	}
 }
 function parseJSON(response: Response) {
-	return response.json()
+	return response.json();
 }

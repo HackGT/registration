@@ -1,13 +1,13 @@
 let form = document.querySelector("form")!;
 let submitButton = document.querySelector("form input[type=submit]")! as HTMLInputElement;
 submitButton.addEventListener("click", e => {
-	if (!form.checkValidity() || !form.dataset["action"]) {
+	if (!form.checkValidity() || !form.dataset.action) {
 		return;
 	}
 	e.preventDefault();
 	submitButton.disabled = true;
 
-	fetch(form.dataset["action"]!, {
+	fetch(form.dataset.action!, {
 		credentials: "same-origin",
 		method: "POST",
 		body: new FormData(form)
@@ -24,7 +24,9 @@ let deleteButton = document.querySelector("#delete") as HTMLButtonElement | null
 if (deleteButton) {
 	deleteButton.addEventListener("click", async e => {
 		e.preventDefault();
-		if (!deleteButton || !deleteButton.dataset["action"]) return;
+		if (!deleteButton || !deleteButton.dataset.action) {
+			return;
+		}
 		deleteButton.disabled = true;
 		try {
 			await sweetAlert({
@@ -42,7 +44,7 @@ if (deleteButton) {
 			return;
 		}
 
-		fetch(deleteButton.dataset["action"]!, {
+		fetch(deleteButton.dataset.action!, {
 			credentials: "same-origin",
 			method: "DELETE"
 		}).then(checkStatus).then(parseJSON).then(async () => {
@@ -60,7 +62,9 @@ for (let i = 0; i < selectsWithOther.length; i++) {
 	selectsWithOther[i].addEventListener("change", e => {
 		let target = e.target as HTMLSelectElement;
 		let otherField = document.querySelector(`input[name="${target.name}"]`) as HTMLInputElement | null;
-		if (!otherField) return;
+		if (!otherField) {
+			return;
+		}
 		if (target.value === "Other") {
 			otherField.disabled = false;
 			otherField.focus();
@@ -73,8 +77,10 @@ for (let i = 0; i < selectsWithOther.length; i++) {
 for (let i = 0; i < inputsWithOther.length; i++) {
 	inputsWithOther[i].addEventListener("change", e => {
 		let target = e.target as HTMLInputElement;
-		let otherField = (<HTMLFieldSetElement> (<HTMLDivElement> target.parentElement).parentElement).querySelector(`input[type="text"]`) as HTMLInputElement | null;
-		if (!otherField) return;
+		let otherField = ((target.parentElement as HTMLDivElement).parentElement as HTMLFieldSetElement).querySelector(`input[type="text"]`) as HTMLInputElement | null;
+		if (!otherField) {
+			return;
+		}
 		if (target.type === "radio") {
 			if (target.value === "Other") {
 				otherField.disabled = false;

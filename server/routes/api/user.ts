@@ -13,9 +13,9 @@ import {
 import {
 	IFormItem,
 	IUser, IUserMongoose, User,
-	ITeam, ITeamMongoose, Team
+	ITeamMongoose, Team
 } from "../../schema";
-import {QuestionBranches, Questions} from "../../config/questions.schema";
+import {QuestionBranches} from "../../config/questions.schema";
 
 function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
@@ -53,7 +53,7 @@ function isAdmin(request: express.Request, response: express.Response, next: exp
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
-userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response) => {
+userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	let branchName = request.params.branch as string;
 	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
@@ -203,7 +203,7 @@ The ${config.eventName} Team`;
 	}
 });
 
-userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
+userRoutes.delete("/application", isUserOrAdmin, async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	user.applied = false;
 	user.applicationBranch = "";
@@ -228,7 +228,7 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
 	}
 });
 
-userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response) => {
+userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	let status = request.body.status === "true";
 
@@ -254,7 +254,7 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 });
 
-userRoutes.route("/export").get(isAdmin, async (request, response) => {
+userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let questionBranches: QuestionBranches;
 		try {
@@ -279,7 +279,9 @@ userRoutes.route("/export").get(isAdmin, async (request, response) => {
 			// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
 			// TODO: Change this to { "accepted": true }
 			let attendingUsers: IUserMongoose[] = await User.find({ "applied": true, "applicationBranch": branchName });
-			if (attendingUsers.length === 0) continue;
+			if (attendingUsers.length === 0) {
+				continue;
+			}
 
 			let csvData = attendingUsers.map(user => {
 				// TODO: Replace with more robust schema-agnostic version
@@ -345,7 +347,7 @@ async function removeUserFromAllTeams(user: IUserMongoose): Promise<boolean> {
 	}
 }
 
-userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, response) => {
+userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
 	/*
 		First, check if there is already a team that has this user as captain
 		If so, just re-assign the user's teamid to that one
@@ -360,9 +362,10 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 	if (existingTeam) {
 
 		// Someone else has a team with this name
-		return response.status(400).json({
+		response.status(400).json({
 			"error": `Someone else has a team called ${decodedTeamName}. Please pick a different name.`
 		});
+		return;
 	}
 
 	// If the user is in a team, remove them from their current team unless they're the team leader
@@ -400,12 +403,12 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 	user.teamId = team._id;
 	await user.save();
 
-	return response.json({
+	response.json({
 		"success": true
 	});
 });
 
-userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response) => {
+userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	let decodedTeamName = decodeURI(request.params.teamName);
 
@@ -416,26 +419,29 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 
 	if (!decodedTeamName) {
 		// No team to join smh
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "Please enter the team name you want to join"
 		});
+		return;
 	}
 
 	let teamToJoin: ITeamMongoose = await Team.findOne({ teamName: decodedTeamName });
 
 	if (!teamToJoin) {
 		// If the team they tried to join isn't real...
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "No such team!"
 		});
+		return;
 	}
 
-	//teamToJoin.members.length plus 2; 1 for the team leader, and 1 for the prospective user
-	//if the maxTeamSize is set as a value that requires teams of 0 size, no team max size
+	// Compare teamToJoin.members.length plus 2; 1 for the team leader, and 1 for the prospective user
+	// If the maxTeamSize is set as a value that requires teams of 0 size, no team max size
 	if (teamToJoin.members.length + 2 > config.maxTeamSize && config.maxTeamSize > 0) {
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "This team is full!"
 		});
+		return;
 	}
 
 	await Team.update({
@@ -450,54 +456,55 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 
 	await user.save();
 
-	return response.json({
+	response.json({
 		"success": true
 	});
-
 });
 
-userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response) => {
-
+userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	await removeUserFromAllTeams(user);
 
-	return response.status(200).json({
+	response.status(200).json({
 		"success": true
 	});
-
 });
 
-userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response) => {
+userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 
 	if (!user.teamId) {
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "You're not in a team"
 		});
+		return;
 	}
 
 	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
 
 	if (!currentUserTeam) {
 		// User tried to change their team name even though they don't have a team
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "You don't belong to a team!"
 		});
+		return;
 	}
 
 	if (currentUserTeam.teamLeader.toString() !== user._id.toString()) {
 		// The user isn't the team captain
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "You're not the leader of this team!"
 		});
+		return;
 	}
 
 	let decodedTeamName = decodeURI(request.params.newTeamName);
 	if (await Team.findOne({teamName: decodedTeamName})) {
 		// If there is a team with that name already
-		return response.status(400).json({
+		response.status(400).json({
 			"error": "Team with that name already exists!"
 		});
+		return;
 	}
 
 	await Team.findOneAndUpdate({_id: user.teamId}, {
@@ -506,7 +513,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		}
 	});
 
-	return response.json({
+	response.json({
 		"success": true
 	});
 });

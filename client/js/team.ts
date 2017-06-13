@@ -13,9 +13,9 @@ joinTeamButton && joinTeamButton.addEventListener("click", e => {
 		return sweetAlert("Whoops!", "Please enter a team name!", "error");
 	}
 
-	fetch(joinTeamButton.getAttribute("action") + encodeURI(joinTeamInput.value), {
+	fetch(joinTeamButton.getAttribute("action")! + encodeURI(joinTeamInput.value), {
 		credentials: "same-origin",
-		method: "POST",
+		method: "POST"
 	}).then(checkStatus).then(parseJSON).then(async () => {
 		await sweetAlert("Awesome!", "You successfully joined your new team.", "success");
 		window.location.assign("/team");
@@ -46,7 +46,7 @@ renameTeamButton && renameTeamButton.addEventListener("click", e => {
 		return sweetAlert("Whoops!", "Please enter a team name!", "error");
 	}
 
-	fetch(renameTeamButton.getAttribute("action") + encodeURI(renameTeamInput.value), {
+	fetch(renameTeamButton.getAttribute("action")! + encodeURI(renameTeamInput.value), {
 		credentials: "same-origin",
 		method: "POST"
 	}).then(checkStatus).then(parseJSON).then(async () => {
@@ -64,7 +64,7 @@ createTeamButton && createTeamButton.addEventListener("click", e => {
 		return sweetAlert("Whoops!", "Please enter a team name!", "error");
 	}
 
-	fetch(createTeamButton.getAttribute("action") + encodeURI(teamNameButton.value), {
+	fetch(createTeamButton.getAttribute("action")! + encodeURI(teamNameButton.value), {
 		credentials: "same-origin",
 		method: "POST"
 	}).then(checkStatus).then(parseJSON).then(async () => {

@@ -1,11 +1,8 @@
 // tslint:disable:interface-name variable-name
 // The database schema used by Mongoose
 // Exports TypeScript interfaces to be used for type checking and Mongoose models derived from these interfaces
-import * as fs from "fs";
-import * as path from "path";
-
 import {mongoose} from "./common";
-import {QuestionBranches, Questions} from "./config/questions.schema";
+import {Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export namespace IConfig {

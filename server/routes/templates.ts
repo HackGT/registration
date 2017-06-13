@@ -7,21 +7,42 @@ import * as bowser from "bowser";
 
 import {
 	STATIC_ROOT,
-	authenticateWithReject,
 	authenticateWithRedirect,
 	timeLimited,
 	validateSchema, config
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
-	ITeam, ITeamMongoose, Team,
-	ISetting, ISettingMongoose, Setting,
-	ICommonTemplate, IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, ResponseCount, StatisticEntry
+	ITeamMongoose, Team,
+	ISetting, Setting,
+	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
 } from "../schema";
-import {QuestionBranches, Questions} from "../config/questions.schema";
+import {QuestionBranches} from "../config/questions.schema";
 
 export let templateRoutes = express.Router();
+
+// Load and compile Handlebars templates
+let [
+	indexTemplate,
+	loginTemplate,
+	preregisterTemplate,
+	registerTemplate,
+	adminTemplate,
+	unsupportedTemplate,
+	teamTemplate
+] = [
+	"index.html",
+	"login.html",
+	"preapplication.html",
+	"application.html",
+	"admin.html",
+	"unsupported.html",
+	"team.html"
+].map(file => {
+	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
+	return Handlebars.compile(data);
+});
 
 // Block IE
 templateRoutes.use(async (request, response, next) => {
@@ -45,28 +66,6 @@ templateRoutes.use(async (request, response, next) => {
 	else {
 		next();
 	}
-});
-
-// Load and compile Handlebars templates
-let [
-	indexTemplate,
-	loginTemplate,
-	preregisterTemplate,
-	registerTemplate,
-	adminTemplate,
-	unsupportedTemplate,
-	teamTemplate
-] = [
-	"index.html",
-	"login.html",
-	"preapplication.html",
-	"application.html",
-	"admin.html",
-	"unsupported.html",
-	"team.html"
-].map(file => {
-	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
-	return Handlebars.compile(data);
 });
 
 // tslint:disable-next-line:no-any
@@ -225,15 +224,14 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 		response.status(400).send("Invalid application branch");
 		return;
 	}
+	// tslint:disable:no-string-literal
 	let questionData = questionBranch.questions.map(question => {
 		let savedValue = user.applicationData.find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
-			// tslint:disable-next-line:no-string-literal
 			question["multi"] = true;
 			if (question.hasOther) {
 				question.options.push("Other");
 			}
-			// tslint:disable-next-line:no-string-literal
 			question["selected"] = question.options.map(option => {
 				if (savedValue && Array.isArray(savedValue.value)) {
 					return savedValue.value.indexOf(option) !== -1;
@@ -247,11 +245,8 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 				if (!Array.isArray(savedValue.value)) {
 					// Select / radio buttons
 					if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
-						// tslint:disable-next-line:no-string-literal
 						question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
-						// tslint:disable-next-line:no-string-literal
 						question["otherSelected"] = true;
-						// tslint:disable-next-line:no-string-literal
 						question["otherValue"] = savedValue.value;
 					}
 				}
@@ -259,11 +254,8 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 					// Checkboxes
 					for (let value of savedValue.value as string[]) {
 						if (question.options.indexOf(value) === -1) {
-							// tslint:disable-next-line:no-string-literal
 							question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
-							// tslint:disable-next-line:no-string-literal
 							question["otherSelected"] = true;
-							// tslint:disable-next-line:no-string-literal
 							question["otherValue"] = value;
 						}
 					}
@@ -271,21 +263,20 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 			}
 		}
 		else {
-			// tslint:disable-next-line:no-string-literal
 			question["multi"] = false;
 		}
 		if (question.type === "file") {
 			savedValue = undefined;
 		}
-		// tslint:disable-next-line:no-string-literal
 		question["value"] = savedValue ? savedValue.value : "";
 		return question;
 	});
+	// tslint:enable:no-string-literal
 
 	let thisUser: IUserMongoose = await User.findById(user._id);
 	thisUser.applicationStartTime = new Date();
 	thisUser.markModified("applicationStartTime");
-	thisUser.save();
+	await thisUser.save();
 
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
@@ -329,11 +320,19 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		generalStatistics: [] as StatisticEntry[],
 		users: (await User.find()).sort((a, b) => {
 			if (!a.teamId || !b.teamId || a.teamId === b.teamId) {
-				if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-				if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+				if (a.name.toLowerCase() < b.name.toLowerCase()) {
+					return -1;
+				}
+				if (a.name.toLowerCase() > b.name.toLowerCase()) {
+					return 1;
+				}
 			}
-			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() < teamIDNameMap[b.teamId.toString()].toLowerCase()) return -1;
-			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() > teamIDNameMap[b.teamId.toString()].toLowerCase()) return 1;
+			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() < teamIDNameMap[b.teamId.toString()].toLowerCase()) {
+				return -1;
+			}
+			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() > teamIDNameMap[b.teamId.toString()].toLowerCase()) {
+				return 1;
+			}
 
 			return 0;
 		}).map(statisticUser => {
@@ -416,7 +415,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	(await User.find({ "applied": true })).forEach(statisticUser => {
 		let branchQuestions = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch)!.questions;
 		statisticUser.applicationData.forEach(question => {
-			if (question.value === null) return;
+			if (question.value === null) {
+				return;
+			}
 			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 				let values: string[];
 				if (!Array.isArray(question.value)) {

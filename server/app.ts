@@ -1,6 +1,4 @@
-import * as fs from "fs";
 import * as path from "path";
-import * as crypto from "crypto";
 
 import * as express from "express";
 import * as serveStatic from "serve-static";
@@ -10,13 +8,11 @@ import * as morgan from "morgan";
 import flash = require("connect-flash");
 
 import {
-	// Functions
-	pbkdf2Async,
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS
 } from "./common";
 import {
-	IUser, IUserMongoose, User
+	User
 } from "./schema";
 
 // Set up Express and its middleware
@@ -34,7 +30,9 @@ app.use(flash());
 		return;
 	}
 	console.warn("No admin users are configured; admins can be added in config.json");
-})();
+})().catch(err => {
+	throw err;
+});
 
 // Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
 import {authRoutes} from "./routes/auth";

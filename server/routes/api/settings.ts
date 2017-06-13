@@ -1,17 +1,14 @@
-import * as fs from "fs";
-import * as path from "path";
 import * as express from "express";
 import * as moment from "moment";
 
 import {
-    uploadHandler
+	uploadHandler
 } from "../../common";
 import {
-	IUser, IUserMongoose, User,
-	ISetting, ISettingMongoose, Setting
+	IUser, Setting
 } from "../../schema";
 
-function isAdmin (request: express.Request, response: express.Response, next: express.NextFunction) {
+function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
 	if (!request.isAuthenticated() || !user.admin) {
 		response.status(403).json({
@@ -24,7 +21,7 @@ function isAdmin (request: express.Request, response: express.Response, next: ex
 }
 
 export async function setDefaultSettings() {
-    if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
+	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
 		await new Setting({
 			"name": "applicationOpen",
 			"value": new Date()
@@ -43,20 +40,22 @@ export async function setDefaultSettings() {
 		}).save();
 	}
 }
-setDefaultSettings();
+setDefaultSettings().catch(err => {
+	throw err;
+});
 
 export let settingsRoutes = express.Router();
 
 settingsRoutes.route("/application_availability")
-    .get(async (request, response) => {
+	.get(async (request, response) => {
 		let open = (await Setting.findOne({ "name": "applicationOpen" })).value as Date;
 		let close = (await Setting.findOne({ "name": "applicationClose" })).value as Date;
 		response.json({
 			"open": open.toISOString(),
 			"close": close.toISOString()
 		});
-    })
-    .put(isAdmin, uploadHandler.any(), async (request, response) => {
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
 		let rawOpen = request.body.open;
 		let rawClose = request.body.close;
 		if (!rawOpen || !rawClose) {
@@ -91,16 +90,16 @@ settingsRoutes.route("/application_availability")
 				"error": "An error occurred while updating the application availability"
 			});
 		}
-    });
+	});
 
 settingsRoutes.route("/teams_enabled")
-    .get(async (request, response) => {
+	.get(async (request, response) => {
 		let enabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
 		response.json({
 			"enabled": enabled
 		});
-    })
-    .put(isAdmin, uploadHandler.any(), async (request, response) => {
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
 		let rawEnabled = request.body.enabled;
 		if (!rawEnabled || (rawEnabled !== "true" && rawEnabled !== "false")) {
 			response.status(400).json({
@@ -123,4 +122,4 @@ settingsRoutes.route("/teams_enabled")
 				"error": "An error occurred while enabling or disabling teams"
 			});
 		}
-    });
+	});
