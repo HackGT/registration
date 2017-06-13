@@ -9,6 +9,11 @@
 		<link rel="stylesheet" href="/node_modules/sweetalert2/dist/sweetalert2.min.css" />
 		<link rel="stylesheet" href="/css/main.css" />
 		<link rel="stylesheet" href="/css/application.css" />
+		<style>
+			h3 {
+				text-align: center;
+			}
+		</style>
 		<script src="/node_modules/es6-promise/dist/es6-promise.auto.min.js"></script>
 		<script src="/node_modules/whatwg-fetch/fetch.js"></script>
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
@@ -19,24 +24,32 @@
 		{{#> sidebar}}
 			<h1>Team Management</h1>
 			{{#if user.teamId}}
-				<h4>Members of Team <b class="teamName">{{team.teamName}}</b></h4>
-				<ul>
-					<li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) - Team Leader</li>
-					{{#each membersAsUsers}}
-						<li>{{name}} ({{email}})</li>
-					{{else}}
-						<p>There are no members in this team other than you!</p>
-					{{/each}}
-				</ul>
+				<h3>Team <b class="teamName">{{team.teamName}}</b></h4>
+				<div class="center">
+					<ul>
+						<li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) &mdash; Team Leader</li>
+						{{#each membersAsUsers}}
+							<li>{{name}} ({{email}})</li>
+						{{/each}}
+					</ul>
+				</div>
+				{{#each membersAsUsers}}
+				{{else}}
+					<p class="text-center">There are no members in this team other than you!</p>
+				{{/each}}
 				<p>Tell your friends to enter <b class="teamName">{{team.teamName}}</b> at their join team menu</p>
-
+				
 				{{#if isCurrentUserTeamLeader}}
-					<p>Rename your team</p>
-					<input id="renameTeamInput" placeholder="New team name">
-					<button id="renameTeam" action="/api/user/{{user._id}}/team/rename/">Rename</button>
+					<label for="renameTeamInput">Rename your team</label>
+					<input id="renameTeamInput" placeholder="New team name" />
 				{{/if}}
 
-				<button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/">Leave Team</button>
+				<div class="center">
+					{{#if isCurrentUserTeamLeader}}
+						<button id="renameTeam" action="/api/user/{{user._id}}/team/rename/">Rename</button>
+					{{/if}}
+					<button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/" style="background-color: #FF4136;">Leave Team</button>
+				</div>
 			{{else}}
 				<h3>Let's get you in a team</h3>
 
@@ -44,13 +57,19 @@
 					<div class="col">
 						<h4>Join A Team</h4>
 						<p>Ask your friend for their team name</p>
-						<input type="text" id="joinTeamInput" placeholder="The name of the team To Join"/>
-						<button id="joinTeam" action="/api/user/{{user._id}}/team/join/"/>Join Team</button>
+						<label for="joinTeamInput">Team name to join</label>
+						<input type="text" id="joinTeamInput" />
+						<div class="center">
+							<button id="joinTeam" action="/api/user/{{user._id}}/team/join/"/>Join Team</button>
+						</div>
 					</div>
 					<div class="col">
 						<h4>Create A Team</h4>
-						<input type="text" id="teamNameInput" placeholder="The name of your team"/>
-						<button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
+						<label for="teamNameInput">Your new team name</label>
+						<input type="text" id="teamNameInput" />
+						<div class="center">
+							<button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
+						</div>
 					</div>
 				</div>
 			{{/if}}
