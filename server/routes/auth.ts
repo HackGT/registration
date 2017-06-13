@@ -1,8 +1,6 @@
 import * as http from "http";
 import * as https from "https";
-import * as fs from "fs";
 import * as crypto from "crypto";
-import * as path from "path";
 import * as express from "express";
 import * as session from "express-session";
 import * as connectMongo from "connect-mongo";
@@ -10,7 +8,7 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	config, mongoose, PORT, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync
+	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync
 } from "../common";
 import {
 	IUser, IUserMongoose, User
@@ -18,7 +16,10 @@ import {
 
 // Passport authentication
 import {app} from "../app";
-const GitHubStrategy = require("passport-github2").Strategy; // No type definitions available yet for this module (or for Google)
+
+// tslint:disable:no-var-requires
+// No type definitions available yet for these module (or for Google)
+const GitHubStrategy = require("passport-github2").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 import {Strategy as FacebookStrategy} from "passport-facebook";
 import {Strategy as LocalStrategy} from "passport-local";
@@ -69,17 +70,18 @@ passport.deserializeUser<IUser, string>((id, done) => {
 	});
 });
 
+// tslint:disable-next-line:interface-over-type-literal
 type OAuthStrategyOptions = {
 	clientID: string;
 	clientSecret: string;
-	profileFields?: string[]
+	profileFields?: string[];
 };
 type Profile = passport.Profile & {
 	profileUrl?: string;
 	_json: any;
 };
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-    passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
+	passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
 		let email: string = "";
 		if (profile.emails && profile.emails.length > 0) {
 			email = profile.emails[0].value;
@@ -88,8 +90,9 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 		let isAdmin = false;
 		if (config.admins.indexOf(email) !== -1) {
 			isAdmin = true;
-			if (!user || !user.admin)
+			if (!user || !user.admin) {
 				console.info(`Adding new admin: ${email}`);
+			}
 		}
 		if (!user) {
 			user = new User({
@@ -108,7 +111,6 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 				"applicationData": [],
 				"applicationStartTime": undefined,
 				"applicationSubmitTime": undefined,
-
 
 				"admin": isAdmin
 			});
@@ -225,7 +227,7 @@ passport.use(new LocalStrategy({
 		}
 		// Send verification email (hostname validated by previous middleware)
 		let link = `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/auth/verify/${user.localData!.verificationCode}`;
-		let text = 
+		let text =
 `Hi ${user.name},
 
 Thanks for signing up for ${config.eventName}! To verify your email, please click the following link: ${link}
@@ -238,7 +240,7 @@ The ${config.eventName} Team.`;
 				from: config.email.from,
 				to: email,
 				subject: `[${config.eventName}] - Verify your email`,
-				text: text // TODO: Add HTML email template
+				text // TODO: Add HTML email template
 			});
 		}
 		catch (err) {
@@ -267,7 +269,6 @@ The ${config.eventName} Team.`;
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 export let authRoutes = express.Router();
 
 function getExternalPort(request: express.Request): number {
@@ -276,7 +277,7 @@ function getExternalPort(request: express.Request): number {
 	let offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
 	let index = host.indexOf(":", offset);
 	if (index !== -1) {
-		return parseInt(host.substring(index + 1));
+		return parseInt(host.substring(index + 1), 10);
 	}
 	else {
 		// Default ports for HTTP and HTTPS
@@ -292,7 +293,7 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 	}
 
 	let nonce = crypto.randomBytes(64).toString("hex");
-	function callback (message: http.IncomingMessage) {
+	function callback(message: http.IncomingMessage) {
 		if (message.statusCode !== 200) {
 			console.error(`Got non-OK status code when validating hostname: ${request.hostname}`);
 			message.resume();
@@ -312,7 +313,7 @@ function validateAndCacheHostName(request: express.Request, response: express.Re
 			}
 		});
 	}
-	function onError (err: Error) {
+	function onError(err: Error) {
 		console.error(`Error when validating hostname: ${request.hostname}`, err);
 	}
 	if (request.protocol === "http") {
@@ -332,14 +333,14 @@ function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", s
 		let callbackURL = `${request.protocol}://${request.hostname}:${getExternalPort(request)}/${callbackHref}`;
 		passport.authenticate(
 			serviceName,
-			<passport.AuthenticateOptions>{ scope: scope, callbackURL: callbackURL }
+			{ scope, callbackURL } as passport.AuthenticateOptions
 		)(request, response, next);
 	});
 	authRoutes.get(`/${serviceName}/callback`, validateAndCacheHostName, (request, response, next) => {
 		let callbackURL = `${request.protocol}://${request.hostname}:${getExternalPort(request)}/${callbackHref}`;
 		passport.authenticate(
 			serviceName,
-			<passport.AuthenticateOptions>{ failureRedirect: "/login", callbackURL: callbackURL }
+			{ failureRedirect: "/login", callbackURL } as passport.AuthenticateOptions
 		)(request, response, next);
 	}, (request, response) => {
 		// Successful authentication, redirect home

@@ -1,10 +1,8 @@
+// tslint:disable:interface-name variable-name
 // The database schema used by Mongoose
 // Exports TypeScript interfaces to be used for type checking and Mongoose models derived from these interfaces
-import * as fs from "fs";
-import * as path from "path";
-
 import {mongoose} from "./common";
-import {QuestionBranches, Questions} from "./config/questions.schema";
+import {Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export namespace IConfig {
@@ -48,6 +46,7 @@ export namespace IConfig {
 		server: Server;
 		admins: string[];
 		eventName: string;
+		maxTeamSize: number;
 	}
 }
 
@@ -57,6 +56,28 @@ export interface IFormItem {
 	// String for most types, string array for checkbox groups, file for file uploads, null if optional field is not filled in
 	"value": string | string[] | Express.Multer.File | null;
 }
+
+export interface ITeam {
+	_id: mongoose.Types.ObjectId;
+	teamLeader: mongoose.Types.ObjectId;
+	members: mongoose.Types.ObjectId[];
+	teamName: string;
+}
+
+export type ITeamMongoose = ITeam & mongoose.Document;
+
+export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
+	teamLeader: {
+		type: mongoose.Schema.Types.ObjectId
+	},
+	members: [{
+		type: mongoose.Schema.Types.ObjectId
+	}],
+	teamName: {
+		type: mongoose.Schema.Types.String
+	}
+}));
+
 export interface IUser {
 	_id: mongoose.Types.ObjectId;
 	email: string;
@@ -71,7 +92,7 @@ export interface IUser {
 	githubData?: {
 		id: string;
 		username: string;
-		profileUrl: string;	
+		profileUrl: string;
 	};
 	googleData?: {
 		id: string;
@@ -89,6 +110,8 @@ export interface IUser {
 	applicationSubmitTime?: Date;
 
 	admin?: boolean;
+
+	teamId?: mongoose.Types.ObjectId;
 }
 export type IUserMongoose = IUser & mongoose.Document;
 
@@ -127,7 +150,11 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
 
-	admin: Boolean
+	admin: Boolean,
+
+	teamId: {
+		type: mongoose.Schema.Types.ObjectId
+	}
 }));
 
 export interface ISetting {
@@ -141,7 +168,7 @@ export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.
 	name: {
 		type: String,
 		required: true,
-		unique: true,
+		unique: true
 	},
 	value: mongoose.Schema.Types.Mixed
 }));
@@ -163,6 +190,12 @@ export interface IIndexTemplate extends ICommonTemplate {
 		afterClose: boolean;
 	};
 }
+export interface ITeamTemplate extends ICommonTemplate {
+	team?: ITeamMongoose | null;
+	membersAsUsers?: IUserMongoose[] | null;
+	teamLeaderAsUser?: IUserMongoose | null;
+	isCurrentUserTeamLeader: boolean;
+}
 export interface ILoginTemplate {
 	siteTitle: string;
 	error?: string;
@@ -182,7 +215,7 @@ export interface ResponseCount {
 export interface StatisticEntry {
 	"questionName": string;
 	"branch": string;
-	"responses"?: ResponseCount[];
+	"responses": ResponseCount[];
 }
 export interface IAdminTemplate extends ICommonTemplate {
 	branchNames: string[];

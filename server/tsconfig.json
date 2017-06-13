@@ -15,7 +15,11 @@
         "alwaysStrict": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
-        "noImplicitReturns": true
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "plugins": [
+            { "name": "tslint-language-service"}
+        ]
     },
     "exclude": [
         "../node_modules/@types/whatwg-fetch/index.d.ts",

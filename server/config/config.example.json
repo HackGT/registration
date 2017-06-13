@@ -26,5 +26,6 @@
 		"port": 3000
 	},
 	"admins": ["example@example.com"],
-	"eventName": "My Hackathon"
+	"eventName": "My Hackathon",
+	"maxTeamSize": 4
 }

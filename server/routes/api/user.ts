@@ -6,17 +6,18 @@ import * as archiver from "archiver";
 
 import {
 	UPLOAD_ROOT,
-    postParser, uploadHandler,
+	postParser, uploadHandler,
 	config, sendMailAsync,
 	validateSchema
 } from "../../common";
 import {
 	IFormItem,
 	IUser, IUserMongoose, User,
+	ITeamMongoose, Team
 } from "../../schema";
-import {QuestionBranches, Questions} from "../../config/questions.schema";
+import {QuestionBranches} from "../../config/questions.schema";
 
-function isUserOrAdmin (request: express.Request, response: express.Response, next: express.NextFunction) {
+function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
 	if (!request.isAuthenticated()) {
 		response.status(401).json({
@@ -33,7 +34,7 @@ function isUserOrAdmin (request: express.Request, response: express.Response, ne
 	}
 }
 
-function isAdmin (request: express.Request, response: express.Response, next: express.NextFunction) {
+function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
 	if (!request.isAuthenticated()) {
 		response.status(401).json({
@@ -52,7 +53,7 @@ function isAdmin (request: express.Request, response: express.Response, next: ex
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
-userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response) => {
+userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	let branchName = request.params.branch as string;
 	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
@@ -87,8 +88,8 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 			return null;
 		}
 		// (Hackily) redefines the type of request.files because the default type is incorrect for multer's .any() handler
-		let files: Express.Multer.File[] = (<any> request.files) as Express.Multer.File[];
-		
+		let files: Express.Multer.File[] = (request.files as any) as Express.Multer.File[];
+
 		if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
 			// Required field not filled in
 			errored = true;
@@ -121,7 +122,7 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 		return;
 	}
 	try {
-		let data = rawData as IFormItem[]; // nulls are only inserted when an error has occurred
+		let data = rawData as IFormItem[]; // Nulls are only inserted when an error has occurred
 		// Move files to permanent, requested location
 		await Promise.all(data
 			.map(item => item.value)
@@ -178,7 +179,7 @@ The ${config.eventName} Team`;
 				from: config.email.from,
 				to: user.email,
 				subject: `[${config.eventName}] - Thank you for appying!`,
-				text: text // TODO: Add HTML email template
+				text // TODO: Add HTML email template
 			});
 		}
 
@@ -202,7 +203,7 @@ The ${config.eventName} Team`;
 	}
 });
 
-userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
+userRoutes.delete("/application", isUserOrAdmin, async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	user.applied = false;
 	user.applicationBranch = "";
@@ -227,7 +228,7 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response) => {
 	}
 });
 
-userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response) => {
+userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
 	let status = request.body.status === "true";
 
@@ -253,7 +254,7 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 });
 
-userRoutes.route("/export").get(isAdmin, async (request, response) => {
+userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let questionBranches: QuestionBranches;
 		try {
@@ -273,12 +274,14 @@ userRoutes.route("/export").get(isAdmin, async (request, response) => {
 		});
 		response.status(200).type("application/zip");
 		archive.pipe(response);
-		
+
 		for (let branchName of branchNames) {
 			// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
 			// TODO: Change this to { "accepted": true }
 			let attendingUsers: IUserMongoose[] = await User.find({ "applied": true, "applicationBranch": branchName });
-			if (attendingUsers.length === 0) continue;
+			if (attendingUsers.length === 0) {
+				continue;
+			}
 
 			let csvData = attendingUsers.map(user => {
 				// TODO: Replace with more robust schema-agnostic version
@@ -298,4 +301,219 @@ userRoutes.route("/export").get(isAdmin, async (request, response) => {
 			"error": "An error occurred while exporting data"
 		});
 	}
+});
+
+async function removeUserFromAllTeams(user: IUserMongoose): Promise<boolean> {
+	if (!user.teamId) {
+		return true;
+	}
+
+	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+	if (!currentUserTeam) {
+		return false;
+	}
+
+	if (currentUserTeam.teamLeader.toString() === user._id.toString()) {
+		// If we're team leader, remove everybody from group
+		await Team.findByIdAndRemove(currentUserTeam._id);
+		await User.update({
+			teamId: user.teamId
+		}, {
+			$unset: {
+				teamId: 1
+			}
+		}, {
+			multi: true
+		});
+		return true;
+	}
+	else {
+		await Team.update({
+			_id: user.teamId
+		}, {
+			$pull: {
+				members: user._id
+			}
+		});
+		// Remove us from the current team we're in
+		await User.update({
+			_id: user._id
+		}, {
+			$unset: {
+				teamId: 1
+			}
+		});
+		return true;
+	}
+}
+
+userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
+	/*
+		First, check if there is already a team that has this user as captain
+		If so, just re-assign the user's teamid to that one
+		Else if the user's in a team, take them out of it
+		Else make them a new team
+	 */
+	let user = await User.findById(request.params.id);
+	let decodedTeamName = decodeURI(request.params.teamName);
+
+	let existingTeam = await Team.findOne({ teamName: decodedTeamName });
+
+	if (existingTeam) {
+
+		// Someone else has a team with this name
+		response.status(400).json({
+			"error": `Someone else has a team called ${decodedTeamName}. Please pick a different name.`
+		});
+		return;
+	}
+
+	// If the user is in a team, remove them from their current team unless they're the team leader
+	if (user.teamId) {
+		let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+
+		if (currentUserTeam.teamLeader === user._id) {
+			// The user is in the team they made already
+			// Ideally this will never happen if we do some validation client side
+			response.status(400).json({
+				"error": "You're already the leader of this team"
+			});
+			return;
+		}
+
+		await removeUserFromAllTeams(user);
+	}
+
+	let query = {
+		teamLeader: request.user._id,
+		members: {
+			$in: [user._id]
+		},
+		teamName: decodedTeamName
+	};
+
+	let options = {
+		upsert: true,
+		new: true,
+		setDefaultsOnInsert: true
+	};
+
+	let team: ITeamMongoose = await Team.findOneAndUpdate(query, {}, options);
+
+	user.teamId = team._id;
+	await user.save();
+
+	response.json({
+		"success": true
+	});
+});
+
+userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
+	let user = await User.findById(request.params.id);
+	let decodedTeamName = decodeURI(request.params.teamName);
+
+	if (user.teamId) {
+		// Remove them from any teams they're in
+		await removeUserFromAllTeams(user);
+	}
+
+	if (!decodedTeamName) {
+		// No team to join smh
+		response.status(400).json({
+			"error": "Please enter the team name you want to join"
+		});
+		return;
+	}
+
+	let teamToJoin: ITeamMongoose = await Team.findOne({ teamName: decodedTeamName });
+
+	if (!teamToJoin) {
+		// If the team they tried to join isn't real...
+		response.status(400).json({
+			"error": "No such team!"
+		});
+		return;
+	}
+
+	// Compare teamToJoin.members.length plus 2; 1 for the team leader, and 1 for the prospective user
+	// If the maxTeamSize is set as a value that requires teams of 0 size, no team max size
+	if (teamToJoin.members.length + 2 > config.maxTeamSize && config.maxTeamSize > 0) {
+		response.status(400).json({
+			"error": "This team is full!"
+		});
+		return;
+	}
+
+	await Team.update({
+		teamName: decodedTeamName
+	}, {
+		$addToSet: {
+			members: user._id
+		}
+	});
+
+	user.teamId = (await Team.findOne({teamName: decodedTeamName}))._id;
+
+	await user.save();
+
+	response.json({
+		"success": true
+	});
+});
+
+userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): Promise<void> => {
+	let user = await User.findById(request.params.id);
+	await removeUserFromAllTeams(user);
+
+	response.status(200).json({
+		"success": true
+	});
+});
+
+userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
+	let user = await User.findById(request.params.id);
+
+	if (!user.teamId) {
+		response.status(400).json({
+			"error": "You're not in a team"
+		});
+		return;
+	}
+
+	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+
+	if (!currentUserTeam) {
+		// User tried to change their team name even though they don't have a team
+		response.status(400).json({
+			"error": "You don't belong to a team!"
+		});
+		return;
+	}
+
+	if (currentUserTeam.teamLeader.toString() !== user._id.toString()) {
+		// The user isn't the team captain
+		response.status(400).json({
+			"error": "You're not the leader of this team!"
+		});
+		return;
+	}
+
+	let decodedTeamName = decodeURI(request.params.newTeamName);
+	if (await Team.findOne({teamName: decodedTeamName})) {
+		// If there is a team with that name already
+		response.status(400).json({
+			"error": "Team with that name already exists!"
+		});
+		return;
+	}
+
+	await Team.findOneAndUpdate({_id: user.teamId}, {
+		$set: {
+			teamName: decodedTeamName
+		}
+	});
+
+	response.json({
+		"success": true
+	});
 });
