@@ -66,7 +66,7 @@ passport.serializeUser<IUser, string>((user, done) => {
 });
 passport.deserializeUser<IUser, string>((id, done) => {
 	User.findById(id, (err, user) => {
-		done(err, user);
+		done(err, user!);
 	});
 });
 

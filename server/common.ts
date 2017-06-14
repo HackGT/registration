@@ -215,8 +215,80 @@ mongoose.connect(url.resolve(config.server.mongoURL, config.server.uniqueAppID))
 export {mongoose};
 
 import {
-	ISetting, Setting
+	ISettingMongoose, Setting
 } from "./schema";
+
+export async function setDefaultSettings() {
+	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
+		await new Setting({
+			"name": "applicationOpen",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "applicationClose" }).count() === 0) {
+		await new Setting({
+			"name": "applicationClose",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationOpen" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationOpen",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationClose" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationClose",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
+		await new Setting({
+			"name": "teamsEnabled",
+			"value": true
+		}).save();
+	}
+	if (await Setting.find({ "name": "applicationBranches" }).count() === 0) {
+		await new Setting({
+			"name": "applicationBranches",
+			"value": []
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationBranches" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationBranches",
+			"value": []
+		}).save();
+	}
+}
+export async function getSetting<T>(name: string, createMissing: boolean = true): Promise<T> {
+	let setting = await Setting.findOne({ name });
+	if (!setting) {
+		if (createMissing) {
+			await setDefaultSettings();
+			setting = await Setting.findOne({ name });
+			if (!setting) {
+				throw new Error("Setting not created by setDefaultSettings()");
+			}
+		}
+		else {
+			throw new Error("Setting not found");
+		}
+	}
+	return setting.value as T;
+}
+export async function updateSetting<T>(name: string, value: T, createMissing: boolean = true): Promise<void> {
+	let setting = await Setting.findOne({ name });
+	if (!setting) {
+		await new Setting({ name, value }).save();
+	}
+	else {
+		setting.value = value;
+		setting.markModified("value");
+		await setting.save();
+	}
+}
 
 //
 // Express middleware
@@ -283,7 +355,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 		closeKey = "confirmationClose";
 	}
 
-	let [openDate, closeDate] = (await Promise.all<ISetting>([
+	let [openDate, closeDate] = (await Promise.all<ISettingMongoose>([
 		Setting.findOne({ "name": openKey }),
 		Setting.findOne({ "name": closeKey })
 	])).map(setting => moment(setting.value as Date));
@@ -312,7 +384,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 
 		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",

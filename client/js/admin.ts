@@ -164,58 +164,58 @@ updateFilterView();
 // Load timezone-correct values for the application open / close time
 let timeInputs = document.querySelectorAll('input[type="datetime-local"]') as NodeListOf<HTMLInputElement>;
 for (let i = 0; i < timeInputs.length; i++) {
-    timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
+	timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
 }
 
 // Settings update
-function parseDateTime (dateTime: string) {
-    let digits = dateTime.split(/\D+/).map(num => parseInt(num));
-    return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
+function parseDateTime(dateTime: string) {
+	let digits = dateTime.split(/\D+/).map(num => parseInt(num, 10));
+	return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
 }
 let settingsUpdateButton = document.querySelector("#settings input[type=submit]") as HTMLInputElement;
 let settingsForm = document.querySelector("#settings form") as HTMLFormElement;
 settingsUpdateButton.addEventListener("click", e => {
-    if (!settingsForm.checkValidity() || !settingsForm.dataset["action"]) {
+	if (!settingsForm.checkValidity() || !settingsForm.dataset.action) {
 		return;
 	}
-    e.preventDefault();
+	e.preventDefault();
 	settingsUpdateButton.disabled = true;
 
-    let applicationAvailabilityData = new FormData();
-    applicationAvailabilityData.append("applicationOpen", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
-    applicationAvailabilityData.append("applicationClose", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
-    applicationAvailabilityData.append("confirmationOpen", parseDateTime((document.getElementById("confirmation-open") as HTMLInputElement).value).toISOString());
-    applicationAvailabilityData.append("confirmationClose", parseDateTime((document.getElementById("confirmation-close") as HTMLInputElement).value).toISOString());
+	let applicationAvailabilityData = new FormData();
+	applicationAvailabilityData.append("applicationOpen", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
+	applicationAvailabilityData.append("applicationClose", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
+	applicationAvailabilityData.append("confirmationOpen", parseDateTime((document.getElementById("confirmation-open") as HTMLInputElement).value).toISOString());
+	applicationAvailabilityData.append("confirmationClose", parseDateTime((document.getElementById("confirmation-close") as HTMLInputElement).value).toISOString());
 
-    let teamsEnabledData = new FormData();
-    teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
+	let teamsEnabledData = new FormData();
+	teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
 
-    let branchRoleData = new FormData();
-    let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
-    for (let i = 0; i < branchRoles.length; i++) {
-        branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
-    }
+	let branchRoleData = new FormData();
+	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
+	for (let i = 0; i < branchRoles.length; i++) {
+		branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
+	}
 
-    const defaultOptions: RequestInit = {
-        credentials: "same-origin",
-		method: "PUT",
-    };
-    fetch("/api/settings/application_availability", {
-        ...defaultOptions,
+	const defaultOptions: RequestInit = {
+		credentials: "same-origin",
+		method: "PUT"
+	};
+	fetch("/api/settings/application_availability", {
+		...defaultOptions,
 		body: applicationAvailabilityData
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/teams_enabled", {
-            ...defaultOptions,
-            body: teamsEnabledData
-        });
-    }).then(checkStatus).then(parseJSON).then(() => {
-        return fetch("/api/settings/branch_roles", {
-            ...defaultOptions,
-            body: branchRoleData
-        });
-    }).then(checkStatus).then(parseJSON).then(async () => {
-        await sweetAlert("Awesome!", "Settings successfully updated.", "success");
-        window.location.reload();
+			...defaultOptions,
+			body: teamsEnabledData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/branch_roles", {
+			...defaultOptions,
+			body: branchRoleData
+		});
+	}).then(checkStatus).then(parseJSON).then(async () => {
+		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
+		window.location.reload();
 	}).catch(async (err: Error) => {
 		await sweetAlert("Oh no!", err.message, "error");
 		settingsUpdateButton.disabled = false;

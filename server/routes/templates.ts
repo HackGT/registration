@@ -9,12 +9,11 @@ import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config
+	validateSchema, config, getSetting
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
-	ISetting, Setting,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
 } from "../schema";
@@ -27,7 +26,9 @@ let [
 	indexTemplate,
 	loginTemplate,
 	preregisterTemplate,
+	preconfirmTemplate,
 	registerTemplate,
+	confirmTemplate,
 	adminTemplate,
 	unsupportedTemplate,
 	teamTemplate
@@ -35,7 +36,9 @@ let [
 	"index.html",
 	"login.html",
 	"preapplication.html",
+	"preconfirmation.html",
 	"application.html",
+	"confirmation.html",
 	"admin.html",
 	"unsupported.html",
 	"team.html"
@@ -105,7 +108,7 @@ Handlebars.registerHelper("toLowerCase", (n: number): string => {
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
-Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationBranches: string[];	confirmationBranches: string[];	}, role: string, branchName: string): string => {
+Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationBranches: string[]; confirmationBranches: string[] }, role: string, branchName: string): string => {
 	if (role === "noop" && roles.noop.indexOf(branchName) !== -1) {
 		return "selected";
 	}
@@ -121,16 +124,14 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
-	let [openDate, closeDate] = (await Promise.all<ISetting>([
-		Setting.findOne({ "name": "applicationOpen" }),
-		Setting.findOne({ "name": "applicationClose" })
-	])).map(setting => moment(setting.value as Date));
+	let openDate = moment(await getSetting<Date>("applicationOpen"));
+	let closeDate = moment(await getSetting<Date>("applicationClose"));
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		applicationOpen: openDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
 		applicationClose: closeDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
@@ -159,13 +160,13 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 	let isCurrentUserTeamLeader = false;
 
 	if (request.user.teamId) {
-		team = await Team.findById(request.user.teamId);
+		team = await Team.findById(request.user.teamId) as ITeamMongoose;
 		membersAsUsers = await User.find({
 			_id: {
 				$in: team.members
 			}
 		});
-		teamLeaderAsUser = await User.findById(team.teamLeader);
+		teamLeaderAsUser = await User.findById(team.teamLeader) as IUserMongoose;
 		isCurrentUserTeamLeader = teamLeaderAsUser._id.toString() === request.user._id.toString();
 	}
 
@@ -177,7 +178,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		teamLeaderAsUser,
 		isCurrentUserTeamLeader,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		}
 	};
 	response.send(teamTemplate(templateData));
@@ -218,7 +219,7 @@ async function applicationHandler(request: express.Request, response: express.Re
 		return;
 	}
 	// Filter to only show application / confirmation branches
-	let applicationBranches = (await Setting.findOne({ "name": requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches" })).value as string[];
+	let applicationBranches = await getSetting<string[]>(requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches");
 	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
 
 	// If there's only one path, redirect to that
@@ -230,7 +231,7 @@ async function applicationHandler(request: express.Request, response: express.Re
 		siteTitle: config.eventName,
 		user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		branches: questionBranches.map(branch => branch.name)
 	};
@@ -318,20 +319,20 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	});
 	// tslint:enable:no-string-literal
 
-	let thisUser: IUserMongoose = await User.findById(user._id);
+	let thisUser = await User.findById(user._id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		thisUser.applicationStartTime = new Date();
 	}
 	else if (requestType === ApplicationType.Confirmation) {
 		thisUser.confirmationStartTime = new Date();
 	}
-	thisUser.save();
+	await thisUser.save();
 
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		branch: questionBranch.name,
 		questionData
@@ -347,9 +348,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	}
 	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 
-	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
-	let applicationBranches = (await Setting.findOne({ "name": "applicationBranches" })).value as string[];
-	let confirmationBranches = (await Setting.findOne({ "name": "confirmationBranches" })).value as string[];
+	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
+	let applicationBranches = await getSetting<string[]>("applicationBranches");
+	let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 
 	let teamIDNameMap: {
 		[id: string]: string;
@@ -456,14 +457,14 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		metrics: {},
 		settings: {
 			application: {
-				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
-				close: (await Setting.findOne({ "name": "applicationClose" })).value
+				open: await getSetting<string>("applicationOpen"),
+				close: await getSetting<string>("applicationClose")
 			},
 			confirmation: {
-				open: (await Setting.findOne({ "name": "confirmationOpen" })).value,
-				close: (await Setting.findOne({ "name": "confirmationClose" })).value
+				open: await getSetting<string>("confirmationOpen"),
+				close: await getSetting<string>("confirmationClose")
 			},
-			teamsEnabled: teamsEnabled,
+			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
 			branchRoles: {
 				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
@@ -489,23 +490,23 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				}
 				for (let checkboxValue of values) {
 					let rawQuestion = branchQuestions.find(q => q.name === question.name)!;
-					let entry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label);
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label);
 
-					if (!entry) {
-						entry = {
+					if (!statisticEntry) {
+						statisticEntry = {
 							"questionName": rawQuestion!.label,
 							"branch": statisticUser.applicationBranch,
 							"responses": []
 						};
-						templateData.generalStatistics.push(entry);
+						templateData.generalStatistics.push(statisticEntry);
 					}
 
-					let responsesIndex = entry.responses.findIndex(resp => resp.response === checkboxValue);
+					let responsesIndex = statisticEntry.responses.findIndex(resp => resp.response === checkboxValue);
 					if (responsesIndex !== -1) {
-						entry.responses[responsesIndex].count++;
+						statisticEntry.responses[responsesIndex].count++;
 					}
 					else {
-						entry.responses.push({
+						statisticEntry.responses.push({
 							"response": checkboxValue,
 							"count": 1
 						});

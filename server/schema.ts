@@ -108,7 +108,7 @@ export interface IUser {
 	applicationData: IFormItem[];
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
-	
+
 	confirmationBranch: string;
 	confirmationData: IFormItem[];
 	confirmationStartTime?: Date;
@@ -146,7 +146,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	facebookData: {
 		id: String
 	},
-	
+
 	teamId: {
 		type: mongoose.Schema.Types.ObjectId
 	},

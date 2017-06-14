@@ -2,10 +2,10 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-    uploadHandler, validateSchema
+	uploadHandler, validateSchema, getSetting, updateSetting, setDefaultSettings
 } from "../../common";
 import {
-	IUser, Setting
+	IUser
 } from "../../schema";
 
 function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
@@ -20,50 +20,6 @@ function isAdmin(request: express.Request, response: express.Response, next: exp
 	}
 }
 
-export async function setDefaultSettings() {
-	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "applicationOpen",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "applicationClose" }).count() === 0) {
-		await new Setting({
-			"name": "applicationClose",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "confirmationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationOpen",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "confirmationClose" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationClose",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
-		await new Setting({
-			"name": "teamsEnabled",
-			"value": true
-		}).save();
-	}
-	if (await Setting.find({ "name": "applicationBranches" }).count() === 0) {
-		await new Setting({
-			"name": "applicationBranches",
-			"value": []
-		}).save();
-	}
-	if (await Setting.find({ "name": "confirmationBranches" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationBranches",
-			"value": []
-		}).save();
-	}
-}
 setDefaultSettings().catch(err => {
 	throw err;
 });
@@ -71,19 +27,19 @@ setDefaultSettings().catch(err => {
 export let settingsRoutes = express.Router();
 
 settingsRoutes.route("/application_availability")
-    .get(async (request, response) => {
-		let applicationOpen = (await Setting.findOne({ "name": "applicationOpen" })).value as Date;
-		let applicationClose = (await Setting.findOne({ "name": "applicationClose" })).value as Date;
-		let confirmationOpen = (await Setting.findOne({ "name": "confirmationOpen" })).value as Date;
-		let confirmationClose = (await Setting.findOne({ "name": "confirmationClose" })).value as Date;
+	.get(async (request, response) => {
+		let applicationOpen = await getSetting<Date>("applicationOpen");
+		let applicationClose = await getSetting<Date>("applicationClose");
+		let confirmationOpen = await getSetting<Date>("confirmationOpen");
+		let confirmationClose = await getSetting<Date>("confirmationClose");
 		response.json({
 			"applicationOpen": applicationOpen.toISOString(),
 			"applicationClose": applicationClose.toISOString(),
 			"confirmationOpen": confirmationOpen.toISOString(),
 			"confirmationClose": confirmationClose.toISOString()
 		});
-    })
-    .put(isAdmin, uploadHandler.any(), async (request, response) => {
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
 		let rawApplicationOpen = request.body.applicationOpen;
 		let rawApplicationClose = request.body.applicationClose;
 		let rawConfirmationOpen = request.body.confirmationOpen;
@@ -106,25 +62,12 @@ settingsRoutes.route("/application_availability")
 			});
 			return;
 		}
-		let applicationOpen = await Setting.findOne({ "name": "applicationOpen" });
-		let applicationClose = await Setting.findOne({ "name": "applicationClose" });
-		let confirmationOpen = await Setting.findOne({ "name": "confirmationOpen" });
-		let confirmationClose = await Setting.findOne({ "name": "confirmationClose" });
-		applicationOpen.value = new Date(rawApplicationOpen);
-		applicationClose.value = new Date(rawApplicationClose);
-		confirmationOpen.value = new Date(rawConfirmationOpen);
-		confirmationClose.value = new Date(rawConfirmationClose);
-		applicationOpen.markModified("value");
-		applicationClose.markModified("value");
-		confirmationOpen.markModified("value");
-		confirmationClose.markModified("value");
+
 		try {
-			await Promise.all([
-				applicationOpen.save(),
-				applicationClose.save(),
-				confirmationOpen.save(),
-				confirmationClose.save()
-			]);
+			await updateSetting<Date>("applicationOpen", new Date(rawApplicationOpen));
+			await updateSetting<Date>("applicationClose", new Date(rawApplicationClose));
+			await updateSetting<Date>("confirmationOpen", new Date(rawConfirmationOpen));
+			await updateSetting<Date>("confirmationClose", new Date(rawConfirmationClose));
 			response.json({
 				"success": true
 			});
@@ -139,7 +82,7 @@ settingsRoutes.route("/application_availability")
 
 settingsRoutes.route("/teams_enabled")
 	.get(async (request, response) => {
-		let enabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
+		let enabled = await getSetting<boolean>("teamsEnabled");
 		response.json({
 			"enabled": enabled
 		});
@@ -152,11 +95,9 @@ settingsRoutes.route("/teams_enabled")
 			});
 			return;
 		}
-		let enable = await Setting.findOne({ "name": "teamsEnabled" });
-		enable.value = rawEnabled === "true";
-		enable.markModified("value");
+
 		try {
-			await enable.save();
+			await updateSetting<boolean>("teamsEnabled", rawEnabled === "true");
 			response.json({
 				"success": true
 			});
@@ -172,8 +113,8 @@ settingsRoutes.route("/teams_enabled")
 settingsRoutes.route("/branch_roles")
 	.get(async (request, response) => {
 		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
-		let applicationBranches = (await Setting.findOne({ "name": "applicationBranches" })).value as string[];
-		let confirmationBranches = (await Setting.findOne({ "name": "confirmationBranches" })).value as string[];
+		let applicationBranches = await getSetting<string[]>("applicationBranches");
+		let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 		response.json({
 			"noop": branchNames.filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
 			"applicationBranches": applicationBranches,
@@ -181,7 +122,6 @@ settingsRoutes.route("/branch_roles")
 		});
 	})
 	.put(isAdmin, uploadHandler.any(), async (request, response) => {
-		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
 		let applicationBranches = [];
 		let confirmationBranches = [];
 		if ((new Set(Object.keys(request.body))).size !== Object.keys(request.body).length) {
@@ -199,13 +139,8 @@ settingsRoutes.route("/branch_roles")
 			}
 		}
 		try {
-			let applicationBranchesSetting = await Setting.findOne({ "name": "applicationBranches" });
-			applicationBranchesSetting.value = applicationBranches;
-			await applicationBranchesSetting.save();
-			let confirmationBranchesSetting = await Setting.findOne({ "name": "confirmationBranches" });
-			confirmationBranchesSetting.value = confirmationBranches;
-			await confirmationBranchesSetting.save();
-
+			await updateSetting<string[]>("applicationBranches", applicationBranches);
+			await updateSetting<string[]>("confirmationBranches", confirmationBranches);
 			response.json({
 				"success": true
 			});

@@ -64,7 +64,7 @@ userRoutes.route("/confirmation/:branch")
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	let branchName = request.params.branch as string;
 	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.status(400).json({
@@ -238,7 +238,7 @@ The ${config.eventName} Team`;
 async function deleteApplicationBranchHandler(request: express.Request, response: express.Response) {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		user.applied = false;
 		user.applicationBranch = "";
@@ -350,7 +350,7 @@ async function removeUserFromAllTeams(user: IUserMongoose): Promise<boolean> {
 		return true;
 	}
 
-	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+	let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
 	if (!currentUserTeam) {
 		return false;
 	}
@@ -396,10 +396,10 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		Else if the user's in a team, take them out of it
 		Else make them a new team
 	 */
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	let decodedTeamName = decodeURI(request.params.teamName);
 
-	let existingTeam = await Team.findOne({ teamName: decodedTeamName });
+	let existingTeam = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
 
 	if (existingTeam) {
 
@@ -412,7 +412,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 
 	// If the user is in a team, remove them from their current team unless they're the team leader
 	if (user.teamId) {
-		let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+		let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
 
 		if (currentUserTeam.teamLeader === user._id) {
 			// The user is in the team they made already
@@ -440,7 +440,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		setDefaultsOnInsert: true
 	};
 
-	let team: ITeamMongoose = await Team.findOneAndUpdate(query, {}, options);
+	let team = await Team.findOneAndUpdate(query, {}, options) as ITeamMongoose;
 
 	user.teamId = team._id;
 	await user.save();
@@ -451,7 +451,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 });
 
 userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	let decodedTeamName = decodeURI(request.params.teamName);
 
 	if (user.teamId) {
@@ -467,7 +467,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 		return;
 	}
 
-	let teamToJoin: ITeamMongoose = await Team.findOne({ teamName: decodedTeamName });
+	let teamToJoin = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
 
 	if (!teamToJoin) {
 		// If the team they tried to join isn't real...
@@ -494,7 +494,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 		}
 	});
 
-	user.teamId = (await Team.findOne({teamName: decodedTeamName}))._id;
+	user.teamId = teamToJoin._id;
 
 	await user.save();
 
@@ -504,7 +504,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 });
 
 userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	await removeUserFromAllTeams(user);
 
 	response.status(200).json({
@@ -513,7 +513,7 @@ userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): P
 });
 
 userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 
 	if (!user.teamId) {
 		response.status(400).json({
@@ -522,7 +522,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		return;
 	}
 
-	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+	let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
 
 	if (!currentUserTeam) {
 		// User tried to change their team name even though they don't have a team
