@@ -1,6 +1,13 @@
-import {
-	StatisticEntry, ResponseCount
-} from "../../server/schema";
+// tslint:disable:interface-name
+interface ResponseCount {
+	"response": string;
+	"count": number;
+}
+interface StatisticEntry {
+	"questionName": string;
+	"branch": string;
+	"responses": ResponseCount[];
+}
 
 // Lazy loading means only type definitions will be imported
 import * as _d3 from "d3";

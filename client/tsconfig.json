@@ -19,7 +19,8 @@
         "plugins": [
             { "name": "tslint-language-service"}
         ],
-		"module": "es6"
+		"module": "es6",
+		"moduleResolution": "node"
 	},
 	"include": [
 		"js/*.ts"

@@ -225,10 +225,7 @@ settingsUpdateButton.addEventListener("click", e => {
 //
 // Email content
 //
-
-// Lazy loading modules means only the type definitions for simplemde are imported
-import * as _SimpleMDE from "simplemde";
-declare let SimpleMDE: typeof _SimpleMDE;
+declare let SimpleMDE: any;
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
 const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
