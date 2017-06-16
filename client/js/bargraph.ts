@@ -2,7 +2,9 @@ import {
 	StatisticEntry, ResponseCount
 } from "../../server/schema";
 
-import * as d3 from "d3";
+// Lazy loading means only type definitions will be imported
+import * as _d3 from "d3";
+declare let d3: typeof _d3;
 
 function drawBarGraph(statistics: StatisticEntry | null, divId: string) {
 	if (statistics === null) {

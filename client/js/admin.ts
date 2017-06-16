@@ -221,3 +221,21 @@ settingsUpdateButton.addEventListener("click", e => {
 		settingsUpdateButton.disabled = false;
 	});
 });
+
+//
+// Email content
+//
+
+// Lazy loading modules means only the type definitions for simplemde are imported
+import * as _SimpleMDE from "simplemde";
+declare let SimpleMDE: typeof _SimpleMDE;
+
+const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+
+function emailTypeChange(): void {
+	// Load editor content via AJAX
+	markdownEditor.value("");
+}
+emailTypeSelect.addEventListener("change", emailTypeChange);
+emailTypeChange();

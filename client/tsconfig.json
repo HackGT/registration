@@ -18,7 +18,8 @@
 		"noUnusedLocals": true,
         "plugins": [
             { "name": "tslint-language-service"}
-        ]
+        ],
+		"module": "es6"
 	},
 	"include": [
 		"js/*.ts"
