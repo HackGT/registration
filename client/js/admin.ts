@@ -158,6 +158,29 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 updateFilterView();
 
 //
+// Email content
+//
+declare let SimpleMDE: any;
+
+const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+
+async function emailTypeChange(): Promise<void> {
+	// Load editor content via AJAX
+	try {
+		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
+		markdownEditor.value(content);
+	}
+	catch (err) {
+		markdownEditor.value("Couldn't retrieve email content");
+	}
+}
+emailTypeSelect.addEventListener("change", emailTypeChange);
+emailTypeChange().catch(err => {
+	console.error(err);
+});
+
+//
 // Settings
 //
 
@@ -196,6 +219,9 @@ settingsUpdateButton.addEventListener("click", e => {
 		branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
 	}
 
+	let emailContentData = new FormData();
+	emailContentData.append("content", markdownEditor.value());
+
 	const defaultOptions: RequestInit = {
 		credentials: "same-origin",
 		method: "PUT"
@@ -213,6 +239,11 @@ settingsUpdateButton.addEventListener("click", e => {
 			...defaultOptions,
 			body: branchRoleData
 		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch(`/api/settings/email_content/${emailTypeSelect.value}`, {
+			...defaultOptions,
+			body: emailContentData
+		});
 	}).then(checkStatus).then(parseJSON).then(async () => {
 		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
 		window.location.reload();
@@ -221,18 +252,3 @@ settingsUpdateButton.addEventListener("click", e => {
 		settingsUpdateButton.disabled = false;
 	});
 });
-
-//
-// Email content
-//
-declare let SimpleMDE: any;
-
-const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
-const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
-
-function emailTypeChange(): void {
-	// Load editor content via AJAX
-	markdownEditor.value("");
-}
-emailTypeSelect.addEventListener("change", emailTypeChange);
-emailTypeChange();

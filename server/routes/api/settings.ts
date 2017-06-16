@@ -111,7 +111,7 @@ settingsRoutes.route("/teams_enabled")
 	});
 
 settingsRoutes.route("/branch_roles")
-	.get(async (request, response) => {
+	.get(isAdmin, async (request, response) => {
 		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
 		let applicationBranches = await getSetting<string[]>("applicationBranches");
 		let confirmationBranches = await getSetting<string[]>("confirmationBranches");
@@ -149,6 +149,35 @@ settingsRoutes.route("/branch_roles")
 			console.error(err);
 			response.status(500).json({
 				"error": "An error occurred while setting branch roles"
+			});
+		}
+	});
+
+settingsRoutes.route("/email_content/:type")
+	.get(isAdmin, async (request, response) => {
+		let content: string;
+		try {
+			content = await getSetting<string>(`${request.params.type}-email`, false);
+		}
+		catch (err) {
+			// Content not set yet
+			content = "";
+		}
+
+		response.json({ content });
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let content = request.body.content as string;
+		try {
+			await updateSetting<string>(`${request.params.type}-email`, content);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting email content"
 			});
 		}
 	});
