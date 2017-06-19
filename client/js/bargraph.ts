@@ -77,7 +77,7 @@ function drawBarGraph(statistics: StatisticEntry | null, divId: string) {
 drawBarGraph(null, "");
 
 function wrap(textEl: any, width: number) {
-	textEl.each(function() {
+	textEl.each(function wrapEl() {
 		// tslint:disable-next-line:no-invalid-this
 		let text = d3.select(this);
 		let words = text.text().split(/\s+/).reverse();

@@ -101,6 +101,6 @@ main {
 	font-family: "Open Sans";
 }
 
-a.btn, button {
+.btn, button {
 	font-size: 15px;
 }
