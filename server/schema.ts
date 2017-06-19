@@ -103,6 +103,7 @@ export interface IUser {
 
 	applied: boolean;
 	accepted: boolean;
+	acceptedEmailSent: boolean;
 	attending: boolean;
 	applicationBranch: string;
 	applicationData: IFormItem[];
@@ -153,6 +154,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 
 	applied: Boolean,
 	accepted: Boolean,
+	acceptedEmailSent: Boolean,
 	attending: Boolean,
 	applicationBranch: String,
 	applicationData: [mongoose.Schema.Types.Mixed],

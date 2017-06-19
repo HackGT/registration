@@ -211,6 +211,7 @@ passport.use(new LocalStrategy({
 
 			"applied": false,
 			"accepted": false,
+			"acceptedEmailSent": false,
 			"attending": false,
 			"applicationData": [],
 			"applicationStartTime": undefined,

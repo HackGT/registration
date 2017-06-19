@@ -53,6 +53,15 @@ window.addEventListener("hashchange", readURLHash);
 // Applicants
 //
 
+const sendAcceptancesButton = document.getElementById("send-acceptances") as HTMLButtonElement;
+sendAcceptancesButton.addEventListener("click", async e => {
+	let sendCount: number = (await fetch(`/api/user/all/send_acceptances`, {
+		credentials: "same-origin",
+		method: "POST"
+	}).then(checkStatus).then(parseJSON)).count;
+	await sweetAlert("Success!", `Acceptance emails sent (${sendCount} in all).`, "success");
+});
+
 let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
 branchFilter.addEventListener("change", e => {
 	revealDivByClasses([branchFilter.value, getAcceptedFilterValue()]);

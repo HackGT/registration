@@ -100,3 +100,7 @@ main {
 .swal2-modal {
 	font-family: "Open Sans";
 }
+
+a.btn, button {
+	font-size: 15px;
+}

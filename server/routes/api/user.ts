@@ -284,6 +284,48 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 });
 
+userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
+	try {
+		let users = await User.find({ "accepted": true, "acceptedEmailSent": { $ne: true } });
+		for (let user of users) {
+			// Email the applicant about their acceptance
+			let emailMarkdown: string;
+			try {
+				emailMarkdown = await getSetting<string>(`${user.applicationBranch}-accept-email`, false);
+			}
+			catch (err) {
+				// Content not set yet
+				emailMarkdown = "";
+			}
+
+			let emailHTML = await renderEmailHTML(emailMarkdown, user);
+			let emailText = await renderEmailText(emailHTML, user, true);
+
+			await sendMailAsync({
+				from: config.email.from,
+				to: user.email,
+				subject: `[${config.eventName}] - You've been accepted!`,
+				html: emailHTML,
+				text: emailText
+			});
+
+			user.acceptedEmailSent = true;
+			await user.save();
+		}
+
+		response.json({
+			"success": true,
+			"count": users.length
+		});
+	}
+	catch (err) {
+		console.error(err);
+		response.status(500).json({
+			"error": "An error occurred while sending out acceptance emails"
+		});
+	}
+});
+
 userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let questionBranches: QuestionBranches;
