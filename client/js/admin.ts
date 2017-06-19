@@ -169,7 +169,11 @@ if (document.head.attachShadow) {
 	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
 }
 const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+let contentChanged = false;
+let lastSelected = emailTypeSelect.value;
+
 markdownEditor.codemirror.on("change", async () => {
+	contentChanged = true;
 	try {
 		let content = new FormData();
 		content.append("content", markdownEditor.value());
@@ -193,6 +197,14 @@ markdownEditor.codemirror.on("change", async () => {
 });
 
 async function emailTypeChange(): Promise<void> {
+	if (contentChanged) {
+		let shouldProceed = confirm("Heads up! You've edited the content of this email but haven't saved it. Click cancel to stay and save.");
+		if (!shouldProceed) {
+			emailTypeSelect.value = lastSelected;
+			return;
+		}
+	}
+
 	// Load editor content via AJAX
 	try {
 		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
@@ -201,6 +213,8 @@ async function emailTypeChange(): Promise<void> {
 	catch (err) {
 		markdownEditor.value("Couldn't retrieve email content");
 	}
+	contentChanged = false;
+	lastSelected = emailTypeSelect.value;
 }
 emailTypeSelect.addEventListener("change", emailTypeChange);
 emailTypeChange().catch(err => {
