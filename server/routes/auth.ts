@@ -240,7 +240,7 @@ The ${config.eventName} Team.`;
 				from: config.email.from,
 				to: email,
 				subject: `[${config.eventName}] - Verify your email`,
-				text // TODO: Add HTML email template
+				text
 			});
 		}
 		catch (err) {
@@ -272,7 +272,7 @@ app.use(passport.session());
 export let authRoutes = express.Router();
 
 function getExternalPort(request: express.Request): number {
-	let host = request.headers.host;
+	let host = request.headers.host!;
 	// IPv6 literal support
 	let offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
 	let index = host.indexOf(":", offset);

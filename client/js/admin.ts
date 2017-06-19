@@ -158,6 +158,56 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 updateFilterView();
 
 //
+// Email content
+//
+declare let SimpleMDE: any;
+
+const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
+if (document.head.attachShadow) {
+	// Browser supports Shadow DOM
+	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
+}
+const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+markdownEditor.codemirror.on("change", async () => {
+	try {
+		let content = new FormData();
+		content.append("content", markdownEditor.value());
+
+		let { html, text }: { html: string; text: string } = (
+			await fetch(`/api/settings/email_content/${emailTypeSelect.value}/rendered`, {
+				credentials: "same-origin",
+				method: "POST",
+				body: content
+			}).then(checkStatus).then(parseJSON)
+		);
+		emailRenderedArea.innerHTML = html;
+		emailRenderedArea.appendChild(document.createElement("hr"));
+		let textContainer = document.createElement("pre");
+		textContainer.textContent = text;
+		emailRenderedArea.appendChild(textContainer);
+	}
+	catch (err) {
+		emailRenderedArea.textContent = "Couldn't retrieve email content";
+	}
+});
+
+async function emailTypeChange(): Promise<void> {
+	// Load editor content via AJAX
+	try {
+		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
+		markdownEditor.value(content);
+	}
+	catch (err) {
+		markdownEditor.value("Couldn't retrieve email content");
+	}
+}
+emailTypeSelect.addEventListener("change", emailTypeChange);
+emailTypeChange().catch(err => {
+	console.error(err);
+});
+
+//
 // Settings
 //
 
@@ -196,6 +246,9 @@ settingsUpdateButton.addEventListener("click", e => {
 		branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
 	}
 
+	let emailContentData = new FormData();
+	emailContentData.append("content", markdownEditor.value());
+
 	const defaultOptions: RequestInit = {
 		credentials: "same-origin",
 		method: "PUT"
@@ -212,6 +265,11 @@ settingsUpdateButton.addEventListener("click", e => {
 		return fetch("/api/settings/branch_roles", {
 			...defaultOptions,
 			body: branchRoleData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch(`/api/settings/email_content/${emailTypeSelect.value}`, {
+			...defaultOptions,
+			body: emailContentData
 		});
 	}).then(checkStatus).then(parseJSON).then(async () => {
 		await sweetAlert("Awesome!", "Settings successfully updated.", "success");

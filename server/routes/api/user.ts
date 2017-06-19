@@ -7,7 +7,7 @@ import * as archiver from "archiver";
 import {
 	UPLOAD_ROOT,
 	postParser, uploadHandler,
-	config, sendMailAsync,
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
 	validateSchema
 } from "../../common";
@@ -164,32 +164,18 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			return item;
 		});
 		// Email the applicant to confirm
-		// TODO: Make the content of these emails admin-configurable
-		let text: string;
-		if (questionBranch.name.toLowerCase() === "mentor") {
-			text =
-`Hi!
-
-Thank you again for volunteering to be a mentor at ${config.eventName}! Please complete these background check forms as soon as possible: https://drive.google.com/open?id=0B8MqIMxG0xUJcmU5RFppWUNhWUE by following this guide: https://docs.google.com/document/d/1QJawDpf3a-oN15djbJ5jZufK_LJtKisMOgrbRVcUPEs/edit?usp=sharing.
-
-If you have any questions, please don't hesitate to contact us by replying to this email.
-
-Sincerely,
-
-The ${config.eventName} Team`;
+		let emailMarkdown: string;
+		try {
+			let type = requestType === ApplicationType.Application ? "apply" : "attend";
+			emailMarkdown = await getSetting<string>(`${questionBranch.name}-${type}-email`, false);
 		}
-		else {
-			text =
-`Hi!
-
-Thank you for applying to be a ${questionBranch.name} at ${config.eventName}! Feel free to go back and update your application any time before registration closes.
-
-If you have any questions please don't hesitate to contact us by replying to this email.
-
-Sincerely,
-
-The ${config.eventName} Team`;
+		catch (err) {
+			// Content not set yet
+			emailMarkdown = "";
 		}
+
+		let emailHTML = await renderEmailHTML(emailMarkdown, user);
+		let emailText = await renderEmailText(emailHTML, user, true);
 
 		if (requestType === ApplicationType.Application) {
 			if (!user.applied) {
@@ -197,7 +183,8 @@ The ${config.eventName} Team`;
 					from: config.email.from,
 					to: user.email,
 					subject: `[${config.eventName}] - Thank you for appying!`,
-					text: text // TODO: Add HTML email template
+					html: emailHTML,
+					text: emailText
 				});
 			}
 			user.applied = true;
@@ -212,7 +199,8 @@ The ${config.eventName} Team`;
 					from: config.email.from,
 					to: user.email,
 					subject: `[${config.eventName}] - Thank you for RSVPing!`,
-					text: text // TODO: Add HTML email template
+					html: emailHTML,
+					text: emailText
 				});
 			}
 			user.attending = true;

@@ -463,6 +463,11 @@ export async function validateSchema(questionsFile: string, schemaFile: string =
 // Email
 //
 import * as nodemailer from "nodemailer";
+import * as marked from "marked";
+// tslint:disable-next-line:no-var-requires
+const striptags = require("striptags");
+import { IUser, Team } from "./schema";
+
 export let emailTransporter = nodemailer.createTransport({
 	host: config.email.host,
 	port: config.email.port,
@@ -482,4 +487,48 @@ export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<n
 			resolve(info);
 		});
 	});
+}
+function sanitize(input: string): string {
+	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
+	return new Promise<string>(async (resolve, reject) => {
+		let teamName = "No team created or joined";
+		if (user.teamId) {
+			let team = await Team.findById(user.teamId);
+			if (team) {
+				teamName = team.teamName;
+			}
+		}
+
+		// Interpolate and sanitize variables
+		markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
+		markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
+		markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
+		markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
+		markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
+		markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+
+		marked(markdown, { sanitize: false, smartypants: true }, (err: Error | null, content: string) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(content);
+		});
+	});
+}
+export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
+	let html: string;
+	if (!markdownRendered) {
+		html = await renderEmailHTML(markdown, user);
+	}
+	else {
+		html = markdown;
+	}
+	// Remove <style> and <script> block's content
+	html = html.replace(/<style>[\s\S]*?<\/style>/gi, "<style></style>").replace(/<script>[\s\S]*?<\/script>/gi, "<script></script>");
+	let text: string = striptags(html);
+	// Reverse sanitization
+	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 }
