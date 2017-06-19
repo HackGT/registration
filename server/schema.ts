@@ -201,6 +201,13 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+	confirmationOpen: string;
+	confirmationClose: string;
+	confirmationStatus: {
+		areOpen: boolean;
+		beforeOpen: boolean;
+		afterClose: boolean;
+	};
 }
 export interface ITeamTemplate extends ICommonTemplate {
 	team?: ITeamMongoose | null;

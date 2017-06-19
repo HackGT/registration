@@ -124,8 +124,10 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
-	let openDate = moment(await getSetting<Date>("applicationOpen"));
-	let closeDate = moment(await getSetting<Date>("applicationClose"));
+	let applicationOpenDate = moment(await getSetting<Date>("applicationOpen"));
+	let applicationCloseDate = moment(await getSetting<Date>("applicationClose"));
+	let confirmationOpenDate = moment(await getSetting<Date>("confirmationOpen"));
+	let confirmationCloseDate = moment(await getSetting<Date>("confirmationClose"));
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
@@ -133,12 +135,21 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
-		applicationOpen: openDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
-		applicationClose: closeDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
+
+		applicationOpen: applicationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		applicationClose: applicationCloseDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
 		applicationStatus: {
-			areOpen: moment().isBetween(openDate, closeDate),
-			beforeOpen: moment().isBefore(openDate),
-			afterClose: moment().isAfter(closeDate)
+			areOpen: moment().isBetween(applicationOpenDate, applicationCloseDate),
+			beforeOpen: moment().isBefore(applicationOpenDate),
+			afterClose: moment().isAfter(applicationCloseDate)
+		},
+
+		confirmationOpen: confirmationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		confirmationClose: confirmationCloseDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		confirmationStatus: {
+			areOpen: moment().isBetween(confirmationOpenDate, confirmationCloseDate),
+			beforeOpen: moment().isBefore(confirmationOpenDate),
+			afterClose: moment().isAfter(confirmationCloseDate)
 		}
 	};
 	response.send(indexTemplate(templateData));

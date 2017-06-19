@@ -365,7 +365,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 		return;
 	}
 
-	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm:ss a z";
+	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
 	interface IClosedTemplate extends ICommonTemplate {
 		type: string;
 		open: {
