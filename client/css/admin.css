@@ -45,9 +45,6 @@ table thead {
     border-radius: 3px;
     background-color: #eee;
 }
-#email-rendered hr {
-    border: 1px solid #737373;
-}
 
 /* Make section button text smaller on small screens */
 @media (max-width: 550px) {

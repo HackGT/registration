@@ -186,7 +186,9 @@ markdownEditor.codemirror.on("change", async () => {
 			}).then(checkStatus).then(parseJSON)
 		);
 		emailRenderedArea.innerHTML = html;
-		emailRenderedArea.appendChild(document.createElement("hr"));
+		let hr = document.createElement("hr");
+		hr.style.border = "1px solid #737373";
+		emailRenderedArea.appendChild(hr);
 		let textContainer = document.createElement("pre");
 		textContainer.textContent = text;
 		emailRenderedArea.appendChild(textContainer);
