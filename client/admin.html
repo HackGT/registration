@@ -235,13 +235,30 @@
 						<div class="col-12">
 							<h4>Edit email content</h4>
 							<select id="email-type">
-								{{#each branchNames}}
-									<option value="{{this}}-apply">{{this}} Post-Apply Email</option>
-									<option value="{{this}}-accept">{{this}} Accepted Email</option>
-									<option value="{{this}}-attend">{{this}} Post-Confirm Email</option>
-								{{/each}}
+								<optgroup label="Application branches">
+									{{#each settings.branchRoles.applicationBranches}}
+										<option value="{{this}}-apply">{{this}} Post-Apply Email</option>
+										<option value="{{this}}-accept">{{this}} Accepted Email</option>
+									{{/each}}
+								</optgroup>
+								<optgroup label="Confirmation branches">
+									{{#each settings.branchRoles.confirmationBranches}}
+										<option value="{{this}}-attend">{{this}} Post-Confirm Email</option>
+									{{/each}}
+								</optgroup>
 							</select>
 							<textarea id="email-content"></textarea>
+							<h5>Rendered HTML and text:</h5>
+							<section id="email-rendered"></section>
+							<h5>List of variables:</h5>
+							<ul>
+								<li><strong>\{{eventName}}</strong>: The name of the event, configured by the <code>eventName</code> key-value pair in the <code>config.json</code> and displayed at the top of the page.</li>
+								<li><strong>\{{email}}</strong>: The user's email as reported by them or a 3rd party OAuth provider (i.e. Google, GitHub, Facebook).</li>
+								<li><strong>\{{name}}</strong>: The user's name as reported by them or a 3rd party OAuth provider (i.e. Google, GitHub, Facebook).</li>
+								<li><strong>\{{teamName}}</strong>: The user's team name if teams are enabled and the user has joined a team. Otherwise, will output <code>Teams not enabled</code> or <code>No team created or joined</code> respectively.</li>
+								<li><strong>\{{applicationBranch}}</strong>: The question branch name that the user applied / was accepted to.</li>
+								<li><strong>\{{confirmationBranch}}</strong>: The question branch name that the user RSVPed to.</li>
+							</ul>
 						</div>
 					</div>
 					<div class="row center">

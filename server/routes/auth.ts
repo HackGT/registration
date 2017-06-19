@@ -240,7 +240,7 @@ The ${config.eventName} Team.`;
 				from: config.email.from,
 				to: email,
 				subject: `[${config.eventName}] - Verify your email`,
-				text // TODO: Add HTML email template
+				text
 			});
 		}
 		catch (err) {

@@ -163,7 +163,30 @@ updateFilterView();
 declare let SimpleMDE: any;
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+const emailRenderedArea = document.getElementById("email-rendered") as HTMLElement;
 const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+markdownEditor.codemirror.on("change", async () => {
+	try {
+		let content = new FormData();
+		content.append("content", markdownEditor.value());
+
+		let { html, text }: { html: string; text: string } = (
+			await fetch(`/api/settings/email_content/${emailTypeSelect.value}/rendered`, {
+				credentials: "same-origin",
+				method: "POST",
+				body: content
+			}).then(checkStatus).then(parseJSON)
+		);
+		emailRenderedArea.innerHTML = html;
+		emailRenderedArea.appendChild(document.createElement("hr"));
+		let textContainer = document.createElement("pre");
+		textContainer.textContent = text;
+		emailRenderedArea.appendChild(textContainer);
+	}
+	catch (err) {
+		emailRenderedArea.textContent = "Couldn't retrieve email content";
+	}
+});
 
 async function emailTypeChange(): Promise<void> {
 	// Load editor content via AJAX

@@ -2,7 +2,7 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-	uploadHandler, validateSchema, getSetting, updateSetting, setDefaultSettings
+	uploadHandler, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
 } from "../../common";
 import {
 	IUser
@@ -180,4 +180,13 @@ settingsRoutes.route("/email_content/:type")
 				"error": "An error occurred while setting email content"
 			});
 		}
+	});
+
+settingsRoutes.route("/email_content/:type/rendered")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		let markdown: string = request.body.content;
+		let html: string = await renderEmailHTML(markdown, request.user);
+		let text: string = await renderEmailText(html, request.user, true);
+
+		response.json({ html, text });
 	});
