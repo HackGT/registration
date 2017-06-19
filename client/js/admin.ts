@@ -163,7 +163,11 @@ updateFilterView();
 declare let SimpleMDE: any;
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
-const emailRenderedArea = document.getElementById("email-rendered") as HTMLElement;
+let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
+if (document.head.attachShadow) {
+	// Browser supports Shadow DOM
+	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
+}
 const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
 markdownEditor.codemirror.on("change", async () => {
 	try {
