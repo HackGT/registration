@@ -493,12 +493,18 @@ function sanitize(input: string): string {
 }
 export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
 	return new Promise<string>(async (resolve, reject) => {
-		let teamName = "No team created or joined";
-		if (user.teamId) {
-			let team = await Team.findById(user.teamId);
-			if (team) {
-				teamName = team.teamName;
+		let teamName: string;
+		if (await getSetting<boolean>("teamsEnabled")) {
+			teamName = "No team created or joined";
+			if (user.teamId) {
+				let team = await Team.findById(user.teamId);
+				if (team) {
+					teamName = team.teamName;
+				}
 			}
+		}
+		else {
+			teamName = "Teams not enabled";
 		}
 
 		// Interpolate and sanitize variables
