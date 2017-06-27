@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# HACKGPROJECT VERSION: 99cb7a0b1640d53c61b8bdf8e6da9ec021f2f09e
+# HACKGPROJECT VERSION: e60621f2a3bbdf06d0023e5578a98555cbaa63e0
 
 set -euo pipefail
 SOURCE_DIR=$(readlink -f "${BASH_SOURCE[0]}")
@@ -51,6 +51,21 @@ publish_project_container() {
     docker push "$push_image_name"
 }
 
+trigger_biodomes_build() {
+    body='{
+    "request": {
+    "branch":"master"
+    } }'
+
+    curl -s -X POST \
+       -H "Content-Type: application/json" \
+       -H "Accept: application/json" \
+       -H "Travis-API-Version: 3" \
+       -H "Authorization: token ${TRAVIS_TOKEN}" \
+       -d "$body" \
+       https://api.travis-ci.org/repo/HackGT%2Fbiodomes/requests
+}
+
 
 build_project_source
 test_project_source
@@ -58,5 +73,6 @@ build_project_container
 
 if [[ ${TRAVIS_BRANCH:-} = master && ${TRAVIS_PULL_REQUEST-} = false ]]; then
     publish_project_container
+    trigger_biodomes_build
 fi
 
