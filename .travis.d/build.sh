@@ -43,7 +43,7 @@ build_project_container() {
 
 publish_project_container() {
     local git_rev=$(git rev-parse HEAD)
-    local push_image_name="${REGISTRY}/${DOCKER_ID_USER}/${image_name}"
+    local push_image_name="${DOCKER_ID_USER}/${image_name}"
     docker login -u="${DOCKER_ID_USER}" -p="${DOCKER_PASSWORD}"
     docker tag "$image_name" "$push_image_name":"$git_rev"
     docker push "$push_image_name"

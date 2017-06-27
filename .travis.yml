@@ -10,5 +10,4 @@ script:
 env:
   global:
     - DOCKER_ID_USER="hackgt"
-    - REGISTRY="hub.docker.com"
 
