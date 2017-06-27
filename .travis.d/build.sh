@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# HACKGPROJECT VERSION: e60621f2a3bbdf06d0023e5578a98555cbaa63e0
+# HACKGPROJECT VERSION: c7f8a4124228d1b48a0420d042a4aea4ff52d480
 
 set -euo pipefail
 SOURCE_DIR=$(readlink -f "${BASH_SOURCE[0]}")
@@ -19,7 +19,8 @@ else
     docker='sudo docker'
 fi
 
-image_name=$(basename "$(pwd)")
+remote=$(git remote -v | grep -Po 'HackGT/[a-zA-Z0-9-_\.]*' | head -1)
+image_name=$(basename "${remote%.*}")
 
 build_project_source() {
     if [[ -f Dockerfile.build ]]; then
