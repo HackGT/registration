@@ -1,11 +1,14 @@
-sudo: false
+sudo: required
 dist: trusty
 
-language: node_js
-node_js:
-  - "8"
+services:
+  - docker
 
-install:
-  - npm install
 script:
-  - npm run build
+  - .travis.d/build.sh
+
+env:
+  global:
+    - DOCKER_ID_USER="hackgt"
+    - REGISTRY="hub.docker.com"
+
