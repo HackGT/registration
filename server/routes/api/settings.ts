@@ -184,9 +184,17 @@ settingsRoutes.route("/email_content/:type")
 
 settingsRoutes.route("/email_content/:type/rendered")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
-		let markdown: string = request.body.content;
-		let html: string = await renderEmailHTML(markdown, request.user);
-		let text: string = await renderEmailText(html, request.user, true);
+		try {
+			let markdown: string = request.body.content;
+			let html: string = await renderEmailHTML(markdown, request.user);
+			let text: string = await renderEmailText(html, request.user, true);
 
-		response.json({ html, text });
+			response.json({ html, text });
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while rendering the email content"
+			});
+		}
 	});
