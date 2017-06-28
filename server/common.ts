@@ -489,6 +489,9 @@ export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<n
 	});
 }
 function sanitize(input: string): string {
+	if (typeof input !== "string") {
+		return "";
+	}
 	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
