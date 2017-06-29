@@ -5,11 +5,11 @@
 			<a href="/">Dashboard</a>
 			<span class="divider"></span>
 
-			<a href="/apply">Application</a>
-			<span class="divider"></span>
-			
 			{{#if user.accepted}}
-				<a href="#">Confirmation</a>
+				<a href="/confirm">Confirmation</a>
+				<span class="divider"></span>
+			{{else}}
+				<a href="/apply">Application</a>
 				<span class="divider"></span>
 			{{/if}}
 			

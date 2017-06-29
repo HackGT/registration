@@ -153,6 +153,11 @@
         ],
         "no-namespace": [
             false
+        ],
+        "only-arrow-functions": [
+            true,
+            "allow-declarations",
+            "allow-named-functions"
         ]
     }
 }

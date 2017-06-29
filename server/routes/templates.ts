@@ -8,13 +8,12 @@ import * as bowser from "bowser";
 import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
-	timeLimited,
-	validateSchema, config
+	timeLimited, ApplicationType,
+	validateSchema, config, getSetting
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
-	ISetting, Setting,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
 } from "../schema";
@@ -27,7 +26,9 @@ let [
 	indexTemplate,
 	loginTemplate,
 	preregisterTemplate,
+	preconfirmTemplate,
 	registerTemplate,
+	confirmTemplate,
 	adminTemplate,
 	unsupportedTemplate,
 	teamTemplate
@@ -35,7 +36,9 @@ let [
 	"index.html",
 	"login.html",
 	"preapplication.html",
+	"preconfirmation.html",
 	"application.html",
+	"confirmation.html",
 	"admin.html",
 	"unsupported.html",
 	"team.html"
@@ -99,30 +102,54 @@ Handlebars.registerHelper("slug", (input: string): string => {
 Handlebars.registerHelper("numberFormat", (n: number): string => {
 	return n.toLocaleString();
 });
+Handlebars.registerHelper("toLowerCase", (n: number): string => {
+	return n.toString().toLowerCase();
+});
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
+});
+Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationBranches: string[]; confirmationBranches: string[] }, role: string, branchName: string): string => {
+	if (role === "noop" && roles.noop.indexOf(branchName) !== -1) {
+		return "selected";
+	}
+	if (role === "application" && roles.applicationBranches.indexOf(branchName) !== -1) {
+		return "selected";
+	}
+	if (role === "confirmation" && roles.confirmationBranches.indexOf(branchName) !== -1) {
+		return "selected";
+	}
+	return "";
 });
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
-	let [openDate, closeDate] = (await Promise.all<ISetting>([
-		Setting.findOne({ "name": "applicationOpen" }),
-		Setting.findOne({ "name": "applicationClose" })
-	])).map(setting => moment(setting.value as Date));
+	let applicationOpenDate = moment(await getSetting<Date>("applicationOpen"));
+	let applicationCloseDate = moment(await getSetting<Date>("applicationClose"));
+	let confirmationOpenDate = moment(await getSetting<Date>("confirmationOpen"));
+	let confirmationCloseDate = moment(await getSetting<Date>("confirmationClose"));
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
-		applicationOpen: openDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
-		applicationClose: closeDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm:ss a z"),
+
+		applicationOpen: applicationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		applicationClose: applicationCloseDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
 		applicationStatus: {
-			areOpen: moment().isBetween(openDate, closeDate),
-			beforeOpen: moment().isBefore(openDate),
-			afterClose: moment().isAfter(closeDate)
+			areOpen: moment().isBetween(applicationOpenDate, applicationCloseDate),
+			beforeOpen: moment().isBefore(applicationOpenDate),
+			afterClose: moment().isAfter(applicationCloseDate)
+		},
+
+		confirmationOpen: confirmationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		confirmationClose: confirmationCloseDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		confirmationStatus: {
+			areOpen: moment().isBetween(confirmationOpenDate, confirmationCloseDate),
+			beforeOpen: moment().isBefore(confirmationOpenDate),
+			afterClose: moment().isAfter(confirmationCloseDate)
 		}
 	};
 	response.send(indexTemplate(templateData));
@@ -138,20 +165,19 @@ templateRoutes.route("/login").get((request, response) => {
 });
 
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
-
 	let team: ITeamMongoose | null = null;
 	let membersAsUsers: IUserMongoose[] | null = null;
 	let teamLeaderAsUser: IUserMongoose | null = null;
 	let isCurrentUserTeamLeader = false;
 
 	if (request.user.teamId) {
-		team = await Team.findById(request.user.teamId);
+		team = await Team.findById(request.user.teamId) as ITeamMongoose;
 		membersAsUsers = await User.find({
 			_id: {
 				$in: team.members
 			}
 		});
-		teamLeaderAsUser = await User.findById(team.teamLeader);
+		teamLeaderAsUser = await User.findById(team.teamLeader) as IUserMongoose;
 		isCurrentUserTeamLeader = teamLeaderAsUser._id.toString() === request.user._id.toString();
 	}
 
@@ -163,16 +189,33 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		teamLeaderAsUser,
 		isCurrentUserTeamLeader,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		}
 	};
 	response.send(teamTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async (request, response) => {
+templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, applicationHandler);
+templateRoutes.route("/confirm").get(authenticateWithRedirect, timeLimited, applicationHandler);
+
+async function applicationHandler(request: express.Request, response: express.Response) {
+	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+
 	let user = request.user as IUser;
-	if (user.applied) {
+	if (requestType === ApplicationType.Application && user.accepted) {
+		response.redirect("/confirm");
+		return;
+	}
+	if (requestType === ApplicationType.Confirmation && !user.accepted) {
+		response.redirect("/apply");
+		return;
+	}
+	if (requestType === ApplicationType.Application && user.applied) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+		return;
+	}
+	else if (requestType === ApplicationType.Confirmation && user.attending) {
+		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 		return;
 	}
 
@@ -186,26 +229,40 @@ templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, async 
 		response.status(500).send("An error occurred while generating the application options");
 		return;
 	}
+	// Filter to only show application / confirmation branches
+	let applicationBranches = await getSetting<string[]>(requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches");
+	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
+
 	// If there's only one path, redirect to that
 	if (questionBranches.length === 1) {
-		response.redirect(`/apply/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
+		response.redirect(`/${requestType === ApplicationType.Application ? "apply" : "confirm"}/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
 		return;
 	}
 	let templateData: IRegisterBranchChoiceTemplate = {
 		siteTitle: config.eventName,
 		user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		branches: questionBranches.map(branch => branch.name)
 	};
-	response.send(preregisterTemplate(templateData));
-});
-templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, async (request, response) => {
+	response.send(requestType === ApplicationType.Application ? preregisterTemplate(templateData) : preconfirmTemplate(templateData));
+}
+
+templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
+templateRoutes.route("/confirm/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
+
+async function applicationBranchHandler(request: express.Request, response: express.Response) {
+	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+
 	let user = request.user as IUser;
 	let branchName = request.params.branch as string;
-	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+		return;
+	}
+	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 		return;
 	}
 
@@ -226,7 +283,7 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 	}
 	// tslint:disable:no-string-literal
 	let questionData = questionBranch.questions.map(question => {
-		let savedValue = user.applicationData.find(item => item.name === question.name);
+		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
 			if (question.hasOther) {
@@ -273,22 +330,27 @@ templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited
 	});
 	// tslint:enable:no-string-literal
 
-	let thisUser: IUserMongoose = await User.findById(user._id);
-	thisUser.applicationStartTime = new Date();
-	thisUser.markModified("applicationStartTime");
+	let thisUser = await User.findById(user._id) as IUserMongoose;
+	if (requestType === ApplicationType.Application) {
+		thisUser.applicationStartTime = new Date();
+	}
+	else if (requestType === ApplicationType.Confirmation) {
+		thisUser.confirmationStartTime = new Date();
+	}
 	await thisUser.save();
 
 	let templateData: IRegisterTemplate = {
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		branch: questionBranch.name,
 		questionData
 	};
-	response.send(registerTemplate(templateData));
-});
+
+	response.send(requestType === ApplicationType.Application ? registerTemplate(templateData) : confirmTemplate(templateData));
+}
 
 templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {
 	let user = request.user as IUser;
@@ -297,7 +359,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	}
 	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
 
-	let teamsEnabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
+	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
+	let applicationBranches = await getSetting<string[]>("applicationBranches");
+	let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 
 	let teamIDNameMap: {
 		[id: string]: string;
@@ -357,7 +421,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				status = `Accepted (${statisticUser.applicationBranch})`;
 			}
 			if (statisticUser.attending) {
-				status = `Attending (${statisticUser.applicationBranch})`;
+				status = `Accepted (${user.applicationBranch}) / Attending (${user.confirmationBranch})`;
 			}
 			let questionsFromBranch = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch);
 			let applicationDataFormatted: {"label": string; "value": string}[] = [];
@@ -404,11 +468,20 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		metrics: {},
 		settings: {
 			application: {
-				open: (await Setting.findOne({ "name": "applicationOpen" })).value,
-				close: (await Setting.findOne({ "name": "applicationClose" })).value
+				open: await getSetting<string>("applicationOpen"),
+				close: await getSetting<string>("applicationClose")
+			},
+			confirmation: {
+				open: await getSetting<string>("confirmationOpen"),
+				close: await getSetting<string>("confirmationClose")
 			},
 			teamsEnabled,
-			teamsEnabledChecked: teamsEnabled ? "checked" : ""
+			teamsEnabledChecked: teamsEnabled ? "checked" : "",
+			branchRoles: {
+				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
+				"applicationBranches": applicationBranches,
+				"confirmationBranches": confirmationBranches
+			}
 		}
 	};
 	// Generate general statistics
@@ -427,24 +500,24 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = branchQuestions.find(q => q.name === question.name);
-					let index = templateData.generalStatistics.findIndex(entry => rawQuestion!.label === entry.questionName);
+					let rawQuestion = branchQuestions.find(q => q.name === question.name)!;
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label);
 
-					if (index === -1) {
-						index = templateData.generalStatistics.push({
+					if (!statisticEntry) {
+						statisticEntry = {
 							"questionName": rawQuestion!.label,
 							"branch": statisticUser.applicationBranch,
 							"responses": []
-						}) - 1;
-
+						};
+						templateData.generalStatistics.push(statisticEntry);
 					}
-					let specificResponseIndex = templateData.generalStatistics[index].responses.findIndex(resp => resp.response === checkboxValue);
 
-					if (specificResponseIndex !== -1) {
-						templateData.generalStatistics[index].responses[specificResponseIndex].count++;
+					let responsesIndex = statisticEntry.responses.findIndex(resp => resp.response === checkboxValue);
+					if (responsesIndex !== -1) {
+						statisticEntry.responses[responsesIndex].count++;
 					}
 					else {
-						templateData.generalStatistics[index].responses.push({
+						statisticEntry.responses.push({
 							"response": checkboxValue,
 							"count": 1
 						});

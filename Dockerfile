@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:8-alpine
 MAINTAINER Ryan Petschek <petschekr@gmail.com>
 
 # Deis wants bash

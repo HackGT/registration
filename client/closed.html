@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Application Closed - {{siteTitle}}</title>
+		<title>{{type}} Closed - {{siteTitle}}</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -10,10 +10,10 @@
 	</head>
 	<body>
 		{{#> sidebar}}
-			<h1 class="center">Application Closed</h1>
+			<h1 class="center">{{type}} Closed</h1>
 				
-			<p>Sorry, applications are currently closed.</p>
-			<p>Applications {{open.verb}} on {{open.time}} and {{close.verb}} on {{close.time}}.</p>
+			<p>Sorry, {{toLowerCase type}}s are currently closed.</p>
+			<p>{{type}}s {{open.verb}} on {{open.time}} and {{close.verb}} on {{close.time}}.</p>
 			<p>If you have any questions, please email the {{siteTitle}} team at <a href="mailto:{{contactEmail}}">{{contactEmail}}</a>.</p>
 		{{/sidebar}}
 	</body>

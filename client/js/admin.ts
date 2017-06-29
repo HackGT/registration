@@ -26,7 +26,7 @@ class State {
 	}
 }
 
-const states: State[] = ["statistics", "users", "settings", "applicants"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "applicants", "settings"].map(id => new State(id));
 
 // Set the correct state on page load
 function readURLHash() {
@@ -49,49 +49,17 @@ readURLHash();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);
 
-// Load timezone-correct values for the application open / close time
-let timeInputs = document.querySelectorAll('input[type="datetime-local"]') as NodeListOf<HTMLInputElement>;
-for (let i = 0; i < timeInputs.length; i++) {
-	timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
-}
+//
+// Applicants
+//
 
-// Settings update
-function parseDateTime(dateTime: string) {
-	let digits = dateTime.split(/\D+/).map(num => parseInt(num, 10));
-	return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
-}
-let settingsUpdateButton = document.querySelector("#settings input[type=submit]") as HTMLInputElement;
-let settingsForm = document.querySelector("#settings form") as HTMLFormElement;
-settingsUpdateButton.addEventListener("click", e => {
-	if (!settingsForm.checkValidity() || !settingsForm.dataset.action) {
-		return;
-	}
-	e.preventDefault();
-	settingsUpdateButton.disabled = true;
-
-	let applicationAvailabilityData = new FormData();
-	applicationAvailabilityData.append("open", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
-	applicationAvailabilityData.append("close", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
-	let teamsEnabledData = new FormData();
-	teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
-
-	fetch("/api/settings/application_availability", {
+const sendAcceptancesButton = document.getElementById("send-acceptances") as HTMLButtonElement;
+sendAcceptancesButton.addEventListener("click", async e => {
+	let sendCount: number = (await fetch(`/api/user/all/send_acceptances`, {
 		credentials: "same-origin",
-		method: "PUT",
-		body: applicationAvailabilityData
-	}).then(checkStatus).then(parseJSON).then(() => {
-		return fetch("/api/settings/teams_enabled", {
-			credentials: "same-origin",
-			method: "PUT",
-			body: teamsEnabledData
-		});
-	}).then(checkStatus).then(parseJSON).then(async () => {
-		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
-		window.location.reload();
-	}).catch(async (err: Error) => {
-		await sweetAlert("Oh no!", err.message, "error");
-		settingsUpdateButton.disabled = false;
-	});
+		method: "POST"
+	}).then(checkStatus).then(parseJSON)).count;
+	await sweetAlert("Success!", `Acceptance emails sent (${sendCount} in all).`, "success");
 });
 
 let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
@@ -147,7 +115,6 @@ function flipClassValue(el: Element, className: string, currentValue: boolean) {
 }
 
 let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
-
 for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 	let statusUpdateButton = applicationStatusUpdateButtons[i];
 
@@ -198,3 +165,142 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 
 // So whatever the default filter options are set at, it'll show accordingly
 updateFilterView();
+
+//
+// Email content
+//
+declare let SimpleMDE: any;
+
+const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
+if (document.head.attachShadow) {
+	// Browser supports Shadow DOM
+	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
+}
+const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+let contentChanged = false;
+let lastSelected = emailTypeSelect.value;
+
+markdownEditor.codemirror.on("change", async () => {
+	contentChanged = true;
+	try {
+		let content = new FormData();
+		content.append("content", markdownEditor.value());
+
+		let { html, text }: { html: string; text: string } = (
+			await fetch(`/api/settings/email_content/${emailTypeSelect.value}/rendered`, {
+				credentials: "same-origin",
+				method: "POST",
+				body: content
+			}).then(checkStatus).then(parseJSON)
+		);
+		emailRenderedArea.innerHTML = html;
+		let hr = document.createElement("hr");
+		hr.style.border = "1px solid #737373";
+		emailRenderedArea.appendChild(hr);
+		let textContainer = document.createElement("pre");
+		textContainer.textContent = text;
+		emailRenderedArea.appendChild(textContainer);
+	}
+	catch (err) {
+		emailRenderedArea.textContent = "Couldn't retrieve email content";
+	}
+});
+
+async function emailTypeChange(): Promise<void> {
+	if (contentChanged) {
+		let shouldProceed = confirm("Heads up! You've edited the content of this email but haven't saved it. Click cancel to stay and save.");
+		if (!shouldProceed) {
+			emailTypeSelect.value = lastSelected;
+			return;
+		}
+	}
+
+	// Load editor content via AJAX
+	try {
+		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
+		markdownEditor.value(content);
+	}
+	catch (err) {
+		markdownEditor.value("Couldn't retrieve email content");
+	}
+	contentChanged = false;
+	lastSelected = emailTypeSelect.value;
+}
+emailTypeSelect.addEventListener("change", emailTypeChange);
+emailTypeChange().catch(err => {
+	console.error(err);
+});
+
+//
+// Settings
+//
+
+// Load timezone-correct values for the application open / close time
+let timeInputs = document.querySelectorAll('input[type="datetime-local"]') as NodeListOf<HTMLInputElement>;
+for (let i = 0; i < timeInputs.length; i++) {
+	timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
+}
+
+// Settings update
+function parseDateTime(dateTime: string) {
+	let digits = dateTime.split(/\D+/).map(num => parseInt(num, 10));
+	return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
+}
+let settingsUpdateButton = document.querySelector("#settings input[type=submit]") as HTMLInputElement;
+let settingsForm = document.querySelector("#settings form") as HTMLFormElement;
+settingsUpdateButton.addEventListener("click", e => {
+	if (!settingsForm.checkValidity() || !settingsForm.dataset.action) {
+		return;
+	}
+	e.preventDefault();
+	settingsUpdateButton.disabled = true;
+
+	let applicationAvailabilityData = new FormData();
+	applicationAvailabilityData.append("applicationOpen", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
+	applicationAvailabilityData.append("applicationClose", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
+	applicationAvailabilityData.append("confirmationOpen", parseDateTime((document.getElementById("confirmation-open") as HTMLInputElement).value).toISOString());
+	applicationAvailabilityData.append("confirmationClose", parseDateTime((document.getElementById("confirmation-close") as HTMLInputElement).value).toISOString());
+
+	let teamsEnabledData = new FormData();
+	teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
+
+	let branchRoleData = new FormData();
+	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
+	for (let i = 0; i < branchRoles.length; i++) {
+		branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
+	}
+
+	let emailContentData = new FormData();
+	emailContentData.append("content", markdownEditor.value());
+
+	const defaultOptions: RequestInit = {
+		credentials: "same-origin",
+		method: "PUT"
+	};
+	fetch("/api/settings/application_availability", {
+		...defaultOptions,
+		body: applicationAvailabilityData
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/teams_enabled", {
+			...defaultOptions,
+			body: teamsEnabledData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/branch_roles", {
+			...defaultOptions,
+			body: branchRoleData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch(`/api/settings/email_content/${emailTypeSelect.value}`, {
+			...defaultOptions,
+			body: emailContentData
+		});
+	}).then(checkStatus).then(parseJSON).then(async () => {
+		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
+		window.location.reload();
+	}).catch(async (err: Error) => {
+		await sweetAlert("Oh no!", err.message, "error");
+		settingsUpdateButton.disabled = false;
+	});
+});

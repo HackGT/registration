@@ -40,6 +40,12 @@ table thead {
     text-align: center;
 }
 
+#email-rendered {
+    padding: 10px;
+    border-radius: 3px;
+    background-color: #eee;
+}
+
 /* Make section button text smaller on small screens */
 @media (max-width: 550px) {
 	nav.row > a {

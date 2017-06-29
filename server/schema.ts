@@ -103,11 +103,17 @@ export interface IUser {
 
 	applied: boolean;
 	accepted: boolean;
+	acceptedEmailSent: boolean;
 	attending: boolean;
 	applicationBranch: string;
 	applicationData: IFormItem[];
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
+
+	confirmationBranch: string;
+	confirmationData: IFormItem[];
+	confirmationStartTime?: Date;
+	confirmationSubmitTime?: Date;
 
 	admin?: boolean;
 
@@ -142,19 +148,25 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		id: String
 	},
 
+	teamId: {
+		type: mongoose.Schema.Types.ObjectId
+	},
+
 	applied: Boolean,
 	accepted: Boolean,
+	acceptedEmailSent: Boolean,
 	attending: Boolean,
 	applicationBranch: String,
 	applicationData: [mongoose.Schema.Types.Mixed],
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
 
-	admin: Boolean,
+	confirmationBranch: String,
+	confirmationData: [mongoose.Schema.Types.Mixed],
+	confirmationStartTime: Date,
+	confirmationSubmitTime: Date,
 
-	teamId: {
-		type: mongoose.Schema.Types.ObjectId
-	}
+	admin: Boolean
 }));
 
 export interface ISetting {
@@ -185,6 +197,13 @@ export interface IIndexTemplate extends ICommonTemplate {
 	applicationOpen: string;
 	applicationClose: string;
 	applicationStatus: {
+		areOpen: boolean;
+		beforeOpen: boolean;
+		afterClose: boolean;
+	};
+	confirmationOpen: string;
+	confirmationClose: string;
+	confirmationStatus: {
 		areOpen: boolean;
 		beforeOpen: boolean;
 		afterClose: boolean;
@@ -234,7 +253,16 @@ export interface IAdminTemplate extends ICommonTemplate {
 			open: string;
 			close: string;
 		};
+		confirmation: {
+			open: string;
+			close: string;
+		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
+		branchRoles: {
+			noop: string[];
+			applicationBranches: string[];
+			confirmationBranches: string[];
+		};
 	};
 }

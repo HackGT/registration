@@ -9,7 +9,6 @@
 		<link rel="stylesheet" href="/css/main.css" />
 		<link rel="stylesheet" href="/css/index.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
 	</head>
 	<body>
 		{{#> sidebar}}
@@ -35,9 +34,29 @@
 				<div class="row">
 					<p>Welcome back, {{user.name}}!</p>
 					{{#if user.attending}}
-						<p></p>
+						<p>You're all set!</p>
+						<p>You applied as a <b>{{user.applicationBranch}}</b> and are confirmed as a <b>{{user.confirmationBranch}}</b>!</p>
+						{{#if confirmationStatus.areOpen}}
+							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it any further.</p>
+							<a class="btn" href="/confirm">Edit your confirmation</a>
+						{{else}}
+							<p>RSVPing closed on {{applicationClose}}.</p>
+						{{/if}}
+						<p>We look forward to seeing you!</p>
 					{{else if user.accepted}}
-						<p></p>
+						{{#if confirmationStatus.areOpen}}
+							<p>You've been accepted as a <b>{{user.applicationBranch}}</b> but you still need to RSVP!</p>
+							<p>If you do not RSVP before {{confirmationClose}}, you will not be able to attend {{siteTitle}}!</p>
+							<a class="btn" href="/confirm">Confirm your attendance</a>
+						{{else}}
+							<p>You've been accepted as a <b>{{user.applicationBranch}}</b>!</p>
+							{{#if confirmationStatus.beforeOpen}}
+								<p>RSVPing will open on {{confirmationOpen}}.</p>
+							{{/if}}
+							{{#if confirmationStatus.afterClose}}
+								<p>RSVPs closed on {{confirmationClose}}. Unfortunately, since you did not RSVP in time, you will be unable to attend {{siteTitle}}.</p>
+							{{/if}}
+						{{/if}}
 					{{else if user.applied}}
 						<p>You've applied to be a <b>{{user.applicationBranch}}</b>!</p>
 						{{#if applicationStatus.areOpen}}

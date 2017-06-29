@@ -215,8 +215,80 @@ mongoose.connect(url.resolve(config.server.mongoURL, config.server.uniqueAppID))
 export {mongoose};
 
 import {
-	ISetting, Setting
+	ISettingMongoose, Setting
 } from "./schema";
+
+export async function setDefaultSettings() {
+	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
+		await new Setting({
+			"name": "applicationOpen",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "applicationClose" }).count() === 0) {
+		await new Setting({
+			"name": "applicationClose",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationOpen" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationOpen",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationClose" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationClose",
+			"value": new Date()
+		}).save();
+	}
+	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
+		await new Setting({
+			"name": "teamsEnabled",
+			"value": true
+		}).save();
+	}
+	if (await Setting.find({ "name": "applicationBranches" }).count() === 0) {
+		await new Setting({
+			"name": "applicationBranches",
+			"value": []
+		}).save();
+	}
+	if (await Setting.find({ "name": "confirmationBranches" }).count() === 0) {
+		await new Setting({
+			"name": "confirmationBranches",
+			"value": []
+		}).save();
+	}
+}
+export async function getSetting<T>(name: string, createMissing: boolean = true): Promise<T> {
+	let setting = await Setting.findOne({ name });
+	if (!setting) {
+		if (createMissing) {
+			await setDefaultSettings();
+			setting = await Setting.findOne({ name });
+			if (!setting) {
+				throw new Error("Setting not created by setDefaultSettings()");
+			}
+		}
+		else {
+			throw new Error("Setting not found");
+		}
+	}
+	return setting.value as T;
+}
+export async function updateSetting<T>(name: string, value: T, createMissing: boolean = true): Promise<void> {
+	let setting = await Setting.findOne({ name });
+	if (!setting) {
+		await new Setting({ name, value }).save();
+	}
+	else {
+		setting.value = value;
+		setting.markModified("value");
+		await setting.save();
+	}
+}
 
 //
 // Express middleware
@@ -266,10 +338,26 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 import * as Handlebars from "handlebars";
 import * as moment from "moment-timezone";
 import { ICommonTemplate } from "./schema";
+export enum ApplicationType {
+	Application, Confirmation
+}
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let [openDate, closeDate] = (await Promise.all<ISetting>([
-		Setting.findOne({ "name": "applicationOpen" }),
-		Setting.findOne({ "name": "applicationClose" })
+	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+
+	let openKey: string;
+	let closeKey: string;
+	if (requestType === ApplicationType.Application) {
+		openKey = "applicationOpen";
+		closeKey = "applicationClose";
+	}
+	else {
+		openKey = "confirmationOpen";
+		closeKey = "confirmationClose";
+	}
+
+	let [openDate, closeDate] = (await Promise.all<ISettingMongoose>([
+		Setting.findOne({ "name": openKey }),
+		Setting.findOne({ "name": closeKey })
 	])).map(setting => moment(setting.value as Date));
 
 	if (moment().isBetween(openDate, closeDate)) {
@@ -277,8 +365,9 @@ export async function timeLimited(request: express.Request, response: express.Re
 		return;
 	}
 
-	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm:ss a z";
+	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
 	interface IClosedTemplate extends ICommonTemplate {
+		type: string;
 		open: {
 			time: string;
 			verb: string;
@@ -295,9 +384,10 @@ export async function timeLimited(request: express.Request, response: express.Re
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean
+			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 
+		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",
 		open: {
 			time: openDate.tz(moment.tz.guess()).format(TIME_FORMAT),
 			verb: moment().isBefore(openDate) ? "will open" : "opened"
@@ -373,6 +463,11 @@ export async function validateSchema(questionsFile: string, schemaFile: string =
 // Email
 //
 import * as nodemailer from "nodemailer";
+import * as marked from "marked";
+// tslint:disable-next-line:no-var-requires
+const striptags = require("striptags");
+import { IUser, Team } from "./schema";
+
 export let emailTransporter = nodemailer.createTransport({
 	host: config.email.host,
 	port: config.email.port,
@@ -392,4 +487,57 @@ export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<n
 			resolve(info);
 		});
 	});
+}
+function sanitize(input: string): string {
+	if (typeof input !== "string") {
+		return "";
+	}
+	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
+	return new Promise<string>(async (resolve, reject) => {
+		let teamName: string;
+		if (await getSetting<boolean>("teamsEnabled")) {
+			teamName = "No team created or joined";
+			if (user.teamId) {
+				let team = await Team.findById(user.teamId);
+				if (team) {
+					teamName = team.teamName;
+				}
+			}
+		}
+		else {
+			teamName = "Teams not enabled";
+		}
+
+		// Interpolate and sanitize variables
+		markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
+		markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
+		markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
+		markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
+		markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
+		markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+
+		marked(markdown, { sanitize: false, smartypants: true }, (err: Error | null, content: string) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(content);
+		});
+	});
+}
+export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
+	let html: string;
+	if (!markdownRendered) {
+		html = await renderEmailHTML(markdown, user);
+	}
+	else {
+		html = markdown;
+	}
+	// Remove <style> and <script> block's content
+	html = html.replace(/<style>[\s\S]*?<\/style>/gi, "<style></style>").replace(/<script>[\s\S]*?<\/script>/gi, "<script></script>");
+	let text: string = striptags(html);
+	// Reverse sanitization
+	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 }

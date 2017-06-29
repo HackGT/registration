@@ -1,8 +1,17 @@
-import {
-	StatisticEntry, ResponseCount
-} from "../../server/schema";
+// tslint:disable:interface-name
+interface ResponseCount {
+	"response": string;
+	"count": number;
+}
+interface StatisticEntry {
+	"questionName": string;
+	"branch": string;
+	"responses": ResponseCount[];
+}
 
-import * as d3 from "d3";
+// Lazy loading means only type definitions will be imported
+import * as _d3 from "d3";
+declare let d3: typeof _d3;
 
 function drawBarGraph(statistics: StatisticEntry | null, divId: string) {
 	if (statistics === null) {
@@ -68,7 +77,7 @@ function drawBarGraph(statistics: StatisticEntry | null, divId: string) {
 drawBarGraph(null, "");
 
 function wrap(textEl: any, width: number) {
-	textEl.each(() => {
+	textEl.each(function wrapEl() {
 		// tslint:disable-next-line:no-invalid-this
 		let text = d3.select(this);
 		let words = text.text().split(/\s+/).reverse();

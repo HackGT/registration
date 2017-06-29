@@ -7,7 +7,8 @@ import * as archiver from "archiver";
 import {
 	UPLOAD_ROOT,
 	postParser, uploadHandler,
-	config, sendMailAsync,
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
+	ApplicationType,
 	validateSchema
 } from "../../common";
 import {
@@ -53,12 +54,27 @@ function isAdmin(request: express.Request, response: express.Response, next: exp
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
-userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler.any(), async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+userRoutes.route("/application/:branch")
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
+userRoutes.route("/confirmation/:branch")
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
+
+async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
+	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
+
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	let branchName = request.params.branch as string;
-	if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.status(400).json({
 			"error": "You can only edit the application branch that you originally submitted"
+		});
+		return;
+	}
+	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+		response.status(400).json({
+			"error": "You can only edit the confirmation branch that you originally submitted"
 		});
 		return;
 	}
@@ -148,47 +164,51 @@ userRoutes.post("/application/:branch", isUserOrAdmin, postParser, uploadHandler
 			return item;
 		});
 		// Email the applicant to confirm
-		// TODO: Make the content of these emails admin-configurable
-		let text: string;
-		if (questionBranch.name.toLowerCase() === "mentor") {
-			text =
-`Hi!
-
-Thank you again for volunteering to be a mentor at ${config.eventName}! Please complete these background check forms as soon as possible: https://drive.google.com/open?id=0B8MqIMxG0xUJcmU5RFppWUNhWUE by following this guide: https://docs.google.com/document/d/1QJawDpf3a-oN15djbJ5jZufK_LJtKisMOgrbRVcUPEs/edit?usp=sharing.
-
-If you have any questions, please don't hesitate to contact us by replying to this email.
-
-Sincerely,
-
-The ${config.eventName} Team`;
+		let emailMarkdown: string;
+		try {
+			let type = requestType === ApplicationType.Application ? "apply" : "attend";
+			emailMarkdown = await getSetting<string>(`${questionBranch.name}-${type}-email`, false);
 		}
-		else {
-			text =
-`Hi!
-
-Thank you for applying to be a ${questionBranch.name} at ${config.eventName}! Feel free to go back and update your application any time before registration closes.
-
-If you have any questions please don't hesitate to contact us by replying to this email.
-
-Sincerely,
-
-The ${config.eventName} Team`;
-		}
-		if (!user.applied) {
-			await sendMailAsync({
-				from: config.email.from,
-				to: user.email,
-				subject: `[${config.eventName}] - Thank you for appying!`,
-				text // TODO: Add HTML email template
-			});
+		catch (err) {
+			// Content not set yet
+			emailMarkdown = "";
 		}
 
-		user.applied = true;
-		user.applicationBranch = questionBranch.name;
-		user.applicationData = data;
-		user.markModified("applicationData");
-		user.applicationSubmitTime = new Date();
-		user.markModified("applicationSubmitTime");
+		let emailHTML = await renderEmailHTML(emailMarkdown, user);
+		let emailText = await renderEmailText(emailHTML, user, true);
+
+		if (requestType === ApplicationType.Application) {
+			if (!user.applied) {
+				await sendMailAsync({
+					from: config.email.from,
+					to: user.email,
+					subject: `[${config.eventName}] - Thank you for appying!`,
+					html: emailHTML,
+					text: emailText
+				});
+			}
+			user.applied = true;
+			user.applicationBranch = questionBranch.name;
+			user.applicationData = data;
+			user.markModified("applicationData");
+			user.applicationSubmitTime = new Date();
+		}
+		else if (requestType === ApplicationType.Confirmation) {
+			if (!user.attending) {
+				await sendMailAsync({
+					from: config.email.from,
+					to: user.email,
+					subject: `[${config.eventName}] - Thank you for RSVPing!`,
+					html: emailHTML,
+					text: emailText
+				});
+			}
+			user.attending = true;
+			user.confirmationBranch = questionBranch.name;
+			user.confirmationData = data;
+			user.markModified("confirmationData");
+			user.confirmationSubmitTime = new Date();
+		}
 
 		await user.save();
 		response.status(200).json({
@@ -198,21 +218,31 @@ The ${config.eventName} Team`;
 	catch (err) {
 		console.error(err);
 		response.status(500).json({
-			"error": "An error occurred while saving the application"
+			"error": "An error occurred while saving your application"
 		});
 	}
-});
+}
 
-userRoutes.delete("/application", isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
-	user.applied = false;
-	user.applicationBranch = "";
-	user.applicationData = [];
-	user.markModified("applicationData");
-	user.applicationSubmitTime = undefined;
-	user.markModified("applicationSubmitTime");
-	user.applicationStartTime = undefined;
-	user.markModified("applicationStartTime");
+async function deleteApplicationBranchHandler(request: express.Request, response: express.Response) {
+	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
+
+	let user = await User.findById(request.params.id) as IUserMongoose;
+	if (requestType === ApplicationType.Application) {
+		user.applied = false;
+		user.applicationBranch = "";
+		user.applicationData = [];
+		user.markModified("applicationData");
+		user.applicationSubmitTime = undefined;
+		user.applicationStartTime = undefined;
+	}
+	else if (requestType === ApplicationType.Confirmation) {
+		user.attending = false;
+		user.confirmationBranch = "";
+		user.confirmationData = [];
+		user.markModified("confirmationData");
+		user.confirmationSubmitTime = undefined;
+		user.confirmationStartTime = undefined;
+	}
 
 	try {
 		await user.save();
@@ -226,7 +256,7 @@ userRoutes.delete("/application", isUserOrAdmin, async (request, response): Prom
 			"error": "An error occurred while deleting the application"
 		});
 	}
-});
+}
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
@@ -250,6 +280,48 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 		console.error(err);
 		response.status(500).json({
 			"error": "An error occurred while accepting or rejecting the user"
+		});
+	}
+});
+
+userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
+	try {
+		let users = await User.find({ "accepted": true, "acceptedEmailSent": { $ne: true } });
+		for (let user of users) {
+			// Email the applicant about their acceptance
+			let emailMarkdown: string;
+			try {
+				emailMarkdown = await getSetting<string>(`${user.applicationBranch}-accept-email`, false);
+			}
+			catch (err) {
+				// Content not set yet
+				emailMarkdown = "";
+			}
+
+			let emailHTML = await renderEmailHTML(emailMarkdown, user);
+			let emailText = await renderEmailText(emailHTML, user, true);
+
+			await sendMailAsync({
+				from: config.email.from,
+				to: user.email,
+				subject: `[${config.eventName}] - You've been accepted!`,
+				html: emailHTML,
+				text: emailText
+			});
+
+			user.acceptedEmailSent = true;
+			await user.save();
+		}
+
+		response.json({
+			"success": true,
+			"count": users.length
+		});
+	}
+	catch (err) {
+		console.error(err);
+		response.status(500).json({
+			"error": "An error occurred while sending out acceptance emails"
 		});
 	}
 });
@@ -308,7 +380,7 @@ async function removeUserFromAllTeams(user: IUserMongoose): Promise<boolean> {
 		return true;
 	}
 
-	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+	let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
 	if (!currentUserTeam) {
 		return false;
 	}
@@ -354,10 +426,10 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		Else if the user's in a team, take them out of it
 		Else make them a new team
 	 */
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	let decodedTeamName = decodeURI(request.params.teamName);
 
-	let existingTeam = await Team.findOne({ teamName: decodedTeamName });
+	let existingTeam = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
 
 	if (existingTeam) {
 
@@ -370,7 +442,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 
 	// If the user is in a team, remove them from their current team unless they're the team leader
 	if (user.teamId) {
-		let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+		let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
 
 		if (currentUserTeam.teamLeader === user._id) {
 			// The user is in the team they made already
@@ -398,7 +470,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		setDefaultsOnInsert: true
 	};
 
-	let team: ITeamMongoose = await Team.findOneAndUpdate(query, {}, options);
+	let team = await Team.findOneAndUpdate(query, {}, options) as ITeamMongoose;
 
 	user.teamId = team._id;
 	await user.save();
@@ -409,7 +481,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 });
 
 userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	let decodedTeamName = decodeURI(request.params.teamName);
 
 	if (user.teamId) {
@@ -425,7 +497,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 		return;
 	}
 
-	let teamToJoin: ITeamMongoose = await Team.findOne({ teamName: decodedTeamName });
+	let teamToJoin = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
 
 	if (!teamToJoin) {
 		// If the team they tried to join isn't real...
@@ -452,7 +524,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 		}
 	});
 
-	user.teamId = (await Team.findOne({teamName: decodedTeamName}))._id;
+	user.teamId = teamToJoin._id;
 
 	await user.save();
 
@@ -462,7 +534,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 });
 
 userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 	await removeUserFromAllTeams(user);
 
 	response.status(200).json({
@@ -471,7 +543,7 @@ userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): P
 });
 
 userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findById(request.params.id) as IUserMongoose;
 
 	if (!user.teamId) {
 		response.status(400).json({
@@ -480,7 +552,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		return;
 	}
 
-	let currentUserTeam: ITeamMongoose = await Team.findById(user.teamId);
+	let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
 
 	if (!currentUserTeam) {
 		// User tried to change their team name even though they don't have a team

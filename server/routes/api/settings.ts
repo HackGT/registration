@@ -2,10 +2,10 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-	uploadHandler
+	uploadHandler, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
 } from "../../common";
 import {
-	IUser, Setting
+	IUser
 } from "../../schema";
 
 function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
@@ -20,26 +20,6 @@ function isAdmin(request: express.Request, response: express.Response, next: exp
 	}
 }
 
-export async function setDefaultSettings() {
-	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "applicationOpen",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "applicationClose" }).count() === 0) {
-		await new Setting({
-			"name": "applicationClose",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
-		await new Setting({
-			"name": "teamsEnabled",
-			"value": true
-		}).save();
-	}
-}
 setDefaultSettings().catch(err => {
 	throw err;
 });
@@ -48,38 +28,46 @@ export let settingsRoutes = express.Router();
 
 settingsRoutes.route("/application_availability")
 	.get(async (request, response) => {
-		let open = (await Setting.findOne({ "name": "applicationOpen" })).value as Date;
-		let close = (await Setting.findOne({ "name": "applicationClose" })).value as Date;
+		let applicationOpen = await getSetting<Date>("applicationOpen");
+		let applicationClose = await getSetting<Date>("applicationClose");
+		let confirmationOpen = await getSetting<Date>("confirmationOpen");
+		let confirmationClose = await getSetting<Date>("confirmationClose");
 		response.json({
-			"open": open.toISOString(),
-			"close": close.toISOString()
+			"applicationOpen": applicationOpen.toISOString(),
+			"applicationClose": applicationClose.toISOString(),
+			"confirmationOpen": confirmationOpen.toISOString(),
+			"confirmationClose": confirmationClose.toISOString()
 		});
 	})
 	.put(isAdmin, uploadHandler.any(), async (request, response) => {
-		let rawOpen = request.body.open;
-		let rawClose = request.body.close;
-		if (!rawOpen || !rawClose) {
+		let rawApplicationOpen = request.body.applicationOpen;
+		let rawApplicationClose = request.body.applicationClose;
+		let rawConfirmationOpen = request.body.confirmationOpen;
+		let rawConfirmationClose = request.body.confirmationClose;
+		if (!rawApplicationOpen || !rawApplicationClose || !rawConfirmationOpen || !rawConfirmationClose) {
 			response.status(400).json({
-				"error": "Application open or close datetime not specified"
+				"error": "Application or confirmation open or close datetime not specified"
 			});
 			return;
 		}
-		if (moment(rawOpen).isAfter(moment(rawClose))) {
+		if (moment(rawApplicationOpen).isAfter(moment(rawApplicationClose))) {
 			response.status(400).json({
 				"error": "Application open must come before application close"
 			});
 			return;
 		}
-		let open = await Setting.findOne({ "name": "applicationOpen" });
-		let close = await Setting.findOne({ "name": "applicationClose" });
-		open.value = new Date(rawOpen);
-		close.value = new Date(rawClose);
-		open.markModified("value");
-		close.markModified("value");
+		if (moment(rawConfirmationOpen).isAfter(moment(rawConfirmationClose))) {
+			response.status(400).json({
+				"error": "Confirmation open must come before confirmation close"
+			});
+			return;
+		}
+
 		try {
-			await Promise.all([
-				open.save(), close.save()
-			]);
+			await updateSetting<Date>("applicationOpen", new Date(rawApplicationOpen));
+			await updateSetting<Date>("applicationClose", new Date(rawApplicationClose));
+			await updateSetting<Date>("confirmationOpen", new Date(rawConfirmationOpen));
+			await updateSetting<Date>("confirmationClose", new Date(rawConfirmationClose));
 			response.json({
 				"success": true
 			});
@@ -94,7 +82,7 @@ settingsRoutes.route("/application_availability")
 
 settingsRoutes.route("/teams_enabled")
 	.get(async (request, response) => {
-		let enabled = (await Setting.findOne({ "name": "teamsEnabled" })).value as boolean;
+		let enabled = await getSetting<boolean>("teamsEnabled");
 		response.json({
 			"enabled": enabled
 		});
@@ -107,11 +95,9 @@ settingsRoutes.route("/teams_enabled")
 			});
 			return;
 		}
-		let enable = await Setting.findOne({ "name": "teamsEnabled" });
-		enable.value = rawEnabled === "true";
-		enable.markModified("value");
+
 		try {
-			await enable.save();
+			await updateSetting<boolean>("teamsEnabled", rawEnabled === "true");
 			response.json({
 				"success": true
 			});
@@ -120,6 +106,95 @@ settingsRoutes.route("/teams_enabled")
 			console.error(err);
 			response.status(500).json({
 				"error": "An error occurred while enabling or disabling teams"
+			});
+		}
+	});
+
+settingsRoutes.route("/branch_roles")
+	.get(isAdmin, async (request, response) => {
+		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
+		let applicationBranches = await getSetting<string[]>("applicationBranches");
+		let confirmationBranches = await getSetting<string[]>("confirmationBranches");
+		response.json({
+			"noop": branchNames.filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
+			"applicationBranches": applicationBranches,
+			"confirmationBranches": confirmationBranches
+		});
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let applicationBranches = [];
+		let confirmationBranches = [];
+		if ((new Set(Object.keys(request.body))).size !== Object.keys(request.body).length) {
+			response.status(400).json({
+				"error": "Each branch can only be used once"
+			});
+			return;
+		}
+		for (let branchName of Object.keys(request.body)) {
+			if (request.body[branchName] === "application") {
+				applicationBranches.push(branchName);
+			}
+			if (request.body[branchName] === "confirmation") {
+				confirmationBranches.push(branchName);
+			}
+		}
+		try {
+			await updateSetting<string[]>("applicationBranches", applicationBranches);
+			await updateSetting<string[]>("confirmationBranches", confirmationBranches);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting branch roles"
+			});
+		}
+	});
+
+settingsRoutes.route("/email_content/:type")
+	.get(isAdmin, async (request, response) => {
+		let content: string;
+		try {
+			content = await getSetting<string>(`${request.params.type}-email`, false);
+		}
+		catch (err) {
+			// Content not set yet
+			content = "";
+		}
+
+		response.json({ content });
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let content = request.body.content as string;
+		try {
+			await updateSetting<string>(`${request.params.type}-email`, content);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting email content"
+			});
+		}
+	});
+
+settingsRoutes.route("/email_content/:type/rendered")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		try {
+			let markdown: string = request.body.content;
+			let html: string = await renderEmailHTML(markdown, request.user);
+			let text: string = await renderEmailText(html, request.user, true);
+
+			response.json({ html, text });
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while rendering the email content"
 			});
 		}
 	});
