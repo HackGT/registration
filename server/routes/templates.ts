@@ -15,7 +15,7 @@ import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry, DataLog
 } from "../schema";
 import {QuestionBranches} from "../config/questions.schema";
 
@@ -152,6 +152,12 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			afterClose: moment().isAfter(confirmationCloseDate)
 		}
 	};
+	let visitLogSignedIn: DataLog = {
+		action: "viewed dashboard",
+		time: moment.utc().format(),
+		user: request.user.email
+	};
+	console.log(visitLogSignedIn);
 	response.send(indexTemplate(templateData));
 });
 
@@ -333,6 +339,12 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	let thisUser = await User.findById(user._id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		thisUser.applicationStartTime = new Date();
+		let applyLog: DataLog = {
+			action: "viewed application",
+			user: thisUser.email,
+			time: moment.utc().format()
+		};
+		console.log(applyLog);
 	}
 	else if (requestType === ApplicationType.Confirmation) {
 		thisUser.confirmationStartTime = new Date();

@@ -6,12 +6,13 @@ import * as session from "express-session";
 import * as connectMongo from "connect-mongo";
 const MongoStore = connectMongo(session);
 import * as passport from "passport";
+import * as moment from "moment-timezone";
 
 import {
 	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync
 } from "../common";
 import {
-	IUser, IUserMongoose, User
+	IUser, IUserMongoose, User, DataLog
 } from "../schema";
 
 // Passport authentication
@@ -121,6 +122,12 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			}
 			try {
 				await user.save();
+				let authLog: DataLog = {
+					action: "created account (auth)",
+					user: email,
+					time: moment.utc().format()
+				};
+				console.log(authLog);
 			}
 			catch (err) {
 				done(err);
@@ -221,6 +228,12 @@ passport.use(new LocalStrategy({
 		});
 		try {
 			await user.save();
+			let registerLog: DataLog = {
+				action: "created account",
+				user: email,
+				time: moment.utc().format()
+			};
+			console.log(registerLog);
 		}
 		catch (err) {
 			done(err);
@@ -373,6 +386,12 @@ authRoutes.get("/verify/:code", async (request, response) => {
 		}
 		await user.save();
 		request.flash("success", "Thanks for verifying your email. You can now log in.");
+		let verifyLog: DataLog = {
+			action: "verified email",
+			user: user.email,
+			time: moment.utc().format()
+		};
+		console.log(verifyLog);
 	}
 	response.redirect("/login");
 });

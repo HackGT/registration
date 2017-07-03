@@ -4,6 +4,7 @@ import * as path from "path";
 import * as url from "url";
 import * as os from "os";
 import "passport";
+import * as moment from "moment-timezone";
 
 //
 // Config
@@ -327,8 +328,14 @@ export function authenticateWithReject(request: express.Request, response: expre
 	}
 }
 // For directly user facing endpoints
+import { DataLog } from "./schema"
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
+		let visitLog: DataLog = {
+			action: "visit",
+			time: moment.utc().format()
+		};
+		console.log(visitLog);
 		response.redirect("/login");
 	}
 	else {
@@ -336,7 +343,6 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 	}
 }
 import * as Handlebars from "handlebars";
-import * as moment from "moment-timezone";
 import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
 	Application, Confirmation

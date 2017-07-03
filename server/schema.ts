@@ -266,3 +266,9 @@ export interface IAdminTemplate extends ICommonTemplate {
 		};
 	};
 }
+
+export interface DataLog {
+	action: string;
+	time: string;
+	user?: string;
+}
