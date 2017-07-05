@@ -220,47 +220,30 @@ import {
 } from "./schema";
 
 export async function setDefaultSettings() {
-	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "applicationOpen",
-			"value": new Date()
-		}).save();
+	async function doesNotExist(key: string): Promise<boolean> {
+		return await Setting.find({ "name": key }).count() === 0;
 	}
-	if (await Setting.find({ "name": "applicationClose" }).count() === 0) {
-		await new Setting({
-			"name": "applicationClose",
-			"value": new Date()
-		}).save();
+
+	if (await doesNotExist("applicationOpen")) {
+		await updateSetting("applicationOpen", new Date());
 	}
-	if (await Setting.find({ "name": "confirmationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationOpen",
-			"value": new Date()
-		}).save();
+	if (await doesNotExist("applicationClose")) {
+		await updateSetting("applicationClose", new Date());
 	}
-	if (await Setting.find({ "name": "confirmationClose" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationClose",
-			"value": new Date()
-		}).save();
+	if (await doesNotExist("confirmationOpen")) {
+		await updateSetting("confirmationOpen", new Date());
 	}
-	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
-		await new Setting({
-			"name": "teamsEnabled",
-			"value": true
-		}).save();
+	if (await doesNotExist("confirmationClose")) {
+		await updateSetting("confirmationClose", new Date());
 	}
-	if (await Setting.find({ "name": "applicationBranches" }).count() === 0) {
-		await new Setting({
-			"name": "applicationBranches",
-			"value": []
-		}).save();
+	if (await doesNotExist("teamsEnabled")) {
+		await updateSetting("teamsEnabled", true);
 	}
-	if (await Setting.find({ "name": "confirmationBranches" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationBranches",
-			"value": []
-		}).save();
+	if (await doesNotExist("applicationBranches")) {
+		await updateSetting("applicationBranches", []);
+	}
+	if (await doesNotExist("confirmationBranches")) {
+		await updateSetting("confirmationBranches", []);
 	}
 }
 export async function getSetting<T>(name: string, createMissing: boolean = true): Promise<T> {
@@ -282,6 +265,9 @@ export async function getSetting<T>(name: string, createMissing: boolean = true)
 export async function updateSetting<T>(name: string, value: T, createMissing: boolean = true): Promise<void> {
 	let setting = await Setting.findOne({ name });
 	if (!setting) {
+		if (!createMissing) {
+			throw new Error("Setting not found to update");
+		}
 		await new Setting({ name, value }).save();
 	}
 	else {
