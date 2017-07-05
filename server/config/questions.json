@@ -26,6 +26,11 @@
                 "for": "tshirt-size",
                 "type": "h3",
                 "content": "Some <h3> content near the end"
+            },
+            {
+                "for": "end",
+                "type": "p",
+                "content": "Example footer text that appears right above the submit button"
             }
         ],
         "questions": [

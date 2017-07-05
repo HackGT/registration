@@ -338,6 +338,13 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	});
 	// tslint:enable:no-string-literal
 
+	let endText: string = "";
+	if (questionBranch.text) {
+		endText = questionBranch.text.filter(text => text.for === "end").map(text => {
+			return `<${text.type} style="font-size: 90%; text-align: center;">${sanitize(text.content)}</${text.type}>`;
+		}).join("\n");
+	}
+
 	let thisUser = await User.findById(user._id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		thisUser.applicationStartTime = new Date();
@@ -354,7 +361,8 @@ async function applicationBranchHandler(request: express.Request, response: expr
 			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		branch: questionBranch.name,
-		questionData
+		questionData,
+		endText
 	};
 
 	response.send(requestType === ApplicationType.Application ? registerTemplate(templateData) : confirmTemplate(templateData));
