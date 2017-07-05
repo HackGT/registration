@@ -474,7 +474,7 @@ export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<n
 		});
 	});
 }
-function sanitize(input: string): string {
+export function sanitize(input: string): string {
 	if (typeof input !== "string") {
 		return "";
 	}

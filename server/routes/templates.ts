@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting
+	validateSchema, config, getSetting, sanitize
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -276,7 +276,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		response.status(500).send("An error occurred while generating the application form");
 		return;
 	}
-	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
 	if (!questionBranch) {
 		response.status(400).send("Invalid application branch");
 		return;
@@ -326,6 +326,14 @@ async function applicationBranchHandler(request: express.Request, response: expr
 			savedValue = undefined;
 		}
 		question["value"] = savedValue ? savedValue.value : "";
+
+		if (questionBranch.text) {
+			let textContent: string = questionBranch.text.filter(text => text.for === question.name).map(text => {
+				return `<${text.type} style="text-align: center;">${sanitize(text.content)}</${text.type}>`;
+			}).join("\n");
+			question["textContent"] = textContent;
+		}
+
 		return question;
 	});
 	// tslint:enable:no-string-literal

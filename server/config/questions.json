@@ -1,6 +1,33 @@
 [
     {
         "name": "Participant",
+        "text": [
+            {
+                "for": "name",
+                "type": "h3",
+                "content": "Some <h3> content"
+            },
+            {
+                "for": "phone",
+                "type": "h6",
+                "content": "Text blocks are stackable"
+            },
+            {
+                "for": "phone",
+                "type": "p",
+                "content": "Some extra information about why we need this"
+            },
+            {
+                "for": "phone",
+                "type": "p",
+                "content": "Another paragraph describing why we need this"
+            },
+            {
+                "for": "tshirt-size",
+                "type": "h3",
+                "content": "Some <h3> content near the end"
+            }
+        ],
         "questions": [
             {
                 "name": "name",
