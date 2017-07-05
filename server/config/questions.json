@@ -23,6 +23,11 @@
                 "content": "Another paragraph describing why we need this"
             },
             {
+                "for": "phone",
+                "type": "p",
+                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas egestas ipsum ut pharetra egestas. Quisque cursus ex quis condimentum ultricies. Vestibulum quis diam eu tortor tincidunt molestie. Vivamus commodo tristique eros vel scelerisque. Vivamus sed velit id lectus laoreet facilisis. Quisque lacinia pellentesque dui, eu venenatis libero porta ut. Etiam id aliquet nibh. Donec eu turpis arcu. Duis pretium tincidunt turpis, id viverra tortor auctor in. Proin eget gravida purus. Nam sed lorem at enim dapibus tempus id non justo. Nullam id est erat."
+            },
+            {
                 "for": "tshirt-size",
                 "type": "h3",
                 "content": "Some <h3> content near the end"

@@ -329,7 +329,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 
 		if (questionBranch.text) {
 			let textContent: string = questionBranch.text.filter(text => text.for === question.name).map(text => {
-				return `<${text.type} style="text-align: center;">${sanitize(text.content)}</${text.type}>`;
+				return `<${text.type}>${sanitize(text.content)}</${text.type}>`;
 			}).join("\n");
 			question["textContent"] = textContent;
 		}

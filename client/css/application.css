@@ -31,8 +31,16 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     outline: none;
     font-family: 'Open Sans';
 }
+form > h1,
+form > h2,
+form > h3,
+form > h4,
+form > h5,
+form > h6 {
+    text-align: center;
+}
 form > p {
-    font-family: "Quicksand";    
+    font-family: "Quicksand";
 }
 fieldset {
 	padding: 8px 20px;
