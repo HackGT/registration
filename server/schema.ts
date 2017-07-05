@@ -37,7 +37,6 @@ export namespace IConfig {
 		cookieMaxAge: number;
 		cookieSecureOnly: boolean;
 		mongoURL: string;
-		uniqueAppID: string;
 	}
 
 	export interface Main {

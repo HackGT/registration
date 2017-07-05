@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
-import * as url from "url";
 import * as os from "os";
 import "passport";
 import * as moment from "moment-timezone";
@@ -41,8 +40,7 @@ class Config implements IConfig.Main {
 		workflowReleaseSummary: null,
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
-		mongoURL: "mongodb://localhost/",
-		uniqueAppID: "registration"
+		mongoURL: "mongodb://localhost/"
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
@@ -153,6 +151,9 @@ class Config implements IConfig.Main {
 		if (process.env.VERSION_HASH) {
 			this.server.versionHash = process.env.VERSION_HASH!;
 		}
+		if (process.env.SOURCE_REV) {
+			this.server.versionHash = process.env.SOURCE_REV!;
+		}
 		if (process.env.SOURCE_VERSION) {
 			this.server.versionHash = process.env.SOURCE_VERSION!;
 		}
@@ -174,12 +175,9 @@ class Config implements IConfig.Main {
 		if (process.env.MONGO_URL) {
 			this.server.mongoURL = process.env.MONGO_URL!;
 		}
-		if (process.env.UNIQUE_APP_ID) {
-			this.server.uniqueAppID = process.env.UNIQUE_APP_ID!;
-		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
-			this.admins = process.env.ADMIN_EMAILS!.split(",");
+			this.admins = JSON.parse(process.env.ADMIN_EMAILS!);
 		}
 		// Event name
 		if (process.env.EVENT_NAME) {
@@ -213,7 +211,7 @@ export const COOKIE_OPTIONS = {
 //
 import * as mongoose from "mongoose";
 (mongoose as any).Promise = global.Promise;
-mongoose.connect(url.resolve(config.server.mongoURL, config.server.uniqueAppID));
+mongoose.connect(config.server.mongoURL);
 export {mongoose};
 
 import { Setting } from "./schema";
