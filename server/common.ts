@@ -328,15 +328,9 @@ export function authenticateWithReject(request: express.Request, response: expre
 	}
 }
 // For directly user facing endpoints
-import { DataLog } from "./schema"
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
-		let visitLog: DataLog = {
-			action: "visit",
-			time: moment.utc().format(),
-			ip: request.ip
-		};
-		console.log(visitLog);
+		trackEvent("visit", request.ip);
 		response.redirect("/login");
 	}
 	else {
@@ -547,4 +541,17 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 	let text: string = striptags(html);
 	// Reverse sanitization
 	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+}
+
+import { DataLog } from "./schema";
+export function trackEvent(action: string, ip: string, user?: string) {
+	let thisEvent: DataLog = {
+		action: action,
+		time: moment.utc().format(),
+		ip: ip
+	};
+	if (user) {
+		thisEvent.user = user;
+	}
+	console.log(thisEvent);
 }

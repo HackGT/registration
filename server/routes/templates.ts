@@ -9,13 +9,13 @@ import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting
+	validateSchema, config, getSetting, trackEvent
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry, DataLog
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
 } from "../schema";
 import {QuestionBranches} from "../config/questions.schema";
 
@@ -152,13 +152,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			afterClose: moment().isAfter(confirmationCloseDate)
 		}
 	};
-	let visitLogSignedIn: DataLog = {
-		action: "viewed dashboard",
-		time: moment.utc().format(),
-		user: request.user.email,
-		ip: request.ip
-	};
-	console.log(visitLogSignedIn);
+	trackEvent("viewed dashboard", request.ip, request.user.email);
 	response.send(indexTemplate(templateData));
 });
 
@@ -340,13 +334,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	let thisUser = await User.findById(user._id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		thisUser.applicationStartTime = new Date();
-		let applyLog: DataLog = {
-			action: "viewed application",
-			user: thisUser.email,
-			time: moment.utc().format(),
-			ip: request.ip
-		};
-		console.log(applyLog);
+		trackEvent("viewed application", request.ip, thisUser.email);
 	}
 	else if (requestType === ApplicationType.Confirmation) {
 		thisUser.confirmationStartTime = new Date();

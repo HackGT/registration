@@ -3,19 +3,19 @@ import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
-import * as moment from "moment-timezone";
 
 import {
 	UPLOAD_ROOT,
 	postParser, uploadHandler,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
-	validateSchema
+	validateSchema,
+	trackEvent
 } from "../../common";
 import {
 	IFormItem,
 	IUser, IUserMongoose, User,
-	ITeamMongoose, Team, DataLog
+	ITeamMongoose, Team
 } from "../../schema";
 import {QuestionBranches} from "../../config/questions.schema";
 
@@ -193,13 +193,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			user.applicationData = data;
 			user.markModified("applicationData");
 			user.applicationSubmitTime = new Date();
-			let applicationSubmitted: DataLog = {
-				action: "submitted application",
-				user: user.email,
-				time: moment.utc().format(),
-				ip: request.ip
-			};
-			console.log(applicationSubmitted);
+			trackEvent("submitted application", request.ip, user.email);
 		}
 		else if (requestType === ApplicationType.Confirmation) {
 			if (!user.attending) {
