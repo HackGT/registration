@@ -55,7 +55,7 @@ templateRoutes.use(async (request, response, next) => {
 		return;
 	}
 
-	let userAgent = request.headers["user-agent"];
+	let userAgent = request.headers["user-agent"] as string | undefined;
 	const minBrowser = {
 		msie: "12", // Microsoft Edge+ (no support for IE)
 		safari: "7.1" // Safari v7 was released in 2013
