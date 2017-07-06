@@ -333,7 +333,8 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 	if (!request.isAuthenticated()) {
 		let visitLog: DataLog = {
 			action: "visit",
-			time: moment.utc().format()
+			time: moment.utc().format(),
+			ip: request.ip
 		};
 		console.log(visitLog);
 		response.redirect("/login");

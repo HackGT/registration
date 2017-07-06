@@ -196,7 +196,8 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			let applicationSubmitted: DataLog = {
 				action: "submitted application",
 				user: user.email,
-				time: moment.utc().format()
+				time: moment.utc().format(),
+				ip: request.ip
 			};
 			console.log(applicationSubmitted);
 		}

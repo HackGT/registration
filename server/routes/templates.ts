@@ -155,7 +155,8 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	let visitLogSignedIn: DataLog = {
 		action: "viewed dashboard",
 		time: moment.utc().format(),
-		user: request.user.email
+		user: request.user.email,
+		ip: request.ip
 	};
 	console.log(visitLogSignedIn);
 	response.send(indexTemplate(templateData));
@@ -342,7 +343,8 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		let applyLog: DataLog = {
 			action: "viewed application",
 			user: thisUser.email,
-			time: moment.utc().format()
+			time: moment.utc().format(),
+			ip: request.ip
 		};
 		console.log(applyLog);
 	}
