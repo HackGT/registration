@@ -9,7 +9,8 @@ import {
 	postParser, uploadHandler,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
-	validateSchema
+	validateSchema,
+	trackEvent
 } from "../../common";
 import {
 	IFormItem,
@@ -192,6 +193,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			user.applicationData = data;
 			user.markModified("applicationData");
 			user.applicationSubmitTime = new Date();
+			trackEvent("submitted application", request, user.email);
 		}
 		else if (requestType === ApplicationType.Confirmation) {
 			if (!user.attending) {

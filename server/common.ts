@@ -4,6 +4,7 @@ import * as path from "path";
 import * as url from "url";
 import * as os from "os";
 import "passport";
+import * as moment from "moment-timezone";
 
 //
 // Config
@@ -336,7 +337,6 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 	}
 }
 import * as Handlebars from "handlebars";
-import * as moment from "moment-timezone";
 import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
 	Application, Confirmation
@@ -540,4 +540,17 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 	let text: string = striptags(html);
 	// Reverse sanitization
 	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+}
+
+import { DataLog } from "./schema";
+export function trackEvent(action: string, request: express.Request, user?: string) {
+	let thisEvent: DataLog = {
+		action,
+		url: request.path,
+		time: moment.utc().format(),
+		ip: request.ip,
+		user,
+		userAgent: request.headers["user-agent"] as string
+	};
+	console.log(thisEvent);
 }

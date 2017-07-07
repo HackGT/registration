@@ -8,7 +8,7 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync
+	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync, trackEvent
 } from "../common";
 import {
 	IUser, IUserMongoose, User
@@ -75,13 +75,14 @@ type OAuthStrategyOptions = {
 	clientID: string;
 	clientSecret: string;
 	profileFields?: string[];
+	passReqToCallback: boolean;
 };
 type Profile = passport.Profile & {
 	profileUrl?: string;
 	_json: any;
 };
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-	passport.use(new strategy(options, async (accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
+	passport.use(new strategy(options, async (request: express.Request, accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
 		let email: string = "";
 		if (profile.emails && profile.emails.length > 0) {
 			email = profile.emails[0].value;
@@ -121,6 +122,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			}
 			try {
 				await user.save();
+				trackEvent("created account (auth)", request, email);
 			}
 			catch (err) {
 				done(err);
@@ -154,16 +156,19 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 
 useLoginStrategy(GitHubStrategy, "githubData", {
 	clientID: config.secrets.github.id,
-	clientSecret: config.secrets.github.secret
+	clientSecret: config.secrets.github.secret,
+	passReqToCallback: true
 });
 useLoginStrategy(GoogleStrategy, "googleData", {
 	clientID: config.secrets.google.id,
-	clientSecret: config.secrets.google.secret
+	clientSecret: config.secrets.google.secret,
+	passReqToCallback: true
 });
 useLoginStrategy(FacebookStrategy, "facebookData", {
 	clientID: config.secrets.facebook.id,
 	clientSecret: config.secrets.facebook.secret,
-	profileFields: ["id", "displayName", "email"]
+	profileFields: ["id", "displayName", "email"],
+	passReqToCallback: true
 });
 
 const PBKDF2_ROUNDS: number = 300000;
@@ -221,6 +226,7 @@ passport.use(new LocalStrategy({
 		});
 		try {
 			await user.save();
+			trackEvent("created account", request, email);
 		}
 		catch (err) {
 			done(err);
@@ -373,6 +379,7 @@ authRoutes.get("/verify/:code", async (request, response) => {
 		}
 		await user.save();
 		request.flash("success", "Thanks for verifying your email. You can now log in.");
+		trackEvent("verified email", request, user.email);
 	}
 	response.redirect("/login");
 });
