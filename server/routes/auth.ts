@@ -122,7 +122,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			}
 			try {
 				await user.save();
-				trackEvent("created account (auth)", request.ip, email);
+				trackEvent("created account (auth)", request, email);
 			}
 			catch (err) {
 				done(err);
@@ -226,7 +226,7 @@ passport.use(new LocalStrategy({
 		});
 		try {
 			await user.save();
-			trackEvent("created account", request.ip, email);
+			trackEvent("created account", request, email);
 		}
 		catch (err) {
 			done(err);
@@ -379,7 +379,7 @@ authRoutes.get("/verify/:code", async (request, response) => {
 		}
 		await user.save();
 		request.flash("success", "Thanks for verifying your email. You can now log in.");
-		trackEvent("verified email", request.ip, user.email);
+		trackEvent("verified email", request, user.email);
 	}
 	response.redirect("/login");
 });

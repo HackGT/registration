@@ -543,14 +543,19 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 }
 
 import { DataLog } from "./schema";
-export function trackEvent(action: string, ip: string, user?:string) {
+export function trackEvent(action: string, request: express.Request, user?:string) {
 	let thisEvent: DataLog = {
 		action: action,
+		url: request.path,
 		time: moment.utc().format(),
-		ip: ip
+		ip: request.ip
 	};
 	if (user) {
 		thisEvent.user = user;
+	}
+	let userAgent = request.headers["user-agent"];
+	if (userAgent) {
+		thisEvent.userAgent = userAgent;
 	}
 	console.log(thisEvent);
 }
