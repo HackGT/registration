@@ -330,7 +330,6 @@ export function authenticateWithReject(request: express.Request, response: expre
 // For directly user facing endpoints
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
-		trackEvent("visit", request.ip);
 		response.redirect("/login");
 	}
 	else {
@@ -544,7 +543,7 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 }
 
 import { DataLog } from "./schema";
-export function trackEvent(action: string, ip: string, user?: string) {
+export function trackEvent(action: string, ip: string, user?:string) {
 	let thisEvent: DataLog = {
 		action: action,
 		time: moment.utc().format(),

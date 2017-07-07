@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting, trackEvent
+	validateSchema, config, getSetting
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -152,7 +152,6 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			afterClose: moment().isAfter(confirmationCloseDate)
 		}
 	};
-	trackEvent("viewed dashboard", request.ip, request.user.email);
 	response.send(indexTemplate(templateData));
 });
 
@@ -334,7 +333,6 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	let thisUser = await User.findById(user._id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		thisUser.applicationStartTime = new Date();
-		trackEvent("viewed application", request.ip, thisUser.email);
 	}
 	else if (requestType === ApplicationType.Confirmation) {
 		thisUser.confirmationStartTime = new Date();

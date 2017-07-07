@@ -47,6 +47,16 @@ apiRouter.use("/settings", settingsRoutes);
 
 app.use("/api", apiRouter);
 
+import {trackEvent} from "./common"
+app.use(async(req, res, next) => {
+	if (path.extname(req.url) === "") {
+		let pageVisit:string = "visited " + req.url;
+		let email:string = req.user ? req.user.email: null;
+		trackEvent(pageVisit, req.ip, email);
+	}
+	next();
+})
+
 // User facing routes
 import {templateRoutes} from "./routes/templates";
 app.use("/", templateRoutes);
