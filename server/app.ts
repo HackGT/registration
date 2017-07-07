@@ -38,6 +38,17 @@ app.use(flash());
 import {authRoutes} from "./routes/auth";
 app.use("/auth", authRoutes);
 
+// Metrics
+import {trackEvent} from "./common";
+app.use((request, response, next) => {
+	// Track endpoints without extensions
+	if (path.extname(request.url) === "") {
+		let email: string | undefined = request.user ? request.user.email : undefined;
+		trackEvent("visit", request, email);
+	}
+	next();
+});
+
 let apiRouter = express.Router();
 // API routes go here
 import {userRoutes} from "./routes/api/user";
@@ -46,15 +57,6 @@ import {settingsRoutes} from "./routes/api/settings";
 apiRouter.use("/settings", settingsRoutes);
 
 app.use("/api", apiRouter);
-
-import {trackEvent} from "./common"
-app.use(async(req, res, next) => {
-	if (path.extname(req.url) === "") {
-		let email:string = req.user ? req.user.email: null;
-		trackEvent("visit", req, email);
-	}
-	next();
-});
 
 // User facing routes
 import {templateRoutes} from "./routes/templates";

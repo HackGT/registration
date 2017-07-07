@@ -269,9 +269,9 @@ export interface IAdminTemplate extends ICommonTemplate {
 
 export interface DataLog {
 	action: string;
-	url: string,
+	url: string;
 	time: string;
-	ip: string,
-	userAgent?: string,
+	ip: string;
+	userAgent?: string;
 	user?: string;
 }
