@@ -267,7 +267,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 	};
 }
 
-export type DataLog = {
+export interface DataLog {
 	action: string;
 	time: string;
 	ip: string,
