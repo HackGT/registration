@@ -223,26 +223,21 @@ export async function setDefaultSettings() {
 		return await Setting.find({ "name": key }).count() === 0;
 	}
 
-	if (await doesNotExist("applicationOpen")) {
-		await updateSetting("applicationOpen", new Date());
-	}
-	if (await doesNotExist("applicationClose")) {
-		await updateSetting("applicationClose", new Date());
-	}
-	if (await doesNotExist("confirmationOpen")) {
-		await updateSetting("confirmationOpen", new Date());
-	}
-	if (await doesNotExist("confirmationClose")) {
-		await updateSetting("confirmationClose", new Date());
-	}
-	if (await doesNotExist("teamsEnabled")) {
-		await updateSetting("teamsEnabled", true);
-	}
-	if (await doesNotExist("applicationBranches")) {
-		await updateSetting("applicationBranches", []);
-	}
-	if (await doesNotExist("confirmationBranches")) {
-		await updateSetting("confirmationBranches", []);
+	const DEFAULTS: any = {
+		"applicationOpen": new Date(),
+		"applicationClose": new Date(),
+		"confirmationOpen": new Date(),
+		"confirmationClose": new Date(),
+		"teamsEnabled": true,
+		"applicationBranches": [],
+		"confirmationBranches": []
+	};
+
+	for (let setting in DEFAULTS) {
+		if (await doesNotExist(setting)) {
+			await updateSetting(setting, DEFAULTS[setting]);
+			console.log(`Updated previously unset setting ${setting} to ${JSON.stringify(DEFAULTS[setting])}`);
+		}
 	}
 }
 export async function getSetting<T>(name: string, createMissing: boolean = true): Promise<T> {
