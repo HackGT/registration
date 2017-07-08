@@ -279,7 +279,16 @@ app.use(passport.session());
 export let authRoutes = express.Router();
 
 function getExternalPort(request: express.Request): number {
-	let host = request.headers.host as string;
+	function defaultPort(): number {
+		// Default ports for HTTP and HTTPS
+		return request.protocol === "http" ? 80 : 443;
+	}
+
+	let host = request.headers.host;
+	if (!host || Array.isArray(host)) {
+		return defaultPort();
+	}
+
 	// IPv6 literal support
 	let offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
 	let index = host.indexOf(":", offset);
@@ -287,8 +296,7 @@ function getExternalPort(request: express.Request): number {
 		return parseInt(host.substring(index + 1), 10);
 	}
 	else {
-		// Default ports for HTTP and HTTPS
-		return request.protocol === "http" ? 80 : 443;
+		return defaultPort();
 	}
 }
 let validatedHostNames: string[] = [];
