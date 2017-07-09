@@ -15,6 +15,10 @@ label {
     font-weight: 300;
     font-family: "Quicksand";
 }
+.required::after {
+    content: " *";
+    color: #FF4136;
+}
 /* Extend Wing's input styles to cover additional types
  * See https://github.com/KingPixil/wing/issues/8
  */

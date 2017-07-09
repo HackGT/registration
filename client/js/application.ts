@@ -1,10 +1,10 @@
 let form = document.querySelector("form") as HTMLFormElement | null;
 let submitButton = document.querySelector("form input[type=submit]") as HTMLInputElement;
 submitButton.addEventListener("click", e => {
-	e.preventDefault();
 	if (!form || !form.checkValidity() || !form.dataset.action) {
 		return;
 	}
+	e.preventDefault();
 	submitButton.disabled = true;
 
 	fetch(form.dataset.action!, {

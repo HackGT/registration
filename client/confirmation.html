@@ -30,7 +30,7 @@
 					{{/if}}
 					{{#if this.multi}}
 						{{#ifCond this.type "select"}}
-							<label for="form-{{this.name}}">{{this.label}}</label>
+							<label for="form-{{this.name}}" class="{{required this.required}}">{{this.label}}</label>
 							<select id="form-{{this.name}}" name="{{this.name}}" data-hasother-select="{{this.hasOther}}">
 								{{#each this.options}}
 									<option {{selected ../this.selected @index}}>{{this}}</option>
@@ -40,7 +40,7 @@
 								<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
 							{{/if}}
 						{{else}}
-							<label>{{this.label}}</label>
+							<label class="{{required this.required}}">{{this.label}}</label>
 							<fieldset data-hasother-fieldset="{{this.hasOther}}">
 								{{#each this.options}}
 									<div>
@@ -56,7 +56,7 @@
 							</fieldset>
 						{{/ifCond}}
 					{{else}}
-						<label for="form-{{this.name}}">{{this.label}}</label>
+						<label for="form-{{this.name}}" class="{{required this.required}}">{{this.label}}</label>
 						{{#ifCond this.type "textarea"}}
 							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}>{{this.value}}</textarea>
 						{{else}}
