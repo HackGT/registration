@@ -70,8 +70,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		if (errored) {
 			return null;
 		}
-		// (Hackily) redefines the type of request.files because the default type is incorrect for multer's .any() handler
-		let files: Express.Multer.File[] = (request.files as any) as Express.Multer.File[];
+		let files = request.files as Express.Multer.File[];
 
 		if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
 			// Required field not filled in

@@ -290,19 +290,20 @@ export let postParser = bodyParser.urlencoded({
 });
 
 import * as multer from "multer";
+export const MAX_FILE_SIZE = 50000000; // 50 MB
 export let uploadHandler = multer({
 	"storage": multer.diskStorage({
 		destination: (req, file, cb) => {
 			// The OS's default temporary directory
 			// Should be changed (or moved via fs.rename()) if the files are to be persisted
-			cb(null!, os.tmpdir());
+			cb(null, os.tmpdir());
 		},
 		filename: (req, file, cb) => {
-			cb(null!, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+			cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
 		}
 	}),
 	"limits": {
-		"fileSize": 50000000, // 50 MB
+		"fileSize": MAX_FILE_SIZE,
 		"files": 10 // Reasonable limit (real number is determined by the number of file questions in the config)
 	}
 });
