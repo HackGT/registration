@@ -6,6 +6,7 @@ import * as archiver from "archiver";
 
 import {
 	UPLOAD_ROOT,
+	formatSize, MAX_FILE_SIZE,
 	postParser, uploadHandler, isAdmin, isUserOrAdmin,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
@@ -21,11 +22,22 @@ import {QuestionBranches} from "../../config/questions.schema";
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
+let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, request, response, next) => {
+	if (err.code === "LIMIT_FILE_SIZE") {
+		response.status(400).json({
+			"error": `File size cannot exceed ${formatSize(MAX_FILE_SIZE, false)}`
+		});
+	}
+	else {
+		next(err);
+	}
+};
+
 userRoutes.route("/application/:branch")
-	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
 	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
 userRoutes.route("/confirmation/:branch")
-	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
 	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
 
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {

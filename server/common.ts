@@ -217,6 +217,18 @@ export const COOKIE_OPTIONS = {
 	"httpOnly": true
 };
 
+export function formatSize(size: number, binary: boolean = true): string {
+	const base = binary ? 1024 : 1000;
+	const labels = binary ? ["bytes", "KiB", "MiB", "GiB", "TiB"] : ["bytes", "KB", "MB", "GB", "TB"];
+
+	let i = Math.floor(Math.log(size) / Math.log(base));
+	let formattedSize = `${(size / Math.pow(base, i)).toFixed(2)} ${labels[i]}`;
+	if (size <= 0) {
+		formattedSize = "0 bytes";
+	}
+	return formattedSize;
+}
+
 //
 // Database connection
 //

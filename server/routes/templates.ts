@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT, UPLOAD_ROOT,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting, sanitize
+	formatSize, validateSchema, config, getSetting, sanitize
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -461,11 +461,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					else {
 						// Multer file
 						let file = question.value;
-						let i = Math.floor(Math.log(file.size) / Math.log(1024));
-						let formattedSize = `${(file.size / Math.pow(1024, i)).toFixed(2)} ${["bytes", "KiB", "MiB", "GiB", "TiB"][i]}`;
-						if (file.size <= 0) {
-							formattedSize = "0 bytes";
-						}
+						let formattedSize = formatSize(file.size);
 
 						value = `[${file.mimetype} | ${formattedSize}]: ${file.path}`;
 						filename = file.filename;
