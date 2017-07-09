@@ -45,6 +45,7 @@ export namespace IConfig {
 		server: Server;
 		admins: string[];
 		eventName: string;
+		uploadDirectory: string;
 		maxTeamSize: number;
 	}
 }

@@ -44,6 +44,7 @@ class Config implements IConfig.Main {
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
+	public uploadDirectory: string = "uploads"; // Relative to app root
 	public maxTeamSize: number = 4;
 
 	public sessionSecretSet: boolean = false;
@@ -87,12 +88,14 @@ class Config implements IConfig.Main {
 		if (config.eventName) {
 			this.eventName = config.eventName;
 		}
-		if (config.secrets && config.secrets.session) {
-			this.sessionSecretSet = true;
+		if (config.uploadDirectory) {
+			this.uploadDirectory = config.uploadDirectory;
 		}
-
 		if (config.maxTeamSize) {
 			this.maxTeamSize = config.maxTeamSize;
+		}
+		if (config.secrets && config.secrets.session) {
+			this.sessionSecretSet = true;
 		}
 	}
 	protected loadFromEnv(): void {
@@ -183,7 +186,11 @@ class Config implements IConfig.Main {
 		if (process.env.EVENT_NAME) {
 			this.eventName = process.env.EVENT_NAME!;
 		}
-
+		// Upload directory (relative to app root)
+		if (process.env.UPLOAD_DIRECTORY) {
+			this.uploadDirectory = process.env.UPLOAD_DIRECTORY!;
+		}
+		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE!, 10);
 		}
@@ -196,7 +203,11 @@ export let config = new Config();
 //
 export const PORT = config.server.port;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
-export const UPLOAD_ROOT = path.resolve(__dirname, "../uploads"); // Should exist already
+export const UPLOAD_ROOT = path.resolve(__dirname, "../", config.uploadDirectory);
+if (!fs.existsSync(UPLOAD_ROOT)) {
+	fs.mkdirSync(UPLOAD_ROOT);
+}
+
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
 export const VERSION_HASH = config.server.versionHash;
 export const COOKIE_OPTIONS = {

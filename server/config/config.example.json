@@ -27,5 +27,6 @@
 	},
 	"admins": ["example@example.com"],
 	"eventName": "My Hackathon",
+	"uploadDirectory": "uploads",
 	"maxTeamSize": 4
 }
