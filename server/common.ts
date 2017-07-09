@@ -234,7 +234,9 @@ export function formatSize(size: number, binary: boolean = true): string {
 //
 import * as mongoose from "mongoose";
 (mongoose as any).Promise = global.Promise;
-mongoose.connect(config.server.mongoURL);
+mongoose.connect(config.server.mongoURL, {
+	useMongoClient: true
+} as mongoose.ConnectionOptions);
 export {mongoose};
 
 import { Setting } from "./schema";
