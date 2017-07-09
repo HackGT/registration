@@ -62,7 +62,7 @@
 						{{else}}
 							{{#ifCond this.type "file"}}
 								{{#if this.value}}
-									<input type="file" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />
+									<input type="file" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" />
 									<p class="file">Previously uploaded: <code>{{this.value}}</code></p>
 								{{else}}
 									<input type="file" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />

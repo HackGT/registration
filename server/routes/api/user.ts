@@ -83,14 +83,24 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			return null;
 		}
 		let files = request.files as Express.Multer.File[];
+		let preexistingFile: boolean = question.type === "file" && user.applicationData && user.applicationData.some(entry => entry.name === question.name && !!entry.value);
 
 		if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
 			// Required field not filled in
-			errored = true;
-			response.status(400).json({
-				"error": `'${question.label}' is a required field`
-			});
-			return null;
+			if (preexistingFile) {
+				return {
+					"name": question.name,
+					"type": "file",
+					"value": user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value
+				};
+			}
+			else {
+				errored = true;
+				response.status(400).json({
+					"error": `'${question.label}' is a required field`
+				});
+				return null;
+			}
 		}
 		if ((question.type === "select" || question.type === "radio") && Array.isArray(request.body[question.name]) && question.hasOther) {
 			// "Other" option selected
