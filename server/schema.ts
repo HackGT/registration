@@ -266,6 +266,13 @@ export interface IAdminTemplate extends ICommonTemplate {
 			confirmationBranches: string[];
 		};
 	};
+	config: {
+		admins: string;
+		eventName: string;
+		uploadDirectoryRaw: string;
+		uploadDirectoryResolved: string;
+		maxTeamSize: string;
+	};
 }
 
 export interface DataLog {

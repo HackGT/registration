@@ -267,6 +267,32 @@
 							</ul>
 						</div>
 					</div>
+					<h4><code>config.json</code> options</h4>
+					<div class="row">
+						<div class="col-4">
+							<label>Event name:</label>
+							<input type="text" value="{{config.eventName}}" disabled />
+						</div>
+						<div class="col-4">
+							<label>Admins:</label>
+							<input type="text" value="{{config.admins}}" disabled />
+						</div>
+						<div class="col-4">
+							<label>Max team size:</label>
+							<input type="text" value="{{config.maxTeamSize}}" disabled />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<label>Upload directory (from <code>config.json</code>):</label>
+							<input type="text" value="{{config.uploadDirectoryRaw}}" disabled />
+						</div>
+						<div class="col-6">
+							<label>Upload directory (resolved):</label>
+							<input type="text" value="{{config.uploadDirectoryResolved}}" disabled />
+						</div>
+					</div>
+
 					<div class="row center">
 						<input type="submit" class="btn" value="Update" />
 					</div>
