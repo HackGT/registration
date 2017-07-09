@@ -179,7 +179,11 @@
 									<td colspan="5">
 										<div class="applicantData">
 											{{#each this.applicationDataFormatted}}
-												<p><b>{{this.label}}</b> &rarr; {{this.value}}</p>
+												{{#if this.filename}}
+													<p><b>{{this.label}}</b> &rarr; {{this.value}} (<a href="/uploads/{{this.filename}}">Download</a>)</p>
+												{{else}}
+													<p><b>{{this.label}}</b> &rarr; {{this.value}}</p>
+												{{/if}}
 											{{/each}}
 										</div>
 									</td>

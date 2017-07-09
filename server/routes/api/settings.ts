@@ -2,23 +2,8 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-	uploadHandler, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
+	uploadHandler, isAdmin, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
 } from "../../common";
-import {
-	IUser
-} from "../../schema";
-
-function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let user = request.user as IUser;
-	if (!request.isAuthenticated() || !user.admin) {
-		response.status(403).json({
-			"error": "You are not permitted to access this endpoint"
-		});
-	}
-	else {
-		next();
-	}
-}
 
 setDefaultSettings().catch(err => {
 	throw err;

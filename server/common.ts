@@ -277,6 +277,7 @@ import * as bodyParser from "body-parser";
 export let postParser = bodyParser.urlencoded({
 	extended: false
 });
+
 import * as multer from "multer";
 export let uploadHandler = multer({
 	"storage": multer.diskStorage({
@@ -294,6 +295,41 @@ export let uploadHandler = multer({
 		"files": 10 // Reasonable limit (real number is determined by the number of file questions in the config)
 	}
 });
+
+export function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	let user = request.user as IUser;
+	if (!request.isAuthenticated()) {
+		response.status(401).json({
+			"error": "You must log in to access this endpoint"
+		});
+	}
+	else if (user._id.toString() !== request.params.id && !user.admin) {
+		response.status(403).json({
+			"error": "You are not permitted to access this endpoint"
+		});
+	}
+	else {
+		next();
+	}
+}
+
+export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	let user = request.user as IUser;
+	if (!request.isAuthenticated()) {
+		response.status(401).json({
+			"error": "You must log in to access this endpoint"
+		});
+	}
+	else if (!user.admin) {
+		response.status(403).json({
+			"error": "You are not permitted to access this endpoint"
+		});
+	}
+	else {
+		next();
+	}
+}
+
 // For API endpoints
 export function authenticateWithReject(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {

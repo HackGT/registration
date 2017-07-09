@@ -6,7 +6,7 @@ import * as archiver from "archiver";
 
 import {
 	UPLOAD_ROOT,
-	postParser, uploadHandler,
+	postParser, uploadHandler, isAdmin, isUserOrAdmin,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
 	validateSchema,
@@ -14,44 +14,10 @@ import {
 } from "../../common";
 import {
 	IFormItem,
-	IUser, IUserMongoose, User,
+	IUserMongoose, User,
 	ITeamMongoose, Team
 } from "../../schema";
 import {QuestionBranches} from "../../config/questions.schema";
-
-function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let user = request.user as IUser;
-	if (!request.isAuthenticated()) {
-		response.status(401).json({
-			"error": "You must log in to access this endpoint"
-		});
-	}
-	else if (user._id.toString() !== request.params.id && !user.admin) {
-		response.status(403).json({
-			"error": "You are not permitted to access this endpoint"
-		});
-	}
-	else {
-		next();
-	}
-}
-
-function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let user = request.user as IUser;
-	if (!request.isAuthenticated()) {
-		response.status(401).json({
-			"error": "You must log in to access this endpoint"
-		});
-	}
-	else if (!user.admin) {
-		response.status(403).json({
-			"error": "You are not permitted to access this endpoint"
-		});
-	}
-	else {
-		next();
-	}
-}
 
 export let userRoutes = express.Router({ "mergeParams": true });
 

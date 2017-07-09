@@ -448,6 +448,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				applicationDataFormatted = statisticUser.applicationData.map(question => {
 					let rawQuestion = questionsFromBranch!.questions.find(q => q.name === question.name);
 					let value: string;
+					let filename = "";
 					if (typeof question.value === "string") {
 						value = question.value;
 					}
@@ -459,19 +460,23 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					}
 					else {
 						// Multer file
-						value = "[file]";
-					}
-					if (!rawQuestion) {
-						// No schema information for this question so return the raw name as the label
-						return {
-							"label": question.name,
-							"value": value
-						};
+						let file = question.value;
+						let i = Math.floor(Math.log(file.size) / Math.log(1024));
+						let formattedSize = `${(file.size / Math.pow(1024, i)).toFixed(2)} ${["bytes", "KiB", "MiB", "GiB", "TiB"][i]}`;
+						if (file.size <= 0) {
+							formattedSize = "0 bytes";
+						}
+
+						value = `[${file.mimetype} | ${formattedSize}]: ${file.path}`;
+						filename = file.filename;
 					}
 
+					// If there isn't schema information for this question return the raw name as the label
+					let label: string = rawQuestion ? rawQuestion.label : question.name;
 					return {
-						"label": rawQuestion.label,
-						"value": value
+						label,
+						value,
+						filename
 					};
 				});
 			}
