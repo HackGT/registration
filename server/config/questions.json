@@ -216,6 +216,29 @@
         ]
     },
     {
+        "name": "File Upload",
+        "questions": [
+            {
+                "name": "name",
+                "type": "text",
+                "label": "Name",
+                "required": true
+            },
+            {
+                "name": "file1",
+                "type": "file",
+                "label": "Upload a file",
+                "required": true
+            },
+            {
+                "name": "file2",
+                "type": "file",
+                "label": "Upload another file",
+                "required": true
+            }
+        ]
+    },
+    {
         "name": "Mentor",
         "questions": [
             {

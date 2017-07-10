@@ -1,11 +1,10 @@
-import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
 
 import {
-	UPLOAD_ROOT,
+	STORAGE_ENGINE,
 	formatSize, MAX_FILE_SIZE,
 	postParser, uploadHandler, isAdmin, isUserOrAdmin,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
@@ -131,23 +130,13 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		await Promise.all(data
 			.map(item => item.value)
 			.filter(possibleFile => possibleFile !== null && typeof possibleFile === "object" && !Array.isArray(possibleFile))
-			.map((file: Express.Multer.File): Promise<void> => {
-				return new Promise<void>((resolve, reject) => {
-					fs.rename(file.path, path.join(UPLOAD_ROOT, file.filename), err => {
-						if (err) {
-							reject(err);
-							return;
-						}
-						resolve();
-					});
-				});
-			})
+			.map((file: Express.Multer.File): Promise<void> => STORAGE_ENGINE.saveFile(file.path, file.filename))
 		);
 		// Set the proper file locations in the data object
 		data = data.map(item => {
 			if (item.value !== null && typeof item.value === "object" && !Array.isArray(item.value)) {
-				item.value.destination = UPLOAD_ROOT;
-				item.value.path = path.join(UPLOAD_ROOT, item.value.filename);
+				item.value.destination = STORAGE_ENGINE.uploadRoot;
+				item.value.path = path.join(STORAGE_ENGINE.uploadRoot, item.value.filename);
 			}
 			return item;
 		});

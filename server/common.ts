@@ -9,6 +9,7 @@ import * as moment from "moment-timezone";
 // Config
 //
 import { IConfig } from "./schema";
+import { storageEngines } from "./storage";
 class Config implements IConfig.Main {
 	public secrets: IConfig.Secrets = {
 		"session": crypto.randomBytes(32).toString("hex"),
@@ -44,7 +45,12 @@ class Config implements IConfig.Main {
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
-	public uploadDirectory: string = "uploads"; // Relative to app root
+	public storageEngine = {
+		"name": "disk",
+		"options": {
+			"uploadDirectory": "uploads"
+		}
+	};
 	public maxTeamSize: number = 4;
 
 	public sessionSecretSet: boolean = false;
@@ -88,8 +94,11 @@ class Config implements IConfig.Main {
 		if (config.eventName) {
 			this.eventName = config.eventName;
 		}
-		if (config.uploadDirectory) {
-			this.uploadDirectory = config.uploadDirectory;
+		if (config.storageEngine) {
+			this.storageEngine = config.storageEngine;
+			if (!storageEngines[this.storageEngine.name]) {
+				console.warn(`Custom storage engine "${this.storageEngine.name}" does not exist`);
+			}
 		}
 		if (config.maxTeamSize) {
 			this.maxTeamSize = config.maxTeamSize;
@@ -186,9 +195,18 @@ class Config implements IConfig.Main {
 		if (process.env.EVENT_NAME) {
 			this.eventName = process.env.EVENT_NAME!;
 		}
-		// Upload directory (relative to app root)
-		if (process.env.UPLOAD_DIRECTORY) {
-			this.uploadDirectory = process.env.UPLOAD_DIRECTORY!;
+		// Storage engine
+		if (process.env.STORAGE_ENGINE) {
+			this.storageEngine.name = process.env.STORAGE_ENGINE!;
+			if (process.env.STORAGE_ENGINE_OPTIONS) {
+				this.storageEngine.options = JSON.parse(process.env.STORAGE_ENGINE_OPTIONS!);
+			}
+			else {
+				console.warn("Custom storage engine defined but no storage engine options passed");
+			}
+			if (!storageEngines[this.storageEngine.name]) {
+				console.warn(`Custom storage engine "${this.storageEngine.name}" does not exist`);
+			}
 		}
 		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
@@ -203,11 +221,6 @@ export let config = new Config();
 //
 export const PORT = config.server.port;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
-export const UPLOAD_ROOT = path.resolve(__dirname, "../", config.uploadDirectory);
-if (!fs.existsSync(UPLOAD_ROOT)) {
-	fs.mkdirSync(UPLOAD_ROOT);
-}
-
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
 export const VERSION_HASH = config.server.versionHash;
 export const COOKIE_OPTIONS = {
@@ -216,6 +229,7 @@ export const COOKIE_OPTIONS = {
 	"secure": config.server.cookieSecureOnly,
 	"httpOnly": true
 };
+export const STORAGE_ENGINE = new storageEngines[config.storageEngine.name](config.storageEngine.options);
 
 export function formatSize(size: number, binary: boolean = true): string {
 	const base = binary ? 1024 : 1000;

@@ -29,6 +29,11 @@
 	},
 	"admins": ["example@example.com"],
 	"eventName": "My Hackathon",
-	"uploadDirectory": "uploads",
+	"storageEngine": {
+		"name": "disk",
+		"options": {
+			"uploadDirectory": "uploads"
+		}
+	},
 	"maxTeamSize": 4
 }

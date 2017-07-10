@@ -6,7 +6,7 @@ import * as moment from "moment-timezone";
 import * as bowser from "bowser";
 
 import {
-	STATIC_ROOT, UPLOAD_ROOT,
+	STATIC_ROOT, STORAGE_ENGINE,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
 	formatSize, validateSchema, config, getSetting, sanitize
@@ -506,8 +506,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		config: {
 			admins: config.admins.join(", "),
 			eventName: config.eventName,
-			uploadDirectoryRaw: config.uploadDirectory,
-			uploadDirectoryResolved: UPLOAD_ROOT,
+			storageEngine: config.storageEngine.name,
+			uploadDirectoryRaw: config.storageEngine.options.uploadDirectory,
+			uploadDirectoryResolved: STORAGE_ENGINE.uploadRoot,
 			maxTeamSize: config.maxTeamSize.toString()
 		}
 	};

@@ -274,12 +274,12 @@
 							<input type="text" value="{{config.eventName}}" disabled />
 						</div>
 						<div class="col-4">
-							<label>Admins:</label>
-							<input type="text" value="{{config.admins}}" disabled />
-						</div>
-						<div class="col-4">
 							<label>Max team size:</label>
 							<input type="text" value="{{config.maxTeamSize}}" disabled />
+						</div>
+						<div class="col-4">
+							<label>Storage engine:</label>
+							<input type="text" value="{{config.storageEngine}}" disabled />
 						</div>
 					</div>
 					<div class="row">
@@ -290,6 +290,12 @@
 						<div class="col-6">
 							<label>Upload directory (resolved):</label>
 							<input type="text" value="{{config.uploadDirectoryResolved}}" disabled />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<label>Admins:</label>
+							<textarea disabled>{{config.admins}}</textarea>
 						</div>
 					</div>
 

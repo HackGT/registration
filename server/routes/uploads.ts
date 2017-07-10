@@ -1,14 +1,10 @@
 import * as express from "express";
-import * as path from "path";
 
-import { isAdmin, UPLOAD_ROOT } from "../common";
+import { isAdmin, STORAGE_ENGINE } from "../common";
 
 export let uploadsRoutes = express.Router();
 
 uploadsRoutes.route("/:file").get(isAdmin, (request, response) => {
-	response.sendFile(path.resolve(UPLOAD_ROOT, request.params.file), {
-		"headers": {
-			"Content-Disposition": `attachment; filename="${request.params.file}"`
-		}
-	});
+	response.attachment(request.params.file);
+	STORAGE_ENGINE.readFile(request.params.file).pipe(response);
 });

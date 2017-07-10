@@ -158,6 +158,7 @@
             true,
             "allow-declarations",
             "allow-named-functions"
-        ]
+        ],
+        "max-classes-per-file": [false]
     }
 }
