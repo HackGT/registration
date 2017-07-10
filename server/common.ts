@@ -304,6 +304,8 @@ export let postParser = bodyParser.urlencoded({
 });
 
 import * as multer from "multer";
+import {QuestionBranches} from "./config/questions.schema";
+
 export const MAX_FILE_SIZE = 50000000; // 50 MB
 export let uploadHandler = multer({
 	"storage": multer.diskStorage({
@@ -318,9 +320,24 @@ export let uploadHandler = multer({
 	}),
 	"limits": {
 		"fileSize": MAX_FILE_SIZE,
-		"files": 10 // Reasonable limit (real number is determined by the number of file questions in the config)
+		"files": getMaxFileUploads()
 	}
 });
+
+function getMaxFileUploads(): number {
+	// Can't use validateSchema() because this function needs to run synchronously to export uploadHandler before it gets used
+	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/questions.json"), "utf8"));
+	let questions = questionBranches.map(branch => branch.questions);
+	let fileUploadsPerBranch: number[] = questions.map(branch => {
+		return branch.reduce((prev, current) => {
+			if (current.type === "file") {
+				return prev + 1;
+			}
+			return prev;
+		}, 0);
+	});
+	return Math.max(...fileUploadsPerBranch);
+}
 
 export function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
@@ -467,7 +484,6 @@ export function readFileAsync(filename: string): Promise<string> {
 // JSON schema validator
 //
 import * as ajv from "ajv";
-import {QuestionBranches} from "./config/questions.schema";
 export async function validateSchema(questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<QuestionBranches> {
 	let questionBranches: QuestionBranches;
 	let schema: any;
