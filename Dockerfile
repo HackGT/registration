@@ -6,7 +6,7 @@ RUN apk update && apk add bash
 RUN apk add git
 # Install latest npm version (in case Node.js hasn't updated with the newest version yet)
 # npm install -g npm@latest doesn't work -> see https://github.com/npm/npm/issues/15611#issuecomment-289133810 for this hack
-RUN npm install npm@"~5.1.0" && rm -rf /usr/local/lib/node_modules && mv node_modules /usr/local/lib
+RUN npm install npm@"~5.2.0" && rm -rf /usr/local/lib/node_modules && mv node_modules /usr/local/lib
 
 # Bundle app source
 WORKDIR /usr/src/registration
