@@ -13,7 +13,7 @@ label {
     line-height: 1.5;
     letter-spacing: 0;
     font-weight: 300;
-    font-family: Quicksand;
+    font-family: "Quicksand";
 }
 /* Extend Wing's input styles to cover additional types
  * See https://github.com/KingPixil/wing/issues/8
@@ -30,6 +30,17 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     transition: 0.5s;
     outline: none;
     font-family: 'Open Sans';
+}
+form > h1,
+form > h2,
+form > h3,
+form > h4,
+form > h5,
+form > h6 {
+    text-align: center;
+}
+form > p {
+    font-family: "Quicksand";
 }
 fieldset {
 	padding: 8px 20px;

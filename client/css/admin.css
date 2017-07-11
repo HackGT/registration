@@ -126,3 +126,7 @@ rect.bar:hover {
     }
 
 }
+
+.branch-role:nth-of-type(3n + 1) {
+    margin-left: 0;
+}

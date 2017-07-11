@@ -292,11 +292,16 @@ settingsUpdateButton.addEventListener("click", e => {
 			body: branchRoleData
 		});
 	}).then(checkStatus).then(parseJSON).then(() => {
-		return fetch(`/api/settings/email_content/${emailTypeSelect.value}`, {
-			...defaultOptions,
-			body: emailContentData
-		});
-	}).then(checkStatus).then(parseJSON).then(async () => {
+		if (emailTypeSelect.value) {
+			return fetch(`/api/settings/email_content/${emailTypeSelect.value}`, {
+				...defaultOptions,
+				body: emailContentData
+			}).then(checkStatus).then(parseJSON);
+		}
+		else {
+			return Promise.resolve();
+		}
+	}).then(async () => {
 		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
 		window.location.reload();
 	}).catch(async (err: Error) => {

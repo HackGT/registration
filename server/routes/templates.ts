@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting
+	validateSchema, config, getSetting, sanitize
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -55,7 +55,7 @@ templateRoutes.use(async (request, response, next) => {
 		return;
 	}
 
-	let userAgent = request.headers["user-agent"];
+	let userAgent = request.headers["user-agent"] as string | undefined;
 	const minBrowser = {
 		msie: "12", // Microsoft Edge+ (no support for IE)
 		safari: "7.1" // Safari v7 was released in 2013
@@ -276,7 +276,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		response.status(500).send("An error occurred while generating the application form");
 		return;
 	}
-	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
 	if (!questionBranch) {
 		response.status(400).send("Invalid application branch");
 		return;
@@ -326,9 +326,24 @@ async function applicationBranchHandler(request: express.Request, response: expr
 			savedValue = undefined;
 		}
 		question["value"] = savedValue ? savedValue.value : "";
+
+		if (questionBranch.text) {
+			let textContent: string = questionBranch.text.filter(text => text.for === question.name).map(text => {
+				return `<${text.type}>${sanitize(text.content)}</${text.type}>`;
+			}).join("\n");
+			question["textContent"] = textContent;
+		}
+
 		return question;
 	});
 	// tslint:enable:no-string-literal
+
+	let endText: string = "";
+	if (questionBranch.text) {
+		endText = questionBranch.text.filter(text => text.for === "end").map(text => {
+			return `<${text.type} style="font-size: 90%; text-align: center;">${sanitize(text.content)}</${text.type}>`;
+		}).join("\n");
+	}
 
 	let thisUser = await User.findById(user._id) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
@@ -346,7 +361,8 @@ async function applicationBranchHandler(request: express.Request, response: expr
 			teamsEnabled: await getSetting<boolean>("teamsEnabled")
 		},
 		branch: questionBranch.name,
-		questionData
+		questionData,
+		endText
 	};
 
 	response.send(requestType === ApplicationType.Application ? registerTemplate(templateData) : confirmTemplate(templateData));

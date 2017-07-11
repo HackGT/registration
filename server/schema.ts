@@ -226,6 +226,7 @@ export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
+	endText: string;
 }
 export interface ResponseCount {
 	"response": string;

@@ -55,6 +55,7 @@ class Config implements IConfig.Main {
 		this.loadFromEnv();
 	}
 	protected loadFromJSON(fileName: string): void {
+		// tslint:disable-next-line:no-shadowed-variable
 		let config: IConfig.Main | null = null;
 		try {
 			config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config", fileName), "utf8"));
@@ -99,94 +100,94 @@ class Config implements IConfig.Main {
 	protected loadFromEnv(): void {
 		// Secrets
 		if (process.env.SESSION_SECRET) {
-			this.secrets.session = process.env.SESSION_SECRET;
+			this.secrets.session = process.env.SESSION_SECRET!;
 			this.sessionSecretSet = true;
 		}
 		if (process.env.GITHUB_CLIENT_ID) {
-			this.secrets.github.id = process.env.GITHUB_CLIENT_ID;
+			this.secrets.github.id = process.env.GITHUB_CLIENT_ID!;
 		}
 		if (process.env.GITHUB_CLIENT_SECRET) {
-			this.secrets.github.secret = process.env.GITHUB_CLIENT_SECRET;
+			this.secrets.github.secret = process.env.GITHUB_CLIENT_SECRET!;
 		}
 		if (process.env.GOOGLE_CLIENT_ID) {
-			this.secrets.google.id = process.env.GOOGLE_CLIENT_ID;
+			this.secrets.google.id = process.env.GOOGLE_CLIENT_ID!;
 		}
 		if (process.env.GOOGLE_CLIENT_SECRET) {
-			this.secrets.google.secret = process.env.GOOGLE_CLIENT_SECRET;
+			this.secrets.google.secret = process.env.GOOGLE_CLIENT_SECRET!;
 		}
 		if (process.env.FACEBOOK_CLIENT_ID) {
-			this.secrets.facebook.id = process.env.FACEBOOK_CLIENT_ID;
+			this.secrets.facebook.id = process.env.FACEBOOK_CLIENT_ID!;
 		}
 		if (process.env.FACEBOOK_CLIENT_SECRET) {
-			this.secrets.facebook.secret = process.env.FACEBOOK_CLIENT_SECRET;
+			this.secrets.facebook.secret = process.env.FACEBOOK_CLIENT_SECRET!;
 		}
 		// Email
 		if (process.env.EMAIL_FROM) {
-			this.email.from = process.env.EMAIL_FROM;
+			this.email.from = process.env.EMAIL_FROM!;
 		}
 		if (process.env.EMAIL_HOST) {
-			this.email.host = process.env.EMAIL_HOST;
+			this.email.host = process.env.EMAIL_HOST!;
 		}
 		if (process.env.EMAIL_USERNAME) {
-			this.email.username = process.env.EMAIL_USERNAME;
+			this.email.username = process.env.EMAIL_USERNAME!;
 		}
 		if (process.env.EMAIL_PASSWORD) {
-			this.email.password = process.env.EMAIL_PASSWORD;
+			this.email.password = process.env.EMAIL_PASSWORD!;
 		}
 		if (process.env.EMAIL_PORT) {
-			let port = parseInt(process.env.EMAIL_PORT, 10);
+			let port = parseInt(process.env.EMAIL_PORT!, 10);
 			if (!isNaN(port) && port > 0) {
 				this.email.port = port;
 			}
 		}
 		// Server
-		if (process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true") {
+		if (process.env.PRODUCTION && process.env.PRODUCTION!.toLowerCase() === "true") {
 			this.server.isProduction = true;
 		}
 		if (process.env.PORT) {
-			let port = parseInt(process.env.PORT, 10);
+			let port = parseInt(process.env.PORT!, 10);
 			if (!isNaN(port) && port > 0) {
 				this.server.port = port;
 			}
 		}
 		if (process.env.VERSION_HASH) {
-			this.server.versionHash = process.env.VERSION_HASH;
+			this.server.versionHash = process.env.VERSION_HASH!;
 		}
 		if (process.env.SOURCE_VERSION) {
-			this.server.versionHash = process.env.SOURCE_VERSION;
+			this.server.versionHash = process.env.SOURCE_VERSION!;
 		}
 		if (process.env.WORKFLOW_RELEASE_CREATED_AT) {
-			this.server.workflowReleaseCreatedAt = process.env.WORKFLOW_RELEASE_CREATED_AT;
+			this.server.workflowReleaseCreatedAt = process.env.WORKFLOW_RELEASE_CREATED_AT!;
 		}
 		if (process.env.WORKFLOW_RELEASE_SUMMARY) {
-			this.server.workflowReleaseSummary = process.env.WORKFLOW_RELEASE_SUMMARY;
+			this.server.workflowReleaseSummary = process.env.WORKFLOW_RELEASE_SUMMARY!;
 		}
 		if (process.env.COOKIE_MAX_AGE) {
-			let maxAge = parseInt(process.env.COOKIE_MAX_AGE, 10);
+			let maxAge = parseInt(process.env.COOKIE_MAX_AGE!, 10);
 			if (!isNaN(maxAge) && maxAge > 0) {
 				this.server.cookieMaxAge = maxAge;
 			}
 		}
-		if (process.env.COOKIE_SECURE_ONLY && process.env.COOKIE_SECURE_ONLY.toLowerCase() === "true") {
+		if (process.env.COOKIE_SECURE_ONLY && process.env.COOKIE_SECURE_ONLY!.toLowerCase() === "true") {
 			this.server.cookieSecureOnly = true;
 		}
 		if (process.env.MONGO_URL) {
-			this.server.mongoURL = process.env.MONGO_URL;
+			this.server.mongoURL = process.env.MONGO_URL!;
 		}
 		if (process.env.UNIQUE_APP_ID) {
-			this.server.uniqueAppID = process.env.UNIQUE_APP_ID;
+			this.server.uniqueAppID = process.env.UNIQUE_APP_ID!;
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
-			this.admins = process.env.ADMIN_EMAILS.split(",");
+			this.admins = process.env.ADMIN_EMAILS!.split(",");
 		}
 		// Event name
 		if (process.env.EVENT_NAME) {
-			this.eventName = process.env.EVENT_NAME;
+			this.eventName = process.env.EVENT_NAME!;
 		}
 
 		if (process.env.MAX_TEAM_SIZE) {
-			this.maxTeamSize = process.env.MAX_TEAM_SIZE;
+			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE!, 10);
 		}
 	}
 }
@@ -215,52 +216,28 @@ import * as mongoose from "mongoose";
 mongoose.connect(url.resolve(config.server.mongoURL, config.server.uniqueAppID));
 export {mongoose};
 
-import {
-	ISettingMongoose, Setting
-} from "./schema";
+import { Setting } from "./schema";
 
 export async function setDefaultSettings() {
-	if (await Setting.find({ "name": "applicationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "applicationOpen",
-			"value": new Date()
-		}).save();
+	async function doesNotExist(key: string): Promise<boolean> {
+		return await Setting.find({ "name": key }).count() === 0;
 	}
-	if (await Setting.find({ "name": "applicationClose" }).count() === 0) {
-		await new Setting({
-			"name": "applicationClose",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "confirmationOpen" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationOpen",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "confirmationClose" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationClose",
-			"value": new Date()
-		}).save();
-	}
-	if (await Setting.find({ "name": "teamsEnabled" }).count() === 0) {
-		await new Setting({
-			"name": "teamsEnabled",
-			"value": true
-		}).save();
-	}
-	if (await Setting.find({ "name": "applicationBranches" }).count() === 0) {
-		await new Setting({
-			"name": "applicationBranches",
-			"value": []
-		}).save();
-	}
-	if (await Setting.find({ "name": "confirmationBranches" }).count() === 0) {
-		await new Setting({
-			"name": "confirmationBranches",
-			"value": []
-		}).save();
+
+	const DEFAULTS: any = {
+		"applicationOpen": new Date(),
+		"applicationClose": new Date(),
+		"confirmationOpen": new Date(),
+		"confirmationClose": new Date(),
+		"teamsEnabled": true,
+		"applicationBranches": [],
+		"confirmationBranches": []
+	};
+
+	for (let setting in DEFAULTS) {
+		if (await doesNotExist(setting)) {
+			await updateSetting(setting, DEFAULTS[setting]);
+			console.log(`Updated previously unset setting ${setting} to ${JSON.stringify(DEFAULTS[setting])}`);
+		}
 	}
 }
 export async function getSetting<T>(name: string, createMissing: boolean = true): Promise<T> {
@@ -282,6 +259,9 @@ export async function getSetting<T>(name: string, createMissing: boolean = true)
 export async function updateSetting<T>(name: string, value: T, createMissing: boolean = true): Promise<void> {
 	let setting = await Setting.findOne({ name });
 	if (!setting) {
+		if (!createMissing) {
+			throw new Error("Setting not found to update");
+		}
 		await new Setting({ name, value }).save();
 	}
 	else {
@@ -344,21 +324,16 @@ export enum ApplicationType {
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let openKey: string;
-	let closeKey: string;
+	let openDate: moment.Moment;
+	let closeDate: moment.Moment;
 	if (requestType === ApplicationType.Application) {
-		openKey = "applicationOpen";
-		closeKey = "applicationClose";
+		openDate = moment(await getSetting<Date>("applicationOpen"));
+		closeDate = moment(await getSetting<Date>("applicationClose"));
 	}
 	else {
-		openKey = "confirmationOpen";
-		closeKey = "confirmationClose";
+		openDate = moment(await getSetting<Date>("confirmationOpen"));
+		closeDate = moment(await getSetting<Date>("confirmationClose"));
 	}
-
-	let [openDate, closeDate] = (await Promise.all<ISettingMongoose>([
-		Setting.findOne({ "name": openKey }),
-		Setting.findOne({ "name": closeKey })
-	])).map(setting => moment(setting.value as Date));
 
 	if (moment().isBetween(openDate, closeDate)) {
 		next();
@@ -488,7 +463,7 @@ export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<n
 		});
 	});
 }
-function sanitize(input: string): string {
+export function sanitize(input: string): string {
 	if (typeof input !== "string") {
 		return "";
 	}

@@ -25,6 +25,9 @@
 			-->
 			<form method="post" data-action="/api/user/{{user._id}}/application/{{slug branch}}">
 				{{#each questionData}}
+					{{#if this.textContent}}
+						{{{this.textContent}}}
+					{{/if}}
 					{{#if this.multi}}
 						{{#ifCond this.type "select"}}
 							<label for="form-{{this.name}}">{{this.label}}</label>
@@ -62,6 +65,7 @@
 					{{/if}}
 					<br />
 				{{/each}}
+				{{{endText}}}
 				<div class="center">
 					{{#if user.applied}}
 						<input type="submit" value="Update" />
