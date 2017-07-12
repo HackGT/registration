@@ -1,6 +1,6 @@
 {
   "name": "registration",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "TBD",
   "main": "server/app.js",
   "scripts": {
