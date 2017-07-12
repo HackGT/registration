@@ -1,12 +1,12 @@
-import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
 
 import {
-	UPLOAD_ROOT,
-	postParser, uploadHandler,
+	STORAGE_ENGINE,
+	formatSize, MAX_FILE_SIZE,
+	postParser, uploadHandler, isAdmin, isUserOrAdmin,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
 	validateSchema,
@@ -14,52 +14,29 @@ import {
 } from "../../common";
 import {
 	IFormItem,
-	IUser, IUserMongoose, User,
+	IUserMongoose, User,
 	ITeamMongoose, Team
 } from "../../schema";
 import {QuestionBranches} from "../../config/questions.schema";
 
-function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let user = request.user as IUser;
-	if (!request.isAuthenticated()) {
-		response.status(401).json({
-			"error": "You must log in to access this endpoint"
-		});
-	}
-	else if (user._id.toString() !== request.params.id && !user.admin) {
-		response.status(403).json({
-			"error": "You are not permitted to access this endpoint"
-		});
-	}
-	else {
-		next();
-	}
-}
-
-function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let user = request.user as IUser;
-	if (!request.isAuthenticated()) {
-		response.status(401).json({
-			"error": "You must log in to access this endpoint"
-		});
-	}
-	else if (!user.admin) {
-		response.status(403).json({
-			"error": "You are not permitted to access this endpoint"
-		});
-	}
-	else {
-		next();
-	}
-}
-
 export let userRoutes = express.Router({ "mergeParams": true });
 
+let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, request, response, next) => {
+	if (err.code === "LIMIT_FILE_SIZE") {
+		response.status(400).json({
+			"error": `File size cannot exceed ${formatSize(MAX_FILE_SIZE, false)}`
+		});
+	}
+	else {
+		next(err);
+	}
+};
+
 userRoutes.route("/application/:branch")
-	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
 	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
 userRoutes.route("/confirmation/:branch")
-	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchHandler)
+	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
 	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
 
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
@@ -104,16 +81,25 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		if (errored) {
 			return null;
 		}
-		// (Hackily) redefines the type of request.files because the default type is incorrect for multer's .any() handler
-		let files: Express.Multer.File[] = (request.files as any) as Express.Multer.File[];
+		let files = request.files as Express.Multer.File[];
+		let preexistingFile: boolean = question.type === "file" && user.applicationData && user.applicationData.some(entry => entry.name === question.name && !!entry.value);
 
 		if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
 			// Required field not filled in
-			errored = true;
-			response.status(400).json({
-				"error": `'${question.label}' is a required field`
-			});
-			return null;
+			if (preexistingFile) {
+				return {
+					"name": question.name,
+					"type": "file",
+					"value": user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value
+				};
+			}
+			else {
+				errored = true;
+				response.status(400).json({
+					"error": `'${question.label}' is a required field`
+				});
+				return null;
+			}
 		}
 		if ((question.type === "select" || question.type === "radio") && Array.isArray(request.body[question.name]) && question.hasOther) {
 			// "Other" option selected
@@ -144,23 +130,13 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		await Promise.all(data
 			.map(item => item.value)
 			.filter(possibleFile => possibleFile !== null && typeof possibleFile === "object" && !Array.isArray(possibleFile))
-			.map((file: Express.Multer.File): Promise<void> => {
-				return new Promise<void>((resolve, reject) => {
-					fs.rename(file.path, path.join(UPLOAD_ROOT, file.filename), err => {
-						if (err) {
-							reject(err);
-							return;
-						}
-						resolve();
-					});
-				});
-			})
+			.map((file: Express.Multer.File): Promise<void> => STORAGE_ENGINE.saveFile(file.path, file.filename))
 		);
 		// Set the proper file locations in the data object
 		data = data.map(item => {
 			if (item.value !== null && typeof item.value === "object" && !Array.isArray(item.value)) {
-				item.value.destination = UPLOAD_ROOT;
-				item.value.path = path.join(UPLOAD_ROOT, item.value.filename);
+				item.value.destination = STORAGE_ENGINE.uploadRoot;
+				item.value.path = path.join(STORAGE_ENGINE.uploadRoot, item.value.filename);
 			}
 			return item;
 		});

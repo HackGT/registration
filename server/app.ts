@@ -58,6 +58,10 @@ apiRouter.use("/settings", settingsRoutes);
 
 app.use("/api", apiRouter);
 
+// Uploaded file downloading for admins
+import {uploadsRoutes} from "./routes/uploads";
+app.use("/uploads", uploadsRoutes);
+
 // User facing routes
 import {templateRoutes} from "./routes/templates";
 app.use("/", templateRoutes);

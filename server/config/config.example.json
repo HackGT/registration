@@ -23,9 +23,17 @@
 	},
 	"server": {
 		"isProduction": true,
-		"port": 3000
+		"port": 3000,
+		"cookieMaxAge": 15552000000,
+		"cookieSecureOnly": true
 	},
 	"admins": ["example@example.com"],
 	"eventName": "My Hackathon",
+	"storageEngine": {
+		"name": "disk",
+		"options": {
+			"uploadDirectory": "uploads"
+		}
+	},
 	"maxTeamSize": 4
 }

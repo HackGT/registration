@@ -9,6 +9,7 @@ import * as moment from "moment-timezone";
 // Config
 //
 import { IConfig } from "./schema";
+import { storageEngines } from "./storage";
 class Config implements IConfig.Main {
 	public secrets: IConfig.Secrets = {
 		"session": crypto.randomBytes(32).toString("hex"),
@@ -44,6 +45,12 @@ class Config implements IConfig.Main {
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
+	public storageEngine = {
+		"name": "disk",
+		"options": {
+			"uploadDirectory": "uploads"
+		}
+	};
 	public maxTeamSize: number = 4;
 
 	public sessionSecretSet: boolean = false;
@@ -87,12 +94,17 @@ class Config implements IConfig.Main {
 		if (config.eventName) {
 			this.eventName = config.eventName;
 		}
-		if (config.secrets && config.secrets.session) {
-			this.sessionSecretSet = true;
+		if (config.storageEngine) {
+			this.storageEngine = config.storageEngine;
+			if (!storageEngines[this.storageEngine.name]) {
+				console.warn(`Custom storage engine "${this.storageEngine.name}" does not exist`);
+			}
 		}
-
 		if (config.maxTeamSize) {
 			this.maxTeamSize = config.maxTeamSize;
+		}
+		if (config.secrets && config.secrets.session) {
+			this.sessionSecretSet = true;
 		}
 	}
 	protected loadFromEnv(): void {
@@ -183,7 +195,20 @@ class Config implements IConfig.Main {
 		if (process.env.EVENT_NAME) {
 			this.eventName = process.env.EVENT_NAME!;
 		}
-
+		// Storage engine
+		if (process.env.STORAGE_ENGINE) {
+			this.storageEngine.name = process.env.STORAGE_ENGINE!;
+			if (process.env.STORAGE_ENGINE_OPTIONS) {
+				this.storageEngine.options = JSON.parse(process.env.STORAGE_ENGINE_OPTIONS!);
+			}
+			else {
+				console.warn("Custom storage engine defined but no storage engine options passed");
+			}
+			if (!storageEngines[this.storageEngine.name]) {
+				console.warn(`Custom storage engine "${this.storageEngine.name}" does not exist`);
+			}
+		}
+		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE!, 10);
 		}
@@ -196,7 +221,6 @@ export let config = new Config();
 //
 export const PORT = config.server.port;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
-export const UPLOAD_ROOT = path.resolve(__dirname, "../uploads"); // Should exist already
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")).version;
 export const VERSION_HASH = config.server.versionHash;
 export const COOKIE_OPTIONS = {
@@ -205,13 +229,28 @@ export const COOKIE_OPTIONS = {
 	"secure": config.server.cookieSecureOnly,
 	"httpOnly": true
 };
+export const STORAGE_ENGINE = new storageEngines[config.storageEngine.name](config.storageEngine.options);
+
+export function formatSize(size: number, binary: boolean = true): string {
+	const base = binary ? 1024 : 1000;
+	const labels = binary ? ["bytes", "KiB", "MiB", "GiB", "TiB"] : ["bytes", "KB", "MB", "GB", "TB"];
+
+	let i = Math.floor(Math.log(size) / Math.log(base));
+	let formattedSize = `${(size / Math.pow(base, i)).toFixed(2)} ${labels[i]}`;
+	if (size <= 0) {
+		formattedSize = "0 bytes";
+	}
+	return formattedSize;
+}
 
 //
 // Database connection
 //
 import * as mongoose from "mongoose";
 (mongoose as any).Promise = global.Promise;
-mongoose.connect(config.server.mongoURL);
+mongoose.connect(config.server.mongoURL, {
+	useMongoClient: true
+} as mongoose.ConnectionOptions);
 export {mongoose};
 
 import { Setting } from "./schema";
@@ -277,23 +316,77 @@ import * as bodyParser from "body-parser";
 export let postParser = bodyParser.urlencoded({
 	extended: false
 });
+
 import * as multer from "multer";
+import {QuestionBranches} from "./config/questions.schema";
+
+export const MAX_FILE_SIZE = 50000000; // 50 MB
 export let uploadHandler = multer({
 	"storage": multer.diskStorage({
 		destination: (req, file, cb) => {
 			// The OS's default temporary directory
 			// Should be changed (or moved via fs.rename()) if the files are to be persisted
-			cb(null!, os.tmpdir());
+			cb(null, os.tmpdir());
 		},
 		filename: (req, file, cb) => {
-			cb(null!, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+			cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
 		}
 	}),
 	"limits": {
-		"fileSize": 50000000, // 50 MB
-		"files": 10 // Reasonable limit (real number is determined by the number of file questions in the config)
+		"fileSize": MAX_FILE_SIZE,
+		"files": getMaxFileUploads()
 	}
 });
+
+function getMaxFileUploads(): number {
+	// Can't use validateSchema() because this function needs to run synchronously to export uploadHandler before it gets used
+	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/questions.json"), "utf8"));
+	let questions = questionBranches.map(branch => branch.questions);
+	let fileUploadsPerBranch: number[] = questions.map(branch => {
+		return branch.reduce((prev, current) => {
+			if (current.type === "file") {
+				return prev + 1;
+			}
+			return prev;
+		}, 0);
+	});
+	return Math.max(...fileUploadsPerBranch);
+}
+
+export function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	let user = request.user as IUser;
+	if (!request.isAuthenticated()) {
+		response.status(401).json({
+			"error": "You must log in to access this endpoint"
+		});
+	}
+	else if (user._id.toString() !== request.params.id && !user.admin) {
+		response.status(403).json({
+			"error": "You are not permitted to access this endpoint"
+		});
+	}
+	else {
+		next();
+	}
+}
+
+export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	let user = request.user as IUser;
+	if (!request.isAuthenticated()) {
+		response.status(401).json({
+			"error": "You must log in to access this endpoint"
+		});
+	}
+	else if (!user.admin) {
+		response.status(403).json({
+			"error": "You are not permitted to access this endpoint"
+		});
+	}
+	else {
+		next();
+	}
+}
+
 // For API endpoints
 export function authenticateWithReject(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
@@ -405,7 +498,6 @@ export function readFileAsync(filename: string): Promise<string> {
 // JSON schema validator
 //
 import * as ajv from "ajv";
-import {QuestionBranches} from "./config/questions.schema";
 export async function validateSchema(questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<QuestionBranches> {
 	let questionBranches: QuestionBranches;
 	let schema: any;

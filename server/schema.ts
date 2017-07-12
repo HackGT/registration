@@ -45,6 +45,10 @@ export namespace IConfig {
 		server: Server;
 		admins: string[];
 		eventName: string;
+		storageEngine: {
+			name: string;
+			options: any;
+		};
 		maxTeamSize: number;
 	}
 }
@@ -264,6 +268,14 @@ export interface IAdminTemplate extends ICommonTemplate {
 			applicationBranches: string[];
 			confirmationBranches: string[];
 		};
+	};
+	config: {
+		admins: string;
+		eventName: string;
+		storageEngine: string;
+		uploadDirectoryRaw: string;
+		uploadDirectoryResolved: string;
+		maxTeamSize: string;
 	};
 }
 

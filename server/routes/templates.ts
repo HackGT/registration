@@ -6,10 +6,10 @@ import * as moment from "moment-timezone";
 import * as bowser from "bowser";
 
 import {
-	STATIC_ROOT,
+	STATIC_ROOT, STORAGE_ENGINE,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting, sanitize
+	formatSize, validateSchema, config, getSetting, sanitize
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -322,8 +322,11 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		else {
 			question["multi"] = false;
 		}
-		if (question.type === "file") {
-			savedValue = undefined;
+		if (savedValue && question.type === "file") {
+			savedValue = {
+				...savedValue,
+				value: (savedValue.value as Express.Multer.File).originalname
+			};
 		}
 		question["value"] = savedValue ? savedValue.value : "";
 
@@ -445,6 +448,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				applicationDataFormatted = statisticUser.applicationData.map(question => {
 					let rawQuestion = questionsFromBranch!.questions.find(q => q.name === question.name);
 					let value: string;
+					let filename = "";
 					if (typeof question.value === "string") {
 						value = question.value;
 					}
@@ -456,19 +460,19 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					}
 					else {
 						// Multer file
-						value = "[file]";
-					}
-					if (!rawQuestion) {
-						// No schema information for this question so return the raw name as the label
-						return {
-							"label": question.name,
-							"value": value
-						};
+						let file = question.value;
+						let formattedSize = formatSize(file.size);
+
+						value = `[${file.mimetype} | ${formattedSize}]: ${file.path}`;
+						filename = file.filename;
 					}
 
+					// If there isn't schema information for this question return the raw name as the label
+					let label: string = rawQuestion ? rawQuestion.label : question.name;
 					return {
-						"label": rawQuestion.label,
-						"value": value
+						label,
+						value,
+						filename
 					};
 				});
 			}
@@ -498,6 +502,14 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				"applicationBranches": applicationBranches,
 				"confirmationBranches": confirmationBranches
 			}
+		},
+		config: {
+			admins: config.admins.join(", "),
+			eventName: config.eventName,
+			storageEngine: config.storageEngine.name,
+			uploadDirectoryRaw: config.storageEngine.options.uploadDirectory,
+			uploadDirectoryResolved: STORAGE_ENGINE.uploadRoot,
+			maxTeamSize: config.maxTeamSize.toString()
 		}
 	};
 	// Generate general statistics
