@@ -1,0 +1,42 @@
+@import url("https://fonts.googleapis.com/css?family=Droid+Sans+Mono|VT323");
+
+/* Colors */
+html, body, #sidebar-nav {
+    background-color: #081517;
+    color: #c4fbf5;
+}
+#sidebar a, #sidebar {
+    color: #c4fbf5;
+}
+#sidebar-nav > span.divider, .main, table thead {
+    border-color: #c4fbf5;
+}
+a {
+    color: #03565c;
+}
+
+/* Buttons */
+.btn, [type=submit], button {
+    background-color: #c4fbf5;
+     /* border: 2px solid #03565c;  */
+    color: #081517;
+}
+
+/* Fonts */
+body, swal2-content, form > p, fieldset > div > label {
+    font-family: "Droid Sans Mono";
+}
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3, h4, h5, h6, code, #sidebar a, #sidebar, label {
+    font-family: "VT323";
+}
+code {
+    color: #081517;
+}
+
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset {
+    background-color: #081517;
+}
