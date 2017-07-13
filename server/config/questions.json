@@ -1,7 +1,13 @@
 [
     {
         "name": "Participant",
-        "text": [],
+        "text": [
+            {
+                "for": "end",
+                "type": "p",
+                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            }
+        ],
         "questions": [
             {
                 "name": "name",
@@ -362,7 +368,8 @@
                 "type": "radio",
                 "options": [
                     "Yes",
-                    "No"
+                    "No, I've attended HackGT before",
+                    "No, I've attended other hackathons before"
                 ],
                 "required": true
             },
@@ -827,7 +834,38 @@
     },
     {
         "name": "Volunteer",
-        "text": [],
+        "text": [
+            {
+                "for": "volunteer-role",
+                "type": "h3",
+                "content": "Volunteer Type"
+            },
+            {
+                "for": "volunteer-role",
+                "type": "p",
+                "content": "We have two types of volunteering positions you may apply for: Core Volunteers and General Volunteers."
+            },
+            {
+                "for": "volunteer-role",
+                "type": "h5",
+                "content": "Core Volunteer"
+            },
+            {
+                "for": "volunteer-role",
+                "type": "p",
+                "content": "Core Volunteer responsibilities include being assigned to a major role during the event, leading other volunteers, and liaisoning between general volunteers and volunteer coordinators. Becoming a Core Volunteer requires a greater time commitment: you'll be expected to attend two training sessions prior to the event and be present for the majority of the event."
+            },
+            {
+                "for": "volunteer-role",
+                "type": "h5",
+                "content": "General Volunteer"
+            },
+            {
+                "for": "volunteer-role",
+                "type": "p",
+                "content": "General Volunteer responsibilities might include setting up and tearing down the venue, managing registration, setting up and cleaning up meals, and working a help desk. Becoming a General Volunteer requires less of a time commitment: you'll be expected to attend one training session prior to the event and work at least 2 4-hour shifts during the event."
+            }
+        ],
         "questions": [
             {
                 "name": "name",
