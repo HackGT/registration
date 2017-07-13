@@ -82,10 +82,14 @@ type Profile = passport.Profile & {
 	_json: any;
 };
 function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleData" | "facebookData", options: OAuthStrategyOptions) {
-	passport.use(new strategy(options, async (request: express.Request, accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false) => void) => {
+	passport.use(new strategy(options, async (request: express.Request, accessToken: string, refreshToken: string, profile: Profile, done: (err: Error | null, user?: IUserMongoose | false, errMessage?: object) => void) => {
 		let email: string = "";
 		if (profile.emails && profile.emails.length > 0) {
 			email = profile.emails[0].value;
+		}
+		else if (!profile.emails || profile.emails.length === 0) {
+			done(null, false, { message: "Your GitHub profile does not have any public email addresses. Please make an email address public before logging in with GitHub." });
+			return;
 		}
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
@@ -355,7 +359,7 @@ function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", s
 		let callbackURL = `${request.protocol}://${request.hostname}:${getExternalPort(request)}/${callbackHref}`;
 		passport.authenticate(
 			serviceName,
-			{ failureRedirect: "/login", callbackURL } as passport.AuthenticateOptions
+			{ failureRedirect: "/login", failureFlash: true, callbackURL } as passport.AuthenticateOptions
 		)(request, response, next);
 	}, (request, response) => {
 		// Successful authentication, redirect home
