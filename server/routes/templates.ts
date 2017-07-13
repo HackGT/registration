@@ -206,7 +206,7 @@ async function applicationHandler(request: express.Request, response: express.Re
 		response.redirect("/confirm");
 		return;
 	}
-	if (requestType === ApplicationType.Confirmation && !user.accepted) {
+	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
 		response.redirect("/apply");
 		return;
 	}
@@ -256,6 +256,12 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
 	let user = request.user as IUser;
+
+	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
+		response.redirect("/apply");
+		return;
+	}
+
 	let branchName = request.params.branch as string;
 	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
