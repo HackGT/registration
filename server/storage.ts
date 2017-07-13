@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
+import * as AWS from "aws-sdk";
+
 /**
  * All uploaded files are initially saved in the OS's temp directory in case the files uploaded aren't valid
  * A storage engine takes this local path to the file on disk and does something with it to persist it for later reference
@@ -59,11 +61,68 @@ class DiskStorageEngine implements IStorageEngine {
 	}
 }
 
+interface IS3Options extends ICommonOptions {
+	bucket: string;
+	region: string;
+	accessKey: string;
+	secretKey: string;
+}
+
+class S3StorageEngine implements IStorageEngine {
+	public readonly uploadRoot: string;
+	private readonly options: IS3Options;
+
+	constructor(options: IS3Options) {
+		// Values copied via spread operator instead of being passed by reference
+		this.options = {
+			...options
+		};
+		this.uploadRoot = this.options.uploadDirectory;
+	}
+
+	public saveFile(currentPath: string, name: string): Promise<void> {
+		AWS.config.update({
+			region: this.options.region,
+			credentials: new AWS.Credentials({
+				accessKeyId: this.options.accessKey,
+				secretAccessKey: this.options.secretKey
+			})
+		});
+		let s3 = new AWS.S3();
+		return new Promise<void>((resolve, reject) => {
+			let readStream = fs.createReadStream(currentPath);
+			readStream.on("error", reject);
+			s3.putObject({
+				Body: readStream,
+				Bucket: this.options.bucket,
+				Key: name
+			}).promise().then((output) => {
+				resolve();
+			}).catch(reject);
+		});
+	}
+	public readFile(name: string): Readable {
+		AWS.config.update({
+			region: this.options.region,
+			credentials: new AWS.Credentials({
+				accessKeyId: this.options.accessKey,
+				secretAccessKey: this.options.secretKey
+			})
+		});
+		let s3 = new AWS.S3();
+		return s3.getObject({
+			Bucket: this.options.bucket,
+			Key: name
+		}).createReadStream();
+	}
+}
+
 interface IStorageEngines {
 	[name: string]: {
 		new(options: ICommonOptions): IStorageEngine;
 	};
 }
 export const storageEngines: IStorageEngines = {
-	"disk": DiskStorageEngine
+	"disk": DiskStorageEngine,
+	"s3": S3StorageEngine
 };
