@@ -602,6 +602,16 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 	}
 	// Remove <style> and <script> block's content
 	html = html.replace(/<style>[\s\S]*?<\/style>/gi, "<style></style>").replace(/<script>[\s\S]*?<\/script>/gi, "<script></script>");
+
+	// Append href of links to their text
+	const cheerio = await import("cheerio");
+	let $ = cheerio.load(html, { decodeEntities: false });
+	$("a").each((i, el) => {
+		let element = $(el);
+		element.text(`${element.text()} (${element.attr("href")})`);
+	});
+	html = $.html();
+
 	let text: string = striptags(html);
 	// Reverse sanitization
 	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
