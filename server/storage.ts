@@ -102,7 +102,13 @@ class S3StorageEngine implements IStorageEngine {
 		});
 	}
 	public readFile(name: string): Readable {
-		AWS.config.update({region: this.options.region});
+		AWS.config.update({
+			region: this.options.region,
+			credentials: new AWS.Credentials({
+				accessKeyId: this.options.accessKey,
+				secretAccessKey: this.options.secretKey
+			})
+		});
 		let s3 = new AWS.S3();
 		return s3.getObject({
 			Bucket: this.options.bucket,
