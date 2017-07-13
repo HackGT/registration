@@ -5,14 +5,26 @@ html, body, #sidebar-nav {
     background-color: #081517;
     color: #c4fbf5;
 }
-#sidebar a, #sidebar {
+#sidebar a, #sidebar, .editor-toolbar > a {
     color: #c4fbf5;
+}
+.editor-toolbar > a {
+    color: #c4fbf5 !important;
+}
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #081517;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
 }
 #sidebar-nav > span.divider, .main, table thead {
     border-color: #c4fbf5;
 }
 a {
     color: #03565c;
+}
+#email-rendered {
+    background-color: #081517;
+    border: 1px solid #c4fbf5;
 }
 
 /* Buttons */
@@ -37,6 +49,12 @@ code {
 }
 
 /* Form elements */
-input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset {
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
     background-color: #081517;
+    color: white;
+    border-color: #c4fbf5;
+    font-family: "Droid Sans Mono";
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: white;
 }
