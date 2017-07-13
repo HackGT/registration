@@ -21,7 +21,7 @@
             {
                 "name": "school-year",
                 "type": "select",
-                "label": "What is your year in school?",
+                "label": "What year of studies are you currently in?",
                 "options": [
                     "First year",
                     "Second year",
@@ -114,7 +114,7 @@
             },
             {
                 "name": "resume",
-                "label": "Please upload a resume or skill sheet",
+                "label": "Please upload your resume or a skill sheet",
                 "type": "file",
                 "required": true
             },
@@ -172,6 +172,180 @@
                 "label": "Anything else you want us to know?",
                 "type": "textarea",
                 "required": false
+            }
+        ]
+    },
+    {
+        "name": "Mentor",
+        "text": [],
+        "questions": [
+            {
+                "name": "name",
+                "type": "text",
+                "label": "Full name",
+                "required": true
+            },
+            {
+                "name": "gender",
+                "label": "Gender",
+                "type": "radio",
+                "options": ["Male", "Female"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "race",
+                "label": "Race / ethnicity",
+                "type": "checkbox",
+                "options": [
+                    "Non-Hispanic White",
+                    "Black or African American",
+                    "Latino, Latina, or Hispanic American",
+                    "South Asian or Indian American",
+                    "East Asian or Asian American",
+                    "Middle Eastern or Arab American",
+                    "Native American or Alaskan Native",
+                    "Hawaiian or Pacific Islander"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "major",
+                "label": "What is your major?",
+                "type": "select",
+                "options": [
+                    "",
+                    "Accounting",
+                    "Aerospace Engineering",
+                    "Applied Physics",
+                    "Architecture",
+                    "Astronomy or Astrophysics",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business",
+                    "Chemical Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computational Media",
+                    "Computer Engineering",
+                    "Computer Science",
+                    "Discrete Mathematics",
+                    "Drama or Theater",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Electrical Engineering",
+                    "English or Literature, Media, and Communication",
+                    "Environmental Engineering",
+                    "Film and Media Studies",
+                    "Finance",
+                    "Global Studies and Languages",
+                    "History",
+                    "Humanities",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs or International Relations",
+                    "Linguistics",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Philosophy",
+                    "Physics",
+                    "Political Science",
+                    "Psychology",
+                    "Public Policy",
+                    "Urban Planning"
+                ],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "is-student",
+                "label": "Are you currently a student?",
+                "type": "radio",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            },
+            {
+                "name": "school-if-student",
+                "label": "If so, what college or university do you attend?",
+                "type": "select",
+                "options": [
+                    "Georgia Institute of Technology"
+                ],
+                "required": false
+            },
+            {
+                "name": "job-if-not-student",
+                "label": "If not, what do you do?",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "resume",
+                "label": "Please upload your resume or a skill sheet",
+                "type": "file",
+                "required": true
+            },
+            {
+                "name": "what-can-mentor",
+                "label": "What topics are you comfortable mentoring in?",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "github",
+                "label": "GitHub username",
+                "type": "url",
+                "required": false
+            },
+            {
+                "name": "website",
+                "label": "Personal website",
+                "type": "url",
+                "required": false
+            },
+            {
+                "name": "other-links",
+                "label": "Other relevant links (e.g. LinkedIn)",
+                "type": "url",
+                "required": false
+            },
+            {
+                "name": "can-hold-workshop",
+                "label": "Would you be willing to hold a workshop?",
+                "type": "radio",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            },
+            {
+                "name": "workshop-if-willing",
+                "label": "If so, about what?",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "teaching-experience",
+                "label": "Describe your previous experiences with teaching",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "why-mentor",
+                "label": "Why do you want to be a mentor at HackGT?",
+                "type": "textarea",
+                "required": true
             }
         ]
     }
