@@ -780,7 +780,7 @@
             },
             {
                 "name": "what-can-mentor",
-                "label": "What topics are you comfortable mentoring in?",
+                "label": "What topics are you comfortable mentoring in? Please list most proficient first.",
                 "type": "textarea",
                 "required": true
             },
