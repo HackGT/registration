@@ -58,3 +58,6 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
 input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
     border-color: white;
 }
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, #081517, #081517 10px, #192729 10px, #192729 20px )
+}
