@@ -831,6 +831,39 @@
                 "label": "Why do you want to be a mentor at HackGT?",
                 "type": "textarea",
                 "required": true
+            },
+            {
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
+                "type": "radio",
+                "options": [
+                    "Extra small",
+                    "Small",
+                    "Medium",
+                    "Large",
+                    "Extra large",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true
+            },
+            {
+                "name": "dietary-restrictions",
+                "label": "Do you have any dietary restrictions?",
+                "type": "checkbox",
+                "options": [
+                    "Vegetarian",
+                    "Vegan",
+                    "Gluten-free"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "other",
+                "label": "Anything else you want us to know?",
+                "type": "textarea",
+                "required": false
             }
         ]
     },
@@ -1038,6 +1071,39 @@
                 "label": "What do you hope to gain by volunteering at HackGT?",
                 "type": "textarea",
                 "required": true
+            },
+            {
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
+                "type": "radio",
+                "options": [
+                    "Extra small",
+                    "Small",
+                    "Medium",
+                    "Large",
+                    "Extra large",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true
+            },
+            {
+                "name": "dietary-restrictions",
+                "label": "Do you have any dietary restrictions?",
+                "type": "checkbox",
+                "options": [
+                    "Vegetarian",
+                    "Vegan",
+                    "Gluten-free"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "other",
+                "label": "Anything else you want us to know?",
+                "type": "textarea",
+                "required": false
             }
         ]
     }
