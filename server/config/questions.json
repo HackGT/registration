@@ -348,5 +348,181 @@
                 "required": true
             }
         ]
+    },
+    {
+        "name": "Volunteer",
+        "text": [],
+        "questions": [
+            {
+                "name": "name",
+                "type": "text",
+                "label": "Full name",
+                "required": true
+            },
+            {
+                "name": "phone",
+                "type": "tel",
+                "label": "Phone number",
+                "required": true
+            },
+            {
+                "name": "gender",
+                "label": "Gender",
+                "type": "radio",
+                "options": ["Male", "Female"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "race",
+                "label": "Race / ethnicity",
+                "type": "checkbox",
+                "options": [
+                    "Non-Hispanic White",
+                    "Black or African American",
+                    "Latino, Latina, or Hispanic American",
+                    "South Asian or Indian American",
+                    "East Asian or Asian American",
+                    "Middle Eastern or Arab American",
+                    "Native American or Alaskan Native",
+                    "Hawaiian or Pacific Islander"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "school-year",
+                "type": "select",
+                "label": "What year of studies are you currently in?",
+                "options": [
+                    "First year",
+                    "Second year",
+                    "Third year",
+                    "Fourth year",
+                    "Fifth year+",
+                    "Master's",
+                    "PhD"
+                ],
+                "required": true
+            },
+            {
+                "name": "major",
+                "label": "What is your major?",
+                "type": "select",
+                "options": [
+                    "",
+                    "Accounting",
+                    "Aerospace Engineering",
+                    "Applied Physics",
+                    "Architecture",
+                    "Astronomy or Astrophysics",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business",
+                    "Chemical Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computational Media",
+                    "Computer Engineering",
+                    "Computer Science",
+                    "Discrete Mathematics",
+                    "Drama or Theater",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Electrical Engineering",
+                    "English or Literature, Media, and Communication",
+                    "Environmental Engineering",
+                    "Film and Media Studies",
+                    "Finance",
+                    "Global Studies and Languages",
+                    "History",
+                    "Humanities",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs or International Relations",
+                    "Linguistics",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Philosophy",
+                    "Physics",
+                    "Political Science",
+                    "Psychology",
+                    "Public Policy",
+                    "Urban Planning"
+                ],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "career-aspirations",
+                "label": "What are your career aspirations within that field?",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "how-know-about-hackgt",
+                "label": "How did you hear about HackGT?",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "hackathon-attendance",
+                "label": "Have you attended HackGT or any other hackathons in the past?",
+                "type": "radio",
+                "options": [
+                    "Yes, HackGT and other hackathons",
+                    "Yes, only HackGT",
+                    "Yes, other hackathons but not HackGT",
+                    "No"
+                ],
+                "required": true
+            },
+            {
+                "name": "hackathon-experiences",
+                "label": "If so, tell us about your experience(s)",
+                "type": "textarea",
+                "required": false
+            },
+            {
+                "name": "volunteer-role",
+                "label": "What role do you want to be as a volunteer?",
+                "type": "radio",
+                "options": [
+                    "Core",
+                    "General"
+                ],
+                "required": true
+            },
+            {
+                "name": "why-you",
+                "label": "What traits do you possess that will make you a good volunteer?",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "example-experience",
+                "label": "Describe a time when you have worked with someone different than yourself and what you learned during that experience",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "example-disagreement",
+                "label": "Describe a situation when you did not agree with a decision being made by someone leading you and how you handled or responded to that situation",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "hope-to-gain",
+                "label": "What do you hope to gain by volunteering at HackGT?",
+                "type": "textarea",
+                "required": true
+            }
+        ]
     }
 ]
