@@ -1,43 +1,7 @@
 [
     {
         "name": "Participant",
-        "text": [
-            {
-                "for": "name",
-                "type": "h3",
-                "content": "Some <h3> content"
-            },
-            {
-                "for": "phone",
-                "type": "h6",
-                "content": "Text blocks are stackable"
-            },
-            {
-                "for": "phone",
-                "type": "p",
-                "content": "Some extra information about why we need this"
-            },
-            {
-                "for": "phone",
-                "type": "p",
-                "content": "Another paragraph describing why we need this"
-            },
-            {
-                "for": "phone",
-                "type": "p",
-                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas egestas ipsum ut pharetra egestas. Quisque cursus ex quis condimentum ultricies. Vestibulum quis diam eu tortor tincidunt molestie. Vivamus commodo tristique eros vel scelerisque. Vivamus sed velit id lectus laoreet facilisis. Quisque lacinia pellentesque dui, eu venenatis libero porta ut. Etiam id aliquet nibh. Donec eu turpis arcu. Duis pretium tincidunt turpis, id viverra tortor auctor in. Proin eget gravida purus. Nam sed lorem at enim dapibus tempus id non justo. Nullam id est erat."
-            },
-            {
-                "for": "tshirt-size",
-                "type": "h3",
-                "content": "Some <h3> content near the end"
-            },
-            {
-                "for": "end",
-                "type": "p",
-                "content": "Example footer text that appears right above the submit button"
-            }
-        ],
+        "text": [],
         "questions": [
             {
                 "name": "name",
@@ -46,136 +10,88 @@
                 "required": true
             },
             {
-                "name": "phone",
-                "type": "tel",
-                "label": "Phone number",
-                "required": true
-            },
-            {
-                "name": "phone-ownership",
-                "label": "Whose phone number is that?",
-                "type": "radio",
+                "name": "school",
+                "type": "select",
+                "label": "What college or university do you currently attend?",
                 "options": [
-                    "Mine",
-                    "My parent's / guardian's"
+                    "Georgia Institute of Technology"
                 ],
                 "required": true
             },
             {
-                "name": "school",
-                "label": "School",
+                "name": "school-year",
+                "type": "select",
+                "label": "What is your year in school?",
+                "options": [
+                    "First year",
+                    "Second year",
+                    "Third year",
+                    "Fourth year",
+                    "Fifth year+",
+                    "Master's",
+                    "PhD"
+                ],
+                "required": true
+            },
+            {
+                "name": "major",
+                "label": "What is your major?",
                 "type": "select",
                 "options": [
-                    "Allatoona High School",
-                    "Alpharetta High School",
-                    "Arabia Mountain High School - Academy of Engineering, Medicine and Environment",
-                    "Banneker High School",
-                    "Booker T. Washington - Early College Small School",
-                    "Booker T. Washington High School - Banking, Finance and Investment Small School",
-                    "Booker T. Washington High School - Health, Sciences and Nutrition Small School",
-                    "Cambridge High School",
-                    "Campbell High School",
-                    "Cedar Grove High School",
-                    "Centennial High School",
-                    "Chamblee Charter High School",
-                    "Charles R. Drew High School",
-                    "Chattahoochee High School",
-                    "Clarkston High School",
-                    "Columbia High School",
-                    "Creekside High School",
-                    "Crim High School",
-                    "Cross Keys High School",
-                    "DeKalb Alternative School",
-                    "Dekalb Early College Academy",
-                    "DeKalb School of the Arts",
-                    "Destiny Achievers Academy of Excellence",
-                    "Douglass High School",
-                    "Druid Hills High School",
-                    "Dunwoody High School",
-                    "Early College High School at Carver",
-                    "Elizabeth Andrews High School",
-                    "Forest Park High School",
-                    "Gateway to College Academy",
-                    "Grady High School",
-                    "Hapeville Charter Career Academy",
-                    "Harrison High School",
-                    "Hillgrove High School",
-                    "Independence Alternative School",
-                    "Jonesboro High School",
-                    "Kell High School",
-                    "Kennesaw Mountain High School",
-                    "Lakeside High School",
-                    "Lassiter High School",
-                    "Lithonia High School",
-                    "Lovejoy High School",
-                    "Martin Luther King, Jr. High School ",
-                    "Maynard H. Jackson, Jr. High School",
-                    "Mays High School",
-                    "McClarin Alternative School",
-                    "McEachern High School",
-                    "McNair High School",
-                    "Miller Grove High School",
-                    "Milton High School",
-                    "Morrow High School",
-                    "Mount Zion High School",
-                    "Mundy's Mill High School",
-                    "North Atlanta High School",
-                    "North Clayton High School",
-                    "North Cobb High School",
-                    "North Springs High School",
-                    "Northview High School",
-                    "Oakwood High School",
-                    "Osborne High School",
-                    "Pebblebrook High School",
-                    "Pope High School",
-                    "Redan High School",
-                    "Riverdale High School",
-                    "Roswell High School",
-                    "School of Health Sciences and Research at Carver",
-                    "School of Technology at Carver",
-                    "South Atlanta Law and Social Justice School",
-                    "South Atlanta School of Computer Animation and Design",
-                    "South Atlanta School of Health and Medical Science",
-                    "South Cobb High School",
-                    "Southwest DeKalb High School",
-                    "Sprayberry High School",
-                    "Stephenson High School",
-                    "Stone Mountain High School",
-                    "TEACH Charter High School",
-                    "The School of the Arts at Carver",
-                    "Therrell School of Engineering, Math, and Science",
-                    "Therrell School of Health and Science",
-                    "Therrell School of Law, Government and Public Policy",
-                    "Towers High School",
-                    "Tucker High School",
-                    "Walton High School",
-                    "Westlake High School",
-                    "Wheeler High School"
+                    "",
+                    "Accounting",
+                    "Aerospace Engineering",
+                    "Applied Physics",
+                    "Architecture",
+                    "Astronomy or Astrophysics",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business",
+                    "Chemical Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computational Media",
+                    "Computer Engineering",
+                    "Computer Science",
+                    "Discrete Mathematics",
+                    "Drama or Theater",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Electrical Engineering",
+                    "English or Literature, Media, and Communication",
+                    "Environmental Engineering",
+                    "Film and Media Studies",
+                    "Finance",
+                    "Global Studies and Languages",
+                    "History",
+                    "Humanities",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs or International Relations",
+                    "Linguistics",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Philosophy",
+                    "Physics",
+                    "Political Science",
+                    "Psychology",
+                    "Public Policy",
+                    "Urban Planning"
                 ],
                 "hasOther": true,
                 "required": true
             },
             {
-                "name": "grade",
-                "label": "Grade",
+                "name": "gender",
+                "label": "Gender",
                 "type": "radio",
-                "options": [
-                    "9th grade",
-                    "10th grade",
-                    "11th grade",
-                    "12th grade"
-                ],
-                "required": true
-            },
-            {
-                "name": "referrer",
-                "label": "How did you hear about us?",
-                "type": "radio",
-                "options": [
-                    "Teacher / Counselor",
-                    "Friend",
-                    "Family"
-                ],
+                "options": ["Male", "Female"],
                 "hasOther": true,
                 "required": true
             },
@@ -184,20 +100,44 @@
                 "label": "Race / ethnicity",
                 "type": "checkbox",
                 "options": [
-                    "White",
-                    "Hispanic or Latino",
+                    "Non-Hispanic White",
                     "Black or African American",
-                    "Native American or American Indian",
-                    "Asian"
+                    "Latino, Latina, or Hispanic American",
+                    "South Asian or Indian American",
+                    "East Asian or Asian American",
+                    "Middle Eastern or Arab American",
+                    "Native American or Alaskan Native",
+                    "Hawaiian or Pacific Islander"
                 ],
-                "hasOther": true
+                "hasOther": true,
+                "required": false
             },
             {
-                "name": "gender",
-                "label": "Gender",
+                "name": "resume",
+                "label": "Please upload a resume or skill sheet",
+                "type": "file",
+                "required": true
+            },
+            {
+                "name": "first-hackathon",
+                "label": "Will HackGT be your first hackathon?",
                 "type": "radio",
-                "options": ["Male", "Female"],
-                "hasOther": true,
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            },
+            {
+                "name": "hope-to-learn",
+                "label": "What do you hope to learn at HackGT?",
+                "type": "textarea",
+                "required": true
+            },
+            {
+                "name": "resources",
+                "label": "Help us help you: what resources would you like to see at HackGT?",
+                "type": "textarea",
                 "required": true
             },
             {
@@ -209,228 +149,29 @@
                     "Small",
                     "Medium",
                     "Large",
-                    "Extra large"
+                    "Extra large",
+                    "2XL",
+                    "3XL"
                 ],
                 "required": true
-            }
-        ]
-    },
-    {
-        "name": "File Upload",
-        "questions": [
-            {
-                "name": "name",
-                "type": "text",
-                "label": "Name",
-                "required": true
             },
             {
-                "name": "file1",
-                "type": "file",
-                "label": "Upload a file",
-                "required": true
-            },
-            {
-                "name": "file2",
-                "type": "file",
-                "label": "Upload another file",
-                "required": true
-            }
-        ]
-    },
-    {
-        "name": "Mentor",
-        "questions": [
-            {
-                "name": "name",
-                "type": "text",
-                "label": "Full name",
-                "required": true
-            },
-            {
-                "name": "phone",
-                "type": "tel",
-                "label": "Phone number",
-                "required": true
-            },
-            {
-                "name": "occupation",
-                "type": "radio",
-                "label": "I am a...",
+                "name": "dietary-restrictions",
+                "label": "Do you have any dietary restrictions?",
+                "type": "checkbox",
                 "options": [
-                    "Teacher",
-                    "School Administrator",
-                    "School Counselor",
-                    "School Librarian",
-                    "Georgia Tech student",
-                    "Georgia Tech faculty",
-                    "Someone in industry"
+                    "Vegetarian",
+                    "Vegan",
+                    "Gluten-free"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": false
             },
             {
-                "name": "essay",
+                "name": "other",
+                "label": "Anything else you want us to know?",
                 "type": "textarea",
-                "label": "Why do you want to be a mentor?",
-                "required": true
-            },
-            {
-                "name": "race",
-                "label": "Race / ethnicity",
-                "type": "checkbox",
-                "options": [
-                    "White",
-                    "Hispanic or Latino",
-                    "Black or African American",
-                    "Native American or American Indian",
-                    "Asian"
-                ],
-                "hasOther": true
-            },
-            {
-                "name": "gender",
-                "label": "Gender",
-                "type": "radio",
-                "options": ["Male", "Female"],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "confirmation",
-                "label": "We need you to confirm a few things",
-                "type": "checkbox",
-                "options": [
-                    "I'm OK with a (free) background check",
-                    "I can attend a 1.5 hour training session (several sessions will be offered)",
-                    "I can stay for all / most of the event and work closely with students to help and inspire"
-                ],
-                "required": true
-            }
-        ]
-    },
-    {
-        "name": "Chaperone",
-        "questions": [
-            {
-                "name": "name",
-                "type": "text",
-                "label": "Full name",
-                "required": true
-            },
-            {
-                "name": "phone",
-                "type": "tel",
-                "label": "Phone number",
-                "required": true
-            },
-            {
-                "name": "occupation",
-                "type": "radio",
-                "label": "I am a...",
-                "options": [
-                    "Teacher",
-                    "School Administrator",
-                    "School Counselor",
-                    "School Librarian",
-                    "Parent / Guardian"
-                ],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "school",
-                "label": "What school are you chaperoning?",
-                "type": "select",
-                "options": [
-                    "Allatoona High School",
-                    "Alpharetta High School",
-                    "Arabia Mountain High School - Academy of Engineering, Medicine and Environment",
-                    "Banneker High School",
-                    "Booker T. Washington - Early College Small School",
-                    "Booker T. Washington High School - Banking, Finance and Investment Small School",
-                    "Booker T. Washington High School - Health, Sciences and Nutrition Small School",
-                    "Cambridge High School",
-                    "Campbell High School",
-                    "Cedar Grove High School",
-                    "Centennial High School",
-                    "Chamblee Charter High School",
-                    "Charles R. Drew High School",
-                    "Chattahoochee High School",
-                    "Clarkston High School",
-                    "Columbia High School",
-                    "Creekside High School",
-                    "Crim High School",
-                    "Cross Keys High School",
-                    "DeKalb Alternative School",
-                    "Dekalb Early College Academy",
-                    "DeKalb School of the Arts",
-                    "Destiny Achievers Academy of Excellence",
-                    "Douglass High School",
-                    "Druid Hills High School",
-                    "Dunwoody High School",
-                    "Early College High School at Carver",
-                    "Elizabeth Andrews High School",
-                    "Forest Park High School",
-                    "Gateway to College Academy",
-                    "Grady High School",
-                    "Hapeville Charter Career Academy",
-                    "Harrison High School",
-                    "Hillgrove High School",
-                    "Independence Alternative School",
-                    "Jonesboro High School",
-                    "Kell High School",
-                    "Kennesaw Mountain High School",
-                    "Lakeside High School",
-                    "Lassiter High School",
-                    "Lithonia High School",
-                    "Lovejoy High School",
-                    "Martin Luther King, Jr. High School ",
-                    "Maynard H. Jackson, Jr. High School",
-                    "Mays High School",
-                    "McClarin Alternative School",
-                    "McEachern High School",
-                    "McNair High School",
-                    "Miller Grove High School",
-                    "Milton High School",
-                    "Morrow High School",
-                    "Mount Zion High School",
-                    "Mundy's Mill High School",
-                    "North Atlanta High School",
-                    "North Clayton High School",
-                    "North Cobb High School",
-                    "North Springs High School",
-                    "Northview High School",
-                    "Oakwood High School",
-                    "Osborne High School",
-                    "Pebblebrook High School",
-                    "Pope High School",
-                    "Redan High School",
-                    "Riverdale High School",
-                    "Roswell High School",
-                    "School of Health Sciences and Research at Carver",
-                    "School of Technology at Carver",
-                    "South Atlanta Law and Social Justice School",
-                    "South Atlanta School of Computer Animation and Design",
-                    "South Atlanta School of Health and Medical Science",
-                    "South Cobb High School",
-                    "Southwest DeKalb High School",
-                    "Sprayberry High School",
-                    "Stephenson High School",
-                    "Stone Mountain High School",
-                    "TEACH Charter High School",
-                    "The School of the Arts at Carver",
-                    "Therrell School of Engineering, Math, and Science",
-                    "Therrell School of Health and Science",
-                    "Therrell School of Law, Government and Public Policy",
-                    "Towers High School",
-                    "Tucker High School",
-                    "Walton High School",
-                    "Westlake High School",
-                    "Wheeler High School"
-                ],
-                "hasOther": true,
-                "required": true
+                "required": false
             }
         ]
     }
