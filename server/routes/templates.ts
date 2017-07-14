@@ -521,7 +521,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	// Generate general statistics
 	(await User.find({ "applied": true })).forEach(statisticUser => {
 		let branchQuestions = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch)!.questions;
-		let branch = statisticUser.applicationBranch;
+		let branchName = statisticUser.applicationBranch;
 		statisticUser.applicationData.forEach(question => {
 			if (question.value === null) {
 				return;
@@ -536,7 +536,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				}
 				for (let checkboxValue of values) {
 					let rawQuestion = branchQuestions.find(q => q.name === question.name)!;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label && entry.branch === branch);
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label && entry.branch === branchName);
 
 					if (!statisticEntry) {
 						statisticEntry = {
