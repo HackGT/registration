@@ -536,11 +536,11 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				}
 				for (let checkboxValue of values) {
 					let rawQuestion = branchQuestions.find(q => q.name === question.name)!;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => branch + '-' + entry.questionName === branch + '-' + rawQuestion.label);
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label && entry.branch === branch);
 
 					if (!statisticEntry) {
 						statisticEntry = {
-							"questionName": branch + '-' + rawQuestion!.label,
+							"questionName": rawQuestion!.label,
 							"branch": statisticUser.applicationBranch,
 							"responses": []
 						};
