@@ -18,7 +18,12 @@
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "plugins": [
-            { "name": "tslint-language-service"}
+            {
+				"name": "tslint-language-service",
+				"alwaysShowRuleFailuresAsWarnings": false,
+				"ignoreDefinitionFiles": true,
+				"configFile": "../tslint.json"
+			}
         ],
         "moduleResolution": "node"
     },
