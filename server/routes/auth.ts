@@ -203,7 +203,7 @@ passport.use(new LocalStrategy({
 		}
 		let isAdmin = false; // Only set this after they have verified their email
 		let salt = crypto.randomBytes(32);
-		let hash = await pbkdf2Async(password, salt, PBKDF2_ROUNDS, 128, "sha256");
+		let hash = await pbkdf2Async(password, salt, PBKDF2_ROUNDS);
 		user = new User({
 			"email": email,
 			"name": request.body.name,
@@ -262,7 +262,7 @@ The ${config.eventName} Team.`;
 	}
 	else {
 		// Log the user in
-		let hash = await pbkdf2Async(password, Buffer.from(user.localData.salt, "hex"), PBKDF2_ROUNDS, 128, "sha256");
+		let hash = await pbkdf2Async(password, Buffer.from(user.localData.salt, "hex"), PBKDF2_ROUNDS);
 		if (hash.toString("hex") === user.localData.hash) {
 			if (user.verifiedEmail) {
 				done(null, user);
@@ -502,7 +502,7 @@ authRoutes.post("/forgot/:code", validateAndCacheHostName, postParser, async (re
 	}
 
 	let salt = crypto.randomBytes(32);
-	let hash = await pbkdf2Async(password1, salt, PBKDF2_ROUNDS, 128, "sha256");
+	let hash = await pbkdf2Async(password1, salt, PBKDF2_ROUNDS);
 
 	try {
 		user.localData!.salt = salt.toString("hex");

@@ -470,16 +470,15 @@ export async function timeLimited(request: express.Request, response: express.Re
 //
 // Promisified APIs for use with async / await
 //
-export function pbkdf2Async(...params: any[]) {
+export function pbkdf2Async(password: string | Buffer, salt: string | Buffer, iterations: number, keylength: number = 128, digest: string = "sha256") {
 	return new Promise<Buffer>((resolve, reject) => {
-		params.push((err: Error, derivedKey: Buffer) => {
+		crypto.pbkdf2(password, salt, iterations, keylength, digest, (err: Error, derivedKey: Buffer) => {
 			if (err) {
 				reject(err);
 				return;
 			}
 			resolve(derivedKey);
 		});
-		crypto.pbkdf2.apply(null, params);
 	});
 }
 export function readFileAsync(filename: string): Promise<string> {
