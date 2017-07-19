@@ -9,6 +9,18 @@
 		<link rel="stylesheet" href="/css/login.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const signUpButton = document.querySelectorAll('input[type="submit"]')[0];
+				const logInButton = document.querySelectorAll('input[type="submit"]')[1];
+				document.querySelector('form[action="/auth/signup"]').addEventListener("submit", () => {
+					signUpButton.disabled = true;
+				});
+				document.querySelector('form[action="/auth/login"]').addEventListener("submit", () => {
+					logInButton.disabled = true;
+				});
+			});
+		</script>
 	</head>
 	<body>
 		<div class="container">
