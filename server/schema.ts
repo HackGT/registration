@@ -91,6 +91,9 @@ export interface IUser {
 		hash: string;
 		salt: string;
 		verificationCode: string;
+		resetRequested: boolean;
+		resetCode: string;
+		resetRequestedTime: Date;
 	};
 	githubData?: {
 		id: string;
@@ -137,7 +140,10 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	localData: {
 		hash: String,
 		salt: String,
-		verificationCode: String
+		verificationCode: String,
+		resetRequested: Boolean,
+		resetCode: String,
+		resetRequestedTime: Date
 	},
 	githubData: {
 		id: String,

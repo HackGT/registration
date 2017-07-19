@@ -237,7 +237,7 @@ passport.use(new LocalStrategy({
 			return;
 		}
 		// Send verification email (hostname validated by previous middleware)
-		let link = `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/auth/verify/${user.localData!.verificationCode}`;
+		let link = createLink(request, `/auth/verify/${user.localData!.verificationCode}`);
 		let text =
 `Hi ${user.name},
 
@@ -347,6 +347,18 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 	response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
 });
 
+function createLink(request: express.Request, path: string): string {
+	if (path[0] === "/") {
+		path = path.substring(1);
+	}
+	if ((request.secure && getExternalPort(request) === 443) || (!request.secure && getExternalPort(request) === 80)) {
+		return `http${request.secure ? "s" : ""}://${request.hostname}/${path}`;
+	}
+	else {
+		return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${path}`;
+	}
+}
+
 function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", scope: string[], callbackHref: string) {
 	authRoutes.get(`/${serviceName}`, validateAndCacheHostName, (request, response, next) => {
 		let callbackURL = `${request.protocol}://${request.hostname}:${getExternalPort(request)}/${callbackHref}`;
@@ -370,13 +382,16 @@ function addAuthenticationRoute(serviceName: "github" | "google" | "facebook", s
 addAuthenticationRoute("github", ["user:email"], GITHUB_CALLBACK_HREF);
 addAuthenticationRoute("google", ["email", "profile"], GOOGLE_CALLBACK_HREF);
 addAuthenticationRoute("facebook", ["email"], FACEBOOK_CALLBACK_HREF);
+
 authRoutes.post("/signup", validateAndCacheHostName, postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), (request, response) => {
 	// User is logged in automatically by Passport but we want them to verify their email first
 	request.logout();
 	request.flash("success", "Account created successfully. Please verify your email before logging in.");
 	response.redirect("/login");
 });
+
 authRoutes.post("/login", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true, successRedirect: "/" }));
+
 authRoutes.get("/verify/:code", async (request, response) => {
 	let user = await User.findOne({ "localData.verificationCode": request.params.code });
 	if (!user) {
@@ -394,6 +409,116 @@ authRoutes.get("/verify/:code", async (request, response) => {
 		trackEvent("verified email", request, user.email);
 	}
 	response.redirect("/login");
+});
+
+authRoutes.post("/forgot", validateAndCacheHostName, postParser, async (request, response) => {
+	let email: string | undefined = request.body.email;
+	if (!email || !email.toString().trim()) {
+		request.flash("error", "Invalid email");
+		response.redirect("/login/forgot");
+		return;
+	}
+	email = email.toString().trim();
+
+	let user = await User.findOne({ email });
+	if (!user) {
+		request.flash("error", "No account matching the email that you submitted was found");
+		response.redirect("/login/forgot");
+		return;
+	}
+	if (!user.verifiedEmail) {
+		request.flash("error", "Please verify your email first");
+		response.redirect("/login");
+		return;
+	}
+	if (!user.localData) {
+		request.flash("error", "The account with the email that you submitted has no password set. Please log in with GitHub, Google, or Facebook instead.");
+		response.redirect("/login");
+		return;
+	}
+
+	user.localData.resetRequested = true;
+	user.localData.resetRequestedTime = new Date();
+	user.localData.resetCode = crypto.randomBytes(32).toString("hex");
+
+	// Send reset email (hostname validated by previous middleware)
+	let link = createLink(request, `/auth/forgot/${user.localData.resetCode}`);
+	let text =
+`Hi ${user.name},
+
+You recently asked to reset the password for this account: ${email}.
+
+You can update your password by clicking the following link: ${link}.
+
+If you don't use this link within an hour, it will expire and you will have to visit ${createLink(request, "/login/forgot")} to request a new one.
+
+Sincerely,
+
+The ${config.eventName} Team.`;
+	try {
+		await user.save();
+		await sendMailAsync({
+			from: config.email.from,
+			to: email,
+			subject: `[${config.eventName}] - Please reset your password`,
+			text
+		});
+		request.flash("success", "Please check your email for a link to reset your password. If it doesn't appear within a few minutes, check your spam folder.");
+		response.redirect("/login/forgot");
+	}
+	catch (err) {
+		console.error(err);
+		request.flash("error", "An error occurred while sending you a password reset email");
+		response.redirect("/login/forgot");
+	}
+});
+authRoutes.post("/forgot/:code", validateAndCacheHostName, postParser, async (request, response) => {
+	let user = await User.findOne({ "localData.resetCode": request.params.code });
+	if (!user) {
+		request.flash("error", "Invalid password reset code");
+		response.redirect("/login");
+		return;
+	}
+	else if (!user.localData!.resetRequested || Date.now() - user.localData!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
+		request.flash("error", "Your password reset link has expired. Please request a new one.");
+		user.localData!.resetCode = "";
+		user.localData!.resetRequested = false;
+		await user.save();
+		response.redirect("/login");
+		return;
+	}
+
+	let password1: string | undefined = request.body.password1;
+	let password2: string | undefined = request.body.password2;
+	if (!password1 || !password2) {
+		request.flash("error", "Missing new password or confirm password");
+		response.redirect(`/auth${request.url}`);
+		return;
+	}
+	if (password1 !== password2) {
+		request.flash("error", "Passwords must match");
+		response.redirect(`/auth${request.url}`);
+		return;
+	}
+
+	let salt = crypto.randomBytes(32);
+	let hash = await pbkdf2Async(password1, salt, PBKDF2_ROUNDS, 128, "sha256");
+
+	try {
+		user.localData!.salt = salt.toString("hex");
+		user.localData!.hash = hash.toString("hex");
+		user.localData!.resetCode = "";
+		user.localData!.resetRequested = false;
+		await user.save();
+
+		request.flash("success", "Password reset successfully. You can now log in.");
+		response.redirect("/login");
+	}
+	catch (err) {
+		console.error(err);
+		request.flash("error", "An error occurred while saving your new password");
+		response.redirect(`/auth${request.url}`);
+	}
 });
 
 authRoutes.all("/logout", (request, response) => {
