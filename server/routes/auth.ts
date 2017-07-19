@@ -8,7 +8,7 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, sendMailAsync, trackEvent
+	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, renderEmailHTML, renderEmailText, sendMailAsync, trackEvent
 } from "../common";
 import {
 	IUser, IUserMongoose, User
@@ -238,10 +238,10 @@ passport.use(new LocalStrategy({
 		}
 		// Send verification email (hostname validated by previous middleware)
 		let link = createLink(request, `/auth/verify/${user.localData!.verificationCode}`);
-		let text =
-`Hi ${user.name},
+		let markdown =
+`Hi {{name}},
 
-Thanks for signing up for ${config.eventName}! To verify your email, please click the following link: ${link}
+Thanks for signing up for ${config.eventName}! To verify your email, please [click here](${link}).
 
 Sincerely,
 
@@ -251,7 +251,8 @@ The ${config.eventName} Team.`;
 				from: config.email.from,
 				to: email,
 				subject: `[${config.eventName}] - Verify your email`,
-				text
+				html: await renderEmailHTML(markdown, user),
+				text: await renderEmailText(markdown, user)
 			});
 		}
 		catch (err) {
@@ -443,14 +444,14 @@ authRoutes.post("/forgot", validateAndCacheHostName, postParser, async (request,
 
 	// Send reset email (hostname validated by previous middleware)
 	let link = createLink(request, `/auth/forgot/${user.localData.resetCode}`);
-	let text =
-`Hi ${user.name},
+	let markdown =
+`Hi {{name}},
 
-You recently asked to reset the password for this account: ${email}.
+You recently asked to reset the password for this account: {{email}}.
 
-You can update your password by clicking the following link: ${link}.
+You can update your password by [clicking here](${link}).
 
-If you don't use this link within an hour, it will expire and you will have to visit ${createLink(request, "/login/forgot")} to request a new one.
+If you don't use this link within an hour, it will expire and you will have to [request a new one](${createLink(request, "/login/forgot")}).
 
 Sincerely,
 
@@ -461,7 +462,8 @@ The ${config.eventName} Team.`;
 			from: config.email.from,
 			to: email,
 			subject: `[${config.eventName}] - Please reset your password`,
-			text
+			html: await renderEmailHTML(markdown, user),
+			text: await renderEmailText(markdown, user)
 		});
 		request.flash("success", "Please check your email for a link to reset your password. If it doesn't appear within a few minutes, check your spam folder.");
 		response.redirect("/login/forgot");
