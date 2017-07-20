@@ -1,6 +1,7 @@
 import * as http from "http";
 import * as https from "https";
 import * as crypto from "crypto";
+import * as path from "path";
 import * as express from "express";
 import * as session from "express-session";
 import * as connectMongo from "connect-mongo";
@@ -348,15 +349,15 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 	response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
 });
 
-function createLink(request: express.Request, path: string): string {
-	if (path[0] === "/") {
-		path = path.substring(1);
+function createLink(request: express.Request, link: string): string {
+	if (link[0] === "/") {
+		link = link.substring(1);
 	}
 	if ((request.secure && getExternalPort(request) === 443) || (!request.secure && getExternalPort(request) === 80)) {
-		return `http${request.secure ? "s" : ""}://${request.hostname}/${path}`;
+		return `http${request.secure ? "s" : ""}://${request.hostname}/${link}`;
 	}
 	else {
-		return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${path}`;
+		return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
 	}
 }
 
@@ -494,12 +495,12 @@ authRoutes.post("/forgot/:code", validateAndCacheHostName, postParser, async (re
 	let password2: string | undefined = request.body.password2;
 	if (!password1 || !password2) {
 		request.flash("error", "Missing new password or confirm password");
-		response.redirect(`/auth${request.url}`);
+		response.redirect(path.join("/auth", request.url));
 		return;
 	}
 	if (password1 !== password2) {
 		request.flash("error", "Passwords must match");
-		response.redirect(`/auth${request.url}`);
+		response.redirect(path.join("/auth", request.url));
 		return;
 	}
 
@@ -519,7 +520,7 @@ authRoutes.post("/forgot/:code", validateAndCacheHostName, postParser, async (re
 	catch (err) {
 		console.error(err);
 		request.flash("error", "An error occurred while saving your new password");
-		response.redirect(`/auth${request.url}`);
+		response.redirect(path.join("/auth", request.url));
 	}
 });
 
