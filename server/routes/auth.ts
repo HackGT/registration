@@ -2,6 +2,7 @@ import * as http from "http";
 import * as https from "https";
 import * as crypto from "crypto";
 import * as path from "path";
+import * as moment from "moment-timezone";
 import * as express from "express";
 import * as session from "express-session";
 import * as connectMongo from "connect-mongo";
@@ -452,7 +453,7 @@ You recently asked to reset the password for this account: {{email}}.
 
 You can update your password by [clicking here](${link}).
 
-If you don't use this link within an hour, it will expire and you will have to [request a new one](${createLink(request, "/login/forgot")}).
+If you don't use this link within ${moment.duration(config.server.passwordResetExpiration, "milliseconds").humanize()}, it will expire and you will have to [request a new one](${createLink(request, "/login/forgot")}).
 
 Sincerely,
 
@@ -482,7 +483,11 @@ authRoutes.post("/forgot/:code", validateAndCacheHostName, postParser, async (re
 		response.redirect("/login");
 		return;
 	}
-	else if (!user.localData!.resetRequested || Date.now() - user.localData!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
+
+	let expirationDuration = moment.duration(config.server.passwordResetExpiration, "milliseconds");
+	// TSLint is matching to the wrong type definition when checking for deprecation
+	// tslint:disable-next-line:deprecation
+	if (!user.localData!.resetRequested || moment().isAfter(moment(user.localData!.resetRequestedTime).add(expirationDuration))) {
 		request.flash("error", "Your password reset link has expired. Please request a new one.");
 		user.localData!.resetCode = "";
 		user.localData!.resetRequested = false;
