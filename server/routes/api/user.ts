@@ -2,6 +2,7 @@ import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
+import * as moment from "moment-timezone";
 
 import {
 	STORAGE_ENGINE,
@@ -32,12 +33,37 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 	}
 };
 
+let applicationTimeRestriction: express.RequestHandler = async (request, response, next) => {
+	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
+
+	let openDate: moment.Moment;
+	let closeDate: moment.Moment;
+	if (requestType === ApplicationType.Application) {
+		openDate = moment(await getSetting<Date>("applicationOpen"));
+		closeDate = moment(await getSetting<Date>("applicationClose"));
+	}
+	else {
+		openDate = moment(await getSetting<Date>("confirmationOpen"));
+		closeDate = moment(await getSetting<Date>("confirmationClose"));
+	}
+
+	if (moment().isBetween(openDate, closeDate) || request.user.isAdmin) {
+		next();
+	}
+	else {
+		response.status(408).json({
+			"error": `${requestType === ApplicationType.Application ? "Applications" : "Confirmations"} are currently closed`
+		});
+		return;
+	}
+};
+
 userRoutes.route("/application/:branch")
-	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
-	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
+	.post(isUserOrAdmin, applicationTimeRestriction, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
+	.delete(isUserOrAdmin, applicationTimeRestriction, deleteApplicationBranchHandler);
 userRoutes.route("/confirmation/:branch")
-	.post(isUserOrAdmin, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
-	.delete(isUserOrAdmin, deleteApplicationBranchHandler);
+	.post(isUserOrAdmin, applicationTimeRestriction, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
+	.delete(isUserOrAdmin, applicationTimeRestriction, deleteApplicationBranchHandler);
 
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;

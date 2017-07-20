@@ -41,7 +41,8 @@ class Config implements IConfig.Main {
 		workflowReleaseSummary: null,
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
-		mongoURL: "mongodb://localhost/"
+		mongoURL: "mongodb://localhost/",
+		passwordResetExpiration: 1000 * 60 * 60 // 1 hour
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
@@ -186,6 +187,12 @@ class Config implements IConfig.Main {
 		}
 		if (process.env.MONGO_URL) {
 			this.server.mongoURL = process.env.MONGO_URL!;
+		}
+		if (process.env.PASSWORD_RESET_EXPIRATION) {
+			let expirationTime = parseInt(process.env.PASSWORD_RESET_EXPIRATION!, 10);
+			if (!isNaN(expirationTime) && expirationTime > 0) {
+				this.server.passwordResetExpiration = expirationTime;
+			}
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
@@ -470,16 +477,15 @@ export async function timeLimited(request: express.Request, response: express.Re
 //
 // Promisified APIs for use with async / await
 //
-export function pbkdf2Async(...params: any[]) {
+export function pbkdf2Async(password: string | Buffer, salt: string | Buffer, iterations: number, keylength: number = 128, digest: string = "sha256") {
 	return new Promise<Buffer>((resolve, reject) => {
-		params.push((err: Error, derivedKey: Buffer) => {
+		crypto.pbkdf2(password, salt, iterations, keylength, digest, (err: Error, derivedKey: Buffer) => {
 			if (err) {
 				reject(err);
 				return;
 			}
 			resolve(derivedKey);
 		});
-		crypto.pbkdf2.apply(null, params);
 	});
 }
 export function readFileAsync(filename: string): Promise<string> {

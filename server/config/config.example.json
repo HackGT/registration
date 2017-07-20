@@ -25,7 +25,8 @@
 		"isProduction": true,
 		"port": 3000,
 		"cookieMaxAge": 15552000000,
-		"cookieSecureOnly": true
+		"cookieSecureOnly": true,
+		"passwordResetExpiration": 3600000
 	},
 	"admins": ["example@example.com"],
 	"eventName": "My Hackathon",

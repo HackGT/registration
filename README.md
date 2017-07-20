@@ -101,6 +101,7 @@ VERSION_HASH | The Git short hash used to identify the current commit (default: 
 *WORKFLOW_RELEASE_SUMMARY* | Provided by Deis (default: `null`)
 COOKIE_MAX_AGE | The `maxAge` of cookies set in milliseconds (default: 6 months) **NOTE: this is different from the session TTL**
 COOKIE_SECURE_ONLY | Whether session cookies should sent exclusively over secure connections (default: `false`)
+PASSWORD_RESET_EXPIRATION | The time that password reset links sent via email should be valid for in milliseconds (default: 1 hour)
 SESSION_SECRET | The secret used to sign and validate session cookies (default: random 32 bytes regenerated on every start up)
 GITHUB_CLIENT_ID | OAuth client ID for GitHub *required*
 GITHUB_CLIENT_SECRET | OAuth client secret for GitHub *required*

@@ -25,6 +25,8 @@ export let templateRoutes = express.Router();
 let [
 	indexTemplate,
 	loginTemplate,
+	forgotPasswordTemplate,
+	resetPasswordTemplate,
 	preregisterTemplate,
 	preconfirmTemplate,
 	registerTemplate,
@@ -35,6 +37,8 @@ let [
 ] = [
 	"index.html",
 	"login.html",
+	"forgotpassword.html",
+	"resetpassword.html",
 	"preapplication.html",
 	"preconfirmation.html",
 	"application.html",
@@ -162,6 +166,36 @@ templateRoutes.route("/login").get((request, response) => {
 		success: request.flash("success")
 	};
 	response.send(loginTemplate(templateData));
+});
+templateRoutes.route("/login/forgot").get((request, response) => {
+	let templateData: ILoginTemplate = {
+		siteTitle: config.eventName,
+		error: request.flash("error"),
+		success: request.flash("success")
+	};
+	response.send(forgotPasswordTemplate(templateData));
+});
+templateRoutes.get("/auth/forgot/:code", async (request, response) => {
+	let user = await User.findOne({ "localData.resetCode": request.params.code });
+	if (!user) {
+		request.flash("error", "Invalid password reset code");
+		response.redirect("/login");
+		return;
+	}
+	else if (!user.localData!.resetRequested || Date.now() - user.localData!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
+		request.flash("error", "Your password reset link has expired. Please request a new one.");
+		user.localData!.resetCode = "";
+		user.localData!.resetRequested = false;
+		await user.save();
+		response.redirect("/login");
+		return;
+	}
+	let templateData: ILoginTemplate = {
+		siteTitle: config.eventName,
+		error: request.flash("error"),
+		success: request.flash("success")
+	};
+	response.send(resetPasswordTemplate(templateData));
 });
 
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
