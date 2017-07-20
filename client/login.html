@@ -11,14 +11,16 @@
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
-				const signUpButton = document.querySelectorAll('input[type="submit"]')[0];
-				const logInButton = document.querySelectorAll('input[type="submit"]')[1];
-				document.querySelector('form[action="/auth/signup"]').addEventListener("submit", () => {
-					signUpButton.disabled = true;
-				});
-				document.querySelector('form[action="/auth/login"]').addEventListener("submit", () => {
-					logInButton.disabled = true;
-				});
+				const submitButtons = document.querySelectorAll('input[type="submit"]');
+				const forms = document.getElementsByTagName("form");
+				
+				for (let i = 0; i < forms.length; i++) {
+					forms[i].addEventListener("submit", () => {
+						for (let j = 0; j < submitButtons.length; j++) {
+							submitButtons[j].disabled = true;
+						}
+					});
+				}
 			});
 		</script>
 	</head>
