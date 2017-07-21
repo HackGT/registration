@@ -19,12 +19,6 @@ html, body, #sidebar-nav {
 #sidebar-nav > span.divider, .main, table thead {
     border-color: #c4fbf5;
 }
-rect.bar {
-    fill: #c4fbf5;
-}
-.axis path, .axis line, text {
-    stroke: #c4fbf5;
-}
 a {
     color: #03565c;
 }
