@@ -309,3 +309,70 @@ settingsUpdateButton.addEventListener("click", e => {
 		settingsUpdateButton.disabled = false;
 	});
 });
+
+//
+// Graphs
+//
+
+// Embedded by Handlebars in admin.html
+declare let data: {
+	questionName: string;
+	branch: string;
+	responses: {
+		response: string;
+		count: number;
+	}[];
+}[];
+declare const Chart: any;
+
+// Get the text color and use that for graphs
+const header = document.querySelector("#sidebar > h1") as HTMLHeadingElement;
+const color = window.getComputedStyle(header).getPropertyValue("color");
+
+for (let i = 0; i < data.length; i++) {
+	let context = document.getElementById(`chart-${i}`) as HTMLCanvasElement | null;
+	if (!context) {
+		console.warn(`Canvas with ID "chart-${i}" does not exist`);
+		continue;
+	}
+
+	new Chart(context, {
+		"type": "bar",
+		"data": {
+			"labels": data[i].responses.map(response => response.response),
+			"datasets": [{
+				"label": data[i].questionName,
+				"data": data[i].responses.map(response => response.count),
+				"backgroundColor": Array(data[i].responses.length).fill(color)
+			}]
+		},
+		"options": {
+			"legend": {
+				"display": false
+			},
+			"scales": {
+				"yAxes": [{
+					"ticks": {
+						"fontColor": color,
+						"beginAtZero": true,
+						"callback": (value: number) => value % 1 === 0 ? value : undefined // Only integers
+					},
+					"gridLines": {
+						"zeroLineColor": color
+					}
+				}],
+				"xAxes": [{
+					"stacked": false,
+					"ticks": {
+						"fontColor": color,
+						"stepSize": 1,
+						"autoSkip": false
+					},
+					"gridLines": {
+						"zeroLineColor": color
+					}
+				}]
+			}
+		}
+	});
+}

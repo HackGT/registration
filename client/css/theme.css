@@ -7,6 +7,8 @@ html, body, #sidebar-nav {
 }
 #sidebar a, #sidebar, .editor-toolbar > a {
     color: #c4fbf5;
+    border: none;
+    text-decoration: initial;
 }
 .editor-toolbar > a {
     color: #c4fbf5 !important;
@@ -19,14 +21,14 @@ html, body, #sidebar-nav {
 #sidebar-nav > span.divider, .main, table thead {
     border-color: #c4fbf5;
 }
-rect.bar {
-    fill: #c4fbf5;
-}
-.axis path, .axis line, text {
-    stroke: #c4fbf5;
-}
 a {
-    color: #03565c;
+    color: #c4fbf5;
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
 }
 #email-rendered {
     background-color: #081517;

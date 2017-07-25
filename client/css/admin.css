@@ -94,27 +94,9 @@ textarea[type=text]:focus {
     background-color: #333030;
 }
 
-.axis {
-    font: 10px sans-serif;
-}
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
-rect.bar {
-    cursor: pointer;
-    transition: 0.25s all;
-    transform-origin: center bottom;
-}
-rect.bar:hover {
-    opacity: .85;
-    animation-timing-function: cubic-bezier(.72,.18,1,1);
-    animation-name: barBounce;
-    animation-duration: 0.15s;
-    animation-direction: alternate;
-    animation-iteration-count: 2;
+canvas {
+    width: 100%;
+    height: 430px;
 }
 
 @keyframes barBounce {

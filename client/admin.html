@@ -16,11 +16,17 @@
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
-		<script src="https://d3js.org/d3.v3.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 		<script src="/js/common.js"></script>
+		<script>
+			window.data = [
+				{{#each generalStatistics}}
+					{{{toJSONString this}}},
+				{{/each}}
+			];
+		</script>
 		<script src="/js/admin.js" defer></script>
-		<script src="/js/bargraph.js"></script>
 	</head>
 	<body>
 		{{#> sidebar}}
@@ -37,7 +43,7 @@
 				<h2>Statistics</h2>
 				<table>
 					<thead>
-						<th colspan="2">Users</th>
+						<tr><th colspan="2">Users</th></tr>
 					</thead>
 					<tbody>
 						<tr>
@@ -64,23 +70,18 @@
 				</table>
 				<table>
 					<thead>
-						<th colspan="2">Application Statistics</th>
+						<tr><th colspan="2">Application Statistics</th></tr>
 					</thead>
+					<tbody>
 						{{#each generalStatistics}}
 							<tr>
 								<td>
-									<div id="chart-{{@index}}">
-										<h5>{{this.questionName}} ({{this.branch}})</h5>
-
-									</div>
-
-									<script>
-										drawBarGraph({{{toJSONString this}}}, "chart-{{@index}}");
-									</script>
-
+									<h5>{{this.questionName}} ({{this.branch}})</h5>
+									<canvas id="chart-{{@index}}"></canvas>
 								</td>
 							</tr>
 						{{/each}}
+					</tbody>
 				</table>
 			</section>
 			<section id="users">

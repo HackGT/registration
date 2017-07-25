@@ -614,6 +614,46 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			}*/
 		});
 	});
+	// Order general statistics as they appear in questions.json
+	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
+		if (a.branch.toLowerCase() < b.branch.toLowerCase()) {
+			return -1;
+		}
+		if (a.branch.toLowerCase() > b.branch.toLowerCase()) {
+			return 1;
+		}
+		return 0;
+	}).map(statistic => {
+		let questions = rawQuestions.find(branch => branch.name === statistic.branch)!.questions;
+		let question = questions.find(q => q.label === statistic.questionName)!;
+
+		statistic.responses = statistic.responses.sort((a, b) => {
+			let aIndex: number = question.options.indexOf(a.response);
+			let bIndex: number = question.options.indexOf(b.response);
+
+			if (aIndex !== -1 && bIndex === -1) {
+				return -1;
+			}
+			if (aIndex === -1 && bIndex !== -1) {
+				return 1;
+			}
+			if (aIndex === -1 && bIndex === -1) {
+				if (a.response.trim() === "") {
+					return 1;
+				}
+				if (a.response.toLowerCase() < b.response.toLowerCase()) {
+					return -1;
+				}
+				if (a.response.toLowerCase() > b.response.toLowerCase()) {
+					return 1;
+				}
+				return 0;
+			}
+			return aIndex - bIndex;
+		});
+
+		return statistic;
+	});
 
 	response.send(adminTemplate(templateData));
 });
