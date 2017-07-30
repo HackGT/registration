@@ -443,6 +443,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		generalStatistics: [] as StatisticEntry[],
 		users: (await User.find()).sort((a, b) => {
 			if (!a.teamId || !b.teamId || a.teamId === b.teamId) {
+				a.name = a.name || "";
+				b.name = b.name || "";
+
 				if (a.name.toLowerCase() < b.name.toLowerCase()) {
 					return -1;
 				}
