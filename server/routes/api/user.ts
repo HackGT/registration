@@ -102,6 +102,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		return;
 	}
 
+	let unchangedFiles: string[] = [];
 	let errored: boolean = false; // Used because .map() can't be broken out of
 	let rawData: (IFormItem | null)[] = questionBranch.questions.map(question => {
 		if (errored) {
@@ -113,10 +114,12 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
 			// Required field not filled in
 			if (preexistingFile) {
+				let previousValue = user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value as Express.Multer.File;
+				unchangedFiles.push(previousValue.filename);
 				return {
 					"name": question.name,
 					"type": "file",
-					"value": user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value
+					"value": previousValue
 				};
 			}
 			else {
@@ -156,7 +159,14 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		await Promise.all(data
 			.map(item => item.value)
 			.filter(possibleFile => possibleFile !== null && typeof possibleFile === "object" && !Array.isArray(possibleFile))
-			.map((file: Express.Multer.File): Promise<void> => STORAGE_ENGINE.saveFile(file.path, file.filename))
+			.map((file: Express.Multer.File): Promise<void> => {
+				if (unchangedFiles.indexOf(file.filename) === -1) {
+					return STORAGE_ENGINE.saveFile(file.path, file.filename);
+				}
+				else {
+					return Promise.resolve();
+				}
+			})
 		);
 		// Set the proper file locations in the data object
 		data = data.map(item => {
