@@ -93,6 +93,10 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 			done(null, false, { message: "Your GitHub profile does not have any public email addresses. Please make an email address public before logging in with GitHub." });
 			return;
 		}
+		else if (!profile.displayName || !profile.displayName.trim()) {
+			done(null, false, { message: "Your profile does not have a publically visible name. Please set a name on your account before logging in." });
+			return;
+		}
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
 		if (config.admins.indexOf(email) !== -1) {
