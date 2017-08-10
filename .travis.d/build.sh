@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# HACKGPROJECT VERSION: 2bc55e5a25fe862aa51aebfc3136951b5c0fe13d
+# HACKGPROJECT VERSION: 302160909a4f927434ad22a9e372242e15648e7c
 set -euo pipefail
 PROJECT_TYPE="deployment"
-ORG_NAME="HackGT"
+ORG_NAME="hackgt"
 SOURCE_DIR=$(readlink -f "${BASH_SOURCE[0]}")
 SOURCE_DIR=$(dirname "$SOURCE_DIR")
 cd "${SOURCE_DIR}/.."
@@ -47,11 +47,23 @@ build_project_container() {
     $docker build -f Dockerfile --rm -t "$image_name" .
 }
 
+git_branch() {
+    if [[ ${TRAVIS_PULL_REQUEST_BRANCH} ]]; then
+        echo "${TRAVIS_PULL_REQUEST_BRANCH}"
+    else
+        echo "${TRAVIS_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+    fi
+}
+
+git_branch_id() {
+    git_branch | sed 's/[^0-9a-zA-Z_-]/-/g'
+}
+
 publish_project_container() {
     local git_rev
     local branch
     git_rev=$(git rev-parse HEAD)
-    branch=${TRAVIS_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}
+    branch=$(git_branch_id)
     local latest_tag_name="latest"
     local push_image_name="${DOCKER_ID_USER}/${image_name}"
     if [[ $branch != master ]]; then
@@ -93,8 +105,8 @@ commit_to_branch() {
     local git_rev
     branch="${1:-gh-pages}"
     git_rev=$(git rev-parse --short HEAD)
-    git config user.name 'Michael Eden'
-    git config user.email 'themichaeleden@gmail.com'
+    git config user.name 'HackGBot'
+    git config user.email 'thehackgt@gmail.com'
     git remote remove origin
     git remote add origin \
         "https://${GH_TOKEN}@github.com/${ORG_NAME}/${image_name}.git"
@@ -104,6 +116,90 @@ commit_to_branch() {
     git status
     git commit -m "Automatic Travis deploy of ${git_rev}."
     git push -q origin "HEAD:${branch}"
+}
+
+push_to_biodomes() {
+    local path="$1"
+    local file="$2"
+
+    pushd "$(mktemp -d)"
+    git clone --depth 1 "https://github.com/${ORG_NAME}/biodomes.git" .
+    git config user.name 'HackGBot'
+    git config user.email 'thehackgt@gmail.com'
+    git remote remove origin
+    git remote add origin \
+        "https://${GH_TOKEN}@github.com/${ORG_NAME}/biodomes.git"
+    mkdir -p "$(dirname "${path}")"
+    echo "$file" > "$path"
+    git add -A .
+    git status
+
+    if git diff-index --quiet HEAD --; then
+        echo 'Nothing to commit, skipping biodomes push.'
+    else
+        git commit -m "Automatic deploy of ${image_name} to ${path}."
+        git push -q origin "HEAD:master"
+    fi
+    popd
+}
+
+github_comment() {
+    local body="$1"
+    local pr_id="$2"
+    local data
+    data=$(jq -nMc "{body:\"${message}\"}")
+
+    curl -X POST \
+         -H 'Accept: application/vnd.github.v3+json' \
+         -H "Authorization: token ${GH_TOKEN}" \
+         --data "${data}" \
+         "https://api.github.com/repos/${ORG_NAME}/${image_name}/issues/${pr_id}/comments"
+}
+
+github_list_comments() {
+    local pr_id="$1"
+    curl "https://api.github.com/repos/${ORG_NAME}/${image_name}/issues/${pr_id}/comments" \
+        | jq -r '.[].body'
+}
+
+find_pr_number() {
+    if [[ ${TRAVIS_PULL_REQUEST} ]]; then
+        echo "${TRAVIS_PULL_REQUEST}"
+    else
+        curl "https://api.github.com/repos/${ORG_NAME}/${image_name}/pulls" \
+            | jq ".[] | select(.head.ref == \"$(git_branch)\") | .number"
+    fi
+}
+
+make_pr_deployment() {
+    local app_domain
+    local message
+    local pr_id
+    local test_url
+    local deployment_conf
+
+    app_domain="${image_name}-$(git_branch_id)"
+    pr_id=$(find_pr_number)
+    test_url="https://${app_domain}.pr.hack.gt"
+    deployment_conf=$(cat <<-END
+git:
+    remote: "https://github.com/${remote}"
+    branch: "$(git_branch)"
+
+secrets-source: git-${ORG_NAME}-${image_name}-secrets
+END
+    )
+    message=$(cat <<-END
+Hey y'all! A deployment of this PR can be found here:
+${test_url}
+END
+    )
+
+    push_to_biodomes "pr/${app_domain}.yaml" "${deployment_conf}"
+
+    if ! github_list_comments "${pr_id}" | grep "${test_url}"; then
+        github_comment "${message}" "${pr_id}"
+    fi
 }
 
 set_cloudflare_dns() {
@@ -185,6 +281,8 @@ deployment_project() {
     if [[ ${TRAVIS_PULL_REQUEST:-} = false ]]; then
         publish_project_container
         trigger_biodomes_build
+    elif ! [[ ${TRAVIS_PULL_REQUEST_SLUG} =~ ^${ORG_NAME}/ ]]; then
+        make_pr_deployment
     fi
 }
 

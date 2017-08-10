@@ -11,7 +11,7 @@ script:
 
 env:
   global:
-    - HACKGPROJECT_REV="2bc55e5a25fe862aa51aebfc3136951b5c0fe13d"
+    - HACKGPROJECT_REV="302160909a4f927434ad22a9e372242e15648e7c"
 
     - DOCKER_ID_USER="hackgt"
 
