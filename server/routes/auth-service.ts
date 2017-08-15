@@ -79,4 +79,17 @@ export function authRoutes(auth: { url: string; cookie: string }) {
 		req.isAuthenticated = () => !!user;
 		next();
 	});
+
+	app.all("/auth/logout", async (req, res) => {
+		const logout: { data: { logout: string } } = await request({
+			method: "POST",
+			url: auth.url + "/graphql",
+			json: true,
+			body: {
+				query: "{logout}"
+			}
+		});
+
+		res.redirect(logout.data.logout);
+	});
 }

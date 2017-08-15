@@ -49,13 +49,6 @@ export function authRoutes() {
 	}
 	const FACEBOOK_CALLBACK_HREF: string = "auth/facebook/callback";
 
-	if (!config.server.isProduction) {
-		console.warn("OAuth callback(s) running in development mode");
-	}
-	else {
-		app.enable("trust proxy");
-	}
-
 	passport.serializeUser<IUser, string>((user, done) => {
 		done(null, user._id.toString());
 	});
