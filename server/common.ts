@@ -46,7 +46,7 @@ class Config implements IConfig.Main {
 		mongoURL: "mongodb://localhost/",
 		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
 		services: {
-			auth: null
+			auth: undefined
 		}
 	};
 	public admins: string[] = [];
@@ -200,8 +200,11 @@ class Config implements IConfig.Main {
 			}
 		}
 		// Services
-		if (process.env.AUTH_SERVICE) {
-			this.server.services.auth = process.env.AUTH_SERVICE!;
+		if (process.env.AUTH_SERVICE && process.env.AUTH_SERVICE_COOKIE) {
+			this.server.services.auth = {
+				url: process.env.AUTH_SERVICE!,
+				cookie: process.env.AUTH_SERVICE_COOKIE!
+			};
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {

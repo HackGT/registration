@@ -5,12 +5,16 @@ import {createLink} from "../common";
 import {User} from "../schema";
 import {app} from "../app";
 
-export async function redirectToLogin(auth: string, req: express.Request, res: express.Response) {
+export async function redirectToLogin(
+	auth: { url: string; cookie: string },
+	req: express.Request,
+	res: express.Response
+) {
 	// TODO: escape url
 	const callback = createLink(req, req.path.substr(1));
 	const redirect = await request({
 		method: "POST",
-		url: auth + "/graphql",
+		url: auth.url + "/graphql",
 		json: true,
 		body: {
 			query: `{authenticate(callback:"${callback}")}`
@@ -26,9 +30,9 @@ export async function redirectToLogin(auth: string, req: express.Request, res: e
 	}
 }
 
-export function authRoutes(auth: string) {
+export function authRoutes(auth: { url: string; cookie: string }) {
 	app.use("/", async (req, res, next) => {
-		const token = req.cookies['sso-auth'];
+		const token = req.cookies[auth.cookie];
 		// TODO: escape token
 		const query = `{
 			user(token: "${token}") {
@@ -52,7 +56,7 @@ export function authRoutes(auth: string) {
 			} | undefined;
 		} = await request({
 			method: "POST",
-			url: auth + "/graphql",
+			url: auth.url + "/graphql",
 			json: true,
 			body: {
 				query

@@ -76,7 +76,7 @@ if (!config.sessionSecretSet) {
 const authService = config.server.services.auth;
 if (authService) {
 	externalAuth(authService);
-	console.log(`Not using built-in auth over ${authService}.`);
+	console.log(`Not using built-in auth over ${authService.url}.`);
 } else {
 	localAuth();
 }
