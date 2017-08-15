@@ -5,6 +5,8 @@ import * as os from "os";
 import "passport";
 import * as moment from "moment-timezone";
 
+import { redirectToLogin } from "./app";
+
 //
 // Config
 //
@@ -413,14 +415,49 @@ export function authenticateWithReject(request: express.Request, response: expre
 	}
 }
 // For directly user facing endpoints
-export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
+export async function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
-		response.redirect("/login");
+		await redirectToLogin(request, response);
 	}
 	else {
 		next();
 	}
 }
+
+export function getExternalPort(request: express.Request): number {
+	function defaultPort(): number {
+		// Default ports for HTTP and HTTPS
+		return request.protocol === "http" ? 80 : 443;
+	}
+
+	let host = request.headers.host;
+	if (!host || Array.isArray(host)) {
+		return defaultPort();
+	}
+
+	// IPv6 literal support
+	let offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
+	let index = host.indexOf(":", offset);
+	if (index !== -1) {
+		return parseInt(host.substring(index + 1), 10);
+	}
+	else {
+		return defaultPort();
+	}
+}
+
+export function createLink(request: express.Request, link: string): string {
+	if (link[0] === "/") {
+		link = link.substring(1);
+	}
+	if ((request.secure && getExternalPort(request) === 443) || (!request.secure && getExternalPort(request) === 80)) {
+		return `http${request.secure ? "s" : ""}://${request.hostname}/${link}`;
+	}
+	else {
+		return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
+	}
+}
+
 import * as Handlebars from "handlebars";
 import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
