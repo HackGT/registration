@@ -41,6 +41,7 @@
     "express-session": "^1.15.1",
     "git-rev-sync": "^1.8.0",
     "handlebars": "^4.0.6",
+    "influx": "^5.0.7",
     "json-schema-to-typescript": "^4.4.0",
     "json2csv": "^3.7.3",
     "marked": "^0.3.6",
