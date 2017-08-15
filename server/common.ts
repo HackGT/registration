@@ -42,6 +42,7 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/",
+		influxUrl: "http://localhost",
 		passwordResetExpiration: 1000 * 60 * 60 // 1 hour
 	};
 	public admins: string[] = [];
@@ -187,6 +188,9 @@ class Config implements IConfig.Main {
 		}
 		if (process.env.MONGO_URL) {
 			this.server.mongoURL = process.env.MONGO_URL!;
+		}
+		if (process.env.INFLUX_URL) {
+			this.server.influxUrl = process.env.INFLUX_URL!;
 		}
 		if (process.env.PASSWORD_RESET_EXPIRATION) {
 			let expirationTime = parseInt(process.env.PASSWORD_RESET_EXPIRATION!, 10);
@@ -635,3 +639,7 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 	};
 	console.log(thisEvent);
 }
+
+import * as Influx from "influx";
+const influx = new Influx.InfluxDB(config.server.influxUrl);
+export {influx};

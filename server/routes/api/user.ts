@@ -5,7 +5,7 @@ import * as archiver from "archiver";
 import * as moment from "moment-timezone";
 
 import {
-	STORAGE_ENGINE,
+	STORAGE_ENGINE, influx,
 	formatSize, MAX_FILE_SIZE,
 	postParser, uploadHandler, isAdmin, isUserOrAdmin,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
@@ -192,6 +192,22 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 
 		if (requestType === ApplicationType.Application) {
 			if (!user.applied) {
+				let tags: {[key: string]: string} = {
+					"type": "applied",
+					"branch": branchName
+				};
+				for (let answer of data) {
+					if (answer.value) {
+						tags[answer.name] = answer.value.toString();
+					}
+				}
+				await influx.writeMeasurement("users", [{
+					tags,
+					fields: {
+						value: 1
+					}
+				}]);
+
 				await sendMailAsync({
 					from: config.email.from,
 					to: user.email,
