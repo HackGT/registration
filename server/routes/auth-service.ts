@@ -32,7 +32,7 @@ export function authRoutes(auth: string) {
 		// TODO: escape token
 		const query = `{
 			user(token: "${token}") {
-				id
+				_id: id
 				email
 				email_verified
 				name
@@ -40,7 +40,17 @@ export function authRoutes(auth: string) {
 			}
         }`;
 
-		const login = await request({
+		const login: {
+			data: {
+				user: {
+					_id: string;
+					email: string;
+					email_verified: boolean;
+					name: string | undefined;
+					admin: boolean;
+				} | null;
+			} | undefined;
+		} = await request({
 			method: "POST",
 			url: auth + "/graphql",
 			json: true,
@@ -56,11 +66,11 @@ export function authRoutes(auth: string) {
 		const user = login && login.data && login.data.user;
 
 		if (user) {
-			const record = await User.findById(user.id);
-			req.user = {
-					...record,
-					...user
-			};
+			req.user = await User.findByIdAndUpdate(user._id, user, {
+				new: true,
+				upsert: true,
+				setDefaultsOnInsert: true
+			});
 		}
 		req.isAuthenticated = () => !!user;
 		next();
