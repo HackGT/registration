@@ -9,7 +9,8 @@ import flash = require("connect-flash");
 
 import {
 	// Constants
-	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS
+	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
+	config
 } from "./common";
 import {
 	User
@@ -35,8 +36,17 @@ app.use(flash());
 });
 
 // Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import {authRoutes} from "./routes/auth";
-app.use("/auth", authRoutes);
+async function loadAuth() {
+	if (config.server.services.auth) {
+		const routes = await import("./routes/auth-service");
+		const service = config.server.services.auth;
+		app.use("/auth", routes.authRoutes(service));
+		console.log(`Not using built-in auth over ${service}.`);
+	} else {
+		const routes = await import("./routes/auth");
+		app.use("/auth", routes.authRoutes);
+	}
+}
 
 // Metrics
 import {trackEvent} from "./common";
@@ -77,6 +87,10 @@ app.use("/node_modules", serveStatic(path.resolve(__dirname, "../node_modules"))
 app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
 
-app.listen(PORT, () => {
-	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);
-});
+loadAuth()
+	.then(() => {
+		app.listen(PORT, () => {
+			console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);
+		});
+	})
+	.catch(e => '');

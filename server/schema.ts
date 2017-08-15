@@ -38,6 +38,9 @@ export namespace IConfig {
 		cookieSecureOnly: boolean;
 		mongoURL: string;
 		passwordResetExpiration: number;
+		services: {
+			auth: string | null;
+		};
 	}
 
 	export interface Main {

@@ -42,7 +42,10 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/",
-		passwordResetExpiration: 1000 * 60 * 60 // 1 hour
+		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
+		services: {
+			auth: null
+		}
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
@@ -193,6 +196,10 @@ class Config implements IConfig.Main {
 			if (!isNaN(expirationTime) && expirationTime > 0) {
 				this.server.passwordResetExpiration = expirationTime;
 			}
+		}
+		// Services
+		if (process.env.AUTH_SERVICE) {
+			this.server.services.auth = process.env.AUTH_SERVICE!;
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
@@ -548,7 +555,7 @@ export let emailTransporter = nodemailer.createTransport({
 		pass: config.email.password
 	}
 });
-export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo>  {
+export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo>	{
 	return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
 		emailTransporter.sendMail(mail, (err, info) => {
 			if (err) {
