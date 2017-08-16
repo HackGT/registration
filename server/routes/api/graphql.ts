@@ -35,17 +35,30 @@ const resolvers = {
 		}
 	},
 	Subscription: {
-		authority: (prev: undefined, args: { token: string }) => {
-			return {
-				// TODO: when central auth is a thing
-			};
-		}
-	},
-	AuthorizedSubscription: {
 		[USER_ADDED]: {
-			subscribe: () => {
-				// TODO: async send all users with this subscription
-				return pubsub.asyncIterator(USER_ADDED);
+			subscribe: (...args: any[]) => {
+				// Create a symbol for this subscriber, giving him all users
+				const target = Symbol();
+				// Iterate with cursor and publish existing users
+				setImmediate(() => {
+					User.find({}).cursor().eachAsync(user => {
+						pubsub.publish(USER_ADDED, {
+							[USER_ADDED]: userRecordToGraphql(user),
+							target
+						});
+					})
+					.catch(err => {
+						// TODO
+						console.error("Error in sending pub sub of users", err);
+					});
+				});
+				// Make a filter for all additions and existing ones.
+				return withFilter(() => pubsub.asyncIterator(USER_ADDED), (payload, vars) => {
+					if (payload.target && payload.target !== target) {
+						return false;
+					}
+					return true;
+				})(...args);
 			}
 		},
 		[USER_REMOVED]: {
@@ -54,14 +67,17 @@ const resolvers = {
 			}
 		},
 		[USER_MODIFIED]: {
-			subscribe: () => {
+			subscribe: (...args: any[]) => {
 				return withFilter(() => pubsub.asyncIterator(USER_MODIFIED), (payload, vars) => {
 					if (payload.event) {
+						// TODO
+						console.log("payload", payload);
+						console.log("vars", vars);
 						return payload.event === vars.event;
 					} else {
 						return true;
 					}
-				});
+				})(...args);
 			}
 		}
 	}
@@ -75,9 +91,29 @@ export const publish = {
 			pubsub.publish(USER_ADDED, {
 				[USER_ADDED]: user
 			});
+		},
+		removed: (id: string) => {
+			pubsub.publish(USER_REMOVED, {
+				[USER_REMOVED]: id
+			});
+		},
+		modified: (user: IUser, event?: UserEvent) => {
+			pubsub.publish(USER_MODIFIED, {
+				[USER_MODIFIED]: user,
+				event
+			});
 		}
 	}
 };
+
+export enum UserEvent {
+	CREATED,
+	APPLIED,
+	ACCEPTED,
+	ACCEPTED_AND_NOTIFIED,
+	ATTENDING,
+	REJECTED
+}
 
 interface IGraphqlUser {
 	id: string;
@@ -102,15 +138,15 @@ interface IGraphqlUser {
 	confirmationSubmitTime: string | undefined;
 
 	team: {
-		id: string | undefined;
-	};
+		id: string;
+	} | undefined;
 }
 
 function userRecordToGraphql(user: IUser): IGraphqlUser {
 	return {
 		id: user._id.toHexString(),
 		email: user.email,
-		email_verified: user.verifiedEmail,
+		email_verified: !!user.verifiedEmail,
 		admin: !!user.admin,
 		name: user.name,
 
@@ -133,8 +169,8 @@ function userRecordToGraphql(user: IUser): IGraphqlUser {
 		confirmationSubmitTime: user.confirmationSubmitTime &&
 			user.confirmationSubmitTime.toDateString(),
 
-		team: {
-			id: user.teamId && user.teamId.toHexString()
+		team: user.teamId && {
+			id: user.teamId.toHexString()
 		}
 	};
 }

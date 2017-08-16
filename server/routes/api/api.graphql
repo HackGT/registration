@@ -11,16 +11,6 @@ type Query {
   authority(token: ID!): AuthorizedQuery!
 }
 
-# The root subscription type, you must provide your auth token to get
-# access to privileged information.
-type Subscription {
-  # The data someone can view is based on who's viewing it, this
-  # is represented by this authorization gate.
-  # If you don't have permissions to view the subscriptions, you will
-  # get back an empty subscriptions block.
-  authority(token: ID!): AuthorizedSubscription
-}
-
 # A Query that's been given an auth token.
 type AuthorizedQuery {
   # Retrieve user through a user ID or through the token passed to
@@ -30,17 +20,17 @@ type AuthorizedQuery {
 }
 
 # The root subscription type, all subscribes go through here
-type AuthorizedSubscription {
+type Subscription {
   # Triggered when a user is added to the registration system.
-  user_added: User!
+  user_added(token: ID!): User!
   # Triggered when a user is removed from the registration system,
   # returns their user ID
-  user_removed: ID!
+  user_removed(token: ID!): ID!
   # Triggered when the user with the specified ID has changed.
   # (This includes being accepted, choosing a team, or applying)
   # If a UserEvent is specified, this triggered when the user has
   # reached that event.
-  user_modified(id: ID!, event: UserEvent): User!
+  user_modified(token: ID!, id: ID!, event: UserEvent): User!
 }
 
 # Some events that a user can go through in registration
