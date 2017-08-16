@@ -2,14 +2,20 @@ import * as path from "path";
 
 import * as express from "express";
 import * as session from "express-session";
+import * as http from "http";
 import * as serveStatic from "serve-static";
 import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
 import * as morgan from "morgan";
 import * as connectMongo from "connect-mongo";
 const MongoStore = connectMongo(session);
+import * as bodyParser from "body-parser";
+import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
+import { execute, subscribe } from "graphql";
+import { SubscriptionServer } from "subscriptions-transport-ws";
 import flash = require("connect-flash");
 
+import * as graphql from "./routes/api/graphql";
 import {
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
@@ -129,6 +135,30 @@ app.use("/node_modules", serveStatic(path.resolve(__dirname, "../node_modules"))
 app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
 
-app.listen(PORT, () => {
+// Set up graphql and graphiql routes
+app.use("/graphql", bodyParser.json(), graphqlExpress({
+	schema: graphql.schema
+}));
+app.use("/graphiql", validateAndCacheHostName);
+app.use("/graphiql", (req, res, next) => {
+	graphiqlExpress({
+		endpointURL: "/graphql",
+		subscriptionsEndpoint: createLink(req, "graphql").replace(/^http/, "ws")
+	})(req, res, next);
+});
+
+const server = http.createServer(app);
+
+server.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);
+
+	// Set up the WebSocket for handling GraphQL subscriptions
+	new SubscriptionServer({
+		execute,
+		subscribe,
+		schema: graphql.schema
+	}, {
+		server,
+		path: "/graphql"
+	});
 });

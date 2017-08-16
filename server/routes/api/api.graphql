@@ -1,0 +1,13 @@
+type Query {
+  healthy: String!
+}
+
+type Subscription {
+  ping: String!
+}
+
+schema {
+  query: Query
+  subscription: Subscription,
+}
+

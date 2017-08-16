@@ -458,7 +458,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 }
 
 let validatedHostNames: string[] = [];
-function validateAndCacheHostName(request: express.Request, response: express.Response, next: express.NextFunction) {
+export function validateAndCacheHostName(request: express.Request, response: express.Response, next: express.NextFunction) {
 	// Basically checks to see if the server behind the hostname has the same session key by HMACing a random nonce
 	if (validatedHostNames.find(hostname => hostname === request.hostname)) {
 		next();
