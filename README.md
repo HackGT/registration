@@ -119,6 +119,8 @@ EVENT_NAME | The current event's name which affects rendered templates and sent 
 STORAGE_ENGINE | The name of the storage engine that handles file uploads as defined in [storage.ts](server/storage.ts) (default: `disk`)
 STORAGE_ENGINE_OPTIONS | JSON-encoded object containing options to be passed to the storage engine. Must at least contain a value for the `uploadDirectory` key. For the default `disk` storage engine, this directory is relative to the app's root, can be absolute, and will be created if it doesn't exist. (default: `{ "uploadDirectory": "uploads" }`)
 MAX_TEAM_SIZE | The maximum number of users allowed per team (default: `4`)
+AUTH_SERVICE | Specifies an external auth service to use (see `HackGT/auth`) (must be used with AUTH_SERVICE_COOKIE)
+AUTH_SERVICE_COOKIE | Specifies the cookie to give the auth service (must be used with AUTH_SERVICE)
 
 ## Contributing
 

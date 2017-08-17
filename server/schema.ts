@@ -39,10 +39,10 @@ export namespace IConfig {
 		mongoURL: string;
 		passwordResetExpiration: number;
 		services: {
-			auth: {
+			auth?: {
 				url: string;
 				cookie: string;
-			} | undefined;
+			};
 		};
 	}
 
