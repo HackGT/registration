@@ -2,7 +2,6 @@ import * as path from "path";
 
 import * as express from "express";
 import * as session from "express-session";
-import * as http from "http";
 import * as serveStatic from "serve-static";
 import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
@@ -11,21 +10,18 @@ import * as connectMongo from "connect-mongo";
 const MongoStore = connectMongo(session);
 import * as bodyParser from "body-parser";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
-import { execute, subscribe } from "graphql";
-import { SubscriptionServer } from "subscriptions-transport-ws";
 import flash = require("connect-flash");
 
 import * as graphql from "./routes/api/graphql";
 import {
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
-	config, mongoose, createLink
+	config, mongoose
 } from "./common";
 import {
 	User
 } from "./schema";
 import {
-	validateAndCacheHostName,
 	authRoutes as localAuth,
 	redirectToLogin as loginRedirectLocal
 } from "./routes/auth";
@@ -140,26 +136,10 @@ app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
 app.use("/graphql", bodyParser.json(), graphqlExpress({
 	schema: graphql.schema
 }));
-app.use("/graphiql", validateAndCacheHostName);
-app.use("/graphiql", (req, res, next) => {
-	graphiqlExpress({
-		endpointURL: "/graphql",
-		subscriptionsEndpoint: createLink(req, "graphql").replace(/^http/, "ws")
-	})(req, res, next);
-});
+app.use("/graphiql", graphiqlExpress({
+	endpointURL: "/graphql"
+}));
 
-const server = http.createServer(app);
-
-server.listen(PORT, () => {
+app.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);
-
-	// Set up the WebSocket for handling GraphQL subscriptions
-	new SubscriptionServer({
-		execute,
-		subscribe,
-		schema: graphql.schema
-	}, {
-		server,
-		path: "/graphql"
-	});
 });

@@ -7,7 +7,7 @@ schema {
 type Query {
   # The data someone can view is based on who's viewing it, this
   # is represented by this authorization gate.
-  authority(token: ID!): AuthorizedQuery!
+  authority(token: ID!): AuthorizedQuery
 }
 
 # A Query that's been given an auth token.
@@ -18,26 +18,11 @@ type AuthorizedQuery {
   user(id: ID): User
 }
 
-# The user's login account and registration info.
+# Registration info about the user
 type User {
   # User ID, valid across the entire system
   id: ID!
 
-  # User's email
-  email: String!
-  # If the user's email has been verified to be his or hers
-  email_verified: Boolean!
-  # If the user is an admin
-  admin: Boolean!
-  # The user's human-readable full name
-  name: String
-
-  # Registration info about the user
-  info: UserInfo!
-}
-
-# Registration info about the user
-type UserInfo {
   # If the user has applied to the event
   applied: Boolean!
   # If the user has been accepted to the event
@@ -74,8 +59,8 @@ type Team {
 type FormItem {
   name: String!
   type: String!
-  value: FormValue
+  value: String
+  values: [String]
+  file: String
 }
-
-union FormValue = String | [String];
 
