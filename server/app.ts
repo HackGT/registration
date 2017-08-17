@@ -19,12 +19,13 @@ import * as graphql from "./routes/api/graphql";
 import {
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
-	config, mongoose
+	config, mongoose, createLink
 } from "./common";
 import {
 	User
 } from "./schema";
 import {
+	validateAndCacheHostName,
 	authRoutes as localAuth,
 	redirectToLogin as loginRedirectLocal
 } from "./routes/auth";

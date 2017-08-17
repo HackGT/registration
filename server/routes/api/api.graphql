@@ -1,6 +1,5 @@
 schema {
   query: Query
-  subscription: Subscription,
 }
 
 # The root query type, you must provide your auth token to get
@@ -19,39 +18,11 @@ type AuthorizedQuery {
   user(id: ID): User
 }
 
-# The root subscription type, all subscribes go through here
-type Subscription {
-  # Triggered when a user is added to the registration system.
-  user_added(token: ID!): User!
-  # Triggered when a user is removed from the registration system,
-  # returns their user ID
-  user_removed(token: ID!): ID!
-  # Triggered when the user with the specified ID has changed.
-  # (This includes being accepted, choosing a team, or applying)
-  # If a UserEvent is specified, this triggered when the user has
-  # reached that event.
-  user_modified(token: ID!, id: ID!, event: UserEvent): User!
-}
-
-# Some events that a user can go through in registration
-enum UserEvent {
-  # User has visited the page but has not hit 'apply'.
-  CREATED
-  # User has filled out the application.
-  APPLIED
-  # User has been accepted to the event.
-  ACCEPTED
-  # User has been accepted and was notified of it.
-  ACCEPTED_AND_NOTIFIED
-  # User indicated he or she is attending the event.
-  ATTENDING
-  # User has been rejected from the event.
-  REJECTED
-}
-
+# The user's login account and registration info.
 type User {
   # User ID, valid across the entire system
   id: ID!
+
   # User's email
   email: String!
   # If the user's email has been verified to be his or hers
@@ -61,6 +32,12 @@ type User {
   # The user's human-readable full name
   name: String
 
+  # Registration info about the user
+  info: UserInfo!
+}
+
+# Registration info about the user
+type UserInfo {
   # If the user has applied to the event
   applied: Boolean!
   # If the user has been accepted to the event
@@ -97,6 +74,8 @@ type Team {
 type FormItem {
   name: String!
   type: String!
-  value: String # TODO
+  value: FormValue
 }
+
+union FormValue = String | [String];
 
