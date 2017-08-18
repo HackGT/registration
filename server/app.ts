@@ -82,11 +82,11 @@ if (authService) {
 }
 
 // Create a redirect function to go with either method
-export async function redirectToLogin(req: express.Request, res: express.Response) {
+export async function redirectToLogin(request: express.Request, response: express.Response) {
 	if (authService) {
-		await loginRedirectExternal(authService, req, res);
+		await loginRedirectExternal(authService, request, response);
 	} else {
-		loginRedirectLocal(req, res);
+		loginRedirectLocal(request, response);
 	}
 }
 

@@ -595,7 +595,7 @@ export let emailTransporter = nodemailer.createTransport({
 		pass: config.email.password
 	}
 });
-export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo>	{
+export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo> {
 	return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
 		emailTransporter.sendMail(mail, (err, info) => {
 			if (err) {
