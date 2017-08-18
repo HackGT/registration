@@ -8,6 +8,10 @@ type Query {
   # The data someone can view is based on who's viewing it, this
   # is represented by this authorization gate.
   authority(token: ID!): AuthorizedQuery
+  # All possible question branches
+  question_branches: [String]!
+  # All possible question names, or names of question in a branch
+  question_names(branch: String): [String]
 }
 
 # A Query that's been given an auth token.
@@ -33,19 +37,21 @@ type User {
   attending: Boolean!
 
   # What type of application did the user fill out (mentor, participant, etc.)?
-  applicationBranch: String
+  application_branch: String
   # A key-value list of questions and answers from the application
-  applicationData: [FormItem]
-  applicationStartTime: String
-  applicationSubmitTime: String
+  application_data: [FormItem]
+  application_start_time: String
+  application_submit_time: String
 
   # What type of application did the user fill out (mentor, participant, etc.)
   # when going through the confirmation steps?
-  confirmationBranch: String
+  confirmation_branch: String
   # A key-value list of questions and answers from the confirmation application
-  confirmationData: [FormItem]
-  confirmationStartTime: String
-  confirmationSubmitTime: String
+  confirmation_data: [FormItem]
+  confirmation_start_time: String
+  confirmation_submit_time: String
+
+  question(name: String!): FormItem
 
   # What team, if any, is the user a part of?
   team: Team

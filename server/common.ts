@@ -328,6 +328,88 @@ export async function updateSetting<T>(name: string, value: T, createMissing: bo
 }
 
 //
+// JSON schema validator
+//
+import * as ajv from "ajv";
+
+export const QUESTIONS_PATH = path.resolve(__dirname, "./config/questions.json");
+
+export const SCHEMA_PATH = path.resolve(__dirname, "./config/questions.schema.json");
+
+export const Questions: QuestionBranches = (() => {
+	const questionBranches: QuestionBranches =
+		JSON.parse(fs.readFileSync(QUESTIONS_PATH, "utf8"));
+
+	const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, "utf8"));
+
+	return validateJsonSchema(schema, questionBranches);
+})();
+
+function validateJsonSchema(schema: any, questionBranches: QuestionBranches) {
+	let validator = new ajv();
+	let valid = validator.validate(schema, questionBranches);
+	let branchNames = questionBranches.map(branch => branch.name);
+	if (!valid) {
+		console.error(validator.errors);
+		throw new Error("Failed to validate schema!");
+	}
+	else if (new Set(branchNames).size !== branchNames.length) {
+		throw new Error("Application branch names are not unique");
+	}
+	else {
+		return questionBranches;
+	}
+}
+
+export async function validateSchema(questionsFile: string, schemaFile: string = SCHEMA_PATH): Promise<QuestionBranches> {
+	const questionsPath = path.resolve(__dirname, questionsFile);
+	const schemaPath = path.resolve(__dirname, schemaFile);
+	if (questionsPath === QUESTIONS_PATH && schemaPath === SCHEMA_PATH) {
+		return Questions;
+	}
+
+	let questionBranches: QuestionBranches;
+	let schema: any;
+	try {
+		questionBranches = JSON.parse(await readFileAsync(questionsPath));
+		schema = JSON.parse(await readFileAsync(schemaPath));
+	}
+	catch (err) {
+		// Invalid JSON or file read failed unexpectedly
+		return Promise.reject(err);
+	}
+
+	return validateJsonSchema(schema, questionBranches);
+}
+
+export const Branches = Questions.map(branch => branch.name);
+
+export const Tags: { [branch: string]: string[] } = Questions.reduce(
+	(obj: { [branch: string]: string[] }, branch) => {
+		obj[branch.name] = branch.questions.map(question => question.name);
+		return obj;
+}, {});
+
+export const AllTags = Array.from(Questions.reduce((obj: Set<string>, branch) => {
+	branch.questions.forEach(question => obj.add(question.name));
+	return obj;
+}, new Set()));
+
+function getMaxFileUploads(): number {
+	// Can't use validateSchema() because this function needs to run synchronously to export uploadHandler before it gets used
+	let questions = Questions.map(branch => branch.questions);
+	let fileUploadsPerBranch: number[] = questions.map(branch => {
+		return branch.reduce((prev, current) => {
+			if (current.type === "file") {
+				return prev + 1;
+			}
+			return prev;
+		}, 0);
+	});
+	return Math.max(...fileUploadsPerBranch);
+}
+
+//
 // Express middleware
 //
 import * as express from "express";
@@ -356,21 +438,6 @@ export let uploadHandler = multer({
 		"files": getMaxFileUploads()
 	}
 });
-
-function getMaxFileUploads(): number {
-	// Can't use validateSchema() because this function needs to run synchronously to export uploadHandler before it gets used
-	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/questions.json"), "utf8"));
-	let questions = questionBranches.map(branch => branch.questions);
-	let fileUploadsPerBranch: number[] = questions.map(branch => {
-		return branch.reduce((prev, current) => {
-			if (current.type === "file") {
-				return prev + 1;
-			}
-			return prev;
-		}, 0);
-	});
-	return Math.max(...fileUploadsPerBranch);
-}
 
 export function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = request.user as IUser;
@@ -545,36 +612,6 @@ export function readFileAsync(filename: string): Promise<string> {
 			resolve(data);
 		});
 	});
-}
-
-//
-// JSON schema validator
-//
-import * as ajv from "ajv";
-export async function validateSchema(questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<QuestionBranches> {
-	let questionBranches: QuestionBranches;
-	let schema: any;
-	try {
-		questionBranches = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
-		schema = JSON.parse(await readFileAsync(path.resolve(__dirname, schemaFile)));
-	}
-	catch (err) {
-		// Invalid JSON or file read failed unexpectedly
-		return Promise.reject(err);
-	}
-
-	let validator = new ajv();
-	let valid = validator.validate(schema, questionBranches);
-	let branchNames = questionBranches.map(branch => branch.name);
-	if (!valid) {
-		return Promise.reject(validator.errors);
-	}
-	else if (new Set(branchNames).size !== branchNames.length) {
-		return Promise.reject(new Error("Application branch names are not unique"));
-	}
-	else {
-		return questionBranches;
-	}
 }
 
 //
