@@ -42,3 +42,7 @@ jspm_packages
 uploads/
 server/config/config.json
 server/config/questions\.schema\.d\.ts
+
+# Editors!
+.nvimlog
+.#*

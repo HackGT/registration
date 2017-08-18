@@ -8,8 +8,11 @@ import * as cookieParser from "cookie-parser";
 import * as morgan from "morgan";
 import * as connectMongo from "connect-mongo";
 const MongoStore = connectMongo(session);
+import * as bodyParser from "body-parser";
+import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import flash = require("connect-flash");
 
+import * as graphql from "./routes/api/graphql";
 import {
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
@@ -128,6 +131,14 @@ app.route("/version").get((request, response) => {
 app.use("/node_modules", serveStatic(path.resolve(__dirname, "../node_modules")));
 app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
+
+// Set up graphql and graphiql routes
+app.use("/graphql", bodyParser.json(), graphqlExpress({
+	schema: graphql.schema
+}));
+app.use("/graphiql", graphiqlExpress({
+	endpointURL: "/graphql"
+}));
 
 app.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);

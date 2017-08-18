@@ -1,0 +1,72 @@
+schema {
+  query: Query
+}
+
+# The root query type, you must provide your auth token to get
+# access to privileged information.
+type Query {
+  # The data someone can view is based on who's viewing it, this
+  # is represented by this authorization gate.
+  authority(token: ID!): AuthorizedQuery
+  # All possible question branches
+  question_branches: [String]!
+  # All possible question names, or names of question in a branch
+  question_names(branch: String): [String]
+}
+
+# A Query that's been given an auth token.
+type AuthorizedQuery {
+  # Retrieve user through a user ID or through the token passed to
+  # Query. Leave id empty if you'd like to view the currently logged in
+  # user.
+  user(id: ID): User
+}
+
+# Registration info about the user
+type User {
+  # User ID, valid across the entire system
+  id: ID!
+
+  # If the user has applied to the event
+  applied: Boolean!
+  # If the user has been accepted to the event
+  accepted: Boolean!
+  # If the user has been accepted and notified of his or her acceptance
+  accepted_and_notified: Boolean!
+  # If the user has indicated that he or she is attending
+  attending: Boolean!
+
+  # What type of application did the user fill out (mentor, participant, etc.)?
+  application_branch: String
+  # A key-value list of questions and answers from the application
+  application_data: [FormItem]
+  application_start_time: String
+  application_submit_time: String
+
+  # What type of application did the user fill out (mentor, participant, etc.)
+  # when going through the confirmation steps?
+  confirmation_branch: String
+  # A key-value list of questions and answers from the confirmation application
+  confirmation_data: [FormItem]
+  confirmation_start_time: String
+  confirmation_submit_time: String
+
+  question(name: String!): FormItem
+
+  # What team, if any, is the user a part of?
+  team: Team
+}
+
+# Application teams
+type Team {
+  id: ID!
+}
+
+type FormItem {
+  name: String!
+  type: String!
+  value: String
+  values: [String]
+  file: String
+}
+

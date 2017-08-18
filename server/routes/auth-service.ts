@@ -42,6 +42,33 @@ export async function redirectToLogin(
 	}
 }
 
+export async function isAdmin(
+	auth: { url: string; cookie: string },
+	token: string
+): Promise<{ id: string; admin: boolean } | null> {
+	const query = `{user(token: "${token}") {id admin}}`;
+
+	const login: {
+		data: {
+			user: {
+				id: string;
+				admin: boolean;
+			} | null;
+		} | undefined;
+	} = await request({
+		method: "POST",
+		url: auth.url + "/graphql",
+		json: true,
+		body: { query }
+	});
+
+	if (!login || !login.data) {
+		console.error(login);
+		throw new Error('Got invalid response from auth service.');
+	}
+	return login && login.data && login.data.user;
+}
+
 export function authRoutes(auth: { url: string; cookie: string }) {
 	app.use("/", async (request, response, next) => {
 		const token = request.cookies[auth.cookie];
