@@ -637,7 +637,6 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 	let tags = {
 		action,
 		url: request.path,
-		time: moment.utc().format(),
 		ip: request.ip,
 		user,
 		...data
