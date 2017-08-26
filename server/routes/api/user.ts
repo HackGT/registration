@@ -205,7 +205,13 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			user.applicationData = data;
 			user.markModified("applicationData");
 			user.applicationSubmitTime = new Date();
-			trackEvent("submitted application", request, user.email);
+
+			// Generate tags for metrics support
+			let tags: {[index: string]: string} = {};
+			for (let ele of data) {
+				tags[ele.name.toString()] = ele.value!.toString();
+			}
+			trackEvent("submitted application", request, user.email, tags);
 		}
 		else if (requestType === ApplicationType.Confirmation) {
 			if (!user.attending) {

@@ -623,8 +623,8 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 }
 
-import { DataLog } from "./schema";
-export function trackEvent(action: string, request: express.Request, user?: string) {
+import { DataLog, HackGTMetrics } from "./schema";
+export function trackEvent(action: string, request: express.Request, user?: string, data?: object) {
 	let thisEvent: DataLog = {
 		action,
 		url: request.path,
@@ -634,4 +634,21 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 		userAgent: request.headers["user-agent"] as string
 	};
 	console.log(thisEvent);
+	let tags = {
+		action,
+		url: request.path,
+		time: moment.utc().format(),
+		ip: request.ip,
+		user,
+		...data
+	};
+	let metricsEvent: HackGTMetrics = {
+		hackgtmetricsversion: 1,
+		serviceName: "registration-" + action,
+		values: {
+			value: 1
+		},
+		tags
+	};
+	console.log(JSON.stringify(metricsEvent));
 }

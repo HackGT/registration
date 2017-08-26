@@ -294,3 +294,10 @@ export interface DataLog {
 	userAgent?: string;
 	user?: string;
 }
+
+export interface HackGTMetrics {
+	tags: object;
+	serviceName: string;
+	values: object;
+	hackgtmetricsversion: number;
+}
