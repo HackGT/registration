@@ -209,7 +209,9 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			// Generate tags for metrics support
 			let tags: {[index: string]: string} = {};
 			for (let ele of data) {
-				tags[ele.name.toString()] = ele.value!.toString();
+				if (ele && ele.name && ele.value) {
+					tags[ele.name.toString()] = ele.value.toString();
+				}
 			}
 			trackEvent("submitted application", request, user.email, tags);
 		}
