@@ -565,38 +565,47 @@ export function sanitize(input: string): string {
 	}
 	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
-	return new Promise<string>(async (resolve, reject) => {
-		let teamName: string;
-		if (await getSetting<boolean>("teamsEnabled")) {
-			teamName = "No team created or joined";
-			if (user.teamId) {
-				let team = await Team.findById(user.teamId);
-				if (team) {
-					teamName = team.teamName;
-				}
-			}
-		}
-		else {
-			teamName = "Teams not enabled";
-		}
-
-		// Interpolate and sanitize variables
-		markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
-		markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
-		markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
-		markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
-		markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
-		markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
-
-		marked(markdown, { sanitize: false, smartypants: true }, (err: Error | null, content: string) => {
+export async function renderMarkdown(markdown: string, options?: MarkedOptions, singleLine: boolean = false): Promise<string> {
+	return new Promise<string>((resolve, reject) => {
+		marked(markdown, { sanitize: false, smartypants: true, ...options }, (err: Error | null, content: string) => {
 			if (err) {
 				reject(err);
 				return;
 			}
+			if (singleLine) {
+				// Open links in a new tab
+				content = content.replace(/<a /g, `<a target="_blank" `);
+				// Remove <p></p> wrapper
+				content = content.substring(3, content.length - 5);
+			}
 			resolve(content);
 		});
 	});
+}
+export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
+	let teamName: string;
+	if (await getSetting<boolean>("teamsEnabled")) {
+		teamName = "No team created or joined";
+		if (user.teamId) {
+			let team = await Team.findById(user.teamId);
+			if (team) {
+				teamName = team.teamName;
+			}
+		}
+	}
+	else {
+		teamName = "Teams not enabled";
+	}
+
+	// Interpolate and sanitize variables
+	markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
+	markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
+	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
+	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
+	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
+	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+
+	return await renderMarkdown(markdown);
 }
 export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
 	let html: string;

@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT, STORAGE_ENGINE,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	formatSize, validateSchema, config, getSetting, sanitize
+	formatSize, validateSchema, config, getSetting, renderMarkdown
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -322,7 +322,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		return;
 	}
 	// tslint:disable:no-string-literal
-	let questionData = questionBranch.questions.map(question => {
+	let questionData = await Promise.all(questionBranch.questions.map(async question => {
 		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
@@ -358,6 +358,9 @@ async function applicationBranchHandler(request: express.Request, response: expr
 					}
 				}
 			}
+			question.options = await Promise.all(question.options.map(async (option) => {
+				return await renderMarkdown(option, undefined, true);
+			}));
 		}
 		else {
 			question["multi"] = false;
@@ -371,21 +374,22 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		question["value"] = savedValue ? savedValue.value : "";
 
 		if (questionBranch.text) {
-			let textContent: string = questionBranch.text.filter(text => text.for === question.name).map(text => {
-				return `<${text.type}>${sanitize(text.content)}</${text.type}>`;
-			}).join("\n");
+			let textContent: string = (await Promise.all(questionBranch.text.filter(text => text.for === question.name).map(async text => {
+				return `<${text.type}>${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
+			}))).join("\n");
 			question["textContent"] = textContent;
 		}
+		question.label = await renderMarkdown(question.label, undefined, true);
 
 		return question;
-	});
+	}));
 	// tslint:enable:no-string-literal
 
 	let endText: string = "";
 	if (questionBranch.text) {
-		endText = questionBranch.text.filter(text => text.for === "end").map(text => {
-			return `<${text.type} style="font-size: 90%; text-align: center;">${sanitize(text.content)}</${text.type}>`;
-		}).join("\n");
+		endText = (await Promise.all(questionBranch.text.filter(text => text.for === "end").map(async text => {
+			return `<${text.type} style="font-size: 90%; text-align: center;">${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
+		}))).join("\n");
 	}
 
 	let thisUser = await User.findById(user._id) as IUserMongoose;
