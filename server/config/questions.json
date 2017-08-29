@@ -1113,7 +1113,7 @@
             {
                 "for": "confirmation",
                 "type": "h5",
-                "content": "Note that opening ceremonies will begin at approximately 7pm on Friday and closing ceremonies will end at approximately 2pm on Sunday"
+                "content": "Note that opening ceremonies will begin at approximately 7pm on Friday, October 13th and closing ceremonies will end at approximately 2pm on Sunday, October 15th"
             },
             {
                 "for": "receipt1",
@@ -1147,13 +1147,7 @@
                 "name": "receipt1",
                 "label": "Flight / Travel receipt",
                 "type": "file",
-                "required": false
-            },
-            {
-                "name": "receipt2",
-                "label": "Flight / Travel receipt",
-                "type": "file",
-                "required": false
+                "required": true
             },
             {
                 "name": "receipt-confirmation",
