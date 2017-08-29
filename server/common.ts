@@ -5,6 +5,8 @@ import * as os from "os";
 import "passport";
 import * as moment from "moment-timezone";
 
+import { redirectToLogin } from "./app";
+
 //
 // Config
 //
@@ -42,7 +44,10 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/",
-		passwordResetExpiration: 1000 * 60 * 60 // 1 hour
+		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
+		services: {
+			auth: undefined
+		}
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
@@ -193,6 +198,13 @@ class Config implements IConfig.Main {
 			if (!isNaN(expirationTime) && expirationTime > 0) {
 				this.server.passwordResetExpiration = expirationTime;
 			}
+		}
+		// Services
+		if (process.env.AUTH_SERVICE && process.env.AUTH_SERVICE_COOKIE) {
+			this.server.services.auth = {
+				url: process.env.AUTH_SERVICE!,
+				cookie: process.env.AUTH_SERVICE_COOKIE!
+			};
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
@@ -406,14 +418,49 @@ export function authenticateWithReject(request: express.Request, response: expre
 	}
 }
 // For directly user facing endpoints
-export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
+export async function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	if (!request.isAuthenticated()) {
-		response.redirect("/login");
+		await redirectToLogin(request, response);
 	}
 	else {
 		next();
 	}
 }
+
+export function getExternalPort(request: express.Request): number {
+	function defaultPort(): number {
+		// Default ports for HTTP and HTTPS
+		return request.protocol === "http" ? 80 : 443;
+	}
+
+	let host = request.headers.host;
+	if (!host || Array.isArray(host)) {
+		return defaultPort();
+	}
+
+	// IPv6 literal support
+	let offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
+	let index = host.indexOf(":", offset);
+	if (index !== -1) {
+		return parseInt(host.substring(index + 1), 10);
+	}
+	else {
+		return defaultPort();
+	}
+}
+
+export function createLink(request: express.Request, link: string): string {
+	if (link[0] === "/") {
+		link = link.substring(1);
+	}
+	if ((request.secure && getExternalPort(request) === 443) || (!request.secure && getExternalPort(request) === 80)) {
+		return `http${request.secure ? "s" : ""}://${request.hostname}/${link}`;
+	}
+	else {
+		return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
+	}
+}
+
 import * as Handlebars from "handlebars";
 import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
@@ -548,7 +595,7 @@ export let emailTransporter = nodemailer.createTransport({
 		pass: config.email.password
 	}
 });
-export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo>  {
+export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo> {
 	return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
 		emailTransporter.sendMail(mail, (err, info) => {
 			if (err) {

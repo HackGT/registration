@@ -1,19 +1,31 @@
 import * as path from "path";
 
 import * as express from "express";
+import * as session from "express-session";
 import * as serveStatic from "serve-static";
 import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
 import * as morgan from "morgan";
+import * as connectMongo from "connect-mongo";
+const MongoStore = connectMongo(session);
 import flash = require("connect-flash");
 
 import {
 	// Constants
-	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS
+	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
+	config, mongoose
 } from "./common";
 import {
 	User
 } from "./schema";
+import {
+	authRoutes as localAuth,
+	redirectToLogin as loginRedirectLocal
+} from "./routes/auth";
+import {
+	authRoutes as externalAuth,
+	redirectToLogin as loginRedirectExternal
+} from "./routes/auth-service";
 
 // Set up Express and its middleware
 export let app = express();
@@ -34,9 +46,49 @@ app.use(flash());
 	throw err;
 });
 
-// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import {authRoutes} from "./routes/auth";
-app.use("/auth", authRoutes);
+// Lets keep session data around
+app.use(session({
+	secret: config.secrets.session,
+	cookie: COOKIE_OPTIONS,
+	resave: false,
+	store: new MongoStore({
+		mongooseConnection: mongoose.connection,
+		touchAfter: 24 * 60 * 60 // Check for TTL every 24 hours at minimum
+	}),
+	saveUninitialized: true
+}));
+
+// Check to enable proxy or not
+if (!config.server.isProduction) {
+	console.warn("OAuth callback(s) running in development mode");
+}
+else {
+	app.enable("trust proxy");
+}
+
+// Check session secret & warn
+if (!config.sessionSecretSet) {
+	console.warn("No session secret set; sessions won't carry over server restarts");
+}
+
+// Auth needs to be the first route configured or else requests handled
+// Before it will always be unauthenticated
+const authService = config.server.services.auth;
+if (authService) {
+	externalAuth(authService);
+	console.log(`Not using built-in auth over ${authService.url}.`);
+} else {
+	localAuth();
+}
+
+// Create a redirect function to go with either method
+export async function redirectToLogin(request: express.Request, response: express.Response) {
+	if (authService) {
+		await loginRedirectExternal(authService, request, response);
+	} else {
+		loginRedirectLocal(request, response);
+	}
+}
 
 // Metrics
 import {trackEvent} from "./common";

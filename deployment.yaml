@@ -17,6 +17,8 @@ secrets:
   - STORAGE_ENGINE_OPTIONS
 
 env:
+  AUTH_SERVICE: 'https://auth.hack.gt'
+  AUTH_SERVICE_COOKIE: 'sso-auth'
   COOKIE_SECURE_ONLY: true
   EMAIL_FROM: "HackGT Team <hello@hackgt.com>"
   EMAIL_HOST: smtp.sendgrid.net
