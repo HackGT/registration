@@ -566,6 +566,19 @@ export async function validateSchema(questionsFile: string, schemaFile: string =
 		return Promise.reject(new Error("Application branch names are not unique"));
 	}
 	else {
+		for (let i = 0; i < questionBranches.length; i++) {
+			for (let j = 0; j < questionBranches[i].questions.length; j++) {
+				// Render labels
+				questionBranches[i].questions[j].label = await renderMarkdown(questionBranches[i].questions[j].label, undefined, true);
+				// Render options (if they exist)
+				let type = questionBranches[i].questions[j].type;
+				if (type === "checkbox" || type === "radio" || type === "select") {
+					for (let k = 0; k < questionBranches[i].questions[j].options.length; k++) {
+						questionBranches[i].questions[j].options[k] = await renderMarkdown(questionBranches[i].questions[j].options[k], undefined, true);
+					}
+				}
+			}
+		}
 		return questionBranches;
 	}
 }
