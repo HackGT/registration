@@ -655,7 +655,7 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 			return "N/A";
 		}
 		else if (typeof formItem.value === "string") {
-			return formItem.value;
+			return formItem.value.replace(/\n/g, "\n<br />");
 		}
 		else if (Array.isArray(formItem.value)) {
 			return formItem.value.join(", ");
