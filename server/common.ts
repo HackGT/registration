@@ -577,7 +577,7 @@ import * as nodemailer from "nodemailer";
 import * as marked from "marked";
 // tslint:disable-next-line:no-var-requires
 const striptags = require("striptags");
-import { IUser, Team } from "./schema";
+import { IUser, Team, IFormItem } from "./schema";
 
 export let emailTransporter = nodemailer.createTransport({
 	host: config.email.host,
@@ -637,6 +637,25 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 		teamName = "Teams not enabled";
 	}
 
+	function formatFormItem(formItem: IFormItem | undefined): string {
+		if (formItem === undefined || formItem.value === null) {
+			return "N/A";
+		}
+		else if (typeof formItem.value === "string") {
+			return formItem.value;
+		}
+		else if (Array.isArray(formItem.value)) {
+			return formItem.value.join(", ");
+		}
+		else {
+			// Multer file
+			let file = formItem.value;
+			let formattedSize = formatSize(file.size);
+
+			return `\`${file.originalname}\` / ${formattedSize}`;
+		}
+	}
+
 	// Interpolate and sanitize variables
 	markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
 	markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
@@ -644,6 +663,14 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
 	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
 	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+	markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
+		let question = user.applicationData.find(data => data.name === name);
+		return formatFormItem(question);
+	});
+	markdown = markdown.replace(/{{confirmation\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
+		let question = user.confirmationData.find(data => data.name === name);
+		return formatFormItem(question);
+	});
 
 	return await renderMarkdown(markdown);
 }
