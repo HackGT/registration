@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
 import * as os from "os";
+import * as tmp from "tmp";
 import "passport";
 import * as moment from "moment-timezone";
 
@@ -226,6 +227,9 @@ class Config implements IConfig.Main {
 		}
 		if (process.env.FAVICON_FILE) {
 			this.style.favicon = process.env.FAVICON_FILE!;
+		}
+		else if (process.env.FAVICON_FILE_BASE64) {
+			this.style.favicon = unbase64File(process.env.FAVICON_FILE_BASE64!);
 		}
 		// Storage engine
 		if (process.env.STORAGE_ENGINE) {
@@ -523,6 +527,14 @@ export function readFileAsync(filename: string): Promise<string> {
 			resolve(data);
 		});
 	});
+}
+
+export function unbase64File(filename: string): string {
+	const text = fs.readFileSync(filename, "utf8");
+	const decoded = Buffer.from(text, "base64");
+	const file = tmp.fileSync();
+	fs.writeSync(file.fd, decoded);
+	return file.name;
 }
 
 //

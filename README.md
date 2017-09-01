@@ -122,6 +122,7 @@ MAX_TEAM_SIZE | The maximum number of users allowed per team (default: `4`)
 QUESTIONS_FILE | Specify a path for the `questions.json` file.
 THEME_FILE | Specify a path for the `theme.css` file, which will be loaded last at every page.
 FAVICON_FILE | Path to the favicon file (default is no favicon).
+FAVICON_FILE_BASE64 | Same as `FAVICON_FILE_BASE64` but the file is base64 encoded.
 
 
 ## Contributing
