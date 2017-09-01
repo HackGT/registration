@@ -20,7 +20,7 @@
 	- List of all users in a table including name, email, email verified status, admin status, and application status, and log in method
 	- List of all applicants with application responses and accept / unaccept button sortable by application branch and accepted status
 	- Acceptance emails are sent out only when a send acceptance emails button is clicked allowing for decisions to be reviewed before being finalized
-	- Setting application and confirmatio open and close times as well as what question branches from `questions.json` are for applications, confirmations, or hidden
+	- Setting application and confirmation open and close times as well as what question branches from `questions.json` are for applications, confirmations, or hidden
 	- Full email customization using a built-in HTML / Markdown editor with live preview and variable interpolation
 	- Ability to view settings from `config.json` or environment variables that cannot be changed while the app is running
 
@@ -119,6 +119,10 @@ EVENT_NAME | The current event's name which affects rendered templates and sent 
 STORAGE_ENGINE | The name of the storage engine that handles file uploads as defined in [storage.ts](server/storage.ts) (default: `disk`)
 STORAGE_ENGINE_OPTIONS | JSON-encoded object containing options to be passed to the storage engine. Must at least contain a value for the `uploadDirectory` key. For the default `disk` storage engine, this directory is relative to the app's root, can be absolute, and will be created if it doesn't exist. (default: `{ "uploadDirectory": "uploads" }`)
 MAX_TEAM_SIZE | The maximum number of users allowed per team (default: `4`)
+QUESTIONS_FILE | Specify a path for the `questions.json` file.
+THEME_FILE | Specify a path for the `theme.css` file, which will be loaded last at every page.
+FAVICON_FILE | Path to the favicon file (default is no favicon).
+
 
 ## Contributing
 

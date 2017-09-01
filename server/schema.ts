@@ -39,13 +39,19 @@ export namespace IConfig {
 		mongoURL: string;
 		passwordResetExpiration: number;
 	}
+	export interface Style {
+		theme: string;
+		favicon: string;
+	}
 
 	export interface Main {
 		secrets: Secrets;
 		email: Email;
 		server: Server;
+		style: Style;
 		admins: string[];
 		eventName: string;
+		questions: string;
 		storageEngine: {
 			name: string;
 			options: any;

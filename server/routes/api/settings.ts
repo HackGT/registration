@@ -2,7 +2,8 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-	uploadHandler, isAdmin, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
+	uploadHandler, isAdmin, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText,
+	config
 } from "../../common";
 
 setDefaultSettings().catch(err => {
@@ -97,7 +98,7 @@ settingsRoutes.route("/teams_enabled")
 
 settingsRoutes.route("/branch_roles")
 	.get(isAdmin, async (request, response) => {
-		let branchNames = (await validateSchema("./config/questions.json", "./config/questions.schema.json")).map(branch => branch.name);
+		let branchNames = (await validateSchema(config.questions, "./config/questions.schema.json")).map(branch => branch.name);
 		let applicationBranches = await getSetting<string[]>("applicationBranches");
 		let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 		response.json({

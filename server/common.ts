@@ -56,6 +56,13 @@ class Config implements IConfig.Main {
 
 	public sessionSecretSet: boolean = false;
 
+	public style: IConfig.Style = {
+		theme: path.resolve(__dirname, "../client/css/theme.css"),
+		favicon: path.resolve(__dirname, "../client/favicon.ico")
+	};
+
+	public questions: string = path.resolve(__dirname, "./config/questions.json");
+
 	constructor(fileName: string = "config.json") {
 		this.loadFromJSON(fileName);
 		this.loadFromEnv();
@@ -106,6 +113,13 @@ class Config implements IConfig.Main {
 		}
 		if (config.secrets && config.secrets.session) {
 			this.sessionSecretSet = true;
+		}
+
+		if (config.questions) {
+			this.questions = config.questions;
+		}
+		if (config.style) {
+			this.style = config.style;
 		}
 	}
 	protected loadFromEnv(): void {
@@ -201,6 +215,17 @@ class Config implements IConfig.Main {
 		// Event name
 		if (process.env.EVENT_NAME) {
 			this.eventName = process.env.EVENT_NAME!;
+		}
+		// Questions
+		if (process.env.QUESTIONS_FILE) {
+			this.questions = process.env.QUESTIONS_FILE!;
+		}
+		// Style
+		if (process.env.THEME_FILE) {
+			this.style.theme = process.env.THEME_FILE!;
+		}
+		if (process.env.FAVICON_FILE) {
+			this.style.favicon = process.env.FAVICON_FILE!;
 		}
 		// Storage engine
 		if (process.env.STORAGE_ENGINE) {
@@ -347,7 +372,7 @@ export let uploadHandler = multer({
 
 function getMaxFileUploads(): number {
 	// Can't use validateSchema() because this function needs to run synchronously to export uploadHandler before it gets used
-	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/questions.json"), "utf8"));
+	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(config.questions, "utf8"));
 	let questions = questionBranches.map(branch => branch.questions);
 	let fileUploadsPerBranch: number[] = questions.map(branch => {
 		return branch.reduce((prev, current) => {
@@ -508,7 +533,7 @@ export async function validateSchema(questionsFile: string, schemaFile: string =
 	let questionBranches: QuestionBranches;
 	let schema: any;
 	try {
-		questionBranches = JSON.parse(await readFileAsync(path.resolve(__dirname, questionsFile)));
+		questionBranches = JSON.parse(await readFileAsync(questionsFile));
 		schema = JSON.parse(await readFileAsync(path.resolve(__dirname, schemaFile)));
 	}
 	catch (err) {

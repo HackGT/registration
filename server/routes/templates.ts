@@ -256,7 +256,7 @@ async function applicationHandler(request: express.Request, response: express.Re
 	let questionBranches: QuestionBranches;
 	try {
 		// Path is relative to common.ts, where validateSchema function is implemented
-		questionBranches = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+		questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
 	}
 	catch (err) {
 		console.error("validateSchema error:", err);
@@ -309,7 +309,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	let questionBranches: QuestionBranches;
 	try {
 		// Path is relative to common.ts, where validateSchema function is implemented
-		questionBranches = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+		questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
 	}
 	catch (err) {
 		console.error("validateSchema error:", err);
@@ -420,7 +420,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	if (!user.admin) {
 		response.redirect("/");
 	}
-	let rawQuestions = await validateSchema("./config/questions.json", "./config/questions.schema.json");
+	let rawQuestions = await validateSchema(config.questions, "./config/questions.schema.json");
 
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let applicationBranches = await getSetting<string[]>("applicationBranches");
