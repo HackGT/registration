@@ -28,8 +28,9 @@ def commit_to_biodomes
   Dir.chdir(File.join(path, 'biodomes')) { || message = yield }
 
   # commit & push
+  git.add(all: true)
   begin
-    git.commit_all(message)
+    git.commit(message)
   rescue
     puts 'Nothing to commit, skipping...'
     return

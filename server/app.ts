@@ -9,7 +9,9 @@ import flash = require("connect-flash");
 
 import {
 	// Constants
-	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS
+	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
+	// Configuration
+	config
 } from "./common";
 import {
 	User
@@ -75,6 +77,8 @@ app.route("/version").get((request, response) => {
 
 app.use("/node_modules", serveStatic(path.resolve(__dirname, "../node_modules")));
 app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
+app.use("/css/theme.css", serveStatic(config.style.theme));
+app.use("/favicon.ico", serveStatic(config.style.favicon));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
 
 app.listen(PORT, () => {
