@@ -4,6 +4,9 @@ git:
 wants:
     mongo: true
 
+health:
+  path: /
+
 secrets:
   - SESSION_SECRET
   - EMAIL_USERNAME

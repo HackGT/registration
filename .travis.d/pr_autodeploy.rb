@@ -65,6 +65,10 @@ def create_biodome_file(branch)
         branch: "#{branch}"
 
     secrets-source: git-#{ORG_NAME}-#{remote}-secrets
+    deployment:
+        replicas: 1
+        strategy:
+            type: Recreate
   EOF
   ["pr/#{pr_id branch}.yaml", data.downcase]
 end
