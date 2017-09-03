@@ -67,6 +67,9 @@ class Config implements IConfig.Main {
 	constructor(fileName: string = "config.json") {
 		this.loadFromJSON(fileName);
 		this.loadFromEnv();
+		if (!this.server.isProduction) {
+			this.eventName += " - Development";
+		}
 	}
 	protected loadFromJSON(fileName: string): void {
 		// tslint:disable-next-line:no-shadowed-variable
