@@ -266,6 +266,8 @@
 								<li><strong>\{{teamName}}</strong>: The user's team name if teams are enabled and the user has joined a team. Otherwise, will output <code>Teams not enabled</code> or <code>No team created or joined</code> respectively.</li>
 								<li><strong>\{{applicationBranch}}</strong>: The question branch name that the user applied / was accepted to.</li>
 								<li><strong>\{{confirmationBranch}}</strong>: The question branch name that the user RSVPed to.</li>
+								<li><strong>\{{application.<code>question-name</code>}}</strong>: Prints the user's response to the application question with the specified name from <code>questions.json</code>. Note that the question name is different from the question label. <a href="https://github.com/HackGT/registration/blob/master/server/config/questions.json" target="_blank">See the GitHub project</a> for details. Will print <code>N/A</code> if not yet answered.</li>
+								<li><strong>\{{confirmation.<code>question-name</code>}}</strong>: Prints the user's response to the confirmation question with the specified name from <code>questions.json</code>.</li>
 							</ul>
 						</div>
 					</div>

@@ -112,6 +112,12 @@ canvas {
 .branch-role:nth-of-type(3n + 1) {
     margin-left: 0;
 }
+.branch-role > h4 {
+    height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 pre {
     overflow: auto;

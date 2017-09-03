@@ -358,9 +358,6 @@ async function applicationBranchHandler(request: express.Request, response: expr
 					}
 				}
 			}
-			question.options = await Promise.all(question.options.map(async (option) => {
-				return await renderMarkdown(option, undefined, true);
-			}));
 		}
 		else {
 			question["multi"] = false;
@@ -379,7 +376,6 @@ async function applicationBranchHandler(request: express.Request, response: expr
 			}))).join("\n");
 			question["textContent"] = textContent;
 		}
-		question.label = await renderMarkdown(question.label, undefined, true);
 
 		return question;
 	}));
