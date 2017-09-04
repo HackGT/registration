@@ -112,18 +112,6 @@ Handlebars.registerHelper("toLowerCase", (n: number): string => {
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
-Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationBranches: string[]; confirmationBranches: string[] }, role: string, branchName: string): string => {
-	if (role === "noop" && roles.noop.indexOf(branchName) !== -1) {
-		return "selected";
-	}
-	if (role === "application" && roles.applicationBranches.indexOf(branchName) !== -1) {
-		return "selected";
-	}
-	if (role === "confirmation" && roles.confirmationBranches.indexOf(branchName) !== -1) {
-		return "selected";
-	}
-	return "";
-});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));

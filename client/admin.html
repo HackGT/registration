@@ -219,14 +219,43 @@
 							<input id="qr-enabled" type="checkbox" {{settings.qrEnabledChecked}} />
 						</div>
 					</div>
-					<div class="row">
-						{{#each branchNames}}
+					<div class="row row-flex">
+						{{#each settings.branchRoles.applicationBranches}}
 							<div class="col-4 branch-role" data-name="{{this}}">
 								<h4>{{this}}</h4>
 								<select>
-									<option value="noop" {{roleSelected ../settings.branchRoles "noop" this}}>Not used</option>
-									<option value="application" {{roleSelected ../settings.branchRoles "application" this}}>Application</option>
-									<option value="confirmation" {{roleSelected ../settings.branchRoles "confirmation" this}}>Confirmation</option>
+									<option value="noop">Not used</option>
+									<option value="application" selected>Application</option>
+									<option value="confirmation">Confirmation</option>
+								</select>
+								<label>Available confirmation branches</label>
+								<fieldset>
+									{{#each ../settings.branchRoles.confirmationBranches}}
+										<div>
+											<input type="checkbox" id="{{../this}}-to-{{this}}" checked />
+											<label for="{{../this}}-to-{{this}}">{{this}}</label>
+										</div>
+									{{/each}}
+								</fieldset>
+							</div>
+						{{/each}}
+						{{#each settings.branchRoles.confirmationBranches}}
+							<div class="col-4 branch-role" data-name="{{this}}">
+								<h4>{{this}}</h4>
+								<select>
+									<option value="noop">Not used</option>
+									<option value="application">Application</option>
+									<option value="confirmation" selected>Confirmation</option>
+								</select>
+							</div>
+						{{/each}}
+						{{#each settings.branchRoles.noop}}
+							<div class="col-4 branch-role" data-name="{{this}}">
+								<h4>{{this}}</h4>
+								<select>
+									<option value="noop" selected>Not used</option>
+									<option value="application">Application</option>
+									<option value="confirmation">Confirmation</option>
 								</select>
 							</div>
 						{{/each}}
