@@ -307,7 +307,8 @@ export async function setDefaultSettings() {
 		"teamsEnabled": true,
 		"qrEnabled": true,
 		"applicationBranches": [],
-		"confirmationBranches": []
+		"confirmationBranches": [],
+		"applicationToConfirmation": {}
 	};
 
 	for (let setting in DEFAULTS) {

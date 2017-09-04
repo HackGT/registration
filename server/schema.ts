@@ -283,6 +283,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 			applicationBranches: string[];
 			confirmationBranches: string[];
 		};
+		applicationToConfirmationMap: ApplicationToConfirmationMap;
 	};
 	config: {
 		admins: string;
@@ -308,4 +309,8 @@ export interface HackGTMetrics {
 	serviceName: string;
 	values: object;
 	hackgtmetricsversion: number;
+}
+
+export interface ApplicationToConfirmationMap {
+	[applicationBranch: string]: string[];
 }
