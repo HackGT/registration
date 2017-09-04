@@ -25,8 +25,106 @@ class State {
 		this.sectionElement.style.display = "block";
 	}
 }
-
 const states: State[] = ["statistics", "users", "applicants", "settings"].map(id => new State(id));
+
+class UserEntries {
+	private static readonly NODE_COUNT = 10;
+	private static nodes: HTMLTableRowElement[] = [];
+	private static offset: number = 0;
+	private static readonly previousButton = document.getElementById("users-entries-previous") as HTMLButtonElement;
+	private static readonly nextButton = document.getElementById("users-entries-next") as HTMLButtonElement;
+
+	private static instantiate() {
+		const userEntryTemplate = document.getElementById("user-entry") as HTMLTemplateElement;
+		const userEntryTableBody = document.querySelector("#users > table > tbody") as HTMLTableSectionElement;
+		for (let i = this.nodes.length; i < this.NODE_COUNT; i++) {
+			let node = document.importNode(userEntryTemplate.content, true);
+			userEntryTableBody.appendChild(node);
+			this.nodes.push(userEntryTableBody.querySelectorAll("tr")[i]);
+		}
+	}
+	private static load() {
+		const status = document.getElementById("users-entries-status") as HTMLParagraphElement;
+		status.textContent = "Loading...";
+
+		let query: { [index: string]: any } = {
+			offset: this.offset,
+			count: this.NODE_COUNT
+		}
+		let params = Object.keys(query)
+			.map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
+			.join("&")
+			.replace(/%20/g, "+");
+		fetch(`/api/admin/users?${params}`, {
+			credentials: "same-origin",
+			method: "GET"
+		}).then(checkStatus).then(parseJSON).then((data: {
+			offset: number;
+			count: number;
+			total: number;
+			data: any[];
+		}) => {
+			for (let i = 0; i < this.NODE_COUNT; i++) {
+				let node = this.nodes[i];
+				let user = data.data[i];
+				node.querySelector("td.name")!.textContent = user.name;
+				node.querySelector("td.email > span")!.textContent = user.email;
+				node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+				if (user.verifiedEmail) {
+					node.querySelector("td.email")!.classList.add("verified");
+				}
+				else {
+					node.querySelector("td.email")!.classList.add("notverified");
+				}
+				if (user.admin) {
+					node.querySelector("td.email")!.classList.add("admin");
+				}
+				node.querySelector("td.status")!.textContent = user.status;
+				node.querySelector("td.login-method")!.textContent = user.loginMethods;
+			}
+
+			if (data.offset <= 0) {
+				this.previousButton.disabled = true;
+			}
+			else {
+				this.previousButton.disabled = false;
+			}
+			let upperBound = data.offset + data.count;
+			if (upperBound >= data.total) {
+				upperBound = data.total;
+				this.nextButton.disabled = true;
+			}
+			else {
+				this.nextButton.disabled = false;
+			}
+			status.textContent = `${data.offset + 1} – ${upperBound} of ${data.total.toLocaleString()}`;
+		});
+	}
+
+	public static setup() {
+		this.nodes = [];
+		this.instantiate();
+		this.offset = 0;
+		this.load();
+		this.previousButton.addEventListener("click", () => {
+			this.previous();
+		});
+		this.nextButton.addEventListener("click", () => {
+			this.next();
+		});
+	}
+	public static next() {
+		this.offset += this.NODE_COUNT;
+		this.load();
+	}
+	public static previous() {
+		this.offset -= this.NODE_COUNT;
+		if (this.offset < 0) {
+			this.offset = 0;
+		}
+		this.load();
+	}
+}
 
 // Set the correct state on page load
 function readURLHash() {
@@ -45,7 +143,11 @@ function readURLHash() {
 		states[0].show();
 	}
 }
-readURLHash();
+
+(function setup() {
+	readURLHash();
+	UserEntries.setup();
+})();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);
 

@@ -263,7 +263,6 @@ export interface IAdminTemplate extends ICommonTemplate {
 		declinedUsers: number;
 	};
 	generalStatistics: StatisticEntry[];
-	users: any[];
 	metrics: {};
 	settings: {
 		application: {

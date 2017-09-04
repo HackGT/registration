@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT, STORAGE_ENGINE,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	formatSize, validateSchema, config, getSetting, renderMarkdown
+	validateSchema, config, getSetting, renderMarkdown
 } from "../common";
 import {
 	IUser, IUserMongoose, User,
@@ -441,93 +441,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
 		},
 		generalStatistics: [] as StatisticEntry[],
-		users: (await User.find()).sort((a, b) => {
-			if (!a.teamId || !b.teamId || a.teamId === b.teamId) {
-				a.name = a.name || "";
-				b.name = b.name || "";
-
-				if (a.name.toLowerCase() < b.name.toLowerCase()) {
-					return -1;
-				}
-				if (a.name.toLowerCase() > b.name.toLowerCase()) {
-					return 1;
-				}
-			}
-			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() < teamIDNameMap[b.teamId.toString()].toLowerCase()) {
-				return -1;
-			}
-			else if (teamIDNameMap[a.teamId.toString()].toLowerCase() > teamIDNameMap[b.teamId.toString()].toLowerCase()) {
-				return 1;
-			}
-
-			return 0;
-		}).map(statisticUser => {
-			let loginMethods: string[] = [];
-			if (statisticUser.githubData && statisticUser.githubData.id) {
-				loginMethods.push("GitHub");
-			}
-			if (statisticUser.googleData && statisticUser.googleData.id) {
-				loginMethods.push("Google");
-			}
-			if (statisticUser.facebookData && statisticUser.facebookData.id) {
-				loginMethods.push("Facebook");
-			}
-			if (statisticUser.localData && statisticUser.localData.hash) {
-				loginMethods.push("Local");
-			}
-			let status: string = "Signed up";
-			if (statisticUser.applied) {
-				status = `Applied (${statisticUser.applicationBranch})`;
-			}
-			if (statisticUser.accepted) {
-				status = `Accepted (${statisticUser.applicationBranch})`;
-			}
-			if (statisticUser.attending) {
-				status = `Accepted (${user.applicationBranch}) / Attending (${user.confirmationBranch})`;
-			}
-			let questionsFromBranch = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch);
-			let applicationDataFormatted: {"label": string; "value": string}[] = [];
-			if (questionsFromBranch) {
-				applicationDataFormatted = statisticUser.applicationData.map(question => {
-					let rawQuestion = questionsFromBranch!.questions.find(q => q.name === question.name);
-					let value: string;
-					let filename = "";
-					if (typeof question.value === "string") {
-						value = question.value;
-					}
-					else if (Array.isArray(question.value)) {
-						value = question.value.join(", ");
-					}
-					else if (question.value === null) {
-						value = "N/A";
-					}
-					else {
-						// Multer file
-						let file = question.value;
-						let formattedSize = formatSize(file.size);
-
-						value = `[${file.mimetype} | ${formattedSize}]: ${file.path}`;
-						filename = file.filename;
-					}
-
-					// If there isn't schema information for this question return the raw name as the label
-					let label: string = rawQuestion ? rawQuestion.label : question.name;
-					return {
-						label,
-						value,
-						filename
-					};
-				});
-			}
-
-			return {
-				...statisticUser.toObject(),
-				"status": status,
-				"loginMethods": loginMethods.join(", "),
-				"applicationDataFormatted": applicationDataFormatted,
-				"teamName": statisticUser.teamId ? teamIDNameMap[statisticUser.teamId.toString()] : undefined
-			};
-		}),
 		metrics: {},
 		settings: {
 			application: {

@@ -93,27 +93,30 @@
 						<th>Status</th>
 						<th>Log in method</th>
 					</thead>
-					<tbody>
-						{{#each users}}
-							<tr>
-								<td>{{this.name}}</td>
-								<td>
-									{{this.email}}
-									{{#if this.verifiedEmail}}
-										<i class="fa fa-check" aria-hidden="true"></i>
-									{{else}}
-										<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-									{{/if}}
-									{{#if this.admin}}
-										<i class="fa fa-asterisk" aria-hidden="true"></i>
-									{{/if}}
-								</td>
-								<td>{{this.status}}</td>
-								<td>{{this.loginMethods}}</td>
-							</tr>
-						{{/each}}
-					</tbody>
+					<tbody></tbody>
 				</table>
+				<p id="users-entries-status">Loading...</p>
+				<div class="center">
+					<button id="users-entries-previous" disabled><i class="fa fa-chevron-left"></i> Previous</button>
+					<button id="users-entries-next">Next <i class="fa fa-chevron-right"></i></button>
+				</div>
+				<template id="user-entry">
+					<tr>
+						<!-- Name -->
+						<td class="name"></td>
+						<!-- Email -->
+						<td class="email">
+							<span></span>
+							<i class="fa fa-check" title="Verified email" aria-hidden="true"></i>
+							<i class="fa fa-exclamation-triangle" title="Unverified email" aria-hidden="true"></i>
+							<i class="fa fa-asterisk" title="Admin" aria-hidden="true"></i>
+						</td>
+						<!-- Status -->
+						<td class="status"></td>
+						<!-- Login method(s) -->
+						<td class="login-method"></td>
+					</tr>
+				</template>
 			</section>
 			<section id="applicants">
 				<h2>Applicants</h2>

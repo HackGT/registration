@@ -33,8 +33,23 @@ table td:last-child {
 #applicants table > tbody > tr:last-child {
     border-bottom: none;
 }
+td.email > i.fa {
+    display: none;
+}
+td.email.verified > i.fa-check {
+    display: inline;
+}
+td.email.notverified > i.fa-exclamation-triangle {
+    display: inline;
+}
+td.email.admin > i.fa-asterisk {
+    display: inline;
+}
 table thead {
     border-bottom: 2px solid #333030;
+}
+#users-entries-status {
+    text-align: center;
 }
 #settings > .row {
     text-align: center;
