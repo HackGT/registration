@@ -50,15 +50,15 @@ class UserEntries {
 		let query: { [index: string]: any } = {
 			offset: this.offset,
 			count: this.NODE_COUNT
-		}
+		};
 		let params = Object.keys(query)
-			.map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
+			.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
 			.join("&")
 			.replace(/%20/g, "+");
 		fetch(`/api/admin/users?${params}`, {
 			credentials: "same-origin",
 			method: "GET"
-		}).then(checkStatus).then(parseJSON).then((data: {
+		}).then(checkStatus).then(parseJSON).then((response: {
 			offset: number;
 			count: number;
 			total: number;
@@ -66,7 +66,7 @@ class UserEntries {
 		}) => {
 			for (let i = 0; i < this.NODE_COUNT; i++) {
 				let node = this.nodes[i];
-				let user = data.data[i];
+				let user = response.data[i];
 
 				if (user) {
 					node.style.display = "table-row";
@@ -90,25 +90,28 @@ class UserEntries {
 				}
 			}
 
-			if (data.offset <= 0) {
+			if (response.offset <= 0) {
 				this.previousButton.disabled = true;
 			}
 			else {
 				this.previousButton.disabled = false;
 			}
-			let upperBound = data.offset + data.count;
-			if (upperBound >= data.total) {
-				upperBound = data.total;
+			let upperBound = response.offset + response.count;
+			if (upperBound >= response.total) {
+				upperBound = response.total;
 				this.nextButton.disabled = true;
 			}
 			else {
 				this.nextButton.disabled = false;
 			}
-			let lowerBound = data.offset + 1;
-			if (data.data.length <= 0) {
+			let lowerBound = response.offset + 1;
+			if (response.data.length <= 0) {
 				lowerBound = 0;
 			}
-			status.textContent = `${lowerBound} – ${upperBound} of ${data.total.toLocaleString()}`;
+			status.textContent = `${lowerBound} – ${upperBound} of ${response.total.toLocaleString()}`;
+		}).catch(async err => {
+			console.error(err);
+			await sweetAlert("Oh no!", err.message, "error");
 		});
 	}
 
@@ -161,7 +164,7 @@ class ApplicantEntries {
 				let id = statusSelect.parentElement!.parentElement!.dataset.id!;
 				let formData = new FormData();
 				formData.append("status", statusSelect.value);
-			
+
 				fetch(`/api/user/${id}/status`, {
 					credentials: "same-origin",
 					method: "POST",
@@ -197,15 +200,15 @@ class ApplicantEntries {
 			count: this.NODE_COUNT,
 			applied: true,
 			...this.filter
-		}
+		};
 		let params = Object.keys(query)
-			.map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
+			.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
 			.join("&")
 			.replace(/%20/g, "+");
 		fetch(`/api/admin/users?${params}`, {
 			credentials: "same-origin",
 			method: "GET"
-		}).then(checkStatus).then(parseJSON).then((data: {
+		}).then(checkStatus).then(parseJSON).then((response: {
 			offset: number;
 			count: number;
 			total: number;
@@ -214,8 +217,8 @@ class ApplicantEntries {
 			for (let i = 0; i < this.NODE_COUNT; i++) {
 				let generalNode = this.generalNodes[i];
 				let detailsNode = this.detailsNodes[i];
-				let user = data.data[i];
-				
+				let user = response.data[i];
+
 				if (user) {
 					generalNode.style.display = "table-row";
 					detailsNode.style.display = "table-row";
@@ -250,7 +253,7 @@ class ApplicantEntries {
 					while (dataSection.hasChildNodes()) {
 						dataSection.removeChild(dataSection.lastChild!);
 					}
-					for (let answer of user.applicationDataFormatted as { label: string, value: string, filename?: string }[]) {
+					for (let answer of user.applicationDataFormatted as { label: string; value: string; filename?: string }[]) {
 						let row = document.createElement("p");
 						let label = document.createElement("b");
 						label.textContent = answer.label;
@@ -273,25 +276,28 @@ class ApplicantEntries {
 				}
 			}
 
-			if (data.offset <= 0) {
+			if (response.offset <= 0) {
 				this.previousButton.disabled = true;
 			}
 			else {
 				this.previousButton.disabled = false;
 			}
-			let upperBound = data.offset + data.count;
-			if (upperBound >= data.total) {
-				upperBound = data.total;
+			let upperBound = response.offset + response.count;
+			if (upperBound >= response.total) {
+				upperBound = response.total;
 				this.nextButton.disabled = true;
 			}
 			else {
 				this.nextButton.disabled = false;
 			}
-			let lowerBound = data.offset + 1;
-			if (data.data.length <= 0) {
+			let lowerBound = response.offset + 1;
+			if (response.data.length <= 0) {
 				lowerBound = 0;
 			}
-			status.textContent = `${lowerBound} – ${upperBound} of ${data.total.toLocaleString()}`;
+			status.textContent = `${lowerBound} – ${upperBound} of ${response.total.toLocaleString()}`;
+		}).catch(async err => {
+			console.error(err);
+			await sweetAlert("Oh no!", err.message, "error");
 		});
 	}
 

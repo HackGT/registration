@@ -23,6 +23,7 @@ adminRoutes.route("/users").get(isAdmin, async (request, response) => {
 		filter.applied = true;
 	}
 	if (request.query.branch) {
+		// tslint:disable-next-line:no-string-literal
 		filter["$or"] = [{ "applicationBranch": request.query.branch }, { "confirmationBranch": request.query.branch }];
 	}
 	if (request.query.status === "no-decision") {
@@ -74,7 +75,7 @@ adminRoutes.route("/users").get(isAdmin, async (request, response) => {
 				let rawQuestion = questionsFromBranch!.questions.find(q => q.name === question.name);
 				// If there isn't schema information for this question return the raw name as the label
 				let label: string = rawQuestion ? rawQuestion.label : question.name;
-				
+
 				if (typeof question.value === "string") {
 					return { label, value: question.value };
 				}
