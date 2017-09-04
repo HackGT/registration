@@ -282,7 +282,7 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
-	let status = request.body.status === "true";
+	let status = request.body.status;
 
 	if (!user) {
 		response.status(400).json({
@@ -290,7 +290,12 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 		});
 		return;
 	}
-	user.accepted = status;
+	if (status === "no-decision") {
+		user.accepted = false;
+	}
+	else if (status === "accepted") {
+		user.accepted = true;
+	}
 
 	try {
 		await user.save();

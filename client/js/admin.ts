@@ -155,6 +155,25 @@ class ApplicantEntries {
 			let node = document.importNode(applicantEntryTemplate.content, true);
 			applicantEntryTableBody.appendChild(node);
 			this.generalNodes.push(applicantEntryTableBody.querySelectorAll("tr.general")[i] as HTMLTableRowElement);
+			applicantEntryTableBody.querySelectorAll("tr.general")[i].querySelector("select.status")!.addEventListener("change", e => {
+				let statusSelect = e.target as HTMLSelectElement;
+				statusSelect.disabled = true;
+				let id = statusSelect.parentElement!.parentElement!.dataset.id!;
+				let formData = new FormData();
+				formData.append("status", statusSelect.value);
+			
+				fetch(`/api/user/${id}/status`, {
+					credentials: "same-origin",
+					method: "POST",
+					body: formData
+				}).then(checkStatus).then(parseJSON).then(async () => {
+					statusSelect.disabled = false;
+					this.load();
+				}).catch(async (err: Error) => {
+					await sweetAlert("Oh no!", err.message, "error");
+					statusSelect.disabled = false;
+				});
+			});
 			this.detailsNodes.push(applicantEntryTableBody.querySelectorAll("tr.details")[i] as HTMLTableRowElement);
 		}
 	}
@@ -201,6 +220,7 @@ class ApplicantEntries {
 					generalNode.style.display = "table-row";
 					detailsNode.style.display = "table-row";
 
+					generalNode.dataset.id = user._id;
 					generalNode.querySelector("td.name")!.textContent = user.name;
 					generalNode.querySelector("td.team")!.textContent = "";
 					if (user.teamName) {
@@ -223,7 +243,8 @@ class ApplicantEntries {
 						generalNode.querySelector("td.email")!.classList.add("admin");
 					}
 					generalNode.querySelector("td.branch")!.textContent = user.applicationBranch;
-					(generalNode.querySelector("select.status") as HTMLSelectElement).value = user.accepted ? "accepted" : "no-decision";
+					let statusSelect = generalNode.querySelector("select.status") as HTMLSelectElement;
+					statusSelect.value = user.accepted ? "accepted" : "no-decision";
 
 					let dataSection = detailsNode.querySelector("div.applicantData") as HTMLDivElement;
 					while (dataSection.hasChildNodes()) {
