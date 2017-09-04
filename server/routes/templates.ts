@@ -261,6 +261,11 @@ async function applicationHandler(request: express.Request, response: express.Re
 	// Filter to only show application / confirmation branches
 	let applicationBranches = await getSetting<string[]>(requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches");
 	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
+	// Additionally selectively allow confirmation branches based on what the user applied as
+	if (requestType === ApplicationType.Confirmation) {
+		let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+		questionBranches = questionBranches.filter(branch => allowedBranches.indexOf(branch.name) !== -1);
+	}
 
 	// If there's only one path, redirect to that
 	if (questionBranches.length === 1) {
@@ -298,6 +303,12 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	}
 	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
 		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
+		return;
+	}
+	let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+	allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
+	if (requestType === ApplicationType.Confirmation && allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
+		response.redirect("/confirm");
 		return;
 	}
 
