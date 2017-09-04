@@ -112,6 +112,9 @@ Handlebars.registerHelper("toLowerCase", (n: number): string => {
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
+Handlebars.registerHelper("removeSpaces", (input: string): string => {
+	return input.replace(/ /g, "-");
+});
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
