@@ -15,7 +15,8 @@ import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
+	ApplicationToConfirmationMap
 } from "../schema";
 import {QuestionBranches} from "../config/questions.schema";
 
@@ -91,6 +92,9 @@ Handlebars.registerHelper("required", (isRequired: boolean) => {
 Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	// Adds the "checked" form attribute if the element was checked previously
 	return selected[index] ? "checked" : "";
+});
+Handlebars.registerHelper("branchChecked", (map: ApplicationToConfirmationMap, applicationBranch: string, confirmationBranch: string) => {
+	return map[applicationBranch] && map[applicationBranch].indexOf(confirmationBranch) !== -1 ? "checked" : "";
 });
 Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
@@ -448,7 +452,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
 				"applicationBranches": applicationBranches,
 				"confirmationBranches": confirmationBranches
-			}
+			},
+			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
 		},
 		config: {
 			admins: config.admins.join(", "),

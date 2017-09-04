@@ -306,7 +306,8 @@ export async function setDefaultSettings() {
 		"confirmationClose": new Date(),
 		"teamsEnabled": true,
 		"applicationBranches": [],
-		"confirmationBranches": []
+		"confirmationBranches": [],
+		"applicationToConfirmation": {}
 	};
 
 	for (let setting in DEFAULTS) {

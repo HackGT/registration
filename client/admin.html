@@ -228,7 +228,7 @@
 								<fieldset>
 									{{#each ../settings.branchRoles.confirmationBranches}}
 										<div>
-											<input type="checkbox" id="{{removeSpaces ../this}}-to-{{removeSpaces this}}" checked />
+											<input type="checkbox" id="{{removeSpaces ../this}}-to-{{removeSpaces this}}" data-confirmation="{{this}}" {{branchChecked ../../settings.applicationToConfirmationMap ../this this}} />
 											<label for="{{removeSpaces ../this}}-to-{{removeSpaces this}}">{{this}}</label>
 										</div>
 									{{/each}}
