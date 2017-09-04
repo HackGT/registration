@@ -67,20 +67,27 @@ class UserEntries {
 			for (let i = 0; i < this.NODE_COUNT; i++) {
 				let node = this.nodes[i];
 				let user = data.data[i];
-				node.querySelector("td.name")!.textContent = user.name;
-				node.querySelector("td.email > span")!.textContent = user.email;
-				node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
-				if (user.verifiedEmail) {
-					node.querySelector("td.email")!.classList.add("verified");
+
+				if (user) {
+					node.style.display = "table-row";
+					node.querySelector("td.name")!.textContent = user.name;
+					node.querySelector("td.email > span")!.textContent = user.email;
+					node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+					if (user.verifiedEmail) {
+						node.querySelector("td.email")!.classList.add("verified");
+					}
+					else {
+						node.querySelector("td.email")!.classList.add("notverified");
+					}
+					if (user.admin) {
+						node.querySelector("td.email")!.classList.add("admin");
+					}
+					node.querySelector("td.status")!.textContent = user.status;
+					node.querySelector("td.login-method")!.textContent = user.loginMethods;
 				}
 				else {
-					node.querySelector("td.email")!.classList.add("notverified");
+					node.style.display = "none";
 				}
-				if (user.admin) {
-					node.querySelector("td.email")!.classList.add("admin");
-				}
-				node.querySelector("td.status")!.textContent = user.status;
-				node.querySelector("td.login-method")!.textContent = user.loginMethods;
 			}
 
 			if (data.offset <= 0) {
@@ -97,7 +104,11 @@ class UserEntries {
 			else {
 				this.nextButton.disabled = false;
 			}
-			status.textContent = `${data.offset + 1} – ${upperBound} of ${data.total.toLocaleString()}`;
+			let lowerBound = data.offset + 1;
+			if (data.data.length <= 0) {
+				lowerBound = 0;
+			}
+			status.textContent = `${lowerBound} – ${upperBound} of ${data.total.toLocaleString()}`;
 		});
 	}
 
@@ -133,6 +144,9 @@ class ApplicantEntries {
 	private static offset: number = 0;
 	private static readonly previousButton = document.getElementById("applicants-entries-previous") as HTMLButtonElement;
 	private static readonly nextButton = document.getElementById("applicants-entries-next") as HTMLButtonElement;
+	private static readonly branchFilter = document.getElementById("branch-filter") as HTMLInputElement;
+	private static readonly statusFilter = document.getElementById("status-filter") as HTMLInputElement;
+	private static filter: any = {};
 
 	private static instantiate() {
 		const applicantEntryTemplate = document.getElementById("applicants-entry") as HTMLTemplateElement;
@@ -144,14 +158,26 @@ class ApplicantEntries {
 			this.detailsNodes.push(applicantEntryTableBody.querySelectorAll("tr.details")[i] as HTMLTableRowElement);
 		}
 	}
-	private static load() {
+	private static updateFilter() {
+		this.filter = {};
+		if (this.branchFilter.value !== "*") {
+			this.filter.branch = this.branchFilter.value;
+		}
+		if (this.statusFilter.value !== "*") {
+			this.filter.status = this.statusFilter.value;
+		}
+		this.offset = 0;
+		this.load();
+	}
+	public static load() {
 		const status = document.getElementById("applicants-entries-status") as HTMLParagraphElement;
 		status.textContent = "Loading...";
 
 		let query: { [index: string]: any } = {
 			offset: this.offset,
 			count: this.NODE_COUNT,
-			applied: true
+			applied: true,
+			...this.filter
 		}
 		let params = Object.keys(query)
 			.map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
@@ -170,50 +196,59 @@ class ApplicantEntries {
 				let generalNode = this.generalNodes[i];
 				let detailsNode = this.detailsNodes[i];
 				let user = data.data[i];
+				
+				if (user) {
+					generalNode.style.display = "table-row";
+					detailsNode.style.display = "table-row";
 
-				generalNode.querySelector("td.name")!.textContent = user.name;
-				generalNode.querySelector("td.team")!.textContent = "";
-				if (user.teamName) {
-					let teamContainer = document.createElement("b");
-					teamContainer.textContent = user.teamName;
-					generalNode.querySelector("td.team")!.appendChild(teamContainer);
-				}
-				else {
-					generalNode.querySelector("td.team")!.textContent = "No Team";
-				}
-				generalNode.querySelector("td.email > span")!.textContent = user.email;
-				generalNode.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
-				if (user.verifiedEmail) {
-					generalNode.querySelector("td.email")!.classList.add("verified");
-				}
-				else {
-					generalNode.querySelector("td.email")!.classList.add("notverified");
-				}
-				if (user.admin) {
-					generalNode.querySelector("td.email")!.classList.add("admin");
-				}
-				generalNode.querySelector("td.branch")!.textContent = user.applicationBranch;
-				(generalNode.querySelector("select.status") as HTMLSelectElement).value = user.accepted ? "Accepted" : "No decision";
-
-				let dataSection = detailsNode.querySelector("div.applicantData") as HTMLDivElement;
-				while (dataSection.hasChildNodes()) {
-					dataSection.removeChild(dataSection.lastChild!);
-				}
-				for (let answer of user.applicationDataFormatted as { label: string, value: string, filename?: string }[]) {
-					let row = document.createElement("p");
-					let label = document.createElement("b");
-					label.textContent = answer.label;
-					row.appendChild(label);
-					row.appendChild(document.createTextNode(` → ${answer.value}`));
-					if (answer.filename) {
-						row.appendChild(document.createTextNode(" ("));
-						let link = document.createElement("a");
-						link.setAttribute("href", `/uploads/${answer.filename}`);
-						link.textContent = "Download";
-						row.appendChild(link);
-						row.appendChild(document.createTextNode(")"));
+					generalNode.querySelector("td.name")!.textContent = user.name;
+					generalNode.querySelector("td.team")!.textContent = "";
+					if (user.teamName) {
+						let teamContainer = document.createElement("b");
+						teamContainer.textContent = user.teamName;
+						generalNode.querySelector("td.team")!.appendChild(teamContainer);
 					}
-					dataSection.appendChild(row);
+					else {
+						generalNode.querySelector("td.team")!.textContent = "No Team";
+					}
+					generalNode.querySelector("td.email > span")!.textContent = user.email;
+					generalNode.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+					if (user.verifiedEmail) {
+						generalNode.querySelector("td.email")!.classList.add("verified");
+					}
+					else {
+						generalNode.querySelector("td.email")!.classList.add("notverified");
+					}
+					if (user.admin) {
+						generalNode.querySelector("td.email")!.classList.add("admin");
+					}
+					generalNode.querySelector("td.branch")!.textContent = user.applicationBranch;
+					(generalNode.querySelector("select.status") as HTMLSelectElement).value = user.accepted ? "accepted" : "no-decision";
+
+					let dataSection = detailsNode.querySelector("div.applicantData") as HTMLDivElement;
+					while (dataSection.hasChildNodes()) {
+						dataSection.removeChild(dataSection.lastChild!);
+					}
+					for (let answer of user.applicationDataFormatted as { label: string, value: string, filename?: string }[]) {
+						let row = document.createElement("p");
+						let label = document.createElement("b");
+						label.textContent = answer.label;
+						row.appendChild(label);
+						row.appendChild(document.createTextNode(` → ${answer.value}`));
+						if (answer.filename) {
+							row.appendChild(document.createTextNode(" ("));
+							let link = document.createElement("a");
+							link.setAttribute("href", `/uploads/${answer.filename}`);
+							link.textContent = "Download";
+							row.appendChild(link);
+							row.appendChild(document.createTextNode(")"));
+						}
+						dataSection.appendChild(row);
+					}
+				}
+				else {
+					generalNode.style.display = "none";
+					detailsNode.style.display = "none";
 				}
 			}
 
@@ -231,7 +266,11 @@ class ApplicantEntries {
 			else {
 				this.nextButton.disabled = false;
 			}
-			status.textContent = `${data.offset + 1} – ${upperBound} of ${data.total.toLocaleString()}`;
+			let lowerBound = data.offset + 1;
+			if (data.data.length <= 0) {
+				lowerBound = 0;
+			}
+			status.textContent = `${lowerBound} – ${upperBound} of ${data.total.toLocaleString()}`;
 		});
 	}
 
@@ -245,6 +284,12 @@ class ApplicantEntries {
 		});
 		this.nextButton.addEventListener("click", () => {
 			this.next();
+		});
+		this.branchFilter.addEventListener("change", e => {
+			this.updateFilter();
+		});
+		this.statusFilter.addEventListener("change", e => {
+			this.updateFilter();
 		});
 	}
 	public static next() {
@@ -299,59 +344,7 @@ sendAcceptancesButton.addEventListener("click", async e => {
 	await sweetAlert("Success!", `Acceptance emails sent (${sendCount} in all).`, "success");
 });
 
-let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
-branchFilter.addEventListener("change", e => {
-	revealDivByClasses([branchFilter.value, getAcceptedFilterValue()]);
-});
-
-function getBranchFilterValue() {
-	return branchFilter.value;
-}
-
-let acceptedFilter = document.getElementById("acceptedFilter") as HTMLInputElement;
-acceptedFilter.addEventListener("change", e => {
-	revealDivByClasses([getBranchFilterValue(), acceptedFilter.value]);
-});
-
-function getAcceptedFilterValue() {
-	return acceptedFilter.value;
-}
-
-function updateFilterView() {
-	revealDivByClasses([getBranchFilterValue(), getAcceptedFilterValue()]);
-}
-
-function revealDivByClasses(classes: string[]) {
-	let elements = document.querySelectorAll(".applicantDiv") as NodeListOf<HTMLElement>;
-	for (let i = 0; i < elements.length; i++) {
-		let element = elements[i];
-		let containsClasses: boolean = true;
-		for (let j = 0; j < classes.length; j++) {
-			let currentClass = classes[j];
-			if (currentClass !== "*") {
-				// If the class is a *, we ignore it, which makes filtering easier
-				if (!element.classList.contains(currentClass)) {
-					containsClasses = false;
-				}
-			}
-		}
-
-		if (containsClasses) {
-			element.style.display = "";
-		}
-		else {
-			element.style.display = "none";
-		}
-	}
-}
-
-// If an element has a class called accepted-true, for instance, and you want to toggle it, call flipClassValue(yourElement, "accepted", true)
-function flipClassValue(el: Element, className: string, currentValue: boolean) {
-	el.classList.remove(`${className}-${currentValue}`);
-	el.classList.add(`${className}-${!currentValue}`);
-}
-
-let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
+/*let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
 for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 	let statusUpdateButton = applicationStatusUpdateButtons[i];
 
@@ -398,10 +391,7 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 			eventTarget.disabled = false;
 		});
 	});
-}
-
-// So whatever the default filter options are set at, it'll show accordingly
-updateFilterView();
+}*/
 
 //
 // Email content

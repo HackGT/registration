@@ -18,7 +18,21 @@ adminRoutes.route("/users").get(isAdmin, async (request, response) => {
 	if (isNaN(count) || count <= 0) {
 		count = 10;
 	}
-	let filter = request.query.applied === "true" ? { applied: true } : {};
+	let filter: any = {};
+	if (request.query.applied === "true") {
+		filter.applied = true;
+	}
+	if (request.query.branch) {
+		filter["$or"] = [{ "applicationBranch": request.query.branch }, { "confirmationBranch": request.query.branch }];
+	}
+	if (request.query.status === "no-decision") {
+		filter.applied = true;
+		filter.accepted = false;
+	}
+	if (request.query.status === "accepted") {
+		filter.applied = true;
+		filter.accepted = true;
+	}
 	let rawQuestions = await validateSchema(config.questions, "./config/questions.schema.json");
 
 	let teamIDNameMap: {

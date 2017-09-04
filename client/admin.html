@@ -131,8 +131,7 @@
 						<th>Email</th>
 						<th>Applicant type</th>
 						<th>
-							<select id="branchFilter">
-								<!--todo, make this prettier-->
+							<select id="branch-filter">
 								<option value="*">All types</option>
 								{{#each branchNames}}
 									<option value="{{this}}">{{this}}</span>
@@ -140,10 +139,10 @@
 							</select>
 						</th>
 						<th>
-							<select id="acceptedFilter">
-								<!--todo, make this prettier-->
-								<option value="accepted-false">Not accepted</option>
-								<option value="accepted-true">Accepted</option>
+							<select id="status-filter">
+								<option value="no-decision">No decision</option>
+								<option value="accepted">Accepted</option>
+								<!--<option value="rejected">Rejected</option>-->
 								<option value="*">All</option>
 							</select>
 						</th>
@@ -173,19 +172,15 @@
 						<td colspan="2">
 							<!-- Set status -->
 							<select class="status">
-								<option>No decision</option>
-								<option>Accepted</option>
+								<option value="no-decision">No decision</option>
+								<option value="accepted">Accepted</option>
 								<!--<option>Rejected</option>-->
 							</select>
 						</td>
 					</tr>
 					<tr class="details">
 						<td colspan="5">
-							<div class="applicantData">
-								<!--
-									<p><b>{{this.label}}</b> &rarr; {{this.value}} (<a href="/uploads/{{this.filename}}">Download</a>)</p>
-								-->
-							</div>
+							<div class="applicantData"></div>
 						</td>
 					</tr>
 				</template>
