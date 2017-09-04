@@ -28,7 +28,7 @@ class State {
 const states: State[] = ["statistics", "users", "applicants", "settings"].map(id => new State(id));
 
 class UserEntries {
-	private static readonly NODE_COUNT = 10;
+	private static readonly NODE_COUNT = 20;
 	private static nodes: HTMLTableRowElement[] = [];
 	private static offset: number = 0;
 	private static readonly previousButton = document.getElementById("users-entries-previous") as HTMLButtonElement;
@@ -126,6 +126,140 @@ class UserEntries {
 	}
 }
 
+class ApplicantEntries {
+	private static readonly NODE_COUNT = 10;
+	private static generalNodes: HTMLTableRowElement[] = [];
+	private static detailsNodes: HTMLTableRowElement[] = [];
+	private static offset: number = 0;
+	private static readonly previousButton = document.getElementById("applicants-entries-previous") as HTMLButtonElement;
+	private static readonly nextButton = document.getElementById("applicants-entries-next") as HTMLButtonElement;
+
+	private static instantiate() {
+		const applicantEntryTemplate = document.getElementById("applicants-entry") as HTMLTemplateElement;
+		const applicantEntryTableBody = document.querySelector("#applicants > table > tbody") as HTMLTableSectionElement;
+		for (let i = this.generalNodes.length; i < this.NODE_COUNT; i++) {
+			let node = document.importNode(applicantEntryTemplate.content, true);
+			applicantEntryTableBody.appendChild(node);
+			this.generalNodes.push(applicantEntryTableBody.querySelectorAll("tr.general")[i] as HTMLTableRowElement);
+			this.detailsNodes.push(applicantEntryTableBody.querySelectorAll("tr.details")[i] as HTMLTableRowElement);
+		}
+	}
+	private static load() {
+		const status = document.getElementById("applicants-entries-status") as HTMLParagraphElement;
+		status.textContent = "Loading...";
+
+		let query: { [index: string]: any } = {
+			offset: this.offset,
+			count: this.NODE_COUNT,
+			applied: true
+		}
+		let params = Object.keys(query)
+			.map(key => encodeURIComponent(key) + "=" + encodeURIComponent(query[key]))
+			.join("&")
+			.replace(/%20/g, "+");
+		fetch(`/api/admin/users?${params}`, {
+			credentials: "same-origin",
+			method: "GET"
+		}).then(checkStatus).then(parseJSON).then((data: {
+			offset: number;
+			count: number;
+			total: number;
+			data: any[];
+		}) => {
+			for (let i = 0; i < this.NODE_COUNT; i++) {
+				let generalNode = this.generalNodes[i];
+				let detailsNode = this.detailsNodes[i];
+				let user = data.data[i];
+
+				generalNode.querySelector("td.name")!.textContent = user.name;
+				generalNode.querySelector("td.team")!.textContent = "";
+				if (user.teamName) {
+					let teamContainer = document.createElement("b");
+					teamContainer.textContent = user.teamName;
+					generalNode.querySelector("td.team")!.appendChild(teamContainer);
+				}
+				else {
+					generalNode.querySelector("td.team")!.textContent = "No Team";
+				}
+				generalNode.querySelector("td.email > span")!.textContent = user.email;
+				generalNode.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+				if (user.verifiedEmail) {
+					generalNode.querySelector("td.email")!.classList.add("verified");
+				}
+				else {
+					generalNode.querySelector("td.email")!.classList.add("notverified");
+				}
+				if (user.admin) {
+					generalNode.querySelector("td.email")!.classList.add("admin");
+				}
+				generalNode.querySelector("td.branch")!.textContent = user.applicationBranch;
+				(generalNode.querySelector("select.status") as HTMLSelectElement).value = user.accepted ? "Accepted" : "No decision";
+
+				let dataSection = detailsNode.querySelector("div.applicantData") as HTMLDivElement;
+				while (dataSection.hasChildNodes()) {
+					dataSection.removeChild(dataSection.lastChild!);
+				}
+				for (let answer of user.applicationDataFormatted as { label: string, value: string, filename?: string }[]) {
+					let row = document.createElement("p");
+					let label = document.createElement("b");
+					label.textContent = answer.label;
+					row.appendChild(label);
+					row.appendChild(document.createTextNode(` → ${answer.value}`));
+					if (answer.filename) {
+						row.appendChild(document.createTextNode(" ("));
+						let link = document.createElement("a");
+						link.setAttribute("href", `/uploads/${answer.filename}`);
+						link.textContent = "Download";
+						row.appendChild(link);
+						row.appendChild(document.createTextNode(")"));
+					}
+					dataSection.appendChild(row);
+				}
+			}
+
+			if (data.offset <= 0) {
+				this.previousButton.disabled = true;
+			}
+			else {
+				this.previousButton.disabled = false;
+			}
+			let upperBound = data.offset + data.count;
+			if (upperBound >= data.total) {
+				upperBound = data.total;
+				this.nextButton.disabled = true;
+			}
+			else {
+				this.nextButton.disabled = false;
+			}
+			status.textContent = `${data.offset + 1} – ${upperBound} of ${data.total.toLocaleString()}`;
+		});
+	}
+
+	public static setup() {
+		this.generalNodes = [];
+		this.instantiate();
+		this.offset = 0;
+		this.load();
+		this.previousButton.addEventListener("click", () => {
+			this.previous();
+		});
+		this.nextButton.addEventListener("click", () => {
+			this.next();
+		});
+	}
+	public static next() {
+		this.offset += this.NODE_COUNT;
+		this.load();
+	}
+	public static previous() {
+		this.offset -= this.NODE_COUNT;
+		if (this.offset < 0) {
+			this.offset = 0;
+		}
+		this.load();
+	}
+}
+
 // Set the correct state on page load
 function readURLHash() {
 	let urlState: State | null = null;
@@ -147,6 +281,7 @@ function readURLHash() {
 (function setup() {
 	readURLHash();
 	UserEntries.setup();
+	ApplicantEntries.setup();
 })();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);

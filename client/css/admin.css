@@ -45,10 +45,13 @@ td.email.notverified > i.fa-exclamation-triangle {
 td.email.admin > i.fa-asterisk {
     display: inline;
 }
+td.team > b {
+    text-decoration: underline;
+}
 table thead {
     border-bottom: 2px solid #333030;
 }
-#users-entries-status {
+#users-entries-status, #applicants-entries-status {
     text-align: center;
 }
 #settings > .row {
