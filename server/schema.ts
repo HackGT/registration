@@ -57,6 +57,7 @@ export namespace IConfig {
 			options: any;
 		};
 		maxTeamSize: number;
+		enableQRCode: boolean;
 	}
 }
 
@@ -224,6 +225,7 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+	enableQRCode: boolean;
 }
 export interface ITeamTemplate extends ICommonTemplate {
 	team?: ITeamMongoose | null;
@@ -288,6 +290,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 		uploadDirectoryRaw: string;
 		uploadDirectoryResolved: string;
 		maxTeamSize: string;
+		enableQRCode: string;
 	};
 }
 

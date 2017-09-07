@@ -10,6 +10,7 @@
 		<link rel="stylesheet" href="/css/index.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.3.1/qrcode.min.js"></script>
 	</head>
 	<body>
 		{{#> sidebar}}
@@ -33,6 +34,16 @@
 					</div>
 				</div>
 				<div class="row">
+						<p>Show your QR code to check in when you get here!</p>
+						<div id="qrCode" data="registration-{{siteTitle}}-{{user._id}}"></div>
+						<script>
+							var typeNumber = 0;
+							var errorCorrectionLevel = 'H';
+							var qr = qrcode(typeNumber, errorCorrectionLevel);
+							qr.addData(document.getElementById('qrCode').attributes.data.value);
+							qr.make();
+							document.getElementById('qrCode').innerHTML = qr.createImgTag();
+						</script>
 					<p>Welcome back, {{user.name}}!</p>
 					{{#if user.attending}}
 						<p>You're all set!</p>

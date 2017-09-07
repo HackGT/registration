@@ -54,6 +54,7 @@ class Config implements IConfig.Main {
 		}
 	};
 	public maxTeamSize: number = 4;
+	public enableQRCode: boolean = false;
 
 	public sessionSecretSet: boolean = false;
 
@@ -115,6 +116,7 @@ class Config implements IConfig.Main {
 		if (config.maxTeamSize) {
 			this.maxTeamSize = config.maxTeamSize;
 		}
+		this.enableQRCode = !!config.enableQRCode;
 		if (config.secrets && config.secrets.session) {
 			this.sessionSecretSet = true;
 		}
@@ -250,6 +252,10 @@ class Config implements IConfig.Main {
 		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE!, 10);
+		}
+
+		if (process.env.ENABLE_QR_CODE) {
+			this.enableQRCode = (process.env.ENABLE_QR_CODE!.toLowerCase() === "true");
 		}
 	}
 }

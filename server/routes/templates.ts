@@ -154,7 +154,9 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			areOpen: moment().isBetween(confirmationOpenDate, confirmationCloseDate),
 			beforeOpen: moment().isBefore(confirmationOpenDate),
 			afterClose: moment().isAfter(confirmationCloseDate)
-		}
+		},
+
+		enableQRCode: config.enableQRCode
 	};
 	response.send(indexTemplate(templateData));
 });
@@ -465,7 +467,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			storageEngine: config.storageEngine.name,
 			uploadDirectoryRaw: config.storageEngine.options.uploadDirectory,
 			uploadDirectoryResolved: STORAGE_ENGINE.uploadRoot,
-			maxTeamSize: config.maxTeamSize.toString()
+			maxTeamSize: config.maxTeamSize.toString(),
+			enableQRCode: config.enableQRCode.toString()
 		}
 	};
 	// Generate general statistics
