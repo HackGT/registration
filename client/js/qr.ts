@@ -1,4 +1,12 @@
-declare var qrcode: any;
+interface IQRCode {
+	addData(data: string): void;
+	make(): void;
+
+	createImgTag(): string;
+	(typeNumber: number, errorCorrectionLevel: string): IQRCode;
+}
+
+declare var qrcode: IQRCode;
 
 window.onload = () => {
 
