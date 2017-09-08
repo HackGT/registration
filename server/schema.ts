@@ -57,7 +57,6 @@ export namespace IConfig {
 			options: any;
 		};
 		maxTeamSize: number;
-		enableQRCode: boolean;
 	}
 }
 
@@ -208,6 +207,7 @@ export interface ICommonTemplate {
 	user: IUser;
 	settings: {
 		teamsEnabled: boolean;
+		qrEnabled: boolean;
 	};
 }
 export interface IIndexTemplate extends ICommonTemplate {
@@ -225,7 +225,6 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
-	enableQRCode: boolean;
 }
 export interface ITeamTemplate extends ICommonTemplate {
 	team?: ITeamMongoose | null;
@@ -277,6 +276,8 @@ export interface IAdminTemplate extends ICommonTemplate {
 		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
+		qrEnabled: boolean;
+		qrEnabledChecked: string;
 		branchRoles: {
 			noop: string[];
 			applicationBranches: string[];
@@ -290,7 +291,6 @@ export interface IAdminTemplate extends ICommonTemplate {
 		uploadDirectoryRaw: string;
 		uploadDirectoryResolved: string;
 		maxTeamSize: string;
-		enableQRCode: string;
 	};
 }
 

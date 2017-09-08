@@ -54,7 +54,6 @@ class Config implements IConfig.Main {
 		}
 	};
 	public maxTeamSize: number = 4;
-	public enableQRCode: boolean = false;
 
 	public sessionSecretSet: boolean = false;
 
@@ -116,7 +115,6 @@ class Config implements IConfig.Main {
 		if (config.maxTeamSize) {
 			this.maxTeamSize = config.maxTeamSize;
 		}
-		this.enableQRCode = !!config.enableQRCode;
 		if (config.secrets && config.secrets.session) {
 			this.sessionSecretSet = true;
 		}
@@ -253,10 +251,6 @@ class Config implements IConfig.Main {
 		if (process.env.MAX_TEAM_SIZE) {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE!, 10);
 		}
-
-		if (process.env.ENABLE_QR_CODE) {
-			this.enableQRCode = (process.env.ENABLE_QR_CODE!.toLowerCase() === "true");
-		}
 	}
 }
 export let config = new Config();
@@ -311,6 +305,7 @@ export async function setDefaultSettings() {
 		"confirmationOpen": new Date(),
 		"confirmationClose": new Date(),
 		"teamsEnabled": true,
+		"qrEnabled": true,
 		"applicationBranches": [],
 		"confirmationBranches": []
 	};
@@ -495,7 +490,8 @@ export async function timeLimited(request: express.Request, response: express.Re
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled")
+			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 
 		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",

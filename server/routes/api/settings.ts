@@ -96,6 +96,36 @@ settingsRoutes.route("/teams_enabled")
 		}
 	});
 
+settingsRoutes.route("/qr_enabled")
+	.get(async (request, response) => {
+		let enabled = await getSetting<boolean>("qrEnabled");
+		response.json({
+			"enabled": enabled
+		});
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let rawEnabled = request.body.enabled;
+		if (!rawEnabled || (rawEnabled !== "true" && rawEnabled !== "false")) {
+			response.status(400).json({
+				"error": "Invalid value for enabling or disabling teams"
+			});
+			return;
+		}
+
+		try {
+			await updateSetting<boolean>("qrEnabled", rawEnabled === "true");
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while enabling or disabling teams"
+			});
+		}
+	});
+
 settingsRoutes.route("/branch_roles")
 	.get(isAdmin, async (request, response) => {
 		let branchNames = (await validateSchema(config.questions, "./config/questions.schema.json")).map(branch => branch.name);

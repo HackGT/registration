@@ -216,6 +216,12 @@
 						</div>
 					</div>
 					<div class="row">
+						<div class="col-12">
+							<label for="qr-enabled">Enable QR Codes?</label>
+							<input id="qr-enabled" type="checkbox" {{settings.qrEnabledChecked}} />
+						</div>
+					</div>
+					<div class="row">
 						{{#each branchNames}}
 							<div class="col-4 branch-role" data-name="{{this}}">
 								<h4>{{this}}</h4>

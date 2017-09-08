@@ -137,7 +137,8 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled")
+			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 
 		applicationOpen: applicationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
@@ -154,9 +155,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			areOpen: moment().isBetween(confirmationOpenDate, confirmationCloseDate),
 			beforeOpen: moment().isBefore(confirmationOpenDate),
 			afterClose: moment().isAfter(confirmationCloseDate)
-		},
-
-		enableQRCode: config.enableQRCode
+		}
 	};
 	response.send(indexTemplate(templateData));
 });
@@ -225,7 +224,8 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		teamLeaderAsUser,
 		isCurrentUserTeamLeader,
 		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled")
+			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		}
 	};
 	response.send(teamTemplate(templateData));
@@ -278,7 +278,8 @@ async function applicationHandler(request: express.Request, response: express.Re
 		siteTitle: config.eventName,
 		user,
 		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled")
+			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 		branches: questionBranches.map(branch => branch.name)
 	};
@@ -403,7 +404,8 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled")
+			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 		branch: questionBranch.name,
 		questionData,
@@ -421,6 +423,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let rawQuestions = await validateSchema(config.questions, "./config/questions.schema.json");
 
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
+	let qrEnabled = await getSetting<boolean>("qrEnabled");
 	let applicationBranches = await getSetting<string[]>("applicationBranches");
 	let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 
@@ -455,6 +458,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			},
 			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
+			qrEnabled,
+			qrEnabledChecked: qrEnabled ? "checked" : "",
 			branchRoles: {
 				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
 				"applicationBranches": applicationBranches,
@@ -467,8 +472,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			storageEngine: config.storageEngine.name,
 			uploadDirectoryRaw: config.storageEngine.options.uploadDirectory,
 			uploadDirectoryResolved: STORAGE_ENGINE.uploadRoot,
-			maxTeamSize: config.maxTeamSize.toString(),
-			enableQRCode: config.enableQRCode.toString()
+			maxTeamSize: config.maxTeamSize.toString()
 		}
 	};
 	// Generate general statistics
