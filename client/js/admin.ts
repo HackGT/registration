@@ -25,8 +25,312 @@ class State {
 		this.sectionElement.style.display = "block";
 	}
 }
-
 const states: State[] = ["statistics", "users", "applicants", "settings"].map(id => new State(id));
+
+class UserEntries {
+	private static readonly NODE_COUNT = 20;
+	private static nodes: HTMLTableRowElement[] = [];
+	private static offset: number = 0;
+	private static readonly previousButton = document.getElementById("users-entries-previous") as HTMLButtonElement;
+	private static readonly nextButton = document.getElementById("users-entries-next") as HTMLButtonElement;
+
+	private static instantiate() {
+		const userEntryTemplate = document.getElementById("user-entry") as HTMLTemplateElement;
+		const userEntryTableBody = document.querySelector("#users > table > tbody") as HTMLTableSectionElement;
+		for (let i = this.nodes.length; i < this.NODE_COUNT; i++) {
+			let node = document.importNode(userEntryTemplate.content, true);
+			userEntryTableBody.appendChild(node);
+			this.nodes.push(userEntryTableBody.querySelectorAll("tr")[i]);
+		}
+	}
+	private static load() {
+		const status = document.getElementById("users-entries-status") as HTMLParagraphElement;
+		status.textContent = "Loading...";
+
+		let query: { [index: string]: any } = {
+			offset: this.offset,
+			count: this.NODE_COUNT
+		};
+		let params = Object.keys(query)
+			.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
+			.join("&")
+			.replace(/%20/g, "+");
+		fetch(`/api/admin/users?${params}`, {
+			credentials: "same-origin",
+			method: "GET"
+		}).then(checkStatus).then(parseJSON).then((response: {
+			offset: number;
+			count: number;
+			total: number;
+			data: any[];
+		}) => {
+			for (let i = 0; i < this.NODE_COUNT; i++) {
+				let node = this.nodes[i];
+				let user = response.data[i];
+
+				if (user) {
+					node.style.display = "table-row";
+					node.querySelector("td.name")!.textContent = user.name;
+					node.querySelector("td.email > span")!.textContent = user.email;
+					node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+					if (user.verifiedEmail) {
+						node.querySelector("td.email")!.classList.add("verified");
+					}
+					else {
+						node.querySelector("td.email")!.classList.add("notverified");
+					}
+					if (user.admin) {
+						node.querySelector("td.email")!.classList.add("admin");
+					}
+					node.querySelector("td.status")!.textContent = user.status;
+					node.querySelector("td.login-method")!.textContent = user.loginMethods;
+				}
+				else {
+					node.style.display = "none";
+				}
+			}
+
+			if (response.offset <= 0) {
+				this.previousButton.disabled = true;
+			}
+			else {
+				this.previousButton.disabled = false;
+			}
+			let upperBound = response.offset + response.count;
+			if (upperBound >= response.total) {
+				upperBound = response.total;
+				this.nextButton.disabled = true;
+			}
+			else {
+				this.nextButton.disabled = false;
+			}
+			let lowerBound = response.offset + 1;
+			if (response.data.length <= 0) {
+				lowerBound = 0;
+			}
+			status.textContent = `${lowerBound} – ${upperBound} of ${response.total.toLocaleString()}`;
+		}).catch(async err => {
+			console.error(err);
+			await sweetAlert("Oh no!", err.message, "error");
+		});
+	}
+
+	public static setup() {
+		this.nodes = [];
+		this.instantiate();
+		this.offset = 0;
+		this.load();
+		this.previousButton.addEventListener("click", () => {
+			this.previous();
+		});
+		this.nextButton.addEventListener("click", () => {
+			this.next();
+		});
+	}
+	public static next() {
+		this.offset += this.NODE_COUNT;
+		this.load();
+	}
+	public static previous() {
+		this.offset -= this.NODE_COUNT;
+		if (this.offset < 0) {
+			this.offset = 0;
+		}
+		this.load();
+	}
+}
+
+class ApplicantEntries {
+	private static readonly NODE_COUNT = 10;
+	private static generalNodes: HTMLTableRowElement[] = [];
+	private static detailsNodes: HTMLTableRowElement[] = [];
+	private static offset: number = 0;
+	private static readonly previousButton = document.getElementById("applicants-entries-previous") as HTMLButtonElement;
+	private static readonly nextButton = document.getElementById("applicants-entries-next") as HTMLButtonElement;
+	private static readonly branchFilter = document.getElementById("branch-filter") as HTMLInputElement;
+	private static readonly statusFilter = document.getElementById("status-filter") as HTMLInputElement;
+	private static filter: any = {};
+
+	private static instantiate() {
+		const applicantEntryTemplate = document.getElementById("applicants-entry") as HTMLTemplateElement;
+		const applicantEntryTableBody = document.querySelector("#applicants > table > tbody") as HTMLTableSectionElement;
+		for (let i = this.generalNodes.length; i < this.NODE_COUNT; i++) {
+			let node = document.importNode(applicantEntryTemplate.content, true);
+			applicantEntryTableBody.appendChild(node);
+			this.generalNodes.push(applicantEntryTableBody.querySelectorAll("tr.general")[i] as HTMLTableRowElement);
+			applicantEntryTableBody.querySelectorAll("tr.general")[i].querySelector("select.status")!.addEventListener("change", e => {
+				let statusSelect = e.target as HTMLSelectElement;
+				statusSelect.disabled = true;
+				let id = statusSelect.parentElement!.parentElement!.dataset.id!;
+				let formData = new FormData();
+				formData.append("status", statusSelect.value);
+
+				fetch(`/api/user/${id}/status`, {
+					credentials: "same-origin",
+					method: "POST",
+					body: formData
+				}).then(checkStatus).then(parseJSON).then(async () => {
+					statusSelect.disabled = false;
+					this.load();
+				}).catch(async (err: Error) => {
+					await sweetAlert("Oh no!", err.message, "error");
+					statusSelect.disabled = false;
+				});
+			});
+			this.detailsNodes.push(applicantEntryTableBody.querySelectorAll("tr.details")[i] as HTMLTableRowElement);
+		}
+	}
+	private static updateFilter() {
+		this.filter = {};
+		if (this.branchFilter.value !== "*") {
+			this.filter.branch = this.branchFilter.value;
+		}
+		if (this.statusFilter.value !== "*") {
+			this.filter.status = this.statusFilter.value;
+		}
+		this.offset = 0;
+		this.load();
+	}
+	public static load() {
+		const status = document.getElementById("applicants-entries-status") as HTMLParagraphElement;
+		status.textContent = "Loading...";
+
+		let query: { [index: string]: any } = {
+			offset: this.offset,
+			count: this.NODE_COUNT,
+			applied: true,
+			...this.filter
+		};
+		let params = Object.keys(query)
+			.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
+			.join("&")
+			.replace(/%20/g, "+");
+		fetch(`/api/admin/users?${params}`, {
+			credentials: "same-origin",
+			method: "GET"
+		}).then(checkStatus).then(parseJSON).then((response: {
+			offset: number;
+			count: number;
+			total: number;
+			data: any[];
+		}) => {
+			for (let i = 0; i < this.NODE_COUNT; i++) {
+				let generalNode = this.generalNodes[i];
+				let detailsNode = this.detailsNodes[i];
+				let user = response.data[i];
+
+				if (user) {
+					generalNode.style.display = "table-row";
+					detailsNode.style.display = "table-row";
+
+					generalNode.dataset.id = user._id;
+					generalNode.querySelector("td.name")!.textContent = user.name;
+					generalNode.querySelector("td.team")!.textContent = "";
+					if (user.teamName) {
+						let teamContainer = document.createElement("b");
+						teamContainer.textContent = user.teamName;
+						generalNode.querySelector("td.team")!.appendChild(teamContainer);
+					}
+					else {
+						generalNode.querySelector("td.team")!.textContent = "No Team";
+					}
+					generalNode.querySelector("td.email > span")!.textContent = user.email;
+					generalNode.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+					if (user.verifiedEmail) {
+						generalNode.querySelector("td.email")!.classList.add("verified");
+					}
+					else {
+						generalNode.querySelector("td.email")!.classList.add("notverified");
+					}
+					if (user.admin) {
+						generalNode.querySelector("td.email")!.classList.add("admin");
+					}
+					generalNode.querySelector("td.branch")!.textContent = user.applicationBranch;
+					let statusSelect = generalNode.querySelector("select.status") as HTMLSelectElement;
+					statusSelect.value = user.accepted ? "accepted" : "no-decision";
+
+					let dataSection = detailsNode.querySelector("div.applicantData") as HTMLDivElement;
+					while (dataSection.hasChildNodes()) {
+						dataSection.removeChild(dataSection.lastChild!);
+					}
+					for (let answer of user.applicationDataFormatted as { label: string; value: string; filename?: string }[]) {
+						let row = document.createElement("p");
+						let label = document.createElement("b");
+						label.textContent = answer.label;
+						row.appendChild(label);
+						row.appendChild(document.createTextNode(` → ${answer.value}`));
+						if (answer.filename) {
+							row.appendChild(document.createTextNode(" ("));
+							let link = document.createElement("a");
+							link.setAttribute("href", `/uploads/${answer.filename}`);
+							link.textContent = "Download";
+							row.appendChild(link);
+							row.appendChild(document.createTextNode(")"));
+						}
+						dataSection.appendChild(row);
+					}
+				}
+				else {
+					generalNode.style.display = "none";
+					detailsNode.style.display = "none";
+				}
+			}
+
+			if (response.offset <= 0) {
+				this.previousButton.disabled = true;
+			}
+			else {
+				this.previousButton.disabled = false;
+			}
+			let upperBound = response.offset + response.count;
+			if (upperBound >= response.total) {
+				upperBound = response.total;
+				this.nextButton.disabled = true;
+			}
+			else {
+				this.nextButton.disabled = false;
+			}
+			let lowerBound = response.offset + 1;
+			if (response.data.length <= 0) {
+				lowerBound = 0;
+			}
+			status.textContent = `${lowerBound} – ${upperBound} of ${response.total.toLocaleString()}`;
+		}).catch(async err => {
+			console.error(err);
+			await sweetAlert("Oh no!", err.message, "error");
+		});
+	}
+
+	public static setup() {
+		this.generalNodes = [];
+		this.instantiate();
+		this.offset = 0;
+		this.load();
+		this.previousButton.addEventListener("click", () => {
+			this.previous();
+		});
+		this.nextButton.addEventListener("click", () => {
+			this.next();
+		});
+		this.branchFilter.addEventListener("change", e => {
+			this.updateFilter();
+		});
+		this.statusFilter.addEventListener("change", e => {
+			this.updateFilter();
+		});
+	}
+	public static next() {
+		this.offset += this.NODE_COUNT;
+		this.load();
+	}
+	public static previous() {
+		this.offset -= this.NODE_COUNT;
+		if (this.offset < 0) {
+			this.offset = 0;
+		}
+		this.load();
+	}
+}
 
 // Set the correct state on page load
 function readURLHash() {
@@ -45,7 +349,12 @@ function readURLHash() {
 		states[0].show();
 	}
 }
-readURLHash();
+
+(function setup() {
+	readURLHash();
+	UserEntries.setup();
+	ApplicantEntries.setup();
+})();
 // Load the correct state on button press
 window.addEventListener("hashchange", readURLHash);
 
@@ -62,59 +371,7 @@ sendAcceptancesButton.addEventListener("click", async e => {
 	await sweetAlert("Success!", `Acceptance emails sent (${sendCount} in all).`, "success");
 });
 
-let branchFilter = document.getElementById("branchFilter") as HTMLInputElement;
-branchFilter.addEventListener("change", e => {
-	revealDivByClasses([branchFilter.value, getAcceptedFilterValue()]);
-});
-
-function getBranchFilterValue() {
-	return branchFilter.value;
-}
-
-let acceptedFilter = document.getElementById("acceptedFilter") as HTMLInputElement;
-acceptedFilter.addEventListener("change", e => {
-	revealDivByClasses([getBranchFilterValue(), acceptedFilter.value]);
-});
-
-function getAcceptedFilterValue() {
-	return acceptedFilter.value;
-}
-
-function updateFilterView() {
-	revealDivByClasses([getBranchFilterValue(), getAcceptedFilterValue()]);
-}
-
-function revealDivByClasses(classes: string[]) {
-	let elements = document.querySelectorAll(".applicantDiv") as NodeListOf<HTMLElement>;
-	for (let i = 0; i < elements.length; i++) {
-		let element = elements[i];
-		let containsClasses: boolean = true;
-		for (let j = 0; j < classes.length; j++) {
-			let currentClass = classes[j];
-			if (currentClass !== "*") {
-				// If the class is a *, we ignore it, which makes filtering easier
-				if (!element.classList.contains(currentClass)) {
-					containsClasses = false;
-				}
-			}
-		}
-
-		if (containsClasses) {
-			element.style.display = "";
-		}
-		else {
-			element.style.display = "none";
-		}
-	}
-}
-
-// If an element has a class called accepted-true, for instance, and you want to toggle it, call flipClassValue(yourElement, "accepted", true)
-function flipClassValue(el: Element, className: string, currentValue: boolean) {
-	el.classList.remove(`${className}-${currentValue}`);
-	el.classList.add(`${className}-${!currentValue}`);
-}
-
-let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
+/*let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
 for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 	let statusUpdateButton = applicationStatusUpdateButtons[i];
 
@@ -161,10 +418,7 @@ for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
 			eventTarget.disabled = false;
 		});
 	});
-}
-
-// So whatever the default filter options are set at, it'll show accordingly
-updateFilterView();
+}*/
 
 //
 // Email content
