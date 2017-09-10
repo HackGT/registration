@@ -124,6 +124,11 @@ Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationB
 	}
 	return "";
 });
+
+Handlebars.registerHelper("escape", (strToEscape: string): string => {
+	return encodeURI(strToEscape);
+});
+
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));

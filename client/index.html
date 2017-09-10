@@ -53,7 +53,7 @@
 
 						{{#if settings.qrEnabled}}
 						<p>Show your QR code to check in when you get here!</p>
-						<div id="qrCode" data="user:{{user._id}},event:{{siteTitle}}"></div>
+						<div id="qrCode" data="user:{{user._id}},event:{{escape siteTitle}}"></div>
 						{{/if}}
 					{{else if user.accepted}}
 						{{#if confirmationStatus.areOpen}}
