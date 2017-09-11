@@ -20,6 +20,7 @@ secrets:
   - STORAGE_ENGINE_OPTIONS
 
 env:
+  STORAGE_ENGINE: s3
   COOKIE_SECURE_ONLY: true
   EMAIL_FROM: "HackGT Team <hello@hackgt.com>"
   EMAIL_HOST: smtp.sendgrid.net
