@@ -371,55 +371,6 @@ sendAcceptancesButton.addEventListener("click", async e => {
 	await sweetAlert("Success!", `Acceptance emails sent (${sendCount} in all).`, "success");
 });
 
-/*let applicationStatusUpdateButtons = document.querySelectorAll(".statusButton") as NodeListOf<HTMLInputElement>;
-for (let i = 0; i < applicationStatusUpdateButtons.length; i++) {
-	let statusUpdateButton = applicationStatusUpdateButtons[i];
-
-	statusUpdateButton.addEventListener("click", e => {
-		let eventTarget = e.target as HTMLInputElement;
-
-		e.preventDefault();
-		eventTarget.disabled = true;
-
-		let userId = eventTarget.dataset.user;
-		let currentCondition = eventTarget.dataset.accepted === "true";
-
-		let formData = new FormData();
-		formData.append("status", (!currentCondition).toString());
-
-		fetch(`/api/user/${userId}/status`, {
-			credentials: "same-origin",
-			method: "POST",
-			body: formData
-		}).then(checkStatus).then(parseJSON).then(async () => {
-			eventTarget.disabled = false;
-			if (!currentCondition) {
-				// Set to Un-Accept
-				flipClassValue(eventTarget, "accepted-btn", false);
-				eventTarget.dataset.accepted = "true";
-				eventTarget.textContent = "Un-Accept";
-				flipClassValue(eventTarget.parentElement!.parentElement!, "accepted", false);
-				flipClassValue(eventTarget.parentElement!.parentElement!.nextElementSibling!, "accepted", false);
-			}
-			else {
-				// Set to Accept
-				flipClassValue(eventTarget, "accepted-btn", true);
-				eventTarget.dataset.accepted = "false";
-				eventTarget.textContent = "Accept";
-				flipClassValue(eventTarget!.parentElement!.parentElement!, "accepted", true);
-				flipClassValue(eventTarget!.parentElement!.parentElement!.nextElementSibling!, "accepted", true);
-			}
-
-			updateFilterView();
-			// Because we've added a class that implies the element should be removed, but haven't actually removed the element yet
-
-		}).catch(async (err: Error) => {
-			await sweetAlert("Oh no!", err.message, "error");
-			eventTarget.disabled = false;
-		});
-	});
-}*/
-
 //
 // Email content
 //
@@ -456,7 +407,7 @@ markdownEditor.codemirror.on("change", async () => {
 		textContainer.textContent = text;
 		emailRenderedArea.appendChild(textContainer);
 	}
-	catch (err) {
+	catch {
 		emailRenderedArea.textContent = "Couldn't retrieve email content";
 	}
 });
@@ -475,7 +426,7 @@ async function emailTypeChange(): Promise<void> {
 		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
 		markdownEditor.value(content);
 	}
-	catch (err) {
+	catch {
 		markdownEditor.value("Couldn't retrieve email content");
 	}
 	contentChanged = false;
@@ -521,9 +472,22 @@ settingsUpdateButton.addEventListener("click", e => {
 
 	let branchRoleData = new FormData();
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
+	let applicationToConfirmationMap: { [applicationBranch: string]: string[] } = {};
 	for (let i = 0; i < branchRoles.length; i++) {
 		branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
+
+		if (branchRoles[i].querySelector("fieldset")) {
+			let checkboxes = branchRoles[i].querySelectorAll("fieldset input") as NodeListOf<HTMLInputElement>;
+			let allowedConfirmationBranches: string[] = [];
+			for (let j = 0; j < checkboxes.length; j++) {
+				if (checkboxes[j].checked) {
+					allowedConfirmationBranches.push(checkboxes[j].dataset.confirmation!);
+				}
+			}
+			applicationToConfirmationMap[branchRoles[i].dataset.name!] = allowedConfirmationBranches;
+		}
 	}
+	branchRoleData.append("applicationToConfirmationMap", JSON.stringify(applicationToConfirmationMap));
 
 	let emailContentData = new FormData();
 	emailContentData.append("content", markdownEditor.value());

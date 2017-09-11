@@ -15,7 +15,8 @@ import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
+	ApplicationToConfirmationMap
 } from "../schema";
 import {QuestionBranches} from "../config/questions.schema";
 
@@ -92,6 +93,9 @@ Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	// Adds the "checked" form attribute if the element was checked previously
 	return selected[index] ? "checked" : "";
 });
+Handlebars.registerHelper("branchChecked", (map: ApplicationToConfirmationMap, applicationBranch: string, confirmationBranch: string) => {
+	return map[applicationBranch] && map[applicationBranch].indexOf(confirmationBranch) !== -1 ? "checked" : "";
+});
 Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
 	return selected[index] ? "selected" : "";
@@ -112,17 +116,8 @@ Handlebars.registerHelper("toLowerCase", (n: number): string => {
 Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 	return JSON.stringify(stat);
 });
-Handlebars.registerHelper("roleSelected", (roles: { noop: string[]; applicationBranches: string[]; confirmationBranches: string[] }, role: string, branchName: string): string => {
-	if (role === "noop" && roles.noop.indexOf(branchName) !== -1) {
-		return "selected";
-	}
-	if (role === "application" && roles.applicationBranches.indexOf(branchName) !== -1) {
-		return "selected";
-	}
-	if (role === "confirmation" && roles.confirmationBranches.indexOf(branchName) !== -1) {
-		return "selected";
-	}
-	return "";
+Handlebars.registerHelper("removeSpaces", (input: string): string => {
+	return input.replace(/ /g, "-");
 });
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
@@ -266,6 +261,11 @@ async function applicationHandler(request: express.Request, response: express.Re
 	// Filter to only show application / confirmation branches
 	let applicationBranches = await getSetting<string[]>(requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches");
 	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
+	// Additionally selectively allow confirmation branches based on what the user applied as
+	if (requestType === ApplicationType.Confirmation) {
+		let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+		questionBranches = questionBranches.filter(branch => allowedBranches.indexOf(branch.name) !== -1);
+	}
 
 	// If there's only one path, redirect to that
 	if (questionBranches.length === 1) {
@@ -303,6 +303,12 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	}
 	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
 		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
+		return;
+	}
+	let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+	allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
+	if (requestType === ApplicationType.Confirmation && allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
+		response.redirect("/confirm");
 		return;
 	}
 
@@ -457,7 +463,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
 				"applicationBranches": applicationBranches,
 				"confirmationBranches": confirmationBranches
-			}
+			},
+			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
 		},
 		config: {
 			admins: config.admins.join(", "),

@@ -5,6 +5,7 @@ import {
 	uploadHandler, isAdmin, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText,
 	config
 } from "../../common";
+import { ApplicationToConfirmationMap } from "../../schema";
 
 setDefaultSettings().catch(err => {
 	throw err;
@@ -104,10 +105,15 @@ settingsRoutes.route("/branch_roles")
 		response.json({
 			"noop": branchNames.filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
 			"applicationBranches": applicationBranches,
-			"confirmationBranches": confirmationBranches
+			"confirmationBranches": confirmationBranches,
+			"applicationToConfirmationMap": await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
 		});
 	})
 	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		// First extract the application to confirmation map
+		let applicationToConfirmationMap: ApplicationToConfirmationMap = JSON.parse(request.body.applicationToConfirmationMap);
+		delete request.body.applicationToConfirmationMap;
+
 		let applicationBranches = [];
 		let confirmationBranches = [];
 		if ((new Set(Object.keys(request.body))).size !== Object.keys(request.body).length) {
@@ -127,6 +133,7 @@ settingsRoutes.route("/branch_roles")
 		try {
 			await updateSetting<string[]>("applicationBranches", applicationBranches);
 			await updateSetting<string[]>("confirmationBranches", confirmationBranches);
+			await updateSetting<ApplicationToConfirmationMap>("applicationToConfirmation", applicationToConfirmationMap);
 			response.json({
 				"success": true
 			});
