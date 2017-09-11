@@ -195,7 +195,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 				await sendMailAsync({
 					from: config.email.from,
 					to: user.email,
-					subject: `[${config.eventName}] - Thank you for appying!`,
+					subject: `[${config.eventName}] - Thank you for applying!`,
 					html: emailHTML,
 					text: emailText
 				});
