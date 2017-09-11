@@ -7,8 +7,11 @@ import * as cookieParser from "cookie-parser";
 import * as cookieSignature from "cookie-signature";
 import * as chalk from "chalk";
 import * as morgan from "morgan";
+import * as bodyParser from "body-parser";
+import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import flash = require("connect-flash");
 
+import * as graphql from "./routes/api/graphql";
 import {
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
@@ -128,6 +131,23 @@ app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
 app.use("/css/theme.css", serveStatic(config.style.theme));
 app.use("/favicon.ico", serveStatic(config.style.favicon));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
+
+// Set up graphql and graphiql routes
+app.use(
+	"/graphql",
+	bodyParser.json(),
+	// TODO: auth without redirect here & pass along userid
+	graphqlExpress({
+		schema: graphql.schema
+	})
+);
+app.use(
+	"/graphiql",
+	// TODO: auth with redirect here & pass along userid
+	graphiqlExpress({
+		endpointURL: "/graphql"
+	})
+);
 
 app.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);
