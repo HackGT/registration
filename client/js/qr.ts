@@ -2,7 +2,7 @@ interface IQRCode {
 	addData(data: string): void;
 	make(): void;
 
-	createImgTag(): string;
+	createSvgTag(): string;
 	(typeNumber: number, errorCorrectionLevel: string): IQRCode;
 }
 
@@ -19,13 +19,13 @@ window.onload = () => {
 	qr.addData(qrElement.attributes.getNamedItem('data').value);
 	qr.make();
 
-	let qrImageString: string = qr.createImgTag();
+	let qrImageString: string = qr.createSvgTag();
 
 	qrElement.innerHTML = qrImageString;
 
-	let qrImageObject = qrElement.firstChild as HTMLImageElement;
+	let qrSVGObject = qrElement.firstChild as HTMLImageElement;
 
-	qrImageObject.removeAttribute('height');
-	qrImageObject.removeAttribute('width');
+	qrSVGObject.removeAttribute('height');
+	qrSVGObject.removeAttribute('width');
 
 };

@@ -34,8 +34,7 @@ p {
 	text-align: center;
 }
 
-#qrCode > img {
-	image-rendering: pixelated;
+#qrCode > svg {
 	width: 50%;
 	height: auto;
 }
