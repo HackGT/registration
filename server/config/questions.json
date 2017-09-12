@@ -1415,7 +1415,7 @@
             },
             {
                 "name": "graduation-year",
-                "label": "Graduation Year",
+                "label": "Graduation year",
                 "type": "text",
                 "required": true
             },
@@ -1461,7 +1461,7 @@
             },
             {
                 "name": "other",
-                "label": "Anything else? Drop us some links (Github, LinkedIn, Personal Site etc.)",
+                "label": "Anything else? Drop us some links (Github, LinkedIn, personal site, etc.)",
                 "type": "textarea",
                 "required": false
             }
