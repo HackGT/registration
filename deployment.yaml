@@ -5,7 +5,7 @@ wants:
     mongo: true
 
 health:
-  path: /
+  path: /version
 
 secrets:
   - SESSION_SECRET
