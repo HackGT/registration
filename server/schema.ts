@@ -199,6 +199,8 @@ export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.
 		unique: true
 	},
 	value: mongoose.Schema.Types.Mixed
+}, {
+	minimize: false
 }));
 
 // Handlebars templates
