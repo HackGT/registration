@@ -1153,12 +1153,6 @@
                 "required": false
             },
             {
-                "name": "resume",
-                "label": "Please upload your resume or a skill sheet",
-                "type": "file",
-                "required": true
-            },
-            {
                 "name": "school",
                 "type": "select",
                 "label": "What college or university do you currently attend?",
@@ -1442,9 +1436,15 @@
                 "required": true
             },
             {
+                "name": "what-can-mentor",
+                "type": "textarea",
+                "label": "What kind of projects do you see yourself providing mentorship for?",
+                "required": true
+            },
+            {
                 "name": "can-hold-workshop",
-                "label": "Would you be willing to hold a tech talk/workshop at HackGT? (Does not need to be technical, just valuable)",
                 "type": "radio",
+                "label": "Would you be interested in giving a tech talk/workshop at HackGT? (Does not need to be technical)",
                 "options": [
                     "Yes",
                     "No"
@@ -1452,10 +1452,10 @@
                 "required": true
             },
             {
-                "name": "why-do-you-want-to-mentor",
-                "label": "Why do you want to mentor?",
+                "name": "workshop-elaborate",
                 "type": "textarea",
-                "required": true
+                "label": "If you already have ideas for a tech talk/workshop, please share.",
+                "required": false
             },
             {
                 "name": "tshirt-size",
