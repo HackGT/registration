@@ -135,6 +135,12 @@ canvas {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+.row-flex {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 pre {
