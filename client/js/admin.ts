@@ -141,7 +141,7 @@ class UserEntries {
 }
 
 class ApplicantEntries {
-	private static readonly NODE_COUNT = 10;
+	private static readonly NODE_COUNT = 100;
 	private static generalNodes: HTMLTableRowElement[] = [];
 	private static detailsNodes: HTMLTableRowElement[] = [];
 	private static offset: number = 0;
