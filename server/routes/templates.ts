@@ -471,7 +471,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				"applicationBranches": applicationBranches,
 				"confirmationBranches": confirmationBranches
 			},
-			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation", true, true)
+			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
 		},
 		config: {
 			admins: config.admins.join(", "),
@@ -484,7 +484,10 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	};
 	// Generate general statistics
 	(await User.find({ "applied": true })).forEach(statisticUser => {
-		let branchQuestions = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch)!.questions;
+		let appliedBranch = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch);
+		if (!appliedBranch) {
+			return;
+		}
 		let branchName = statisticUser.applicationBranch;
 		statisticUser.applicationData.forEach(question => {
 			if (question.value === null) {
@@ -499,7 +502,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = branchQuestions.find(q => q.name === question.name)!;
+					let rawQuestion = appliedBranch!.questions.find(q => q.name === question.name)!;
 					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label && entry.branch === branchName);
 
 					if (!statisticEntry) {
