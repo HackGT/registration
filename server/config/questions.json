@@ -1619,5 +1619,56 @@
                 "required": false
             }
         ]
+    },
+    {
+        "name": "General Confirmation",
+        "text": [
+            {
+                "for": "confirmation",
+                "type": "h5",
+                "content": "Note that opening ceremonies will begin at approximately 7pm on Friday and closing ceremonies will end at approximately 2pm on Sunday"
+            },
+            {
+                "for": "required-items",
+                "type": "h5",
+                "content": "Please confirm some things"
+            }
+        ],
+        "questions": [
+            {
+                "name": "confirmation",
+                "label": "Will you be attending HackGT this year on October 13th to 15th?",
+                "type": "radio",
+                "options": [
+                    "Yes, I'll be there!",
+                    "Sorry, I can't make it"
+                ],
+                "hasOther": false,
+                "required": true
+            },
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the terms of the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/blob/master/prize-terms-and-conditions/contest-terms.md)",
+                    "I agree to the terms of the [MLH Privacy Policy](https://mlh.io/privacy)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/0B2pRUVzz8hWeUE9oaGxXNUxRTjg/view?usp=sharing)"
+                ],
+                "hasOther": false,
+                "required": true
+            },
+            {
+                "name": "optional-items",
+                "label": "Please confirm the following (optional):",
+                "type": "checkbox",
+                "options": [
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/0B2pRUVzz8hWebXQ1WllYSmI5TGc/view?usp=sharing)"
+                ],
+                "hasOther": false,
+                "required": false
+            }
+        ]
     }
 ]
