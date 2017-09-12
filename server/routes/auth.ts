@@ -61,7 +61,7 @@ app.use(session({
 		mongooseConnection: mongoose.connection,
 		touchAfter: 24 * 60 * 60 // Check for TTL every 24 hours at minimum
 	}),
-	saveUninitialized: true
+	saveUninitialized: false
 }));
 passport.serializeUser<IUser, string>((user, done) => {
 	done(null, user._id.toString());
