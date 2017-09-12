@@ -36,5 +36,6 @@
 			"uploadDirectory": "uploads"
 		}
 	},
-	"maxTeamSize": 4
+	"maxTeamSize": 4,
+	"enableQRCode": false
 }

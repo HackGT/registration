@@ -207,6 +207,7 @@ export interface ICommonTemplate {
 	user: IUser;
 	settings: {
 		teamsEnabled: boolean;
+		qrEnabled: boolean;
 	};
 }
 export interface IIndexTemplate extends ICommonTemplate {
@@ -275,6 +276,8 @@ export interface IAdminTemplate extends ICommonTemplate {
 		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
+		qrEnabled: boolean;
+		qrEnabledChecked: string;
 		branchRoles: {
 			noop: string[];
 			applicationBranches: string[];

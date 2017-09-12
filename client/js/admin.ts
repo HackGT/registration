@@ -519,6 +519,9 @@ settingsUpdateButton.addEventListener("click", e => {
 	let teamsEnabledData = new FormData();
 	teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
 
+	let qrEnabledData = new FormData();
+	qrEnabledData.append("enabled", (document.getElementById("qr-enabled") as HTMLInputElement).checked ? "true" : "false");
+
 	let branchRoleData = new FormData();
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
 	for (let i = 0; i < branchRoles.length; i++) {
@@ -539,6 +542,11 @@ settingsUpdateButton.addEventListener("click", e => {
 		return fetch("/api/settings/teams_enabled", {
 			...defaultOptions,
 			body: teamsEnabledData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/qr_enabled", {
+			...defaultOptions,
+			body: qrEnabledData
 		});
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/branch_roles", {

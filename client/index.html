@@ -10,6 +10,12 @@
 		<link rel="stylesheet" href="/css/index.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
+		{{#if user.attending}}
+			{{#if settings.qrEnabled}}
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.3.1/qrcode.min.js"></script>
+				<script src="/js/qr.js" defer></script>
+			{{/if}}
+		{{/if}}
 	</head>
 	<body>
 		{{#> sidebar}}
@@ -44,6 +50,11 @@
 							<p>RSVPing closed on {{applicationClose}}.</p>
 						{{/if}}
 						<p>We look forward to seeing you!</p>
+
+						{{#if settings.qrEnabled}}
+							<p>Show your QR code to check in when you get here.</p>
+							<div id="qrCode" data="user:{{user._id}}"></div>
+						{{/if}}
 					{{else if user.accepted}}
 						{{#if confirmationStatus.areOpen}}
 							<p>You've been accepted as a <b>{{user.applicationBranch}}</b> but you still need to RSVP!</p>

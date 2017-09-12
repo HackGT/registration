@@ -29,3 +29,12 @@ p {
 	display: block;
 	margin: 0 auto;
 }
+#qrCode {
+	width: 100%;
+	text-align: center;
+}
+
+#qrCode > svg {
+	width: 50%;
+	height: auto;
+}

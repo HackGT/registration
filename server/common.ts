@@ -305,6 +305,7 @@ export async function setDefaultSettings() {
 		"confirmationOpen": new Date(),
 		"confirmationClose": new Date(),
 		"teamsEnabled": true,
+		"qrEnabled": true,
 		"applicationBranches": [],
 		"confirmationBranches": []
 	};
@@ -489,7 +490,8 @@ export async function timeLimited(request: express.Request, response: express.Re
 		siteTitle: config.eventName,
 		user: request.user,
 		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled")
+			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 
 		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",
