@@ -1118,7 +1118,7 @@
         ]
     },
     {
-        "name": "Alumni Mentors",
+        "name": "Alumni Mentor",
         "text": [],
         "questions": [
             {
@@ -1413,7 +1413,7 @@
             },
             {
                 "name": "graduation-year",
-                "label": "Graduation year",
+                "label": "What year did you graduate?",
                 "type": "text",
                 "required": true
             },
@@ -1425,7 +1425,7 @@
             },
             {
                 "name": "hackathon-history",
-                "label": "What are hackathons to you? What are things you've done in the hackathon space?",
+                "label": "What are hackathons to you? What are some things you've done in the hackathon space?",
                 "type": "textarea",
                 "required": true
             },
@@ -1443,7 +1443,7 @@
             },
             {
                 "name": "can-hold-workshop",
-                "label": "Would you be willing to hold a tech talk/workshop? (Does not need to be technical, just valuable)",
+                "label": "Would you be willing to hold a tech talk/workshop at HackGT? (Does not need to be technical, just valuable)",
                 "type": "radio",
                 "options": [
                     "Yes",
@@ -1456,6 +1456,33 @@
                 "label": "Why do you want to mentor?",
                 "type": "textarea",
                 "required": true
+            },
+            {
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
+                "type": "radio",
+                "options": [
+                    "Extra small",
+                    "Small",
+                    "Medium",
+                    "Large",
+                    "Extra large",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true
+            },
+            {
+                "name": "dietary-restrictions",
+                "label": "Do you have any dietary restrictions?",
+                "type": "checkbox",
+                "options": [
+                    "Vegetarian",
+                    "Vegan",
+                    "Gluten-free"
+                ],
+                "hasOther": true,
+                "required": false
             },
             {
                 "name": "other",
