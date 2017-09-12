@@ -318,13 +318,20 @@ export async function setDefaultSettings() {
 		}
 	}
 }
-export async function getSetting<T>(name: string, createMissing: boolean = true): Promise<T> {
+export async function getSetting<T>(name: string, createMissing: boolean = true, allowUndefined: boolean = false): Promise<T> {
 	let setting = await Setting.findOne({ name });
-	if (!setting) {
+	if (!setting || !setting.value) {
+		if (setting && allowUndefined) {
+			// Caller explicitly allowed undefined to be returned as the value
+			return undefined!;
+		}
 		if (createMissing) {
 			await setDefaultSettings();
 			setting = await Setting.findOne({ name });
-			if (!setting) {
+			if (!setting || !setting.value) {
+				if (setting && allowUndefined) {
+					return undefined!;
+				}
 				throw new Error("Setting not created by setDefaultSettings()");
 			}
 		}

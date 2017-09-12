@@ -25,6 +25,11 @@ let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS);
 app.use(cookieParserInstance);
 app.use(flash());
 
+// Throw and show a stack trace on an unhandled Promise rejection instead of logging an unhelpful warning
+process.on("unhandledRejection", err => {
+	throw err;
+});
+
 // Check for number of admin users and warn if none
 (async () => {
 	let users = await User.find({"admin": true});

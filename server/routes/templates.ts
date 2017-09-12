@@ -94,7 +94,7 @@ Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	return selected[index] ? "checked" : "";
 });
 Handlebars.registerHelper("branchChecked", (map: ApplicationToConfirmationMap, applicationBranch: string, confirmationBranch: string) => {
-	return map[applicationBranch] && map[applicationBranch].indexOf(confirmationBranch) !== -1 ? "checked" : "";
+	return (map && map[applicationBranch] && map[applicationBranch].indexOf(confirmationBranch) !== -1) ? "checked" : "";
 });
 Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
@@ -471,7 +471,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				"applicationBranches": applicationBranches,
 				"confirmationBranches": confirmationBranches
 			},
-			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
+			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation", true, true)
 		},
 		config: {
 			admins: config.admins.join(", "),
