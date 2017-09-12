@@ -1119,9 +1119,7 @@
     },
     {
         "name": "Alumni Mentors",
-        "text": [
-            {}
-        ],
+        "text": [],
         "questions": [
             {
                 "name": "name",
@@ -1461,7 +1459,7 @@
             },
             {
                 "name": "other",
-                "label": "Anything else? Drop us some links (Github, LinkedIn, personal site, etc.)",
+                "label": "Anything else? Drop us some links (GitHub, LinkedIn, personal site, etc.)",
                 "type": "textarea",
                 "required": false
             }
