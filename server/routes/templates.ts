@@ -265,7 +265,11 @@ async function applicationHandler(request: express.Request, response: express.Re
 	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
 	// Additionally selectively allow confirmation branches based on what the user applied as
 	if (requestType === ApplicationType.Confirmation) {
-		let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+		let applicationToConfirmationMap: ApplicationToConfirmationMap = await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation");
+		let allowedBranches: string[] = [];
+		if (applicationToConfirmationMap && applicationToConfirmationMap[user.applicationBranch]) {
+			allowedBranches = applicationToConfirmationMap[user.applicationBranch];
+		}
 		questionBranches = questionBranches.filter(branch => allowedBranches.indexOf(branch.name) !== -1);
 	}
 
@@ -502,12 +506,16 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = appliedBranch!.questions.find(q => q.name === question.name)!;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label && entry.branch === branchName);
+					let rawQuestion = appliedBranch!.questions.find(q => q.name === question.name);
+					if (!rawQuestion) {
+						continue;
+					}
+					let rawQuestionLabel = rawQuestion.label;
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestionLabel && entry.branch === branchName);
 
 					if (!statisticEntry) {
 						statisticEntry = {
-							"questionName": rawQuestion!.label,
+							"questionName": rawQuestionLabel,
 							"branch": statisticUser.applicationBranch,
 							"responses": []
 						};
