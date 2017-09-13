@@ -256,7 +256,7 @@ class ApplicantEntries {
 					for (let answer of user.applicationDataFormatted as { label: string; value: string; filename?: string }[]) {
 						let row = document.createElement("p");
 						let label = document.createElement("b");
-						label.textContent = answer.label;
+						label.innerHTML = answer.label;
 						row.appendChild(label);
 						row.appendChild(document.createTextNode(` → ${answer.value}`));
 						if (answer.filename) {
