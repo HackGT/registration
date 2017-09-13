@@ -502,12 +502,16 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					values = question.value as string[];
 				}
 				for (let checkboxValue of values) {
-					let rawQuestion = appliedBranch!.questions.find(q => q.name === question.name)!;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestion.label && entry.branch === branchName);
+					let rawQuestion = appliedBranch!.questions.find(q => q.name === question.name);
+					if (!rawQuestion) {
+						continue;
+					}
+					let rawQuestionLabel = rawQuestion.label;
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestionLabel && entry.branch === branchName);
 
 					if (!statisticEntry) {
 						statisticEntry = {
-							"questionName": rawQuestion!.label,
+							"questionName": rawQuestionLabel,
 							"branch": statisticUser.applicationBranch,
 							"responses": []
 						};
