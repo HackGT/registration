@@ -42,7 +42,8 @@
 					<p>Welcome back, {{user.name}}!</p>
 					{{#if user.attending}}
 						<p>You're all set!</p>
-						<p>You applied as a <b>{{user.applicationBranch}}</b> and are confirmed as a <b>{{user.confirmationBranch}}</b>!</p>
+						<p>Application type: <b>{{user.applicationBranch}}</b></p>
+						<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 						{{#if confirmationStatus.areOpen}}
 							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it any further.</p>
 							<a class="btn" href="/confirm">Edit your confirmation</a>
@@ -57,11 +58,13 @@
 						{{/if}}
 					{{else if user.accepted}}
 						{{#if confirmationStatus.areOpen}}
-							<p>You've been accepted as a <b>{{user.applicationBranch}}</b> but you still need to RSVP!</p>
+							<p>You've been accepted but you still need to RSVP!</p>
+							<p>Application type: <b>{{user.applicationBranch}}</b></p>
 							<p>If you do not RSVP before {{confirmationClose}}, you will not be able to attend {{siteTitle}}!</p>
 							<a class="btn" href="/confirm">Confirm your attendance</a>
 						{{else}}
-							<p>You've been accepted as a <b>{{user.applicationBranch}}</b>!</p>
+							<p>You've been accepted!</p>
+							<p>Application type: <b>{{user.applicationBranch}}</b></p>
 							{{#if confirmationStatus.beforeOpen}}
 								<p>RSVPing will open on {{confirmationOpen}}.</p>
 							{{/if}}
@@ -70,7 +73,8 @@
 							{{/if}}
 						{{/if}}
 					{{else if user.applied}}
-						<p>You've applied to be a <b>{{user.applicationBranch}}</b>!</p>
+						<p>You've applied and are all set for now!</p>
+						<p>Application type: <b>{{user.applicationBranch}}</b></p>
 						{{#if applicationStatus.areOpen}}
 							<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
 							<a class="btn" href="/apply">Edit your application</a>
