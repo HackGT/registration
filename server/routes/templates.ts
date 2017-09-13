@@ -265,7 +265,11 @@ async function applicationHandler(request: express.Request, response: express.Re
 	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
 	// Additionally selectively allow confirmation branches based on what the user applied as
 	if (requestType === ApplicationType.Confirmation) {
-		let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+		let applicationToConfirmationMap: ApplicationToConfirmationMap = await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation");
+		let allowedBranches: string[] = [];
+		if (applicationToConfirmationMap && applicationToConfirmationMap[user.applicationBranch]) {
+			allowedBranches = applicationToConfirmationMap[user.applicationBranch];
+		}
 		questionBranches = questionBranches.filter(branch => allowedBranches.indexOf(branch.name) !== -1);
 	}
 
