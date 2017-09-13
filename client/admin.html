@@ -66,6 +66,20 @@
 							<td>Declined users</td>
 							<td>{{numberFormat applicationStatistics.declinedUsers}}</td>
 						</tr>
+						<tr><th colspan="2">Applications by branch</th></tr>
+						{{#each applicationStatistics.applicationBranches}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>{{numberFormat this.count}}</td>
+							</tr>
+						{{/each}}
+						<tr><th colspan="2">Confirmations by branch</th></tr>
+						{{#each applicationStatistics.confirmationBranches}}
+							<tr>
+								<td>{{this.name}}</td>
+								<td>{{numberFormat this.count}}</td>
+							</tr>
+						{{/each}}
 					</tbody>
 				</table>
 				<table>

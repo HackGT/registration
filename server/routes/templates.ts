@@ -453,7 +453,19 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			appliedUsers: await User.find({ "applied": true }).count(),
 			admittedUsers: await User.find({ "accepted": true }).count(),
 			attendingUsers: await User.find({ "attending": true }).count(),
-			declinedUsers: await User.find({ "accepted": true, "attending": false }).count()
+			declinedUsers: await User.find({ "accepted": true, "attending": false }).count(),
+			applicationBranches: await Promise.all(applicationBranches.map(async branch => {
+				return {
+					"name": branch,
+					"count": await User.find({ "applicationBranch": branch }).count()
+				};
+			})),
+			confirmationBranches: await Promise.all(confirmationBranches.map(async branch => {
+				return {
+					"name": branch,
+					"count": await User.find({ "confirmationBranch": branch }).count()
+				};
+			}))
 		},
 		generalStatistics: [] as StatisticEntry[],
 		metrics: {},

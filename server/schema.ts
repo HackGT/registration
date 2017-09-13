@@ -264,6 +264,14 @@ export interface IAdminTemplate extends ICommonTemplate {
 		admittedUsers: number;
 		attendingUsers: number;
 		declinedUsers: number;
+		applicationBranches: {
+			name: string;
+			count: number;
+		}[];
+		confirmationBranches: {
+			name: string;
+			count: number;
+		}[];
 	};
 	generalStatistics: StatisticEntry[];
 	metrics: {};
