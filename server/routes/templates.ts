@@ -9,7 +9,7 @@ import {
 	STATIC_ROOT, STORAGE_ENGINE,
 	authenticateWithRedirect,
 	timeLimited, ApplicationType,
-	validateSchema, config, getSetting, renderMarkdown
+	config, getSetting, renderMarkdown
 } from "../common";
 import {
 	IUser, IUserMongoose, User,

@@ -203,6 +203,36 @@ export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.
 	minimize: false
 }));
 
+type QuestionBranchType = "Application" | "Confirmation" | "Noop";
+export interface QuestionBranchSettings {
+	open?: Date; // Used by all except noop
+	close?: Date; // Used by all except noop
+	confirmationBranches?: string[]; // Used by application branch
+}
+export interface IQuestionBranchConfig {
+	_id: mongoose.Types.ObjectId;
+	name: string;
+	type: QuestionBranchType;
+	settings: QuestionBranchSettings;
+	location: string;
+}
+export type IQuestionBranchConfigMongoose = IQuestionBranchConfig & mongoose.Document;
+
+export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose>("QuestionBranchConfig", new mongoose.Schema({
+	name: {
+		type: String,
+		required: true,
+		unique: true
+	},
+	type: String,
+	config: {
+		open: Date,
+		close: Date,
+		confirmationBranches: [String]
+	},
+	location: String
+}));
+
 // Handlebars templates
 export interface ICommonTemplate {
 	siteTitle: string;

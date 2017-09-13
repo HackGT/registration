@@ -544,49 +544,6 @@ export function unbase64File(filename: string): string {
 }
 
 //
-// JSON schema validator
-//
-import * as ajv from "ajv";
-export async function validateSchema(questionsFile: string, schemaFile: string = "./config/questions.schema.json"): Promise<QuestionBranches> {
-	let questionBranches: QuestionBranches;
-	let schema: any;
-	try {
-		questionBranches = JSON.parse(await readFileAsync(questionsFile));
-		schema = JSON.parse(await readFileAsync(path.resolve(__dirname, schemaFile)));
-	}
-	catch (err) {
-		// Invalid JSON or file read failed unexpectedly
-		return Promise.reject(err);
-	}
-
-	let validator = new ajv();
-	let valid = validator.validate(schema, questionBranches);
-	let branchNames = questionBranches.map(branch => branch.name);
-	if (!valid) {
-		return Promise.reject(validator.errors);
-	}
-	else if (new Set(branchNames).size !== branchNames.length) {
-		return Promise.reject(new Error("Application branch names are not unique"));
-	}
-	else {
-		for (let i = 0; i < questionBranches.length; i++) {
-			for (let j = 0; j < questionBranches[i].questions.length; j++) {
-				// Render labels
-				questionBranches[i].questions[j].label = await renderMarkdown(questionBranches[i].questions[j].label, undefined, true);
-				// Render options (if they exist)
-				let type = questionBranches[i].questions[j].type;
-				if (type === "checkbox" || type === "radio" || type === "select") {
-					for (let k = 0; k < questionBranches[i].questions[j].options.length; k++) {
-						questionBranches[i].questions[j].options[k] = await renderMarkdown(questionBranches[i].questions[j].options[k], undefined, true);
-					}
-				}
-			}
-		}
-		return questionBranches;
-	}
-}
-
-//
 // Email
 //
 import * as nodemailer from "nodemailer";
