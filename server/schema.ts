@@ -304,26 +304,23 @@ export interface IAdminTemplate extends ICommonTemplate {
 		}[];
 	};
 	generalStatistics: StatisticEntry[];
-	metrics: {};
 	settings: {
-		application: {
-			open: string;
-			close: string;
-		};
-		confirmation: {
-			open: string;
-			close: string;
-		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
 		qrEnabled: boolean;
 		qrEnabledChecked: string;
-		branchRoles: {
+		branches: {
 			noop: string[];
-			applicationBranches: string[];
-			confirmationBranches: string[];
+			application: {
+				open: string;
+				close: string;
+				confirmationBranches: string[];
+			}[];
+			confirmation: {
+				open: string;
+				close: string;
+			}[];
 		};
-		applicationToConfirmationMap: ApplicationToConfirmationMap;
 	};
 	config: {
 		admins: string;

@@ -10,7 +10,6 @@ import {
 	postParser, uploadHandler, isAdmin, isUserOrAdmin,
 	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
 	ApplicationType,
-	validateSchema,
 	trackEvent
 } from "../../common";
 import {
@@ -18,7 +17,7 @@ import {
 	IUserMongoose, User,
 	ITeamMongoose, Team
 } from "../../schema";
-import {QuestionBranches} from "../../config/questions.schema";
+import * as Branches from "../../branch";
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
@@ -83,18 +82,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		return;
 	}
 
-	let questionBranches: QuestionBranches;
-	try {
-		questionBranches = await validateSchema(config.questionsLocation, "./config/questions.schema.json");
-	}
-	catch (err) {
-		console.error("validateSchema error:", err);
-		response.status(500).json({
-			"error": "An error occurred while validating question structure"
-		});
-		return;
-	}
-	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
 	if (!questionBranch) {
 		response.status(400).json({
 			"error": "Invalid application branch"
@@ -355,26 +343,13 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 
 userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
 	try {
-		let questionBranches: QuestionBranches;
-		try {
-			questionBranches = await validateSchema(config.questionsLocation, "./config/questions.schema.json");
-		}
-		catch (err) {
-			console.error("validateSchema error:", err);
-			response.status(500).json({
-				"error": "An error occurred while validating question structure"
-			});
-			return;
-		}
-
-		let branchNames: string[] = questionBranches.map(branch => branch.name);
 		let archive = archiver("zip", {
 			store: true
 		});
 		response.status(200).type("application/zip");
 		archive.pipe(response);
 
-		for (let branchName of branchNames) {
+		for (let branchName of await Branches.BranchConfig.getNames()) {
 			// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
 			// TODO: Change this to { "accepted": true }
 			let attendingUsers: IUserMongoose[] = await User.find({ "applied": true, "applicationBranch": branchName });

@@ -2,10 +2,10 @@ import * as express from "express";
 import * as moment from "moment";
 
 import {
-	uploadHandler, isAdmin, validateSchema, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText,
-	config
+	uploadHandler, isAdmin, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
 } from "../../common";
 import { ApplicationToConfirmationMap } from "../../schema";
+import * as Branches from "../../branch";
 
 setDefaultSettings().catch(err => {
 	throw err;
@@ -129,14 +129,10 @@ settingsRoutes.route("/qr_enabled")
 
 settingsRoutes.route("/branch_roles")
 	.get(isAdmin, async (request, response) => {
-		let branchNames = (await validateSchema(config.questionsLocation, "./config/questions.schema.json")).map(branch => branch.name);
-		let applicationBranches = await getSetting<string[]>("applicationBranches");
-		let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 		response.json({
-			"noop": branchNames.filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
-			"applicationBranches": applicationBranches,
-			"confirmationBranches": confirmationBranches,
-			"applicationToConfirmationMap": await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
+			"noop": (await Branches.BranchConfig.loadAllBranches("Noop")).map(branch => branch.name),
+			"applicationBranches": (await Branches.BranchConfig.loadAllBranches("Application")).map(branch => branch.name),
+			"confirmationBranches": (await Branches.BranchConfig.loadAllBranches("Confirmation")).map(branch => branch.name)
 		});
 	})
 	.put(isAdmin, uploadHandler.any(), async (request, response) => {

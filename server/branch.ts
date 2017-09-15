@@ -4,76 +4,27 @@ import { QuestionBranchConfig, QuestionBranchSettings } from "./schema";
 import { config, readFileAsync, renderMarkdown } from "./common";
 import { QuestionBranches, Questions, TextBlocks } from "./config/questions.schema";
 
-type Labels = {
+// tslint:disable:interface-name variable-name
+interface Labels {
 	[questionName: string]: string;
-};
-
-type QuestionBranchTypes = {
-	"Application": ApplicationBranch,
-	"Confirmation": ConfirmationBranch,
-	"Noop": NoopBranch
+}
+interface QuestionBranchTypes {
+	"Application": ApplicationBranch;
+	"Confirmation": ConfirmationBranch;
+	"Noop": NoopBranch;
 }
 type QuestionBranch = QuestionBranchTypes[keyof QuestionBranchTypes];
 
 const SCHEMA_FILE: string = "./config/questions.schema.json";
 
-export class BranchConfig {
-	public static async getNames(): Promise<string[]> {
-		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(config.questionsLocation));
-		return questionBranches.map(branch => branch.name);
-	}
-	public static async loadAllBranches(location: string = config.questionsLocation): Promise<QuestionBranch[]> {
-		let names = await this.getNames();
-		let branches: QuestionBranch[] = [];
-		for (let name of names) {
-			branches.push(await this.loadBranchFromDB(name, location));
-		}
-		return branches;
-	}
-	public static async verifyConfig(): Promise<boolean> {
-		try {
-			await this.loadAllBranches();
-			return true;
-		}
-		catch {
-			return false;
-		}
-	}
-	public static async loadBranchFromDB(name: string, location?: string): Promise<QuestionBranch> {
-		let branchConfig = await QuestionBranchConfig.findOne({ name });
-		if (!branchConfig) {
-			if (location) {
-				return await new NoopBranch(name, location).loadFromSchema();
-			}
-			else {
-				throw new Error("Config does not exist for specified branch name");
-			}
-		}
-
-		let instance: QuestionBranch;
-		switch (branchConfig.type) {
-			case "Application":
-				instance = await new ApplicationBranch(name, location || branchConfig.location).loadFromSchema();
-				break;
-			case "Confirmation":
-				instance = await new ConfirmationBranch(name, location || branchConfig.location).loadFromSchema();
-				break;
-			default:
-				instance = await new NoopBranch(name, location || branchConfig.location).loadFromSchema()
-		}
-
-		return instance;
-	}
-}
-
 export class NoopBranch {
 	public readonly name: string;
 	public readonly type: keyof QuestionBranchTypes = "Noop";
-	
+
 	public textBlocks: TextBlocks | undefined;
 	public questions: Questions;
 	public questionLabels: Labels;
-	
+
 	protected readonly location: string;
 
 	constructor(name: string, location: string) {
@@ -123,7 +74,7 @@ export class NoopBranch {
 				}
 			}
 		}
-		
+
 		await this.loadSettings();
 		return this;
 	}
@@ -131,7 +82,8 @@ export class NoopBranch {
 	public async convertTo<T extends QuestionBranch>(type: keyof QuestionBranchTypes): Promise<T> {
 		await this.save();
 		await QuestionBranchConfig.update({ "name": this.name }, { "$set": { "type": type } });
-		return await loadBranchFromDB(this.name, this.location) as T;
+		// tslint:disable-next-line:no-use-before-declare
+		return await BranchConfig.loadBranchFromDB(this.name) as T;
 	}
 
 	public async save(): Promise<this> {
@@ -197,4 +149,56 @@ export class ApplicationBranch extends TimedBranch {
 
 export class ConfirmationBranch extends TimedBranch {
 	public readonly type: keyof QuestionBranchTypes = "Confirmation";
+}
+
+export class BranchConfig {
+	public static async getNames(): Promise<string[]> {
+		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(config.questionsLocation));
+		return questionBranches.map(branch => branch.name);
+	}
+	public static async loadAllBranches(type: keyof QuestionBranchTypes | "All" = "All", location: string = config.questionsLocation): Promise<QuestionBranch[]> {
+		let names = await this.getNames();
+		let branches: QuestionBranch[] = [];
+		for (let name of names) {
+			let branch = await this.loadBranchFromDB(name, false, location);
+			if (type === "All" || branch.type === type) {
+				branches.push(branch);
+			}
+		}
+		return branches;
+	}
+	public static async verifyConfig(): Promise<boolean> {
+		try {
+			await this.loadAllBranches();
+			return true;
+		}
+		catch {
+			return false;
+		}
+	}
+	public static async loadBranchFromDB(name: string, createNew: boolean = false, location: string = config.questionsLocation): Promise<QuestionBranch> {
+		let branchConfig = await QuestionBranchConfig.findOne({ name });
+		if (!branchConfig) {
+			if (createNew && location) {
+				return await new NoopBranch(name, location).loadFromSchema();
+			}
+			else {
+				throw new Error("Config does not exist for specified branch name");
+			}
+		}
+
+		let instance: QuestionBranch;
+		switch (branchConfig.type) {
+			case "Application":
+				instance = await new ApplicationBranch(name, location || branchConfig.location).loadFromSchema();
+				break;
+			case "Confirmation":
+				instance = await new ConfirmationBranch(name, location || branchConfig.location).loadFromSchema();
+				break;
+			default:
+				instance = await new NoopBranch(name, location || branchConfig.location).loadFromSchema();
+		}
+
+		return instance;
+	}
 }

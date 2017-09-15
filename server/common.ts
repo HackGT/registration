@@ -300,15 +300,8 @@ export async function setDefaultSettings() {
 	}
 
 	const DEFAULTS: any = {
-		"applicationOpen": new Date(),
-		"applicationClose": new Date(),
-		"confirmationOpen": new Date(),
-		"confirmationClose": new Date(),
 		"teamsEnabled": true,
-		"qrEnabled": true,
-		"applicationBranches": [],
-		"confirmationBranches": [],
-		"applicationToConfirmation": {}
+		"qrEnabled": true
 	};
 
 	for (let setting in DEFAULTS) {
