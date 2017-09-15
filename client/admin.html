@@ -234,9 +234,9 @@
 						</div>
 					</div>
 					<div class="row row-flex">
-						{{#each settings.branchRoles.applicationBranches}}
-							<div class="col-4 branch-role" data-name="{{this}}">
-								<h4>{{this}}</h4>
+						{{#each settings.branches.application}}
+							<div class="col-4 branch-role" data-name="{{this.name}}">
+								<h4>{{this.name}}</h4>
 								<select>
 									<option value="noop">Not used</option>
 									<option value="application" selected>Application</option>
@@ -244,18 +244,18 @@
 								</select>
 								<label>Available confirmation branches</label>
 								<fieldset>
-									{{#each ../settings.branchRoles.confirmationBranches}}
+									{{#each ../settings.branches.confirmation}}
 										<div>
-											<input type="checkbox" id="{{removeSpaces ../this}}-to-{{removeSpaces this}}" data-confirmation="{{this}}" {{branchChecked ../../settings.applicationToConfirmationMap ../this this}} />
-											<label for="{{removeSpaces ../this}}-to-{{removeSpaces this}}">{{this}}</label>
+											<input type="checkbox" id="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}" data-confirmation="{{this.name}}" {{branchChecked  ../this.confirmationBranches this.name}} />
+											<label for="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}">{{this.name}}</label>
 										</div>
 									{{/each}}
 								</fieldset>
 							</div>
 						{{/each}}
-						{{#each settings.branchRoles.confirmationBranches}}
-							<div class="col-4 branch-role" data-name="{{this}}">
-								<h4>{{this}}</h4>
+						{{#each settings.branches.confirmation}}
+							<div class="col-4 branch-role" data-name="{{this.name}}">
+								<h4>{{this.name}}</h4>
 								<select>
 									<option value="noop">Not used</option>
 									<option value="application">Application</option>
@@ -263,9 +263,9 @@
 								</select>
 							</div>
 						{{/each}}
-						{{#each settings.branchRoles.noop}}
-							<div class="col-4 branch-role" data-name="{{this}}">
-								<h4>{{this}}</h4>
+						{{#each settings.branches.noop}}
+							<div class="col-4 branch-role" data-name="{{this.name}}">
+								<h4>{{this.name}}</h4>
 								<select>
 									<option value="noop" selected>Not used</option>
 									<option value="application">Application</option>

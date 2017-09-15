@@ -310,7 +310,9 @@ export interface IAdminTemplate extends ICommonTemplate {
 		qrEnabled: boolean;
 		qrEnabledChecked: string;
 		branches: {
-			noop: string[];
+			noop: {
+				name: string;
+			}[];
 			application: {
 				open: string;
 				close: string;

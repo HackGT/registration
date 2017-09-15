@@ -93,8 +93,8 @@ Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	// Adds the "checked" form attribute if the element was checked previously
 	return selected[index] ? "checked" : "";
 });
-Handlebars.registerHelper("branchChecked", (map: ApplicationToConfirmationMap, applicationBranch: string, confirmationBranch: string) => {
-	return (map && map[applicationBranch] && map[applicationBranch].indexOf(confirmationBranch) !== -1) ? "checked" : "";
+Handlebars.registerHelper("branchChecked", (selectedBranches: string[], confirmationBranch: string) => {
+	return (selectedBranches.indexOf(confirmationBranch) !== -1) ? "checked" : "";
 });
 Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
@@ -458,9 +458,12 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			qrEnabled,
 			qrEnabledChecked: qrEnabled ? "checked" : "",
 			branches: {
-				noop: (await Branches.BranchConfig.loadAllBranches("Noop")).map(branch => branch.name),
+				noop: (await Branches.BranchConfig.loadAllBranches("Noop")).map(branch => {
+					return { name: branch.name };
+				}),
 				application: (await Branches.BranchConfig.loadAllBranches("Application")).map((branch: Branches.ApplicationBranch) => {
 					return {
+						name: branch.name,
 						open: branch.open.toISOString(),
 						close: branch.close.toISOString(),
 						confirmationBranches: branch.confirmationBranches
@@ -468,6 +471,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				}),
 				confirmation: (await Branches.BranchConfig.loadAllBranches("Confirmation")).map((branch: Branches.ConfirmationBranch) => {
 					return {
+						name: branch.name,
 						open: branch.open.toISOString(),
 						close: branch.close.toISOString()
 					};
