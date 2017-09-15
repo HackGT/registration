@@ -85,7 +85,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 
 	let questionBranches: QuestionBranches;
 	try {
-		questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
+		questionBranches = await validateSchema(config.questionsLocation, "./config/questions.schema.json");
 	}
 	catch (err) {
 		console.error("validateSchema error:", err);
@@ -357,7 +357,7 @@ userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void
 	try {
 		let questionBranches: QuestionBranches;
 		try {
-			questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
+			questionBranches = await validateSchema(config.questionsLocation, "./config/questions.schema.json");
 		}
 		catch (err) {
 			console.error("validateSchema error:", err);

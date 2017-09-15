@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as ajv from "ajv";
 import { QuestionBranchConfig, QuestionBranchSettings } from "./schema";
-import { readFileAsync, renderMarkdown } from "./common";
+import { config, readFileAsync, renderMarkdown } from "./common";
 import { QuestionBranches, Questions, TextBlocks } from "./config/questions.schema";
 
 type Labels = {
@@ -15,30 +15,55 @@ type QuestionBranchTypes = {
 }
 type QuestionBranch = QuestionBranchTypes[keyof QuestionBranchTypes];
 
-export async function loadBranchFromDB(name: string, location?: string): Promise<QuestionBranch> {
-	let branchConfig = await QuestionBranchConfig.findOne({ name });
-	if (!branchConfig) {
-		if (location) {
-			return await new NoopBranch(name, location).loadFromSchema();
+const SCHEMA_FILE: string = "./config/questions.schema.json";
+
+export class BranchConfig {
+	public static async getNames(): Promise<string[]> {
+		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(config.questionsLocation));
+		return questionBranches.map(branch => branch.name);
+	}
+	public static async loadAllBranches(location: string = config.questionsLocation): Promise<QuestionBranch[]> {
+		let names = await this.getNames();
+		let branches: QuestionBranch[] = [];
+		for (let name of names) {
+			branches.push(await this.loadBranchFromDB(name, location));
 		}
-		else {
-			throw new Error("Config does not exist for specified branch name");
+		return branches;
+	}
+	public static async verifyConfig(): Promise<boolean> {
+		try {
+			await this.loadAllBranches();
+			return true;
+		}
+		catch {
+			return false;
 		}
 	}
+	public static async loadBranchFromDB(name: string, location?: string): Promise<QuestionBranch> {
+		let branchConfig = await QuestionBranchConfig.findOne({ name });
+		if (!branchConfig) {
+			if (location) {
+				return await new NoopBranch(name, location).loadFromSchema();
+			}
+			else {
+				throw new Error("Config does not exist for specified branch name");
+			}
+		}
 
-	let instance: QuestionBranch;
-	switch (branchConfig.type) {
-		case "Application":
-			instance = await new ApplicationBranch(name, location || branchConfig.location).loadFromSchema();
-			break;
-		case "Confirmation":
-			instance = await new ConfirmationBranch(name, location || branchConfig.location).loadFromSchema();
-			break;
-		default:
-			instance = await new NoopBranch(name, location || branchConfig.location).loadFromSchema()
+		let instance: QuestionBranch;
+		switch (branchConfig.type) {
+			case "Application":
+				instance = await new ApplicationBranch(name, location || branchConfig.location).loadFromSchema();
+				break;
+			case "Confirmation":
+				instance = await new ConfirmationBranch(name, location || branchConfig.location).loadFromSchema();
+				break;
+			default:
+				instance = await new NoopBranch(name, location || branchConfig.location).loadFromSchema()
+		}
+
+		return instance;
 	}
-
-	return instance;
 }
 
 export class NoopBranch {
@@ -49,7 +74,6 @@ export class NoopBranch {
 	public questions: Questions;
 	public questionLabels: Labels;
 	
-	protected static readonly schemaFile: string = "./config/questions.schema.json";
 	protected readonly location: string;
 
 	constructor(name: string, location: string) {
@@ -67,7 +91,7 @@ export class NoopBranch {
 
 	public async loadFromSchema(): Promise<this> {
 		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(this.location));
-		let schema = JSON.parse(await readFileAsync(path.resolve(__dirname, NoopBranch.schemaFile)));
+		let schema = JSON.parse(await readFileAsync(path.resolve(__dirname, SCHEMA_FILE)));
 
 		let validator = new ajv();
 		let valid = validator.validate(schema, questionBranches);

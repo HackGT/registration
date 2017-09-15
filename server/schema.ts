@@ -51,7 +51,7 @@ export namespace IConfig {
 		style: Style;
 		admins: string[];
 		eventName: string;
-		questions: string;
+		questionsLocation: string;
 		storageEngine: {
 			name: string;
 			options: any;

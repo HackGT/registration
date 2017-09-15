@@ -129,7 +129,7 @@ settingsRoutes.route("/qr_enabled")
 
 settingsRoutes.route("/branch_roles")
 	.get(isAdmin, async (request, response) => {
-		let branchNames = (await validateSchema(config.questions, "./config/questions.schema.json")).map(branch => branch.name);
+		let branchNames = (await validateSchema(config.questionsLocation, "./config/questions.schema.json")).map(branch => branch.name);
 		let applicationBranches = await getSetting<string[]>("applicationBranches");
 		let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 		response.json({

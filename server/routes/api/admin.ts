@@ -34,7 +34,7 @@ adminRoutes.route("/users").get(isAdmin, async (request, response) => {
 		filter.applied = true;
 		filter.accepted = true;
 	}
-	let rawQuestions = await validateSchema(config.questions, "./config/questions.schema.json");
+	let rawQuestions = await validateSchema(config.questionsLocation, "./config/questions.schema.json");
 
 	let teamIDNameMap: {
 		[id: string]: string;

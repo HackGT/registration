@@ -62,7 +62,7 @@ class Config implements IConfig.Main {
 		favicon: path.resolve(__dirname, "../client/favicon.ico")
 	};
 
-	public questions: string = path.resolve(__dirname, "./config/questions.json");
+	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
 
 	constructor(fileName: string = "config.json") {
 		this.loadFromJSON(fileName);
@@ -119,8 +119,8 @@ class Config implements IConfig.Main {
 			this.sessionSecretSet = true;
 		}
 
-		if (config.questions) {
-			this.questions = config.questions;
+		if (config.questionsLocation) {
+			this.questionsLocation = config.questionsLocation;
 		}
 		if (config.style) {
 			this.style = config.style;
@@ -222,7 +222,7 @@ class Config implements IConfig.Main {
 		}
 		// Questions
 		if (process.env.QUESTIONS_FILE) {
-			this.questions = process.env.QUESTIONS_FILE!;
+			this.questionsLocation = process.env.QUESTIONS_FILE!;
 		}
 		// Style
 		if (process.env.THEME_FILE) {
@@ -381,7 +381,7 @@ export let uploadHandler = multer({
 
 function getMaxFileUploads(): number {
 	// Can't use validateSchema() because this function needs to run synchronously to export uploadHandler before it gets used
-	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(config.questions, "utf8"));
+	let questionBranches: QuestionBranches = JSON.parse(fs.readFileSync(config.questionsLocation, "utf8"));
 	let questions = questionBranches.map(branch => branch.questions);
 	let fileUploadsPerBranch: number[] = questions.map(branch => {
 		return branch.reduce((prev, current) => {
