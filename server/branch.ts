@@ -160,7 +160,7 @@ export class BranchConfig {
 		let names = await this.getNames();
 		let branches: QuestionBranch[] = [];
 		for (let name of names) {
-			let branch = await this.loadBranchFromDB(name, false, location);
+			let branch = await this.loadBranchFromDB(name, location);
 			if (type === "All" || branch.type === type) {
 				branches.push(branch);
 			}
@@ -176,15 +176,10 @@ export class BranchConfig {
 			return false;
 		}
 	}
-	public static async loadBranchFromDB(name: string, createNew: boolean = false, location: string = config.questionsLocation): Promise<QuestionBranch> {
+	public static async loadBranchFromDB(name: string, location: string = config.questionsLocation): Promise<QuestionBranch> {
 		let branchConfig = await QuestionBranchConfig.findOne({ name });
 		if (!branchConfig) {
-			if (createNew && location) {
-				return await new NoopBranch(name, location).loadFromSchema();
-			}
-			else {
-				throw new Error("Config does not exist for specified branch name");
-			}
+			return await new NoopBranch(name, location).loadFromSchema();
 		}
 
 		let instance: QuestionBranch;
