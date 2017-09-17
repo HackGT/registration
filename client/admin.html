@@ -203,26 +203,6 @@
 				<h2>Settings</h2>
 
 				<form method="post" data-action="/">
-					<div class="row">
-						<div class="col-6">
-							<label for="application-open">Applications open:</label>
-							<input id="application-open" type="datetime-local" data-raw-value="{{settings.application.open}}" required />
-						</div>
-						<div class="col-6">
-							<label for="application-close">Applications close:</label>
-							<input id="application-close" type="datetime-local" data-raw-value="{{settings.application.close}}" required />
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-6">
-							<label for="confirmation-open">Confirmations open:</label>
-							<input id="confirmation-open" type="datetime-local" data-raw-value="{{settings.confirmation.open}}" required />
-						</div>
-						<div class="col-6">
-							<label for="confirmation-close">Confirmations close:</label>
-							<input id="confirmation-close" type="datetime-local" data-raw-value="{{settings.confirmation.close}}" required />
-						</div>
-					</div>
 					<div class="row" style="text-align: center;">
 						<div class="col-6">
 							<label for="teams-enabled">Enable teams?</label>
@@ -238,12 +218,12 @@
 							<div class="col-4 branch-role" data-name="{{this.name}}">
 								<h4>{{this.name}}</h4>
 								<select>
-									<option value="noop">Not used</option>
-									<option value="application" selected>Application</option>
-									<option value="confirmation">Confirmation</option>
+									<option value="Noop">Not used</option>
+									<option value="Application" selected>Application</option>
+									<option value="Confirmation">Confirmation</option>
 								</select>
 								<label>Available confirmation branches</label>
-								<fieldset>
+								<fieldset class="availableConfirmationBranches">
 									{{#each ../settings.branches.confirmation}}
 										<div>
 											<input type="checkbox" id="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}" data-confirmation="{{this.name}}" {{branchChecked  ../this.confirmationBranches this.name}} />
@@ -251,25 +231,39 @@
 										</div>
 									{{/each}}
 								</fieldset>
+								<label>Open/Close Times</label>
+								<fieldset>
+									<label for="{{removeSpaces this.name}}-open">Open</label>
+									<input type="datetime-local" id="{{removeSpaces this.name}}-open" class="openTime" data-raw-value="{{this.open}}"/>
+									<label for="{{removeSpaces this.name}}-close">Close</label>
+									<input type="datetime-local" id="{{removeSpaces this.name}}-close" class="closeTime" data-raw-value="{{this.close}}"/>
+								</fieldset>
 							</div>
 						{{/each}}
 						{{#each settings.branches.confirmation}}
 							<div class="col-4 branch-role" data-name="{{this.name}}">
 								<h4>{{this.name}}</h4>
 								<select>
-									<option value="noop">Not used</option>
-									<option value="application">Application</option>
-									<option value="confirmation" selected>Confirmation</option>
+									<option value="Noop">Not used</option>
+									<option value="Application">Application</option>
+									<option value="Confirmation" selected>Confirmation</option>
 								</select>
+								<label>Open/Close Times</label>
+								<fieldset>
+									<label for="{{removeSpaces this.name}}-open">Open</label>
+									<input type="datetime-local" id="{{removeSpaces this.name}}-open" class="openTime" data-raw-value="{{this.open}}"/>
+									<label for="{{removeSpaces this.name}}-close">Close</label>
+									<input type="datetime-local" id="{{removeSpaces this.name}}-close" class="closeTime" data-raw-value="{{this.close}}"/>
+								</fieldset>
 							</div>
 						{{/each}}
 						{{#each settings.branches.noop}}
 							<div class="col-4 branch-role" data-name="{{this.name}}">
 								<h4>{{this.name}}</h4>
 								<select>
-									<option value="noop" selected>Not used</option>
-									<option value="application">Application</option>
-									<option value="confirmation">Confirmation</option>
+									<option value="Noop" selected>Not used</option>
+									<option value="Application">Application</option>
+									<option value="Confirmation">Confirmation</option>
 								</select>
 							</div>
 						{{/each}}

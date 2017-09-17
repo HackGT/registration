@@ -80,6 +80,7 @@ export class NoopBranch {
 	}
 
 	public async convertTo<T extends QuestionBranch>(type: keyof QuestionBranchTypes): Promise<T> {
+		// TODO typecast and return if types match - do not need to save to DB
 		await this.save();
 		await QuestionBranchConfig.update({ "name": this.name }, { "$set": { "type": type } });
 		// tslint:disable-next-line:no-use-before-declare
@@ -117,8 +118,8 @@ abstract class TimedBranch extends NoopBranch {
 	protected async loadSettings(): Promise<void> {
 		await super.loadSettings();
 		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
-		this.open = branchConfig && branchConfig.settings.open || new Date();
-		this.close = branchConfig && branchConfig.settings.close || new Date();
+		this.open = branchConfig && branchConfig.settings && branchConfig.settings.open || new Date();
+		this.close = branchConfig && branchConfig.settings && branchConfig.settings.close || new Date();
 	}
 	protected serializeSettings(): QuestionBranchSettings {
 		return {
@@ -137,7 +138,7 @@ export class ApplicationBranch extends TimedBranch {
 	protected async loadSettings(): Promise<void> {
 		await super.loadSettings();
 		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
-		this.confirmationBranches = branchConfig && branchConfig.settings.confirmationBranches || [];
+		this.confirmationBranches = branchConfig && branchConfig.settings && branchConfig.settings.confirmationBranches || [];
 	}
 	protected serializeSettings(): QuestionBranchSettings {
 		return {

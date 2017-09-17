@@ -225,7 +225,7 @@ export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose
 		unique: true
 	},
 	type: String,
-	config: {
+	settings: {
 		open: Date,
 		close: Date,
 		confirmationBranches: [String]
@@ -350,6 +350,7 @@ export interface HackGTMetrics {
 	hackgtmetricsversion: number;
 }
 
+// TODO remove this? deprecated?
 export interface ApplicationToConfirmationMap {
 	[applicationBranch: string]: string[];
 }

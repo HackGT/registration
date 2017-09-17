@@ -461,12 +461,6 @@ settingsUpdateButton.addEventListener("click", e => {
 	e.preventDefault();
 	settingsUpdateButton.disabled = true;
 
-	let applicationAvailabilityData = new FormData();
-	applicationAvailabilityData.append("applicationOpen", parseDateTime((document.getElementById("application-open") as HTMLInputElement).value).toISOString());
-	applicationAvailabilityData.append("applicationClose", parseDateTime((document.getElementById("application-close") as HTMLInputElement).value).toISOString());
-	applicationAvailabilityData.append("confirmationOpen", parseDateTime((document.getElementById("confirmation-open") as HTMLInputElement).value).toISOString());
-	applicationAvailabilityData.append("confirmationClose", parseDateTime((document.getElementById("confirmation-close") as HTMLInputElement).value).toISOString());
-
 	let teamsEnabledData = new FormData();
 	teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
 
@@ -475,22 +469,33 @@ settingsUpdateButton.addEventListener("click", e => {
 
 	let branchRoleData = new FormData();
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
-	let applicationToConfirmationMap: { [applicationBranch: string]: string[] } = {};
 	for (let i = 0; i < branchRoles.length; i++) {
-		branchRoleData.append(branchRoles[i].dataset.name!, branchRoles[i].querySelector("select")!.value);
-
-		if (branchRoles[i].querySelector("fieldset")) {
-			let checkboxes = branchRoles[i].querySelectorAll("fieldset input") as NodeListOf<HTMLInputElement>;
+		let branchName = branchRoles[i].dataset.name!;
+		let branchRole = branchRoles[i].querySelector("select")!.value;
+		let branchData: {
+				role: string;
+				open?: Date;
+				close?: Date;
+				confirmationBranches?: string[];
+		} = {role: branchRole};
+		if (branchRole !== "noop") {
+				let openInputElem = branchRoles[i].querySelector("input.openTime") as HTMLInputElement;
+				let closeInputElem = branchRoles[i].querySelector("input.closeTime") as HTMLInputElement;
+				branchData.open = openInputElem ? new Date(openInputElem.value) : new Date();
+				branchData.close = closeInputElem ? new Date(closeInputElem.value) : new Date();
+		}
+		if (branchRole !== "application") {
+			let checkboxes = branchRoles[i].querySelectorAll("fieldset.availableConfirmationBranches input") as NodeListOf<HTMLInputElement>;
 			let allowedConfirmationBranches: string[] = [];
 			for (let j = 0; j < checkboxes.length; j++) {
 				if (checkboxes[j].checked) {
 					allowedConfirmationBranches.push(checkboxes[j].dataset.confirmation!);
 				}
 			}
-			applicationToConfirmationMap[branchRoles[i].dataset.name!] = allowedConfirmationBranches;
+			branchData.confirmationBranches = allowedConfirmationBranches;
 		}
+		branchRoleData.append(branchName, JSON.stringify(branchData));
 	}
-	branchRoleData.append("applicationToConfirmationMap", JSON.stringify(applicationToConfirmationMap));
 
 	let emailContentData = new FormData();
 	emailContentData.append("content", markdownEditor.value());
@@ -499,14 +504,9 @@ settingsUpdateButton.addEventListener("click", e => {
 		credentials: "same-origin",
 		method: "PUT"
 	};
-	fetch("/api/settings/application_availability", {
+	fetch("/api/settings/teams_enabled", {
 		...defaultOptions,
-		body: applicationAvailabilityData
-	}).then(checkStatus).then(parseJSON).then(() => {
-		return fetch("/api/settings/teams_enabled", {
-			...defaultOptions,
-			body: teamsEnabledData
-		});
+		body: teamsEnabledData
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/qr_enabled", {
 			...defaultOptions,

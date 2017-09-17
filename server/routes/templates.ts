@@ -418,6 +418,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
+
+	// TODO convert this to use class based branches
 	let applicationBranches = await getSetting<string[]>("applicationBranches");
 	let confirmationBranches = await getSetting<string[]>("confirmationBranches");
 
