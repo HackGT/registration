@@ -255,19 +255,6 @@ class Config implements IConfig.Main {
 }
 export let config = new Config();
 
-// Verify and load questions
-import { BranchConfig } from "./branch";
-BranchConfig.verifyConfig().then(good => {
-	if (good) {
-		console.log(`Question branches loaded from ${config.questionsLocation} to DB successfully`);
-	}
-	else {
-		throw new Error(`Question branches in ${config.questionsLocation} failed schema verification`);
-	}
-}).catch(err => {
-	throw err;
-});
-
 //
 // Constants
 //
@@ -706,3 +693,16 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 	};
 	console.log(JSON.stringify(metricsEvent));
 }
+
+// Verify and load questions
+import { BranchConfig } from "./branch";
+BranchConfig.verifyConfig().then(good => {
+	if (good) {
+		console.log(`Question branches loaded from ${config.questionsLocation} to DB successfully`);
+	}
+	else {
+		throw new Error(`Question branches in ${config.questionsLocation} failed schema verification`);
+	}
+}).catch(err => {
+	throw err;
+});
