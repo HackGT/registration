@@ -1155,7 +1155,7 @@
             {
                 "name": "school",
                 "type": "select",
-                "label": "What college or university do you currently attend?",
+                "label": "What college or university did you attend?",
                 "options": [
                     "Georgia Institute of Technology",
                     "Abraham Baldwin Agricultural College",
