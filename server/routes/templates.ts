@@ -125,14 +125,44 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
-	let applicationOpenDate = moment(await getSetting<Date>("applicationOpen"));
-	let applicationCloseDate = moment(await getSetting<Date>("applicationClose"));
-	let confirmationOpenDate = moment(await getSetting<Date>("confirmationOpen"));
-	let confirmationCloseDate = moment(await getSetting<Date>("confirmationClose"));
+	let user = request.user as IUser;
+
+	let applyBranches: Branches.ApplicationBranch[];
+	if (user.applicationBranch) {
+		applyBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch))] as Branches.ApplicationBranch[];
+	} else {
+		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
+	}
+	let confirmBranches: Branches.ConfirmationBranch[];
+	if (user.confirmationBranch) {
+		confirmBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.confirmationBranch))] as Branches.ConfirmationBranch[];
+	} else {
+		confirmBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
+	}
+
+	interface IDeadlineMap {
+		[name: string]: {
+			name: string;
+			open: Date;
+			close: Date;
+		};
+	}
+	let confirmTimes = confirmBranches.reduce((map, branch) => {
+		map[branch.name] = branch;
+		return map;
+	}, {} as IDeadlineMap);
+	for (let branchTimes of user.confirmationDeadlines) {
+		confirmTimes[branchTimes.name] = branchTimes;
+	}
+
+	let applicationOpenDate = moment(applyBranches.map(b => b.open).sort()[0]);
+	let applicationCloseDate = moment(applyBranches.map(b => b.close).sort()[applyBranches.length - 1]);
+	let confirmationOpenDate = moment(confirmBranches.map(b => b.open).sort()[0]);
+	let confirmationCloseDate = moment(confirmBranches.map(b => b.close).sort()[confirmBranches.length - 1]);
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
-		user: request.user,
+		user,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 			qrEnabled: await getSetting<boolean>("qrEnabled")
@@ -252,17 +282,17 @@ async function applicationHandler(request: express.Request, response: express.Re
 		return;
 	}
 
-	let questionBranches = await Branches.BranchConfig.loadAllBranches();
+	let questionBranches: (Branches.ApplicationBranch | Branches.ConfirmationBranch)[] = [];
 
 	// Filter to only show application / confirmation branches
 	if (requestType === ApplicationType.Application) {
-		questionBranches = questionBranches.filter(branch => branch.type === "Application");
+		questionBranches = await Branches.BranchConfig.getOpenBranches<Branches.ApplicationBranch>("Application");
 	}
 	// Additionally selectively allow confirmation branches based on what the user applied as
 	else if (requestType === ApplicationType.Confirmation) {
-		questionBranches = questionBranches.filter(branch => branch.type === "Confirmation");
+		questionBranches = await Branches.getOpenConfirmationBranches(user);
 
-		let appliedBranch = questionBranches.find(branch => branch.name === user.applicationBranch) as Branches.ApplicationBranch | undefined;
+		let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
 		if (appliedBranch) {
 			questionBranches = questionBranches.filter(branch => appliedBranch!.confirmationBranches.indexOf(branch.name) !== -1);
 		}

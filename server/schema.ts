@@ -123,6 +123,12 @@ export interface IUser {
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
 
+	confirmationDeadlines: {
+		name: string;
+		open: Date;
+		close: Date;
+	}[];
+
 	confirmationBranch: string;
 	confirmationData: IFormItem[];
 	confirmationStartTime?: Date;
@@ -176,6 +182,12 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applicationData: [mongoose.Schema.Types.Mixed],
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
+
+	confirmationDeadlines: [{
+		name: String,
+		open: Date,
+		close: Date
+	}],
 
 	confirmationBranch: String,
 	confirmationData: [mongoose.Schema.Types.Mixed],

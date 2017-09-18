@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as ajv from "ajv";
-import { QuestionBranchConfig, QuestionBranchSettings } from "./schema";
+import * as moment from "moment-timezone";
+import { QuestionBranchConfig, QuestionBranchSettings, IUser } from "./schema";
 import { config, readFileAsync, renderMarkdown } from "./common";
 import { QuestionBranches, Questions, TextBlocks } from "./config/questions.schema";
 
@@ -197,4 +198,46 @@ export class BranchConfig {
 
 		return instance;
 	}
+
+	public static async getOpenBranches<T extends TimedBranch>(type: keyof QuestionBranchTypes): Promise<T[]> {
+		let branches: TimedBranch[];
+		switch (type) {
+		case "Application":
+			branches = (await this.loadAllBranches(type)) as ApplicationBranch[];
+			break;
+		case "Confirmation":
+			branches = (await this.loadAllBranches(type)) as ConfirmationBranch[];
+			break;
+		default:
+			branches = [];
+			break;
+		}
+		return branches.filter(b => moment().isBetween(b.open, b.close)) as T[];
+	}
+}
+
+// TODO move this to the user model?
+export async function getOpenConfirmationBranches(user: IUser): Promise<ConfirmationBranch[]> {
+	interface DeadlineMap {
+		[name: string]: {
+			name: string;
+			open: Date;
+			close: Date;
+		};
+	}
+	let deadlines = user.confirmationDeadlines.reduce((map, data) => {
+		map[data.name] = data;
+		return map;
+	}, {} as DeadlineMap);
+
+	let branches = await (BranchConfig.loadAllBranches("Confirmation")) as ConfirmationBranch[];
+
+	let now = moment();
+
+	return branches.filter(b => {
+			if (deadlines[b.name]) {
+					return now.isBetween(deadlines[b.name].open, deadlines[b.name].close);
+			}
+			return now.isBetween(b.open, b.close);
+	});
 }

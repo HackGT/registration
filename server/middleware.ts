@@ -4,6 +4,7 @@ import * as path from "path";
 import * as os from "os";
 
 import { config, getSetting, readFileAsync, STATIC_ROOT } from "./common";
+import { getOpenConfirmationBranches, BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
 import { IUser } from "./schema";
 
 //
@@ -113,25 +114,26 @@ export enum ApplicationType {
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let openDate: moment.Moment;
-	let closeDate: moment.Moment;
+	let openBranches: (ApplicationBranch | ConfirmationBranch)[];
 	if (requestType === ApplicationType.Application) {
-		openDate = moment(await getSetting<Date>("applicationOpen"));
-		closeDate = moment(await getSetting<Date>("applicationClose"));
+		openBranches = await BranchConfig.getOpenBranches<ApplicationBranch>("Application");
 	}
 	else {
-		openDate = moment(await getSetting<Date>("confirmationOpen"));
-		closeDate = moment(await getSetting<Date>("confirmationClose"));
+		openBranches = await getOpenConfirmationBranches(request.user as IUser);
 	}
 
-	if (moment().isBetween(openDate, closeDate)) {
+	if (openBranches.length > 0) {
 		next();
 		return;
 	}
 
+	// TODO reimplement open and close times
+	/*
 	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
+	*/
 	interface IClosedTemplate extends ICommonTemplate {
 		type: string;
+		/*
 		open: {
 			time: string;
 			verb: string;
@@ -140,6 +142,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 			time: string;
 			verb: string;
 		};
+		*/
 		contactEmail: string;
 	}
 	let template = Handlebars.compile(await readFileAsync(path.resolve(STATIC_ROOT, "closed.html")));
@@ -153,6 +156,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 		},
 
 		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",
+		/*
 		open: {
 			time: openDate.tz(moment.tz.guess()).format(TIME_FORMAT),
 			verb: moment().isBefore(openDate) ? "will open" : "opened"
@@ -161,6 +165,7 @@ export async function timeLimited(request: express.Request, response: express.Re
 			time: closeDate.tz(moment.tz.guess()).format(TIME_FORMAT),
 			verb: moment().isBefore(closeDate) ? "will close" : "closed"
 		},
+		*/
 		contactEmail: emailParsed ? emailParsed[1] : config.email.from
 	};
 	response.send(template(templateData));

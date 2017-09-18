@@ -36,16 +36,25 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 
 let applicationTimeRestriction: express.RequestHandler = async (request, response, next) => {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
-
-	let openDate: moment.Moment;
-	let closeDate: moment.Moment;
-	if (requestType === ApplicationType.Application) {
-		openDate = moment(await getSetting<Date>("applicationOpen"));
-		closeDate = moment(await getSetting<Date>("applicationClose"));
+	let branchName = request.params.branch as string; // TODO this might not match
+	let branch = (await Branches.BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (Branches.ApplicationBranch | Branches.ConfirmationBranch);
+	if (!branch) {
+		response.status(400).json({
+			"error": "Invalid application branch"
+		});
+		return;
 	}
-	else {
-		openDate = moment(await getSetting<Date>("confirmationOpen"));
-		closeDate = moment(await getSetting<Date>("confirmationClose"));
+
+	let user = request.user as IUserMongoose;
+
+	let openDate = branch.open;
+	let closeDate = branch.close;
+	if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
+		let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
+		if (times) {
+			openDate = times.open;
+			closeDate = times.close;
+		}
 	}
 
 	if (moment().isBetween(openDate, closeDate) || request.user.isAdmin) {
@@ -84,6 +93,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		return;
 	}
 
+	// TODO embed branchname in the form so we don't have to do this
 	let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
 	if (!questionBranch) {
 		response.status(400).json({
@@ -285,6 +295,7 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 	else if (status === "accepted") {
 		user.accepted = true;
+		// TODO copy confirmation deadlines to user object (for rolling deadlines)
 	}
 
 	try {
