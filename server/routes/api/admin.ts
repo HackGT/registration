@@ -1,8 +1,11 @@
 import * as express from "express";
 
 import {
-	isAdmin, formatSize
+	formatSize
 } from "../../common";
+import {
+	isAdmin
+} from "../../middleware";
 import {
 	User, Team
 } from "../../schema";

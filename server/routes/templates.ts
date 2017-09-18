@@ -7,10 +7,12 @@ import * as bowser from "bowser";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
-	authenticateWithRedirect,
-	timeLimited, ApplicationType,
 	config, getSetting, renderMarkdown
 } from "../common";
+import {
+	authenticateWithRedirect,
+	timeLimited, ApplicationType
+} from "../middleware";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,

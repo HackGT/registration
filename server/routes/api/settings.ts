@@ -1,8 +1,11 @@
 import * as express from "express";
 
 import {
-	uploadHandler, isAdmin, getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
+	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
 } from "../../common";
+import {
+	isAdmin, uploadHandler
+} from "../../middleware";
 import * as Branches from "../../branch";
 
 setDefaultSettings().catch(err => {

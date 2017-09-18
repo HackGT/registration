@@ -6,12 +6,14 @@ import * as moment from "moment-timezone";
 
 import {
 	STORAGE_ENGINE,
-	formatSize, MAX_FILE_SIZE,
-	postParser, uploadHandler, isAdmin, isUserOrAdmin,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
-	ApplicationType,
-	trackEvent
+	formatSize,
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync
 } from "../../common";
+import {
+	MAX_FILE_SIZE, postParser, uploadHandler,
+	isAdmin, isUserOrAdmin, ApplicationType,
+	trackEvent
+} from "../../middleware";
 import {
 	IFormItem,
 	IUserMongoose, User,

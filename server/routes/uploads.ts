@@ -1,6 +1,7 @@
 import * as express from "express";
 
-import { isAdmin, STORAGE_ENGINE } from "../common";
+import { STORAGE_ENGINE } from "../common";
+import { isAdmin } from "../middleware";
 
 export let uploadsRoutes = express.Router();
 

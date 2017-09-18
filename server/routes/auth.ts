@@ -10,8 +10,11 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, postParser, renderEmailHTML, renderEmailText, sendMailAsync, trackEvent
+	config, mongoose, COOKIE_OPTIONS, pbkdf2Async, renderEmailHTML, renderEmailText, sendMailAsync
 } from "../common";
+import {
+	postParser, trackEvent
+} from "../middleware";
 import {
 	IUser, IUserMongoose, User
 } from "../schema";
