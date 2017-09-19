@@ -434,7 +434,10 @@ userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void
 			"error": "An error occurred while exporting data"
 		});
 	}
-});
+}
+
+userRoutes.route("/export").get(isAdmin, exportFunction);
+userRoutes.route("/export/:exportKey").get(hasProperExportKey, exportFunction);
 
 async function removeUserFromAllTeams(user: IUserMongoose): Promise<boolean> {
 	if (!user.teamId) {
