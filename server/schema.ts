@@ -254,6 +254,7 @@ export interface ICommonTemplate {
 	settings: {
 		teamsEnabled: boolean;
 		qrEnabled: boolean;
+		exportKey: string;
 	};
 }
 export interface IIndexTemplate extends ICommonTemplate {

@@ -467,6 +467,9 @@ settingsUpdateButton.addEventListener("click", e => {
 	let qrEnabledData = new FormData();
 	qrEnabledData.append("enabled", (document.getElementById("qr-enabled") as HTMLInputElement).checked ? "true" : "false");
 
+	let exportKeyData = new FormData();
+	exportKeyData.append("key", (document.getElementById("export-key") as HTMLInputElement).value);
+
 	let adminEmailData = new FormData();
 	adminEmailData.append("adminString", (document.getElementById("admin-emails") as HTMLInputElement).value);
 	adminEmailData.append("addAdmins", (document.getElementById("add-admins") as HTMLInputElement).checked ? "true" : "false");
@@ -521,6 +524,11 @@ settingsUpdateButton.addEventListener("click", e => {
 		return fetch("/api/settings/qr_enabled", {
 			...defaultOptions,
 			body: qrEnabledData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/export_key", {
+			...defaultOptions,
+			body: exportKeyData
 		});
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/admin_emails", {

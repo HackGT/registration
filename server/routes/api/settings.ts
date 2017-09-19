@@ -70,7 +70,31 @@ settingsRoutes.route("/qr_enabled")
 		catch (err) {
 			console.error(err);
 			response.status(500).json({
-				"error": "An error occurred while enabling or disabling teams"
+				"error": "An error occurred while enabling or disabling qr codes"
+			});
+		}
+	});
+
+settingsRoutes.route("/export_key")
+	.get(async (request, response) => {
+		let key = await getSetting<string>("exportKey");
+		response.json({
+			"exportKey": key
+		});
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let rawKey = request.body.key;
+
+		try {
+			await updateSetting<string>("exportKey", rawKey);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting the export key"
 			});
 		}
 	});
