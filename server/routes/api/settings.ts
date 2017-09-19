@@ -76,7 +76,7 @@ settingsRoutes.route("/qr_enabled")
 	});
 
 settingsRoutes.route("/export_key")
-	.get(async (request, response) => {
+	.get(isAdmin, async (request, response) => {
 		let key = await getSetting<string>("exportKey");
 		response.json({
 			"exportKey": key
