@@ -476,15 +476,17 @@ settingsUpdateButton.addEventListener("click", e => {
 				role: string;
 				open?: Date;
 				close?: Date;
+				usesRollingDeadline?: boolean;
 				confirmationBranches?: string[];
 		} = {role: branchRole};
-		if (branchRole !== "noop") {
+		// TODO this should probably be typed (not just strings)
+		if (branchRole !== "Noop") {
 				let openInputElem = branchRoles[i].querySelector("input.openTime") as HTMLInputElement;
 				let closeInputElem = branchRoles[i].querySelector("input.closeTime") as HTMLInputElement;
 				branchData.open = openInputElem ? new Date(openInputElem.value) : new Date();
 				branchData.close = closeInputElem ? new Date(closeInputElem.value) : new Date();
 		}
-		if (branchRole !== "application") {
+		if (branchRole === "Application") {
 			let checkboxes = branchRoles[i].querySelectorAll("fieldset.availableConfirmationBranches input") as NodeListOf<HTMLInputElement>;
 			let allowedConfirmationBranches: string[] = [];
 			for (let j = 0; j < checkboxes.length; j++) {
@@ -493,6 +495,9 @@ settingsUpdateButton.addEventListener("click", e => {
 				}
 			}
 			branchData.confirmationBranches = allowedConfirmationBranches;
+		}
+		if (branchRole === "Confirmation") {
+			branchData.usesRollingDeadline = (branchRoles[i].querySelectorAll("input.usesRollingDeadline") as NodeListOf<HTMLInputElement>)[0].checked;
 		}
 		branchRoleData.append(branchName, JSON.stringify(branchData));
 	}

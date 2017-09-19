@@ -295,7 +295,10 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 	else if (status === "accepted") {
 		user.accepted = true;
-		// TODO copy confirmation deadlines to user object (for rolling deadlines)
+		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
+				.filter(c => c.usesRollingDeadline)
+				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
 	}
 
 	try {

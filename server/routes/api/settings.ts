@@ -110,6 +110,7 @@ settingsRoutes.route("/branch_roles")
 							break;
 						}
 				}
+
 				// Set open/close times (if not noop)
 				if (branch instanceof Branches.ApplicationBranch || branch instanceof Branches.ConfirmationBranch) {
 					branch.open = branchData.open ? new Date(branchData.open) : new Date();
@@ -119,6 +120,11 @@ settingsRoutes.route("/branch_roles")
 				if (branch instanceof Branches.ApplicationBranch) {
 					branch.confirmationBranches = branchData.confirmationBranches || [];
 				}
+				// Set rolling deadline flag (if confirmation branch)
+				if (branch instanceof Branches.ConfirmationBranch) {
+					branch.usesRollingDeadline = branchData.usesRollingDeadline || false;
+				}
+
 				await branch.save();
 			}
 			response.json({

@@ -17,8 +17,7 @@ import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
-	ApplicationToConfirmationMap
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
 } from "../schema";
 import * as Branches from "../branch";
 
@@ -328,6 +327,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		return;
 	}
 
+	// Redirect directly to branch if there is an existing application or confirmation
 	let branchName = request.params.branch as string;
 	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
@@ -337,7 +337,9 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 		return;
 	}
-	let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
+
+	// Redirect to confirmation selection screen if no match is found
+	let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
 	allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
 	if (requestType === ApplicationType.Confirmation && allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
 		response.redirect("/confirm");
@@ -507,7 +509,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					return {
 						name: branch.name,
 						open: branch.open.toISOString(),
-						close: branch.close.toISOString()
+						close: branch.close.toISOString(),
+						usesRollingDeadline: branch.usesRollingDeadline,
+						usesRollingDeadlineChecked: branch.usesRollingDeadline ? "checked" : ""
 					};
 				})
 			}

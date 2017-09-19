@@ -220,6 +220,7 @@ export interface QuestionBranchSettings {
 	open?: Date; // Used by all except noop
 	close?: Date; // Used by all except noop
 	confirmationBranches?: string[]; // Used by application branch
+	usesRollingDeadline?: boolean; // Used by confirmation branch
 }
 export interface IQuestionBranchConfig {
 	_id: mongoose.Types.ObjectId;
@@ -240,7 +241,8 @@ export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose
 	settings: {
 		open: Date,
 		close: Date,
-		confirmationBranches: [String]
+		confirmationBranches: [String],
+		usesRollingDeadline: Boolean
 	},
 	location: String
 }));

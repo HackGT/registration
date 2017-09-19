@@ -151,6 +151,20 @@ export class ApplicationBranch extends TimedBranch {
 
 export class ConfirmationBranch extends TimedBranch {
 	public readonly type: keyof QuestionBranchTypes = "Confirmation";
+
+	public usesRollingDeadline: boolean;
+
+	protected async loadSettings(): Promise<void> {
+		await super.loadSettings();
+		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
+		this.usesRollingDeadline = branchConfig && branchConfig.settings && branchConfig.settings.usesRollingDeadline || false;
+	}
+	protected serializeSettings(): QuestionBranchSettings {
+		return {
+			...super.serializeSettings(),
+			usesRollingDeadline: this.usesRollingDeadline
+		};
+	}
 }
 
 export class BranchConfig {

@@ -252,8 +252,10 @@
 								<fieldset>
 									<label for="{{removeSpaces this.name}}-open">Open</label>
 									<input type="datetime-local" id="{{removeSpaces this.name}}-open" class="openTime" data-raw-value="{{this.open}}"/>
-									<label for="{{removeSpaces this.name}}-close">TODO Current Close (rolling)</label>
+									<label for="{{removeSpaces this.name}}-close">Close</label>
 									<input type="datetime-local" id="{{removeSpaces this.name}}-close" class="closeTime" data-raw-value="{{this.close}}"/>
+									<input type="checkbox" id="{{removeSpaces this.name}}-usesRolling" class="usesRollingDeadline" {{this.usesRollingDeadlineChecked}}/>
+									<label for="{{removeSpaces this.name}}-usesRolling">Rolling Open/Close Times</label>
 								</fieldset>
 							</div>
 						{{/each}}
