@@ -497,7 +497,8 @@ settingsUpdateButton.addEventListener("click", e => {
 			branchData.confirmationBranches = allowedConfirmationBranches;
 		}
 		if (branchRole === "Confirmation") {
-			branchData.usesRollingDeadline = (branchRoles[i].querySelectorAll("input.usesRollingDeadline") as NodeListOf<HTMLInputElement>)[0].checked;
+			let usesRollingDeadlineCheckbox = (branchRoles[i].querySelectorAll("input.usesRollingDeadline") as NodeListOf<HTMLInputElement>);
+			branchData.usesRollingDeadline = usesRollingDeadlineCheckbox.length > 0 ? usesRollingDeadlineCheckbox[0].checked : false;
 		}
 		branchRoleData.append(branchName, JSON.stringify(branchData));
 	}
