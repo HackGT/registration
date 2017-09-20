@@ -322,6 +322,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 
 	let user = request.user as IUser;
 
+	// Redirect to application screen if confirmation was requested and user has not applied/been accepted
 	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
 		response.redirect("/apply");
 		return;
@@ -339,11 +340,14 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	}
 
 	// Redirect to confirmation selection screen if no match is found
-	let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
-	allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
-	if (requestType === ApplicationType.Confirmation && allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
-		response.redirect("/confirm");
-		return;
+	if (requestType === ApplicationType.Confirmation) {
+		// We know that `user.applicationBranch` exists because the user has applied and was accepted
+		let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
+		allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
+		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
+			response.redirect("/confirm");
+			return;
+		}
 	}
 
 	let questionBranches = await Branches.BranchConfig.loadAllBranches();
