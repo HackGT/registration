@@ -18,6 +18,11 @@ type QuestionBranch = QuestionBranchTypes[keyof QuestionBranchTypes];
 
 const SCHEMA_FILE: string = "./config/questions.schema.json";
 
+interface IQuestionBranchCache {
+	[location: string]: QuestionBranches;
+}
+let QuestionBranchCache: IQuestionBranchCache = {};
+
 export class NoopBranch {
 	public readonly name: string;
 	public readonly type: keyof QuestionBranchTypes = "Noop";
@@ -42,20 +47,24 @@ export class NoopBranch {
 	}
 
 	public async loadFromSchema(): Promise<this> {
-		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(this.location));
-		let schema = JSON.parse(await readFileAsync(path.resolve(__dirname, SCHEMA_FILE)));
+		let questionBranches = QuestionBranchCache[this.location];
+		if (!questionBranches) {
+			QuestionBranchCache[this.location] = JSON.parse(await readFileAsync(this.location));
+			questionBranches = QuestionBranchCache[this.location];
+			let schema = JSON.parse(await readFileAsync(path.resolve(__dirname, SCHEMA_FILE)));
+			let validator = new ajv();
+			let valid = validator.validate(schema, questionBranches);
+			if (!valid) {
+				throw new Error(JSON.stringify(validator.errors));
+			}
+			let branchNames = questionBranches.map(branch => branch.name);
+			if (new Set(branchNames).size !== branchNames.length) {
+				throw new Error("Application branch names are not unique");
+			}
+		}
 
-		let validator = new ajv();
-		let valid = validator.validate(schema, questionBranches);
-		let branchNames = questionBranches.map(branch => branch.name);
 		let questionBranch = questionBranches.find(branch => branch.name === this.name);
-		if (!valid) {
-			throw new Error(JSON.stringify(validator.errors));
-		}
-		else if (new Set(branchNames).size !== branchNames.length) {
-			throw new Error("Application branch names are not unique");
-		}
-		else if (!questionBranch) {
+		if (!questionBranch) {
 			throw new Error(`Branch "${this.name}" not found in schema (${this.location})`);
 		}
 

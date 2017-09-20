@@ -531,13 +531,19 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			maxTeamSize: config.maxTeamSize.toString()
 		}
 	};
+
+	interface IApplicationMap {
+		[key: string]: Branches.ApplicationBranch;
+	}
+	let applicationBranchMap = applicationBranches.reduce((map, b) => {
+		map[b.name] = b;
+		return map;
+	}, {} as IApplicationMap);
+
 	// Generate general statistics
 	(await User.find({ "applied": true })).forEach(async statisticUser => {
-		let appliedBranch: Branches.ApplicationBranch;
-		try {
-			appliedBranch = await Branches.BranchConfig.loadBranchFromDB(statisticUser.applicationBranch) as Branches.ApplicationBranch;
-		}
-		catch {
+		let appliedBranch = applicationBranchMap[statisticUser.applicationBranch];
+		if (!appliedBranch) {
 			return;
 		}
 		statisticUser.applicationData.forEach(question => {

@@ -277,13 +277,13 @@
 							<select id="email-type">
 								<optgroup label="Application branches">
 									{{#each settings.branches.application}}
-										<option value="{{this}}-apply">{{this.name}} Post-Apply Email</option>
-										<option value="{{this}}-accept">{{this.name}} Accepted Email</option>
+										<option value="{{this.name}}-apply">{{this.name}} Post-Apply Email</option>
+										<option value="{{this.name}}-accept">{{this.name}} Accepted Email</option>
 									{{/each}}
 								</optgroup>
 								<optgroup label="Confirmation branches">
 									{{#each settings.branch.confirmation}}
-										<option value="{{this}}-attend">{{this.name}} Post-Confirm Email</option>
+										<option value="{{this.name}}-attend">{{this.name}} Post-Confirm Email</option>
 									{{/each}}
 								</optgroup>
 							</select>
