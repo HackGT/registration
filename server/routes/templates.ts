@@ -7,18 +7,19 @@ import * as bowser from "bowser";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
-	authenticateWithRedirect,
-	timeLimited, ApplicationType,
-	validateSchema, config, getSetting, renderMarkdown
+	config, getSetting, renderMarkdown
 } from "../common";
+import {
+	authenticateWithRedirect,
+	timeLimited, ApplicationType
+} from "../middleware";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
-	ApplicationToConfirmationMap
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
 } from "../schema";
-import {QuestionBranches} from "../config/questions.schema";
+import * as Branches from "../branch";
 
 export let templateRoutes = express.Router();
 
@@ -93,8 +94,8 @@ Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	// Adds the "checked" form attribute if the element was checked previously
 	return selected[index] ? "checked" : "";
 });
-Handlebars.registerHelper("branchChecked", (map: ApplicationToConfirmationMap, applicationBranch: string, confirmationBranch: string) => {
-	return (map && map[applicationBranch] && map[applicationBranch].indexOf(confirmationBranch) !== -1) ? "checked" : "";
+Handlebars.registerHelper("branchChecked", (selectedBranches: string[], confirmationBranch: string) => {
+	return (selectedBranches.indexOf(confirmationBranch) !== -1) ? "checked" : "";
 });
 Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
@@ -123,14 +124,46 @@ Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, 
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
-	let applicationOpenDate = moment(await getSetting<Date>("applicationOpen"));
-	let applicationCloseDate = moment(await getSetting<Date>("applicationClose"));
-	let confirmationOpenDate = moment(await getSetting<Date>("confirmationOpen"));
-	let confirmationCloseDate = moment(await getSetting<Date>("confirmationClose"));
+	let user = request.user as IUser;
+
+	let applyBranches: Branches.ApplicationBranch[];
+	if (user.applicationBranch) {
+		applyBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch))] as Branches.ApplicationBranch[];
+	} else {
+		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
+	}
+	let confirmBranches: Branches.ConfirmationBranch[];
+	if (user.confirmationBranch) {
+		confirmBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.confirmationBranch))] as Branches.ConfirmationBranch[];
+	} else {
+		confirmBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
+	}
+
+	interface IDeadlineMap {
+		[name: string]: {
+			name: string;
+			open: Date;
+			close: Date;
+		};
+	}
+	let confirmTimes = confirmBranches.reduce((map, branch) => {
+		map[branch.name] = branch;
+		return map;
+	}, {} as IDeadlineMap);
+	for (let branchTimes of user.confirmationDeadlines) {
+		confirmTimes[branchTimes.name] = branchTimes;
+	}
+
+	let dateComparator = (a: Date, b: Date) => (a.valueOf() - b.valueOf());
+
+	let applicationOpenDate = moment(applyBranches.map(b => b.open).sort(dateComparator)[0]);
+	let applicationCloseDate = moment(applyBranches.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
+	let confirmationOpenDate = moment(confirmBranches.map(b => b.open).sort(dateComparator)[0]);
+	let confirmationCloseDate = moment(confirmBranches.map(b => b.close).sort(dateComparator)[confirmBranches.length - 1]);
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
-		user: request.user,
+		user,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 			qrEnabled: await getSetting<boolean>("qrEnabled")
@@ -250,27 +283,20 @@ async function applicationHandler(request: express.Request, response: express.Re
 		return;
 	}
 
-	let questionBranches: QuestionBranches;
-	try {
-		// Path is relative to common.ts, where validateSchema function is implemented
-		questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
-	}
-	catch (err) {
-		console.error("validateSchema error:", err);
-		response.status(500).send("An error occurred while generating the application options");
-		return;
-	}
+	let questionBranches: (Branches.ApplicationBranch | Branches.ConfirmationBranch)[] = [];
+
 	// Filter to only show application / confirmation branches
-	let applicationBranches = await getSetting<string[]>(requestType === ApplicationType.Application ? "applicationBranches" : "confirmationBranches");
-	questionBranches = questionBranches.filter(branch => applicationBranches.indexOf(branch.name) !== -1);
+	if (requestType === ApplicationType.Application) {
+		questionBranches = await Branches.BranchConfig.getOpenBranches<Branches.ApplicationBranch>("Application");
+	}
 	// Additionally selectively allow confirmation branches based on what the user applied as
-	if (requestType === ApplicationType.Confirmation) {
-		let applicationToConfirmationMap: ApplicationToConfirmationMap = await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation");
-		let allowedBranches: string[] = [];
-		if (applicationToConfirmationMap && applicationToConfirmationMap[user.applicationBranch]) {
-			allowedBranches = applicationToConfirmationMap[user.applicationBranch];
+	else if (requestType === ApplicationType.Confirmation) {
+		questionBranches = await Branches.getOpenConfirmationBranches(user);
+
+		let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+		if (appliedBranch) {
+			questionBranches = questionBranches.filter(branch => appliedBranch!.confirmationBranches.indexOf(branch.name) !== -1);
 		}
-		questionBranches = questionBranches.filter(branch => allowedBranches.indexOf(branch.name) !== -1);
 	}
 
 	// If there's only one path, redirect to that
@@ -298,11 +324,13 @@ async function applicationBranchHandler(request: express.Request, response: expr
 
 	let user = request.user as IUser;
 
+	// Redirect to application screen if confirmation was requested and user has not applied/been accepted
 	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
 		response.redirect("/apply");
 		return;
 	}
 
+	// Redirect directly to branch if there is an existing application or confirmation
 	let branchName = request.params.branch as string;
 	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
@@ -312,23 +340,20 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 		return;
 	}
-	let allowedBranches = (await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation"))[user.applicationBranch] || [];
-	allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
-	if (requestType === ApplicationType.Confirmation && allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
-		response.redirect("/confirm");
-		return;
+
+	// Redirect to confirmation selection screen if no match is found
+	if (requestType === ApplicationType.Confirmation) {
+		// We know that `user.applicationBranch` exists because the user has applied and was accepted
+		let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
+		allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
+		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
+			response.redirect("/confirm");
+			return;
+		}
 	}
 
-	let questionBranches: QuestionBranches;
-	try {
-		// Path is relative to common.ts, where validateSchema function is implemented
-		questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
-	}
-	catch (err) {
-		console.error("validateSchema error:", err);
-		response.status(500).send("An error occurred while generating the application form");
-		return;
-	}
+	let questionBranches = await Branches.BranchConfig.loadAllBranches();
+
 	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
 	if (!questionBranch) {
 		response.status(400).send("Invalid application branch");
@@ -383,8 +408,8 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		}
 		question["value"] = savedValue ? savedValue.value : "";
 
-		if (questionBranch.text) {
-			let textContent: string = (await Promise.all(questionBranch.text.filter(text => text.for === question.name).map(async text => {
+		if (questionBranch.textBlocks) {
+			let textContent: string = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === question.name).map(async text => {
 				return `<${text.type}>${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
 			}))).join("\n");
 			question["textContent"] = textContent;
@@ -395,8 +420,8 @@ async function applicationBranchHandler(request: express.Request, response: expr
 	// tslint:enable:no-string-literal
 
 	let endText: string = "";
-	if (questionBranch.text) {
-		endText = (await Promise.all(questionBranch.text.filter(text => text.for === "end").map(async text => {
+	if (questionBranch.textBlocks) {
+		endText = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === "end").map(async text => {
 			return `<${text.type} style="font-size: 90%; text-align: center;">${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
 		}))).join("\n");
 	}
@@ -430,12 +455,13 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	if (!user.admin) {
 		response.redirect("/");
 	}
-	let rawQuestions = await validateSchema(config.questions, "./config/questions.schema.json");
 
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
-	let applicationBranches = await getSetting<string[]>("applicationBranches");
-	let confirmationBranches = await getSetting<string[]>("confirmationBranches");
+
+	let noopBranches = (await Branches.BranchConfig.loadAllBranches("Noop")) as Branches.NoopBranch[];
+	let applicationBranches = (await Branches.BranchConfig.loadAllBranches("Application")) as Branches.ApplicationBranch[];
+	let confirmationBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
 
 	let teamIDNameMap: {
 		[id: string]: string;
@@ -447,7 +473,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user,
-		branchNames: rawQuestions.map(branch => branch.name),
+		branchNames: await Branches.BranchConfig.getNames(),
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
@@ -456,38 +482,45 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count(),
 			applicationBranches: await Promise.all(applicationBranches.map(async branch => {
 				return {
-					"name": branch,
-					"count": await User.find({ "applicationBranch": branch }).count()
+					"name": branch.name,
+					"count": await User.find({ "applicationBranch": branch.name }).count()
 				};
 			})),
 			confirmationBranches: await Promise.all(confirmationBranches.map(async branch => {
 				return {
-					"name": branch,
-					"count": await User.find({ "confirmationBranch": branch }).count()
+					"name": branch.name,
+					"count": await User.find({ "confirmationBranch": branch.name }).count()
 				};
 			}))
 		},
 		generalStatistics: [] as StatisticEntry[],
-		metrics: {},
 		settings: {
-			application: {
-				open: await getSetting<string>("applicationOpen"),
-				close: await getSetting<string>("applicationClose")
-			},
-			confirmation: {
-				open: await getSetting<string>("confirmationOpen"),
-				close: await getSetting<string>("confirmationClose")
-			},
 			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
 			qrEnabled,
 			qrEnabledChecked: qrEnabled ? "checked" : "",
-			branchRoles: {
-				"noop": rawQuestions.map(branch => branch.name).filter(branchName => applicationBranches.indexOf(branchName) === -1 && confirmationBranches.indexOf(branchName) === -1),
-				"applicationBranches": applicationBranches,
-				"confirmationBranches": confirmationBranches
-			},
-			applicationToConfirmationMap: await getSetting<ApplicationToConfirmationMap>("applicationToConfirmation")
+			branches: {
+				noop: noopBranches.map(branch => {
+					return { name: branch.name };
+				}),
+				application: applicationBranches.map((branch: Branches.ApplicationBranch) => {
+					return {
+						name: branch.name,
+						open: branch.open.toISOString(),
+						close: branch.close.toISOString(),
+						confirmationBranches: branch.confirmationBranches
+					};
+				}),
+				confirmation: confirmationBranches.map((branch: Branches.ConfirmationBranch) => {
+					return {
+						name: branch.name,
+						open: branch.open.toISOString(),
+						close: branch.close.toISOString(),
+						usesRollingDeadline: branch.usesRollingDeadline,
+						usesRollingDeadlineChecked: branch.usesRollingDeadline ? "checked" : ""
+					};
+				})
+			}
 		},
 		config: {
 			admins: config.admins.join(", "),
@@ -499,12 +532,14 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		}
 	};
 	// Generate general statistics
-	(await User.find({ "applied": true })).forEach(statisticUser => {
-		let appliedBranch = rawQuestions.find(branch => branch.name === statisticUser.applicationBranch);
-		if (!appliedBranch) {
+	(await User.find({ "applied": true })).forEach(async statisticUser => {
+		let appliedBranch: Branches.ApplicationBranch;
+		try {
+			appliedBranch = await Branches.BranchConfig.loadBranchFromDB(statisticUser.applicationBranch) as Branches.ApplicationBranch;
+		}
+		catch {
 			return;
 		}
-		let branchName = statisticUser.applicationBranch;
 		statisticUser.applicationData.forEach(question => {
 			if (question.value === null) {
 				return;
@@ -523,7 +558,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						continue;
 					}
 					let rawQuestionLabel = rawQuestion.label;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestionLabel && entry.branch === branchName);
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestionLabel && entry.branch === appliedBranch.name);
 
 					if (!statisticEntry) {
 						statisticEntry = {
@@ -568,7 +603,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		});
 	});
 	// Order general statistics as they appear in questions.json
-	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
+	templateData.generalStatistics = await Promise.all(templateData.generalStatistics.sort((a, b) => {
 		if (a.branch.toLowerCase() < b.branch.toLowerCase()) {
 			return -1;
 		}
@@ -576,8 +611,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			return 1;
 		}
 		return 0;
-	}).map(statistic => {
-		let questions = rawQuestions.find(branch => branch.name === statistic.branch)!.questions;
+	}).map(async statistic => {
+		let questions = (await Branches.BranchConfig.loadBranchFromDB(statistic.branch)).questions;
 		let question = questions.find(q => q.label === statistic.questionName)!;
 
 		statistic.responses = statistic.responses.sort((a, b) => {
@@ -606,7 +641,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		});
 
 		return statistic;
-	});
+	}));
 
 	response.send(adminTemplate(templateData));
 });

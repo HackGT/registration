@@ -1,11 +1,15 @@
 import * as express from "express";
 
 import {
-	isAdmin, config, validateSchema, formatSize
+	formatSize
 } from "../../common";
+import {
+	isAdmin
+} from "../../middleware";
 import {
 	User, Team
 } from "../../schema";
+import * as Branches from "../../branch";
 
 export let adminRoutes = express.Router();
 
@@ -34,7 +38,7 @@ adminRoutes.route("/users").get(isAdmin, async (request, response) => {
 		filter.applied = true;
 		filter.accepted = true;
 	}
-	let rawQuestions = await validateSchema(config.questions, "./config/questions.schema.json");
+	let branches = await Branches.BranchConfig.loadAllBranches();
 
 	let teamIDNameMap: {
 		[id: string]: string;
@@ -68,7 +72,7 @@ adminRoutes.route("/users").get(isAdmin, async (request, response) => {
 		if (user.attending) {
 			status = `Accepted (${user.applicationBranch}) / Attending (${user.confirmationBranch})`;
 		}
-		let questionsFromBranch = rawQuestions.find(branch => branch.name === user.applicationBranch);
+		let questionsFromBranch = branches.find(branch => branch.name === user.applicationBranch);
 		let applicationDataFormatted: {"label": string; "value": string}[] = [];
 		if (questionsFromBranch) {
 			applicationDataFormatted = user.applicationData.map(question => {

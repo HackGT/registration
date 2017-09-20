@@ -46,7 +46,7 @@ import {authRoutes} from "./routes/auth";
 app.use("/auth", authRoutes);
 
 // Metrics
-import {trackEvent} from "./common";
+import {trackEvent} from "./middleware";
 app.use((request, response, next) => {
 	// Track endpoints without extensions
 	if (path.extname(request.url) === "") {

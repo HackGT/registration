@@ -51,7 +51,7 @@ export namespace IConfig {
 		style: Style;
 		admins: string[];
 		eventName: string;
-		questions: string;
+		questionsLocation: string;
 		storageEngine: {
 			name: string;
 			options: any;
@@ -123,6 +123,12 @@ export interface IUser {
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
 
+	confirmationDeadlines: {
+		name: string;
+		open: Date;
+		close: Date;
+	}[];
+
 	confirmationBranch: string;
 	confirmationData: IFormItem[];
 	confirmationStartTime?: Date;
@@ -177,6 +183,12 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
 
+	confirmationDeadlines: [{
+		name: String,
+		open: Date,
+		close: Date
+	}],
+
 	confirmationBranch: String,
 	confirmationData: [mongoose.Schema.Types.Mixed],
 	confirmationStartTime: Date,
@@ -201,6 +213,38 @@ export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.
 	value: mongoose.Schema.Types.Mixed
 }, {
 	minimize: false
+}));
+
+type QuestionBranchType = "Application" | "Confirmation" | "Noop";
+export interface QuestionBranchSettings {
+	open?: Date; // Used by all except noop
+	close?: Date; // Used by all except noop
+	confirmationBranches?: string[]; // Used by application branch
+	usesRollingDeadline?: boolean; // Used by confirmation branch
+}
+export interface IQuestionBranchConfig {
+	_id: mongoose.Types.ObjectId;
+	name: string;
+	type: QuestionBranchType;
+	settings: QuestionBranchSettings;
+	location: string;
+}
+export type IQuestionBranchConfigMongoose = IQuestionBranchConfig & mongoose.Document;
+
+export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose>("QuestionBranchConfig", new mongoose.Schema({
+	name: {
+		type: String,
+		required: true,
+		unique: true
+	},
+	type: String,
+	settings: {
+		open: Date,
+		close: Date,
+		confirmationBranches: [String],
+		usesRollingDeadline: Boolean
+	},
+	location: String
 }));
 
 // Handlebars templates
@@ -274,26 +318,25 @@ export interface IAdminTemplate extends ICommonTemplate {
 		}[];
 	};
 	generalStatistics: StatisticEntry[];
-	metrics: {};
 	settings: {
-		application: {
-			open: string;
-			close: string;
-		};
-		confirmation: {
-			open: string;
-			close: string;
-		};
 		teamsEnabled: boolean;
 		teamsEnabledChecked: string;
 		qrEnabled: boolean;
 		qrEnabledChecked: string;
-		branchRoles: {
-			noop: string[];
-			applicationBranches: string[];
-			confirmationBranches: string[];
+		branches: {
+			noop: {
+				name: string;
+			}[];
+			application: {
+				open: string;
+				close: string;
+				confirmationBranches: string[];
+			}[];
+			confirmation: {
+				open: string;
+				close: string;
+			}[];
 		};
-		applicationToConfirmationMap: ApplicationToConfirmationMap;
 	};
 	config: {
 		admins: string;
@@ -321,6 +364,7 @@ export interface HackGTMetrics {
 	hackgtmetricsversion: number;
 }
 
+// TODO remove this? deprecated?
 export interface ApplicationToConfirmationMap {
 	[applicationBranch: string]: string[];
 }

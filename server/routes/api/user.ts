@@ -6,19 +6,20 @@ import * as moment from "moment-timezone";
 
 import {
 	STORAGE_ENGINE,
-	formatSize, MAX_FILE_SIZE,
-	postParser, uploadHandler, isAdmin, isUserOrAdmin,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync,
-	ApplicationType,
-	validateSchema,
-	trackEvent
+	formatSize,
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync
 } from "../../common";
+import {
+	MAX_FILE_SIZE, postParser, uploadHandler,
+	isAdmin, isUserOrAdmin, ApplicationType,
+	trackEvent
+} from "../../middleware";
 import {
 	IFormItem,
 	IUserMongoose, User,
 	ITeamMongoose, Team
 } from "../../schema";
-import {QuestionBranches} from "../../config/questions.schema";
+import * as Branches from "../../branch";
 
 export let userRoutes = express.Router({ "mergeParams": true });
 
@@ -35,16 +36,25 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 
 let applicationTimeRestriction: express.RequestHandler = async (request, response, next) => {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
-
-	let openDate: moment.Moment;
-	let closeDate: moment.Moment;
-	if (requestType === ApplicationType.Application) {
-		openDate = moment(await getSetting<Date>("applicationOpen"));
-		closeDate = moment(await getSetting<Date>("applicationClose"));
+	let branchName = request.params.branch as string;
+	let branch = (await Branches.BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (Branches.ApplicationBranch | Branches.ConfirmationBranch);
+	if (!branch) {
+		response.status(400).json({
+			"error": "Invalid application branch"
+		});
+		return;
 	}
-	else {
-		openDate = moment(await getSetting<Date>("confirmationOpen"));
-		closeDate = moment(await getSetting<Date>("confirmationClose"));
+
+	let user = request.user as IUserMongoose;
+
+	let openDate = branch.open;
+	let closeDate = branch.close;
+	if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
+		let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
+		if (times) {
+			openDate = times.open;
+			closeDate = times.close;
+		}
 	}
 
 	if (moment().isBetween(openDate, closeDate) || request.user.isAdmin) {
@@ -83,18 +93,8 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		return;
 	}
 
-	let questionBranches: QuestionBranches;
-	try {
-		questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
-	}
-	catch (err) {
-		console.error("validateSchema error:", err);
-		response.status(500).json({
-			"error": "An error occurred while validating question structure"
-		});
-		return;
-	}
-	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	// TODO embed branchname in the form so we don't have to do this
+	let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
 	if (!questionBranch) {
 		response.status(400).json({
 			"error": "Invalid application branch"
@@ -295,6 +295,10 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 	else if (status === "accepted") {
 		user.accepted = true;
+		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
+				.filter(c => c.usesRollingDeadline)
+				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
 	}
 
 	try {
@@ -355,26 +359,13 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 
 userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
 	try {
-		let questionBranches: QuestionBranches;
-		try {
-			questionBranches = await validateSchema(config.questions, "./config/questions.schema.json");
-		}
-		catch (err) {
-			console.error("validateSchema error:", err);
-			response.status(500).json({
-				"error": "An error occurred while validating question structure"
-			});
-			return;
-		}
-
-		let branchNames: string[] = questionBranches.map(branch => branch.name);
 		let archive = archiver("zip", {
 			store: true
 		});
 		response.status(200).type("application/zip");
 		archive.pipe(response);
 
-		for (let branchName of branchNames) {
+		for (let branchName of await Branches.BranchConfig.getNames()) {
 			// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
 			// TODO: Change this to { "accepted": true }
 			let attendingUsers: IUserMongoose[] = await User.find({ "applied": true, "applicationBranch": branchName });
