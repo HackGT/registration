@@ -36,7 +36,7 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 
 let applicationTimeRestriction: express.RequestHandler = async (request, response, next) => {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
-	let branchName = request.params.branch as string; // TODO this might not match
+	let branchName = request.params.branch as string;
 	let branch = (await Branches.BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (Branches.ApplicationBranch | Branches.ConfirmationBranch);
 	if (!branch) {
 		response.status(400).json({

@@ -453,9 +453,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
 
-	// TODO convert this to use class based branches
-	let applicationBranches = await getSetting<string[]>("applicationBranches");
-	let confirmationBranches = await getSetting<string[]>("confirmationBranches");
+	let noopBranches = (await Branches.BranchConfig.loadAllBranches("Noop")) as Branches.NoopBranch[];
+	let applicationBranches = (await Branches.BranchConfig.loadAllBranches("Application")) as Branches.ApplicationBranch[];
+	let confirmationBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
 
 	let teamIDNameMap: {
 		[id: string]: string;
@@ -476,14 +476,14 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			declinedUsers: await User.find({ "accepted": true, "attending": false }).count(),
 			applicationBranches: await Promise.all(applicationBranches.map(async branch => {
 				return {
-					"name": branch,
-					"count": await User.find({ "applicationBranch": branch }).count()
+					"name": branch.name,
+					"count": await User.find({ "applicationBranch": branch.name }).count()
 				};
 			})),
 			confirmationBranches: await Promise.all(confirmationBranches.map(async branch => {
 				return {
-					"name": branch,
-					"count": await User.find({ "confirmationBranch": branch }).count()
+					"name": branch.name,
+					"count": await User.find({ "confirmationBranch": branch.name }).count()
 				};
 			}))
 		},
@@ -494,10 +494,10 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			qrEnabled,
 			qrEnabledChecked: qrEnabled ? "checked" : "",
 			branches: {
-				noop: (await Branches.BranchConfig.loadAllBranches("Noop")).map(branch => {
+				noop: noopBranches.map(branch => {
 					return { name: branch.name };
 				}),
-				application: (await Branches.BranchConfig.loadAllBranches("Application")).map((branch: Branches.ApplicationBranch) => {
+				application: applicationBranches.map((branch: Branches.ApplicationBranch) => {
 					return {
 						name: branch.name,
 						open: branch.open.toISOString(),
@@ -505,7 +505,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						confirmationBranches: branch.confirmationBranches
 					};
 				}),
-				confirmation: (await Branches.BranchConfig.loadAllBranches("Confirmation")).map((branch: Branches.ConfirmationBranch) => {
+				confirmation: confirmationBranches.map((branch: Branches.ConfirmationBranch) => {
 					return {
 						name: branch.name,
 						open: branch.open.toISOString(),
