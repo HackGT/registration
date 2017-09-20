@@ -166,8 +166,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		user,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled"),
-			exportKey: await getSetting<string>("exportKey")
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 
 		applicationOpen: applicationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
@@ -254,8 +253,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		isCurrentUserTeamLeader,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled"),
-			exportKey: await getSetting<string>("exportKey")
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		}
 	};
 	response.send(teamTemplate(templateData));
@@ -465,8 +463,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		user: request.user,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled"),
-			exportKey: await getSetting<string>("exportKey")
+			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 		branch: questionBranch.name,
 		questionData,

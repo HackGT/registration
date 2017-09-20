@@ -468,7 +468,7 @@ settingsUpdateButton.addEventListener("click", e => {
 	qrEnabledData.append("enabled", (document.getElementById("qr-enabled") as HTMLInputElement).checked ? "true" : "false");
 
 	let exportKeyData = new FormData();
-	exportKeyData.append("key", (document.getElementById("export-key") as HTMLInputElement).value);
+	exportKeyData.append("key", (document.getElementById("export-key") as HTMLInputElement).value.trim());
 
 	let adminEmailData = new FormData();
 	adminEmailData.append("adminString", (document.getElementById("admin-emails") as HTMLInputElement).value);
