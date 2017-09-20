@@ -154,10 +154,12 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		confirmTimes[branchTimes.name] = branchTimes;
 	}
 
-	let applicationOpenDate = moment(applyBranches.map(b => b.open).sort()[0]);
-	let applicationCloseDate = moment(applyBranches.map(b => b.close).sort()[applyBranches.length - 1]);
-	let confirmationOpenDate = moment(confirmBranches.map(b => b.open).sort()[0]);
-	let confirmationCloseDate = moment(confirmBranches.map(b => b.close).sort()[confirmBranches.length - 1]);
+	let dateComparator = (a: Date, b: Date) => (a.valueOf() - b.valueOf());
+
+	let applicationOpenDate = moment(applyBranches.map(b => b.open).sort(dateComparator)[0]);
+	let applicationCloseDate = moment(applyBranches.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
+	let confirmationOpenDate = moment(confirmBranches.map(b => b.open).sort(dateComparator)[0]);
+	let confirmationCloseDate = moment(confirmBranches.map(b => b.close).sort(dateComparator)[confirmBranches.length - 1]);
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
