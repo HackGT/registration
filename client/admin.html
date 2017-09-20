@@ -276,14 +276,14 @@
 							<p>Email content is written in <a href="https://daringfireball.net/projects/markdown/" target="_blank">Markdown</a>. A text version of email content will also be generated automatically. Valid HTML is also valid Markdown and can be useful for more complex layouts or styles. Interpolated variables will have any possible HTML tags or entities escaped. To prevent <code>&lt;style&gt;</code> blocks from affecting the rest of the page, use a browser that supports the <a href="https://caniuse.com/#search=shadow%20dom" target="_blank">Shadow DOM</a> like Chrome, Opera, or Safari.</p>
 							<select id="email-type">
 								<optgroup label="Application branches">
-									{{#each settings.branchRoles.applicationBranches}}
-										<option value="{{this}}-apply">{{this}} Post-Apply Email</option>
-										<option value="{{this}}-accept">{{this}} Accepted Email</option>
+									{{#each settings.branches.application}}
+										<option value="{{this}}-apply">{{this.name}} Post-Apply Email</option>
+										<option value="{{this}}-accept">{{this.name}} Accepted Email</option>
 									{{/each}}
 								</optgroup>
 								<optgroup label="Confirmation branches">
-									{{#each settings.branchRoles.confirmationBranches}}
-										<option value="{{this}}-attend">{{this}} Post-Confirm Email</option>
+									{{#each settings.branch.confirmation}}
+										<option value="{{this}}-attend">{{this.name}} Post-Confirm Email</option>
 									{{/each}}
 								</optgroup>
 							</select>
