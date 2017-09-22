@@ -8,6 +8,7 @@ import * as cookieSignature from "cookie-signature";
 import * as chalk from "chalk";
 import * as morgan from "morgan";
 import * as bodyParser from "body-parser";
+import * as passport from "passport";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import flash = require("connect-flash");
 
@@ -143,6 +144,10 @@ app.use(
 );
 app.use(
 	"/graphiql",
+	passport.authenticate("cas", {
+		failureRedirect: "/access_denied",
+		successRedirect: "/graphiql"
+	}),
 	// TODO: auth with redirect here & pass along userid
 	graphiqlExpress({
 		endpointURL: "/graphql"

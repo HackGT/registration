@@ -26,6 +26,7 @@ import {app} from "../app";
 // No type definitions available yet for these module (or for Google)
 const GitHubStrategy = require("passport-github2").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const CasStrategy = require("passport-cas2").Strategy;
 import {Strategy as FacebookStrategy} from "passport-facebook";
 import {Strategy as LocalStrategy} from "passport-local";
 
@@ -285,6 +286,25 @@ The ${config.eventName} Team.`;
 			done(null, false, { "message": "Incorrect email or password" });
 		}
 	}
+}));
+
+// CAS
+passport.use(new CasStrategy({
+	// TODO: configure in some way
+	casURL: "https://auth.hack.gt/cas"
+}, (username: string, profile: any, done: (error: Error | null, user: IUser | null) => void) => {
+	const user = new User({
+		name: username,
+		email: profile.email
+	});
+
+	user.save()
+		.then(() => {
+			done(null, user);
+		})
+		.catch(err => {
+			done(err, null);
+		});
 }));
 
 app.use(passport.initialize());
