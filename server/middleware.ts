@@ -113,6 +113,7 @@ export function authenticateWithReject(request: express.Request, response: expre
 		next();
 	}
 }
+
 // For directly user facing endpoints
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
@@ -123,6 +124,41 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 		next();
 	}
 }
+
+// To authenticate with CAS
+export function authenticateWithCustomRedirect(redirect: string): (
+	request: express.Request,
+	response: express.Response,
+	next: express.NextFunction
+) => void {
+	return (
+		request: express.Request,
+		response: express.Response,
+		next: express.NextFunction
+	) => {
+		if (!request.isAuthenticated()) {
+			response.redirect(`/cas-login?redirect=${redirect}`);
+		}
+		else {
+			next();
+		}
+	};
+}
+
+// For use with the ?redirect=url query
+export function followRedirectParam(
+	request: express.Request,
+	response: express.Response,
+	next: express.NextFunction
+) {
+	if (request.query.redirect) {
+		response.redirect(request.query.redirect);
+	}
+	else {
+		next();
+	}
+}
+
 import * as Handlebars from "handlebars";
 import { ICommonTemplate } from "./schema";
 export enum ApplicationType {

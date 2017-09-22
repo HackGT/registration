@@ -7,12 +7,8 @@ import * as cookieParser from "cookie-parser";
 import * as cookieSignature from "cookie-signature";
 import * as chalk from "chalk";
 import * as morgan from "morgan";
-import * as bodyParser from "body-parser";
-import * as passport from "passport";
-import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import flash = require("connect-flash");
 
-import * as graphql from "./routes/api/graphql";
 import {
 	// Constants
 	PORT, STATIC_ROOT, VERSION_NUMBER, VERSION_HASH, COOKIE_OPTIONS,
@@ -22,6 +18,8 @@ import {
 import {
 	User
 } from "./schema";
+import { setupRoutes as graphQlRoutes } from "./routes/api/graphql";
+import { followRedirectParam } from "./middleware";
 
 // Set up Express and its middleware
 export let app = express();
@@ -118,7 +116,7 @@ app.use("/uploads", uploadsRoutes);
 
 // User facing routes
 import {templateRoutes} from "./routes/templates";
-app.use("/", templateRoutes);
+app.use("/", followRedirectParam, templateRoutes);
 app.route("/version").get((request, response) => {
 	response.json({
 		"version": VERSION_NUMBER,
@@ -133,26 +131,7 @@ app.use("/css/theme.css", serveStatic(config.style.theme));
 app.use("/favicon.ico", serveStatic(config.style.favicon));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
 
-// Set up graphql and graphiql routes
-app.use(
-	"/graphql",
-	bodyParser.json(),
-	// TODO: auth without redirect here & pass along userid
-	graphqlExpress({
-		schema: graphql.schema
-	})
-);
-app.use(
-	"/graphiql",
-	passport.authenticate("cas", {
-		failureRedirect: "/access_denied",
-		successRedirect: "/graphiql"
-	}),
-	// TODO: auth with redirect here & pass along userid
-	graphiqlExpress({
-		endpointURL: "/graphql"
-	})
-);
+graphQlRoutes(app);
 
 app.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);

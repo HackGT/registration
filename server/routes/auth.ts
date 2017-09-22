@@ -312,6 +312,8 @@ app.use(passport.session());
 
 export let authRoutes = express.Router();
 
+app.use("/cas-login", passport.authenticate("cas", {}));
+
 function getExternalPort(request: express.Request): number {
 	function defaultPort(): number {
 		// Default ports for HTTP and HTTPS

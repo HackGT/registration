@@ -1,12 +1,19 @@
 import * as fs from "fs";
 import * as path from "path";
 
+import * as bodyParser from "body-parser";
+import * as express from "express";
+import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import { makeExecutableSchema } from "graphql-tools";
+import { authenticateWithCustomRedirect } from "../../middleware";
 import { User, IUser, IFormItem } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
 
 const typeDefs = fs.readFileSync(path.resolve(__dirname, "./api.graphql"), "utf8");
 
+/**
+ * GraphQL API
+ */
 const resolvers = {
 	Query: {
 		user: async (
@@ -53,6 +60,31 @@ const resolvers = {
 
 export const schema = makeExecutableSchema({ typeDefs, resolvers });
 
+/**
+ * Routes
+ */
+export function setupRoutes(app: express.Express) {
+	// Set up graphql and graphiql routes
+	app.use(
+		"/graphql",
+		bodyParser.json(),
+		// TODO: auth without redirect here & pass along userid
+		graphqlExpress({
+			schema
+		})
+	);
+	app.use(
+		"/graphiql",
+		authenticateWithCustomRedirect("/graphiql"),
+		graphiqlExpress({
+			endpointURL: "/graphql"
+		})
+	);
+}
+
+/**
+ * Util and Types
+ */
 interface IGraphqlFormItem {
 	name: string;
 	type: string;
