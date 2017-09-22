@@ -292,15 +292,16 @@ export const QuestionsConfig: QuestionBranches = JSON.parse(fs.readFileSync(conf
 export const Branches: string[] = QuestionsConfig.map(branch => branch.name);
 
 export const Tags: {[branch: string]: string[]} = {};
-QuestionsConfig.reduce((obj, branch) => {
-	obj[branch.name] = branch.questions.map(question => question.name);
-	return obj;
-}, Tags);
+QuestionsConfig.forEach(branch => {
+	Tags[branch.name] = branch.questions.map(question => question.name);
+});
 
-export const AllTags: string[] = [];
-Branches.reduce((tags, branch) => {
-	return tags.concat(Tags[branch]);
-}, AllTags);
+export const AllTags: Set<string> = new Set();
+Branches.forEach(branch => {
+	Tags[branch].forEach(tag => {
+		AllTags.add(tag);
+	});
+});
 
 //
 // Database connection
