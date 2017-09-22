@@ -1,9 +1,27 @@
+import * as fs from "fs";
 import * as path from "path";
 import * as ajv from "ajv";
 import * as moment from "moment-timezone";
 import { QuestionBranchConfig, QuestionBranchSettings, IUser } from "./schema";
 import { config, readFileAsync, renderMarkdown } from "./common";
 import { QuestionBranches, Questions, TextBlocks } from "./config/questions.schema";
+
+// TODO: take adjvantage of this frontloading
+export const QuestionsConfig: QuestionBranches = JSON.parse(fs.readFileSync(config.questionsLocation, "utf8"));
+
+export const Branches: string[] = QuestionsConfig.map(branch => branch.name);
+
+export const Tags: {[branch: string]: string[]} = {};
+QuestionsConfig.forEach(branch => {
+	Tags[branch.name] = branch.questions.map(question => question.name);
+});
+
+export const AllTags: Set<string> = new Set();
+Branches.forEach(branch => {
+	Tags[branch].forEach(tag => {
+		AllTags.add(tag);
+	});
+});
 
 // tslint:disable:interface-name variable-name
 interface Labels {
@@ -213,7 +231,7 @@ export class BranchConfig {
 			await this.loadAllBranches();
 			return true;
 		}
-		catch {
+		catch (err) {
 			return false;
 		}
 	}

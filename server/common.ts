@@ -287,22 +287,6 @@ export function formatSize(size: number, binary: boolean = true): string {
 	return formattedSize;
 }
 
-export const QuestionsConfig: QuestionBranches = JSON.parse(fs.readFileSync(config.questions, "utf8"));
-
-export const Branches: string[] = QuestionsConfig.map(branch => branch.name);
-
-export const Tags: {[branch: string]: string[]} = {};
-QuestionsConfig.forEach(branch => {
-	Tags[branch.name] = branch.questions.map(question => question.name);
-});
-
-export const AllTags: Set<string> = new Set();
-Branches.forEach(branch => {
-	Tags[branch].forEach(tag => {
-		AllTags.add(tag);
-	});
-});
-
 //
 // Database connection
 //

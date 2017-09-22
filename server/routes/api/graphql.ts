@@ -3,7 +3,7 @@ import * as path from "path";
 
 import { makeExecutableSchema } from "graphql-tools";
 import { User, IUser, IFormItem } from "../../schema";
-import { Branches, Tags, AllTags } from "../../common";
+import { Branches, Tags, AllTags } from "../../branch";
 
 const typeDefs = fs.readFileSync(path.resolve(__dirname, "./api.graphql"), "utf8");
 
