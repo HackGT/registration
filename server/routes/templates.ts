@@ -292,8 +292,7 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 				questionBranches = [user.applicationBranch.toLowerCase()];
 			}
 			else {
-				const branches = await Branches.BranchConfig
-					.getOpenBranches<Branches.ApplicationBranch>("Application");
+				const branches = await Branches.BranchConfig.getOpenBranches<Branches.ApplicationBranch>("Application");
 				questionBranches = branches.map(branch => branch.name.toLowerCase());
 			}
 		}
@@ -302,21 +301,16 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 			const branches = await Branches.getOpenConfirmationBranches(user);
 			questionBranches = branches.map(branch => branch.name.toLowerCase());
 
-			let appliedBranch = (await Branches.BranchConfig
-				.loadBranchFromDB(user.applicationBranch)) as
-				Branches.ApplicationBranch;
+			let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
 			if (appliedBranch) {
 				questionBranches = questionBranches.filter(branch => {
-					return !!appliedBranch!.confirmationBranches.find(confirm => {
+					return !!appliedBranch.confirmationBranches.find(confirm => {
 						return confirm.toLowerCase() === branch;
 					});
 				});
 			}
 
-			const userConfirm = user.confirmationBranch.toLowerCase();
-			if (user.attending
-				&& questionBranches.indexOf(userConfirm) !== -1
-			) {
+			if (user.attending && questionBranches.indexOf(user.confirmationBranch.toLowerCase()) !== -1) {
 				questionBranches = [user.confirmationBranch.toLowerCase()];
 			}
 		}
