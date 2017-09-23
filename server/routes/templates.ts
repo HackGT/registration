@@ -298,20 +298,21 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 		}
 		// Additionally selectively allow confirmation branches based on what the user applied as
 		else if (requestType === ApplicationType.Confirmation) {
-			const branches = await Branches.getOpenConfirmationBranches(user);
-			questionBranches = branches.map(branch => branch.name.toLowerCase());
-
-			let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
-			if (appliedBranch) {
-				questionBranches = questionBranches.filter(branch => {
-					return !!appliedBranch.confirmationBranches.find(confirm => {
-						return confirm.toLowerCase() === branch;
-					});
-				});
-			}
-
-			if (user.attending && questionBranches.indexOf(user.confirmationBranch.toLowerCase()) !== -1) {
+			if (user.attending) {
 				questionBranches = [user.confirmationBranch.toLowerCase()];
+			}
+			else {
+				const branches = await Branches.getOpenConfirmationBranches(user);
+				questionBranches = branches.map(branch => branch.name.toLowerCase());
+
+				let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+				if (appliedBranch) {
+					questionBranches = questionBranches.filter(branch => {
+						return !!appliedBranch.confirmationBranches.find(confirm => {
+							return confirm.toLowerCase() === branch;
+						});
+					});
+				}
 			}
 		}
 
@@ -371,7 +372,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		// We know that `user.applicationBranch` exists because the user has applied and was accepted
 		let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
 		allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
-		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
+		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
 			response.redirect("/confirm");
 			return;
 		}
