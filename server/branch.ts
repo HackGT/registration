@@ -51,6 +51,7 @@ export class NoopBranch {
 		if (!questionBranches) {
 			QuestionBranchCache[this.location] = JSON.parse(await readFileAsync(this.location));
 			questionBranches = QuestionBranchCache[this.location];
+
 			let schema = JSON.parse(await readFileAsync(path.resolve(__dirname, SCHEMA_FILE)));
 			let validator = new ajv();
 			let valid = validator.validate(schema, questionBranches);
@@ -61,28 +62,43 @@ export class NoopBranch {
 			if (new Set(branchNames).size !== branchNames.length) {
 				throw new Error("Application branch names are not unique");
 			}
+
+			for (let questionBranch of questionBranches) {
+				let renderedQuestions = [];
+				for (let question of questionBranch.questions) {
+					// Render labels
+					question.label = await renderMarkdown(question.label, undefined, true);
+					// Render options (if they exist)
+					let type = question.type;
+					if (type === "checkbox" || type === "radio" || type === "select") {
+						if (question.hasOther) {
+							question.options.push("Other");
+						}
+						let renderedOptions = [];
+						for (let option of question.options) {
+							renderedOptions.push(await renderMarkdown(option, undefined, true));
+						}
+						question.options = renderedOptions;
+					}
+					renderedQuestions.push(question);
+				}
+				questionBranch.questions = renderedQuestions;
+			}
 		}
 
-		let questionBranch = questionBranches.find(branch => branch.name === this.name);
-		if (!questionBranch) {
+		let cachedQuestionBranch = questionBranches.find(branch => branch.name === this.name);
+		if (!cachedQuestionBranch) {
 			throw new Error(`Branch "${this.name}" not found in schema (${this.location})`);
 		}
+		// This is a cheap way to "clone" the object so we don't have to worry about outside code's side effects or any global state
+		cachedQuestionBranch = JSON.parse(JSON.stringify(cachedQuestionBranch)) as typeof cachedQuestionBranch;
 
-		this.textBlocks = questionBranch.text;
-		this.questions = questionBranch.questions;
+		this.textBlocks = cachedQuestionBranch.text;
+		this.questions = cachedQuestionBranch.questions;
 		this.questionLabels = {};
 
 		for (let i = 0; i < this.questions.length; i++) {
-			// Render labels
-			this.questions[i].label = await renderMarkdown(this.questions[i].label, undefined, true);
 			this.questionLabels[this.questions[i].name] = this.questions[i].label;
-			// Render options (if they exist)
-			let type = this.questions[i].type;
-			if (type === "checkbox" || type === "radio" || type === "select") {
-				for (let k = 0; k < this.questions[i].options.length; k++) {
-					this.questions[i].options[k] = await renderMarkdown(this.questions[i].options[k], undefined, true);
-				}
-			}
 		}
 
 		await this.loadSettings();
