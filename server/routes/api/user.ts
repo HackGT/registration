@@ -282,7 +282,7 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findById(request.params.id);
-	let status = request.body.status;
+	let status = request.body.status as ("accepted" | "no-decision");
 
 	if (!user) {
 		response.status(400).json({
@@ -290,16 +290,8 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 		});
 		return;
 	}
-	if (status === "no-decision") {
-		user.accepted = false;
-	}
-	else if (status === "accepted") {
-		user.accepted = true;
-		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
-		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
-				.filter(c => c.usesRollingDeadline)
-				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
-	}
+
+	await updateUserStatus(user, status);
 
 	try {
 		await user.save();
@@ -314,6 +306,19 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 		});
 	}
 });
+
+async function updateUserStatus(user: IUserMongoose, status: ("accepted" | "no-decision")): Promise<void> {
+	if (status === "no-decision") {
+		user.accepted = false;
+		user.confirmationDeadlines = [];
+	} else if (status === "accepted") {
+		user.accepted = true;
+		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
+				.filter(c => c.usesRollingDeadline)
+				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
+	}
+}
 
 userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
 	try {

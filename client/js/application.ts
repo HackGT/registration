@@ -1,3 +1,9 @@
+enum FormType {
+	Application,
+	Confirmation
+}
+let formType = window.location.pathname.match(/^\/apply/) ? FormType.Application : FormType.Confirmation;
+
 let form = document.querySelector("form") as HTMLFormElement | null;
 let submitButton = document.querySelector("form input[type=submit]") as HTMLInputElement;
 submitButton.addEventListener("click", e => {
@@ -12,7 +18,7 @@ submitButton.addEventListener("click", e => {
 		method: "POST",
 		body: new FormData(form)
 	}).then(checkStatus).then(parseJSON).then(async () => {
-		let successMessage: string = window.location.pathname.match(/^\/apply/) ?
+		let successMessage: string = formType === FormType.Application ?
 			"Your application has been saved. Feel free to come back here and edit it at any time." :
 			"Your RSVP has been saved. Feel free to come back here and edit it at any time. We look forward to seeing you!";
 
@@ -34,7 +40,7 @@ if (deleteButton) {
 		deleteButton.disabled = true;
 
 		try {
-			let confirmMessage: string = window.location.pathname.match(/^\/apply/) ?
+			let confirmMessage: string = formType === FormType.Application ?
 				"This will allow you to submit a different application type but your current data will be lost forever." :
 				"Your current data will be lost forever and we'll mark you as not attending. You can still RSVP again if you change your mind.";
 
@@ -57,7 +63,11 @@ if (deleteButton) {
 			credentials: "same-origin",
 			method: "DELETE"
 		}).then(checkStatus).then(parseJSON).then(async () => {
-			window.location.assign("/apply");
+			if (formType === FormType.Application) {
+				window.location.assign("/apply");
+			} else {
+				window.location.assign("/confirm");
+			}
 		}).catch(async (err: Error) => {
 			await sweetAlert("Oh no!", err.message, "error");
 			submitButton.disabled = false;

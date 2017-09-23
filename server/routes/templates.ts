@@ -364,9 +364,6 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
 		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
 			question["multi"] = true;
-			if (question.hasOther) {
-				question.options.push("Other");
-			}
 			question["selected"] = question.options.map(option => {
 				if (savedValue && Array.isArray(savedValue.value)) {
 					return savedValue.value.indexOf(option) !== -1;

@@ -409,18 +409,18 @@ export function sanitize(input: string): string {
 	}
 	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+let renderer = new marked.Renderer();
+let singleLineRenderer = new marked.Renderer();
+singleLineRenderer.link = (href, title, text) => `<a target=\"_blank\" href=\"${href}\" title=\"${title || ''}\">${text}</a>`;
+singleLineRenderer.paragraph = (text) => text;
 export async function renderMarkdown(markdown: string, options?: MarkedOptions, singleLine: boolean = false): Promise<string> {
+	let r = singleLine ? singleLineRenderer : renderer;
 	return new Promise<string>((resolve, reject) => {
-		marked(markdown, { sanitize: false, smartypants: true, ...options }, (err: Error | null, content: string) => {
+		marked(markdown, { sanitize: false, smartypants: true, renderer: r, ...options }, (err: Error | null, content: string) => {
 			if (err) {
 				reject(err);
 				return;
-			}
-			if (singleLine) {
-				// Open links in a new tab
-				content = content.replace(/<a /g, `<a target="_blank" `);
-				// Remove <p></p> wrapper
-				content = content.substring(3, content.length - 5);
 			}
 			resolve(content);
 		});
