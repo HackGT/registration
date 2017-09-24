@@ -114,12 +114,20 @@ export enum ApplicationType {
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
+	let user = request.user as IUser;
+
 	let openBranches: (ApplicationBranch | ConfirmationBranch)[];
 	if (requestType === ApplicationType.Application) {
 		openBranches = await BranchConfig.getOpenBranches<ApplicationBranch>("Application");
+		if (user.applied) {
+			openBranches = openBranches.filter((b => b.name === user.applicationBranch));
+		}
 	}
 	else {
 		openBranches = await getOpenConfirmationBranches(request.user as IUser);
+		if (user.attending) {
+			openBranches = openBranches.filter((b => b.name === user.confirmationBranch));
+		}
 	}
 
 	if (openBranches.length > 0) {

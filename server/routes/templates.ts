@@ -259,61 +259,87 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 	response.send(teamTemplate(templateData));
 });
 
-templateRoutes.route("/apply").get(authenticateWithRedirect, timeLimited, applicationHandler);
-templateRoutes.route("/confirm").get(authenticateWithRedirect, timeLimited, applicationHandler);
+templateRoutes.route("/apply").get(
+	authenticateWithRedirect,
+	timeLimited,
+	applicationHandler(ApplicationType.Application)
+);
+templateRoutes.route("/confirm").get(
+	authenticateWithRedirect,
+	timeLimited,
+	applicationHandler(ApplicationType.Confirmation)
+);
 
-async function applicationHandler(request: express.Request, response: express.Response) {
-	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
-
-	let user = request.user as IUser;
-	if (requestType === ApplicationType.Application && user.accepted) {
-		response.redirect("/confirm");
-		return;
-	}
-	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
-		response.redirect("/apply");
-		return;
-	}
-	if (requestType === ApplicationType.Application && user.applied) {
-		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
-		return;
-	}
-	else if (requestType === ApplicationType.Confirmation && user.attending) {
-		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
-		return;
-	}
-
-	let questionBranches: (Branches.ApplicationBranch | Branches.ConfirmationBranch)[] = [];
-
-	// Filter to only show application / confirmation branches
-	if (requestType === ApplicationType.Application) {
-		questionBranches = await Branches.BranchConfig.getOpenBranches<Branches.ApplicationBranch>("Application");
-	}
-	// Additionally selectively allow confirmation branches based on what the user applied as
-	else if (requestType === ApplicationType.Confirmation) {
-		questionBranches = await Branches.getOpenConfirmationBranches(user);
-
-		let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
-		if (appliedBranch) {
-			questionBranches = questionBranches.filter(branch => appliedBranch!.confirmationBranches.indexOf(branch.name) !== -1);
+function applicationHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
+	return async (request: express.Request, response: express.Response) => {
+		// TODO: fix branch names so they have a machine ID and human label
+		let user = request.user as IUser;
+		if (requestType === ApplicationType.Application && user.accepted) {
+			response.redirect("/confirm");
+			return;
 		}
-	}
+		if (requestType === ApplicationType.Confirmation && !user.accepted) {
+			response.redirect("/apply");
+			return;
+		}
 
-	// If there's only one path, redirect to that
-	if (questionBranches.length === 1) {
-		response.redirect(`/${requestType === ApplicationType.Application ? "apply" : "confirm"}/${encodeURIComponent(questionBranches[0].name.toLowerCase())}`);
-		return;
-	}
-	let templateData: IRegisterBranchChoiceTemplate = {
-		siteTitle: config.eventName,
-		user,
-		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled")
-		},
-		branches: questionBranches.map(branch => branch.name)
+		let questionBranches: string[] = [];
+
+		// Filter to only show application / confirmation branches
+		// NOTE: this assumes the user is still able to apply as this type at this point
+		if (requestType === ApplicationType.Application) {
+			if (user.applied) {
+				questionBranches = [user.applicationBranch.toLowerCase()];
+			}
+			else {
+				const branches = await Branches.BranchConfig.getOpenBranches<Branches.ApplicationBranch>("Application");
+				questionBranches = branches.map(branch => branch.name.toLowerCase());
+			}
+		}
+		// Additionally selectively allow confirmation branches based on what the user applied as
+		else if (requestType === ApplicationType.Confirmation) {
+			if (user.attending) {
+				questionBranches = [user.confirmationBranch.toLowerCase()];
+			}
+			else {
+				const branches = await Branches.getOpenConfirmationBranches(user);
+				questionBranches = branches.map(branch => branch.name.toLowerCase());
+
+				let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+				if (appliedBranch) {
+					questionBranches = questionBranches.filter(branch => {
+						return !!appliedBranch.confirmationBranches.find(confirm => {
+							return confirm.toLowerCase() === branch;
+						});
+					});
+				}
+			}
+		}
+
+		// If there's only one path, redirect to that
+		if (questionBranches.length === 1) {
+			const uriBranch = encodeURIComponent(questionBranches[0]);
+			const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
+			response.redirect(`/${redirPath}/${uriBranch}`);
+			return;
+		}
+		let templateData: IRegisterBranchChoiceTemplate = {
+			siteTitle: config.eventName,
+			user,
+			settings: {
+				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+				qrEnabled: await getSetting<boolean>("qrEnabled")
+			},
+			branches: questionBranches
+		};
+
+		if (requestType === ApplicationType.Application) {
+			response.send(preregisterTemplate(templateData));
+		}
+		else {
+			response.send(preconfirmTemplate(templateData));
+		}
 	};
-	response.send(requestType === ApplicationType.Application ? preregisterTemplate(templateData) : preconfirmTemplate(templateData));
 }
 
 templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
@@ -346,7 +372,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		// We know that `user.applicationBranch` exists because the user has applied and was accepted
 		let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
 		allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
-		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1) {
+		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
 			response.redirect("/confirm");
 			return;
 		}

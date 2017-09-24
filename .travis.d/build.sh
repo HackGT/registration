@@ -58,7 +58,7 @@ git_branch() {
 }
 
 git_branch_id() {
-    git_branch | sed 's/[^0-9a-zA-Z_-.]/-/g'
+    git_branch | sed 's/[^0-9a-zA-Z_.-]/-/g'
 }
 
 publish_project_container() {
