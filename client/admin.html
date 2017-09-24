@@ -335,7 +335,15 @@
 					<div class="row">
 						<div class="col-12">
 							<label>Admins:</label>
-							<textarea disabled>{{config.admins}}</textarea>
+							<ul>
+								{{#each settings.adminEmails}}
+									<li>{{email}}</li>
+								{{/each}}
+							</ul>
+							<label for="admin-emails">Add admins by email; comma separate multiple values:</label>
+							<input id="admin-emails" value="" />
+							<label for="add-admins">Check box to add admins; leave unchecked to remove admins</label>
+							<input id="add-admins" type="checkbox" checked />
 						</div>
 					</div>
 

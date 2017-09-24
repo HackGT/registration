@@ -337,6 +337,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 				close: string;
 			}[];
 		};
+		adminEmails: IUserMongoose[];
 	};
 	config: {
 		admins: string;

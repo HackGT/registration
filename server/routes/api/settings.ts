@@ -7,6 +7,7 @@ import {
 	isAdmin, uploadHandler
 } from "../../middleware";
 import * as Branches from "../../branch";
+import {User} from "../../schema";
 
 setDefaultSettings().catch(err => {
 	throw err;
@@ -72,6 +73,42 @@ settingsRoutes.route("/qr_enabled")
 				"error": "An error occurred while enabling or disabling teams"
 			});
 		}
+	});
+
+settingsRoutes.route("/admin_emails")
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let rawAdminString = request.body.adminString;
+		let addAdmins = request.body.addAdmins === "true";
+
+		if (!rawAdminString) {
+			return response.status(400).json({
+				"error": "Invalid value for admin emails"
+			});
+		}
+
+		let adminEmailArray = rawAdminString.split(",").map((element: string) => {
+			return element.trim();
+		});
+
+		if (adminEmailArray.length === 0) {
+			return response.status(400).json({
+				"error": "Invalid value for enabling or disabling teams"
+			});
+		}
+
+		await User.update({
+			email: adminEmailArray[0]
+		}, {
+			$set: {
+				admin: addAdmins
+			}
+		}, {
+			multi: true
+		});
+
+		return response.json({
+			"success": true
+		});
 	});
 
 settingsRoutes.route("/branch_roles")
