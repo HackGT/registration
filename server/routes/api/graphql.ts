@@ -24,6 +24,31 @@ const resolvers = {
 			const user = await User.findById(args.id);
 			return user? userRecordToGraphql(user) : undefined;
 		},
+		search_user: async (
+			prev: undefined,
+			args: { token: string; search: string; offset: number; n: number },
+		): Promise<IGraphqlUser[]> => {
+			// TODO: auth
+			const results = await User
+				.find({
+					$text: {
+						$search: args.search
+					}
+				}, {
+					score : {
+						$meta: "textScore"
+					}
+				})
+				.sort({
+					score: {
+						$meta: "textScore"
+					}
+				})
+				.skip(args.offset)
+				.limit(args.n);
+
+			return results.map(userRecordToGraphql);
+		},
 		question_branches: () => {
 			return Branches;
 		},
