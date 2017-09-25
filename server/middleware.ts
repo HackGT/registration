@@ -53,6 +53,7 @@ function getMaxFileUploads(): number {
 }
 
 export function isUserOrAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	response.setHeader("Cache-Control", "private");
 	let user = request.user as IUser;
 	if (!request.isAuthenticated()) {
 		response.status(401).json({
@@ -89,6 +90,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 
 // For API endpoints
 export function authenticateWithReject(request: express.Request, response: express.Response, next: express.NextFunction) {
+	response.setHeader("Cache-Control", "no-cache");
 	if (!request.isAuthenticated()) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
@@ -100,6 +102,7 @@ export function authenticateWithReject(request: express.Request, response: expre
 }
 // For directly user facing endpoints
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
+	response.setHeader("Cache-Control", "private");
 	if (!request.isAuthenticated()) {
 		response.redirect("/login");
 	}
