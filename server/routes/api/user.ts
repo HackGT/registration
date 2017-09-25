@@ -362,6 +362,44 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 	}
 });
 
+userRoutes.route("/batch_accept").post(isAdmin, postParser, uploadHandler.any(), async (request, response): Promise<void> => {
+	try {
+		let userIds = request.body.userIds.split(',');
+		let acceptedCount = 0;
+		let notAccepted = [];
+		for (let userId of userIds) {
+			let user;
+			try {
+				user = await User.findById(userId);
+			} catch {
+				notAccepted.push(userId);
+			}
+			if (user && user.applied && !user.accepted) {
+				try {
+					await updateUserStatus(user, "accepted"); // Assume that this succeeds
+					await user.save();
+					acceptedCount += 1;
+				} catch {
+					notAccepted.push(userId);
+				}
+			} else {
+				notAccepted.push(userId);
+			}
+		}
+		response.json({
+			"success": true,
+			"count": acceptedCount,
+			"notAccepted": notAccepted
+		});
+	}
+	catch (err) {
+		console.error(err);
+		response.status(500).json({
+			"error": "An error occurred while batch accepting applicants"
+		});
+	}
+});
+
 userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let archive = archiver("zip", {
