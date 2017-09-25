@@ -70,6 +70,7 @@ export function isUserOrAdmin(request: express.Request, response: express.Respon
 }
 
 export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	response.setHeader("Cache-Control", "private");
 	let user = request.user as IUser;
 	if (!request.isAuthenticated()) {
 		response.status(401).json({
