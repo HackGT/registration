@@ -110,10 +110,14 @@ class S3StorageEngine implements IStorageEngine {
 			})
 		});
 		let s3 = new AWS.S3();
-		return s3.getObject({
+		let stream = s3.getObject({
 			Bucket: this.options.bucket,
 			Key: name
 		}).createReadStream();
+		stream.on("error", err => {
+			throw err;
+		});
+		return stream;
 	}
 }
 
