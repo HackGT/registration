@@ -86,7 +86,7 @@ settingsRoutes.route("/admin_emails")
 			});
 		}
 
-		let adminEmailArray = rawAdminString.split(",").map((element: string) => {
+		let adminEmailArray = rawAdminString.split(/, */).map((element: string) => {
 			return element.trim();
 		});
 
