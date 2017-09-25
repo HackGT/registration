@@ -4,6 +4,7 @@ import * as express from "express";
 import * as serveStatic from "serve-static";
 import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
+import * as cookieSignature from "cookie-signature";
 import * as morgan from "morgan";
 import flash = require("connect-flash");
 
@@ -19,10 +20,23 @@ import {
 
 // Set up Express and its middleware
 export let app = express();
-app.use(morgan("dev"));
+
 app.use(compression());
 let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS);
 app.use(cookieParserInstance);
+morgan.token("sessionid", (request, response) => {
+	const FAILURE_MESSAGE = "Unknown session";
+	if (!request.cookies["connect.sid"]) {
+		return FAILURE_MESSAGE;
+	}
+	let rawID: string = request.cookies["connect.sid"].slice(2);
+	let id = cookieSignature.unsign(rawID, config.secrets.session);
+	if (typeof id === "string") {
+		return id;
+	}
+	return FAILURE_MESSAGE;
+});
+app.use(morgan(":date[iso] :remote-addr :sessionid :method :url :status :response-time ms - :res[content-length]"));
 app.use(flash());
 
 // Throw and show a stack trace on an unhandled Promise rejection instead of logging an unhelpful warning
