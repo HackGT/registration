@@ -19,7 +19,6 @@ import {
 	User
 } from "./schema";
 import { setupRoutes as graphQlRoutes } from "./routes/api/graphql";
-import { followRedirectParam } from "./middleware";
 
 // Set up Express and its middleware
 export let app = express();
@@ -116,7 +115,7 @@ app.use("/uploads", uploadsRoutes);
 
 // User facing routes
 import {templateRoutes} from "./routes/templates";
-app.use("/", followRedirectParam, templateRoutes);
+app.use("/", templateRoutes);
 app.route("/version").get((request, response) => {
 	response.json({
 		"version": VERSION_NUMBER,

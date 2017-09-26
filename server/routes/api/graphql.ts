@@ -5,7 +5,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import { makeExecutableSchema } from "graphql-tools";
-import { authenticateWithCustomRedirect } from "../../middleware";
+import { isAdmin, authenticateWithRedirect } from "../../middleware";
 import { User, IUser, IFormItem } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
 
@@ -18,17 +18,17 @@ const resolvers = {
 	Query: {
 		user: async (
 			prev: undefined,
-			// TODO: replace `id` with `id?`
-			args: { id: string }
+			args: { id?: string },
+			request: express.Request
 		): Promise<IGraphqlUser | undefined> => {
-			const user = await User.findById(args.id);
-			return user? userRecordToGraphql(user) : undefined;
+			const id = args.id || (request.user as IUser)._id;
+			const user = await User.findById(id);
+			return user ? userRecordToGraphql(user) : undefined;
 		},
 		search_user: async (
 			prev: undefined,
-			args: { token: string; search: string; offset: number; n: number },
+			args: { search: string; offset: number; n: number }
 		): Promise<IGraphqlUser[]> => {
-			// TODO: auth
 			const results = await User
 				.find({
 					$text: {
@@ -93,14 +93,18 @@ export function setupRoutes(app: express.Express) {
 	app.use(
 		"/graphql",
 		bodyParser.json(),
-		// TODO: auth without redirect here & pass along userid
-		graphqlExpress({
-			schema
-		})
+		isAdmin,
+		(request, response, next) => {
+			graphqlExpress({
+				schema,
+				context: request
+			})(request, response, next);
+		}
 	);
 	app.use(
 		"/graphiql",
-		authenticateWithCustomRedirect("/graphiql"),
+		authenticateWithRedirect,
+		isAdmin,
 		graphiqlExpress({
 			endpointURL: "/graphql"
 		})
@@ -121,20 +125,28 @@ interface IGraphqlFormItem {
 interface IGraphqlUser {
 	id: string;
 
+	name: string;
+	email: string;
+	email_verified: boolean;
+
 	applied: boolean;
 	accepted: boolean;
 	accepted_and_notified: boolean;
 	attending: boolean;
 
-	applicationBranch: string | undefined;
-	applicationData: IFormItem[] | undefined;
-	applicationStartTime: string | undefined;
-	applicationSubmitTime: string | undefined;
+	confirmation: {
+		type: string;
+		data: IFormItem[];
+		start_time: string | undefined;
+		submit_time: string | undefined;
+	} | undefined;
 
-	confirmationBranch: string | undefined;
-	confirmationData: IFormItem[] | undefined;
-	confirmationStartTime: string | undefined;
-	confirmationSubmitTime: string | undefined;
+	application: {
+		type: string;
+		data: IFormItem[];
+		start_time: string | undefined;
+		submit_time: string | undefined;
+	} | undefined;
 
 	team: {
 		id: string;
@@ -145,24 +157,32 @@ function userRecordToGraphql(user: IUser): IGraphqlUser {
 	return {
 		id: user._id.toHexString(),
 
+		name: user.name,
+		email: user.email,
+		email_verified: !!user.verifiedEmail,
+
 		applied: !!user.applied,
 		accepted: !!user.accepted,
 		accepted_and_notified: !!user.acceptedEmailSent,
 		attending: !!user.attending,
 
-		applicationBranch: user.applicationBranch,
-		applicationData: user.applicationData,
-		applicationStartTime: user.applicationStartTime &&
-			user.applicationStartTime.toDateString(),
-		applicationSubmitTime: user.applicationSubmitTime &&
-			user.applicationSubmitTime.toDateString(),
+		application: user.applied ? {
+			type: user.applicationBranch,
+			data: user.applicationData || [],
+			start_time: user.applicationStartTime &&
+				user.applicationStartTime.toDateString(),
+			submit_time: user.applicationSubmitTime &&
+				user.applicationSubmitTime.toDateString()
+		} : undefined,
 
-		confirmationBranch: user.confirmationBranch,
-		confirmationData: user.confirmationData,
-		confirmationStartTime: user.confirmationStartTime &&
-			user.confirmationStartTime.toDateString(),
-		confirmationSubmitTime: user.confirmationSubmitTime &&
-			user.confirmationSubmitTime.toDateString(),
+		confirmation: user.attending ? {
+			type: user.confirmationBranch,
+			data: user.confirmationData,
+			start_time: user.confirmationStartTime &&
+				user.confirmationStartTime.toDateString(),
+			submit_time: user.confirmationSubmitTime &&
+				user.confirmationSubmitTime.toDateString()
+		} : undefined,
 
 		team: user.teamId && {
 			id: user.teamId.toHexString()

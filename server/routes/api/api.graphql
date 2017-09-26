@@ -9,7 +9,7 @@ type Query {
   # user.
   user(id: ID): User
   # Search through a user's name and email through regex (admin only)
-  search_user(token: ID!, search: String!, offset: Int!, n: Int!): [User]!
+  search_user(search: String!, offset: Int!, n: Int!): [User]!
   # All possible question branches
   question_branches: [String]!
   # All possible question names, or names of question in a branch
@@ -20,6 +20,13 @@ type Query {
 type User {
   # User ID, valid across the entire system
   id: ID!
+
+  # User's full name
+  name: String!
+  # User's email
+  email: String!
+  # If the user's email is a verified email
+  email_verified: Boolean!
 
   # If the user has applied to the event
   applied: Boolean!

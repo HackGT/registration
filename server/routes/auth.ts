@@ -26,7 +26,6 @@ import {app} from "../app";
 // No type definitions available yet for these module (or for Google)
 const GitHubStrategy = require("passport-github2").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const CasStrategy = require("passport-cas2").Strategy;
 import {Strategy as FacebookStrategy} from "passport-facebook";
 import {Strategy as LocalStrategy} from "passport-local";
 
@@ -288,89 +287,10 @@ The ${config.eventName} Team.`;
 	}
 }));
 
-// CAS
-interface ICasProfile {
-	provider: "CAS";
-	id: string;
-	displayName: string;
-	name: {
-		familyName?: string;
-		givenName?: string;
-		middleName?: string;
-	};
-	emails: string[];
-	isfromnewlogin?: string[]; // Boolean
-	authenticationdate?: string[]; // Date
-	authenticationmethod?: string[];
-	successfulauthenticationhandlers?: string[]; // Boolean
-	longtermauthenticationrequesttokenused?: string[]; // Boolean
-	groupmembership?: string[];
-}
-
-passport.use(new CasStrategy({
-	// TODO: configure in some way
-	casURL: "https://auth.hack.gt/cas",
-	passReqToCallback: true
-}, (
-	request: express.Request,
-	username: string,
-	profile: ICasProfile,
-	done: (err: Error | null, user?: IUserMongoose | false, errMessage?: object) => void
-) => {
-	if (profile.emails.length === 0) {
-		return done(null, false, {
-			message: `User ${username} does not have an email!`
-		});
-	}
-	if (!profile.name.givenName || !profile.name.familyName) {
-		return done(null, false, {
-			message: `User ${username} does not have a real name!`
-		});
-	}
-	const email = profile.emails[0];
-	const name = `${profile.name.givenName} ${profile.name.familyName}`;
-
-	const user = new User({
-		email,
-		name,
-		verifiedEmail: true,
-
-		localData: {},
-		githubData: {},
-		googleData: {},
-		facebookData: {},
-
-		applied: false,
-		accepted: false,
-		attending: false,
-		applicationData: [],
-		applicationStartTime: undefined,
-		applicationSubmitTime: undefined,
-
-		admin: profile.groupmembership &&
-			!!profile.groupmembership.find(group => group === "admin")
-	});
-
-	user
-		.save()
-		.then(() => {
-			trackEvent("created account (auth)", request, email);
-			done(null, user);
-		})
-		.catch(err => {
-			done(err);
-		});
-}));
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 export let authRoutes = express.Router();
-
-app.use("/cas-login", passport.authenticate("cas", {
-	failureRedirect: "/login",
-	failureFlash: true
-}));
 
 function getExternalPort(request: express.Request): number {
 	function defaultPort(): number {
