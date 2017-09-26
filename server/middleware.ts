@@ -213,22 +213,12 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 }
 
 export async function hasProperExportKey(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let exportKey = await getSetting<string>("exportKey");
-
-	if (exportKey === "") {
-		// No export key defined
-		response.status(403).json({
-			"error": "Fetching exports by key is not supported - please configure it in registration's admin menu"
-		});
+	if (config.secrets.adminKey === request.params.exportKey) {
+		next();
 	} else {
-		let userKey = request.params.exportKey;
-		if (exportKey === userKey) {
-			next();
-		} else {
-			console.log("Export failed for export key!");
-			response.status(401).json({
-				"error": "Invalid key!"
-			});
-		}
+		console.log("Invalid admin API key.");
+		response.status(401).json({
+			"error": "Invalid key!"
+		});
 	}
 }

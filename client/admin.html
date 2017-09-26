@@ -216,10 +216,6 @@
 							<label for="qr-enabled">Enable check-in QR Codes?</label>
 							<input id="qr-enabled" type="checkbox" {{settings.qrEnabledChecked}} />
 						</div>
-						<div class="col-6">
-							<label for="export-key">Secret key to allow us to retrieve participant CSV with checkin; leave blank for no key</label>
-							<input id="export-key" type="text" value="{{settings.exportKey}}" />
-						</div>
 					</div>
 					<div class="row row-flex">
 						{{#each settings.branches.application}}

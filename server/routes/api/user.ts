@@ -12,7 +12,7 @@ import {
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
 	isAdmin, isUserOrAdmin, ApplicationType,
-	trackEvent
+	trackEvent, hasProperExportKey
 } from "../../middleware";
 import {
 	IFormItem,
@@ -400,7 +400,7 @@ userRoutes.route("/batch_accept").post(isAdmin, postParser, uploadHandler.any(),
 	}
 });
 
-userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void> => {
+async function exportFunction(request: express.Request, response: express.Response): Promise<void> {
 	try {
 		let archive = archiver("zip", {
 			store: true

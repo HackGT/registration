@@ -75,30 +75,6 @@ settingsRoutes.route("/qr_enabled")
 		}
 	});
 
-settingsRoutes.route("/export_key")
-	.get(isAdmin, async (request, response) => {
-		let key = await getSetting<string>("exportKey");
-		response.json({
-			"exportKey": key
-		});
-	})
-	.put(isAdmin, uploadHandler.any(), async (request, response) => {
-		let rawKey = request.body.key;
-
-		try {
-			await updateSetting<string>("exportKey", rawKey);
-			response.json({
-				"success": true
-			});
-		}
-		catch (err) {
-			console.error(err);
-			response.status(500).json({
-				"error": "An error occurred while setting the export key"
-			});
-		}
-	});
-
 settingsRoutes.route("/admin_emails")
 	.put(isAdmin, uploadHandler.any(), async (request, response) => {
 		let rawAdminString = request.body.adminString;
