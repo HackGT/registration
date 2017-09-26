@@ -8,6 +8,7 @@ health:
   path: /version
 
 secrets:
+  - ADMIN_KEY_SECRET
   - SESSION_SECRET
   - EMAIL_USERNAME
   - EMAIL_PASSWORD
