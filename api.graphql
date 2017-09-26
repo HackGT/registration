@@ -8,6 +8,8 @@ type Query {
   # Query. Leave id empty if you'd like to view the currently logged in
   # user.
   user(id: ID): User
+  # All the users in the database, useful for polling for new user information
+  users(last_id: ID, n: Int!): [User!]!
   # Search through a user's name and email through regex (admin only)
   search_user(search: String!, offset: Int!, n: Int!): [User!]!
   # All possible question branches

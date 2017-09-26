@@ -31,6 +31,18 @@ const resolvers: IResolver = {
 			const user = await User.findById(id);
 			return user ? userRecordToGraphql(user) : undefined;
 		},
+		users: async (prev, args) => {
+			const allUsers = await User
+				.find(args.last_id ? {
+					_id: {
+						$gt: args.last_id
+					}
+				} : {}, {
+				})
+				.limit(args.n);
+
+			return allUsers.map(userRecordToGraphql);
+		},
 		search_user: async (prev, args) => {
 			const results = await User
 				.find({
@@ -38,7 +50,7 @@ const resolvers: IResolver = {
 						$search: args.search
 					}
 				}, {
-					score : {
+					score: {
 						$meta: "textScore"
 					}
 				})
