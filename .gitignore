@@ -40,8 +40,12 @@ jspm_packages
 *.js.map
 .vscode/
 uploads/
+
+# Build Artifacts
 server/config/config.json
 server/config/questions\.schema\.d\.ts
+api.graphql.types.ts
+server/routes/api/api.graphql.types.ts
 
 # Editors!
 .nvimlog

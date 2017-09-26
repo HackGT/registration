@@ -8,27 +8,30 @@ import { makeExecutableSchema } from "graphql-tools";
 import { isAdmin, authenticateWithRedirect } from "../../middleware";
 import { User, IUser, IFormItem } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
+import { schema as types } from "./api.graphql.types";
 
-const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphqls"), "utf8");
+const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphql"), "utf8");
+
+type Ctx = express.Request;
+
+interface IResolver {
+	Query: types.Query<Ctx>;
+	User: {
+		question: types.GraphqlField<{name: string}, types.FormItem<Ctx> | undefined, Ctx>;
+	};
+}
 
 /**
  * GraphQL API
  */
-const resolvers = {
+const resolvers: IResolver = {
 	Query: {
-		user: async (
-			prev: undefined,
-			args: { id?: string },
-			request: express.Request
-		): Promise<IGraphqlUser | undefined> => {
+		user: async (prev, args, request) => {
 			const id = args.id || (request.user as IUser)._id;
 			const user = await User.findById(id);
 			return user ? userRecordToGraphql(user) : undefined;
 		},
-		search_user: async (
-			prev: undefined,
-			args: { search: string; offset: number; n: number }
-		): Promise<IGraphqlUser[]> => {
+		search_user: async (prev, args) => {
 			const results = await User
 				.find({
 					$text: {
@@ -52,18 +55,16 @@ const resolvers = {
 		question_branches: () => {
 			return Branches;
 		},
-		question_names: (prev: undefined, args: { branch?: string }) => {
+		question_names: (prev, args) => {
 			if (args.branch) {
 				return Tags[args.branch];
 			}
-			return AllTags;
+			return Array.from(AllTags);
 		}
 	},
 	User: {
-		question: async (
-			prev: IGraphqlUser,
-			args: { name: string }
-		): Promise<IGraphqlFormItem | undefined> => {
+		question: async (prev, args) => {
+			prev = prev as types.User<express.Request>;
 			const user = await User.findById(prev.id);
 			if (!user) return undefined;
 
@@ -72,42 +73,18 @@ const resolvers = {
 			});
 
 			if (found) {
-				if (typeof found.value === "string") {
-					return {
-						name: found.name,
-						type: found.type,
-						value: found.value
-					};
-				}
-				else if (found.value instanceof Array) {
-					return {
-						name: found.name,
-						type: found.type,
-						values: found.value
-					};
-				}
-				// XXX: assume this is a file
-				else if (found.value) {
-					const file = found.value as Express.Multer.File;
-					return {
-						name: found.name,
-						type: found.type,
-						file: {
-							original_name: file.originalname,
-							encoding: file.encoding,
-							mimetype: file.mimetype,
-							path: file.path,
-							size: file.size
-						}
-					};
-				}
+				return recordToFormItem(found);
 			}
 			return undefined;
 		}
 	}
 };
 
-export const schema = makeExecutableSchema({ typeDefs, resolvers });
+export const schema = makeExecutableSchema({
+	typeDefs,
+	// XXX: The types are javascript equivalent, but unreachable from the graphql-tools library
+	resolvers: resolvers as any
+});
 
 /**
  * Routes
@@ -138,52 +115,58 @@ export function setupRoutes(app: express.Express) {
 /**
  * Util and Types
  */
-interface IGraphqlFormItem {
-	name: string;
-	type: string;
-	value?: string;
-	values?: string[];
-	file?: {
-		original_name: string;
-		encoding: string;
-		mimetype: string;
-		path: string;
-		size: number;
-	};
+
+function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
+	if (typeof item.value === "string") {
+		return {
+			name: item.name,
+			type: item.type,
+			value: item.value
+		};
+	}
+	else if (item.value instanceof Array) {
+		return {
+			name: item.name,
+			type: item.type,
+			values: item.value
+		};
+	}
+	// XXX: assume this is a file
+	else {
+		const file = item.value as Express.Multer.File;
+		return {
+			name: item.name,
+			type: item.type,
+			file: {
+				original_name: file.originalname,
+				encoding: file.encoding,
+				mimetype: file.mimetype,
+				path: file.path,
+				size: file.size
+			}
+		};
+	}
 }
 
-interface IGraphqlUser {
-	id: string;
+function userRecordToGraphql(user: IUser): types.User<Ctx> {
+	const application: types.Branch<Ctx> | undefined = user.applied ? {
+			type: user.applicationBranch,
+			data: user.applicationData.map(recordToFormItem),
+			start_time: user.applicationStartTime &&
+				user.applicationStartTime.toDateString(),
+			submit_time: user.applicationSubmitTime &&
+				user.applicationSubmitTime.toDateString()
+	} : undefined;
 
-	name: string;
-	email: string;
-	email_verified: boolean;
+	const confirmation: types.Branch<Ctx> | undefined = user.attending ? {
+		type: user.confirmationBranch,
+		data: user.confirmationData.map(recordToFormItem),
+		start_time: user.confirmationStartTime &&
+			user.confirmationStartTime.toDateString(),
+		submit_time: user.confirmationSubmitTime &&
+			user.confirmationSubmitTime.toDateString()
+	} : undefined;
 
-	applied: boolean;
-	accepted: boolean;
-	accepted_and_notified: boolean;
-	attending: boolean;
-
-	confirmation: {
-		type: string;
-		data: IFormItem[];
-		start_time: string | undefined;
-		submit_time: string | undefined;
-	} | undefined;
-
-	application: {
-		type: string;
-		data: IFormItem[];
-		start_time: string | undefined;
-		submit_time: string | undefined;
-	} | undefined;
-
-	team: {
-		id: string;
-	} | undefined;
-}
-
-function userRecordToGraphql(user: IUser): IGraphqlUser {
 	return {
 		id: user._id.toHexString(),
 
@@ -196,23 +179,8 @@ function userRecordToGraphql(user: IUser): IGraphqlUser {
 		accepted_and_notified: !!user.acceptedEmailSent,
 		attending: !!user.attending,
 
-		application: user.applied ? {
-			type: user.applicationBranch,
-			data: user.applicationData || [],
-			start_time: user.applicationStartTime &&
-				user.applicationStartTime.toDateString(),
-			submit_time: user.applicationSubmitTime &&
-				user.applicationSubmitTime.toDateString()
-		} : undefined,
-
-		confirmation: user.attending ? {
-			type: user.confirmationBranch,
-			data: user.confirmationData,
-			start_time: user.confirmationStartTime &&
-				user.confirmationStartTime.toDateString(),
-			submit_time: user.confirmationSubmitTime &&
-				user.confirmationSubmitTime.toDateString()
-		} : undefined,
+		application,
+		confirmation,
 
 		team: user.teamId && {
 			id: user.teamId.toHexString()
