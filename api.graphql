@@ -9,11 +9,11 @@ type Query {
   # user.
   user(id: ID): User
   # Search through a user's name and email through regex (admin only)
-  search_user(search: String!, offset: Int!, n: Int!): [User]!
+  search_user(search: String!, offset: Int!, n: Int!): [User!]!
   # All possible question branches
-  question_branches: [String]!
+  question_branches: [String!]!
   # All possible question names, or names of question in a branch
-  question_names(branch: String): [String]
+  question_names(branch: String): [String!]
 }
 
 # Registration info about the user
@@ -59,7 +59,7 @@ type Branch {
   # when going through the form?
   type: String!
   # A key-value list of questions and answers from the confirmation application
-  data: [FormItem]!
+  data: [FormItem!]!
   start_time: String
   submit_time: String
 }
@@ -69,11 +69,26 @@ type Team {
   id: ID!
 }
 
+# Entries to various forms (application, confirmation, etc.)
 type FormItem {
   name: String!
   type: String!
   value: String
-  values: [String]
-  file: String
+  values: [String!]
+  file: File
+}
+
+# Uploaded file
+type File {
+  # The original name of the uploaded file
+  original_name: String!
+  # The file's encoding
+  encoding: String!
+  # The file's mimetype
+  mimetype: String!
+  # The path to the file in S3
+  path: String!
+  # The size of the file in bytes
+  size: Int!
 }
 

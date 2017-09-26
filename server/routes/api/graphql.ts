@@ -9,7 +9,7 @@ import { isAdmin, authenticateWithRedirect } from "../../middleware";
 import { User, IUser, IFormItem } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
 
-const typeDefs = fs.readFileSync(path.resolve(__dirname, "./api.graphql"), "utf8");
+const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphqls"), "utf8");
 
 /**
  * GraphQL API
@@ -71,12 +71,36 @@ const resolvers = {
 				return question.name === args.name;
 			});
 
-			if (found && found.value instanceof String) {
-				return {
-					name: found.name,
-					type: found.type,
-					value: found.value
-				};
+			if (found) {
+				if (typeof found.value === "string") {
+					return {
+						name: found.name,
+						type: found.type,
+						value: found.value
+					};
+				}
+				else if (found.value instanceof Array) {
+					return {
+						name: found.name,
+						type: found.type,
+						values: found.value
+					};
+				}
+				// XXX: assume this is a file
+				else if (found.value) {
+					const file = found.value as Express.Multer.File;
+					return {
+						name: found.name,
+						type: found.type,
+						file: {
+							original_name: file.originalname,
+							encoding: file.encoding,
+							mimetype: file.mimetype,
+							path: file.path,
+							size: file.size
+						}
+					};
+				}
 			}
 			return undefined;
 		}
@@ -119,7 +143,13 @@ interface IGraphqlFormItem {
 	type: string;
 	value?: string;
 	values?: string[];
-	file?: string;
+	file?: {
+		original_name: string;
+		encoding: string;
+		mimetype: string;
+		path: string;
+		size: number;
+	};
 }
 
 interface IGraphqlUser {
