@@ -5,6 +5,7 @@ import * as serveStatic from "serve-static";
 import * as compression from "compression";
 import * as cookieParser from "cookie-parser";
 import * as cookieSignature from "cookie-signature";
+import * as chalk from "chalk";
 import * as morgan from "morgan";
 import flash = require("connect-flash");
 
@@ -36,7 +37,33 @@ morgan.token("sessionid", (request, response) => {
 	}
 	return FAILURE_MESSAGE;
 });
-app.use(morgan(":date[iso] :remote-addr :sessionid :method :url :status :response-time ms - :res[content-length]"));
+morgan.format("hackgt", (tokens, request, response) => {
+	let statusColorizer: (input: string) => string = input => input; // Default passthrough function
+	if (response.statusCode >= 500) {
+		statusColorizer = chalk.red;
+	}
+	if (response.statusCode >= 400) {
+		statusColorizer = chalk.yellow;
+	}
+	if (response.statusCode >= 300) {
+		statusColorizer = chalk.cyan;
+	}
+	if (response.statusCode >= 200) {
+		statusColorizer = chalk.green;
+	}
+
+	return [
+		tokens.date(request, response, "iso"),
+		tokens["remote-addr"](request, response),
+		tokens.sessionid(request, response),
+		tokens.method(request, response),
+		tokens.url(request, response),
+		statusColorizer(tokens.status(request, response)),
+		tokens["response-time"](request, response), "ms", "-",
+		tokens.res(request, response, "content-length")
+	].join(" ");
+});
+app.use(morgan("hackgt"));
 app.use(flash());
 
 // Throw and show a stack trace on an unhandled Promise rejection instead of logging an unhelpful warning
