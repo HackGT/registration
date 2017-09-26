@@ -73,7 +73,10 @@ export function isUserOrAdmin(request: express.Request, response: express.Respon
 export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
 	let user = request.user as IUser;
-	if (!request.isAuthenticated()) {
+	if (request.query.adminKey === config.secrets.adminKey) {
+		next();
+	}
+	else if (!request.isAuthenticated()) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
 		});
@@ -210,15 +213,4 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 		tags
 	};
 	console.log(JSON.stringify(metricsEvent));
-}
-
-export async function hasProperExportKey(request: express.Request, response: express.Response, next: express.NextFunction) {
-	if (config.secrets.adminKey === request.params.exportKey) {
-		next();
-	} else {
-		console.log("Invalid admin API key.");
-		response.status(401).json({
-			"error": "Invalid key!"
-		});
-	}
 }
