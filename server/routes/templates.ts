@@ -482,6 +482,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
 
+	let adminEmails = await User.find({admin: true}).select('email');
+
 	let noopBranches = (await Branches.BranchConfig.loadAllBranches("Noop")) as Branches.NoopBranch[];
 	let applicationBranches = (await Branches.BranchConfig.loadAllBranches("Application")) as Branches.ApplicationBranch[];
 	let confirmationBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
@@ -521,6 +523,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
 			qrEnabled,
+			adminEmails,
 			qrEnabledChecked: qrEnabled ? "checked" : "",
 			branches: {
 				noop: noopBranches.map(branch => {
