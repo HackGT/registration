@@ -81,8 +81,9 @@ settingsRoutes.route("/admin_emails")
 		let addAdmins = request.body.addAdmins === "true";
 
 		if (!rawAdminString) {
-			return response.status(400).json({
-				"error": "Invalid value for admin emails"
+			return response.json({
+				"success": true,
+				"info": "Admins unchanged"
 			});
 		}
 
