@@ -423,7 +423,7 @@ async function applicationBranchHandler(request: express.Request, response: expr
 		else {
 			question["multi"] = false;
 		}
-		if (savedValue && question.type === "file") {
+		if (savedValue && question.type === "file" && savedValue.value) {
 			savedValue = {
 				...savedValue,
 				value: (savedValue.value as Express.Multer.File).originalname
