@@ -70,7 +70,7 @@ settingsRoutes.route("/qr_enabled")
 		catch (err) {
 			console.error(err);
 			response.status(500).json({
-				"error": "An error occurred while enabling or disabling teams"
+				"error": "An error occurred while enabling or disabling qr codes"
 			});
 		}
 	});

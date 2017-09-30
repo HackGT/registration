@@ -11,18 +11,19 @@ import { IConfig } from "./schema";
 import { storageEngines } from "./storage";
 class Config implements IConfig.Main {
 	public secrets: IConfig.Secrets = {
-		"session": crypto.randomBytes(32).toString("hex"),
-		"github": {
-			"id": "",
-			"secret": ""
+		adminKey: crypto.randomBytes(32).toString("hex"),
+		session: crypto.randomBytes(32).toString("hex"),
+		github: {
+			id: "",
+			secret: ""
 		},
-		"google": {
-			"id": "",
-			"secret": ""
+		google: {
+			id: "",
+			secret: ""
 		},
-		"facebook": {
-			"id": "",
-			"secret": ""
+		facebook: {
+			id: "",
+			secret: ""
 		}
 	};
 	public email: IConfig.Email = {
@@ -126,6 +127,12 @@ class Config implements IConfig.Main {
 	}
 	protected loadFromEnv(): void {
 		// Secrets
+		if (process.env.ADMIN_KEY_SECRET) {
+			this.secrets.adminKey = process.env.ADMIN_KEY_SECRET!;
+		}
+		else {
+			console.warn("Setting random admin key! Cannot use the service-to-service APIs.");
+		}
 		if (process.env.SESSION_SECRET) {
 			this.secrets.session = process.env.SESSION_SECRET!;
 			this.sessionSecretSet = true;

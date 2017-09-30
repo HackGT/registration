@@ -470,7 +470,6 @@ settingsUpdateButton.addEventListener("click", e => {
 	let adminEmailData = new FormData();
 	adminEmailData.append("adminString", (document.getElementById("admin-emails") as HTMLInputElement).value);
 	adminEmailData.append("addAdmins", (document.getElementById("add-admins") as HTMLInputElement).checked ? "true" : "false");
-
 	let branchRoleData = new FormData();
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
 	for (let i = 0; i < branchRoles.length; i++) {

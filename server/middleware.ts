@@ -73,7 +73,20 @@ export function isUserOrAdmin(request: express.Request, response: express.Respon
 export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
 	let user = request.user as IUser;
-	if (!request.isAuthenticated()) {
+	const auth = request.headers.authorization;
+
+	if (auth && typeof auth === "string" && auth.indexOf(" ") > -1) {
+		const key = new Buffer(auth.split(" ")[1], "base64").toString();
+		if (key === config.secrets.adminKey) {
+			next();
+		}
+		else {
+			response.status(401).json({
+				"error": "Incorrect auth token!"
+			});
+		}
+	}
+	else if (!request.isAuthenticated()) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
 		});

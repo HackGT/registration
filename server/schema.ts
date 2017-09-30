@@ -7,6 +7,7 @@ import {Questions} from "./config/questions.schema";
 // Secrets JSON file schema
 export namespace IConfig {
 	export interface Secrets {
+		adminKey: string;
 		session: string;
 		github: {
 			id: string;
