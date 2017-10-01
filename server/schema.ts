@@ -136,6 +136,7 @@ export interface IUser {
 	confirmationSubmitTime?: Date;
 
 	admin?: boolean;
+	uuid: string;
 
 	teamId?: mongoose.Types.ObjectId;
 }
@@ -199,7 +200,8 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	confirmationStartTime: Date,
 	confirmationSubmitTime: Date,
 
-	admin: Boolean
+	admin: Boolean,
+	uuid: String
 }).index({
 	email: 'text',
 	name: 'text'

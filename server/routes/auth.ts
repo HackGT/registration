@@ -6,6 +6,7 @@ import * as moment from "moment-timezone";
 import * as express from "express";
 import * as session from "express-session";
 import * as connectMongo from "connect-mongo";
+import * as uuid from "uuid/v4";
 const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
@@ -235,7 +236,8 @@ passport.use(new LocalStrategy({
 			"applicationStartTime": undefined,
 			"applicationSubmitTime": undefined,
 
-			"admin": isAdmin
+			"admin": isAdmin,
+			"uuid": uuid()
 		});
 		try {
 			await user.save();
