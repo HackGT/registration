@@ -1,11 +1,11 @@
 {
   "name": "registration",
-  "version": "1.10.8",
+  "version": "1.11.0",
   "description": "TBD",
   "main": "server/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node node_modules/json-schema-to-typescript/dist/src/cli.js server/config/questions.schema.json > server/config/questions.schema.d.ts && ./node_modules/tslint/bin/tslint -p server/ && ./node_modules/tslint/bin/tslint -p client/ && ./node_modules/typescript/bin/tsc -p server/ && ./node_modules/typescript/bin/tsc -p client/",
+    "build": "bash ./build.sh",
     "quickbuild": "./node_modules/typescript/bin/tsc -p server/ && ./node_modules/typescript/bin/tsc -p client/",
     "start": "node server/app.js",
     "build-start": "npm run build && npm start"
@@ -43,6 +43,10 @@
     "express": "^4.15.2",
     "express-session": "^1.15.1",
     "git-rev-sync": "^1.8.0",
+    "graphql": "^0.10.5",
+    "graphql-server-express": "^1.1.0",
+    "graphql-tools": "^1.2.2",
+    "graphql-typewriter": "git://github.com/illegalprime/graphql-typewriter.git#hacks",
     "handlebars": "^4.0.6",
     "json-schema-to-typescript": "^4.4.0",
     "json2csv": "^3.7.3",

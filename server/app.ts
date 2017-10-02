@@ -18,6 +18,7 @@ import {
 import {
 	User
 } from "./schema";
+import { setupRoutes as graphQlRoutes } from "./routes/api/graphql";
 
 // Set up Express and its middleware
 export let app = express();
@@ -128,6 +129,8 @@ app.use("/js", serveStatic(path.resolve(STATIC_ROOT, "js")));
 app.use("/css/theme.css", serveStatic(config.style.theme));
 app.use("/favicon.ico", serveStatic(config.style.favicon));
 app.use("/css", serveStatic(path.resolve(STATIC_ROOT, "css")));
+
+graphQlRoutes(app);
 
 app.listen(PORT, () => {
 	console.log(`Registration system v${VERSION_NUMBER} @ ${VERSION_HASH} started on port ${PORT}`);

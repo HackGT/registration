@@ -113,6 +113,7 @@ export function authenticateWithReject(request: express.Request, response: expre
 		next();
 	}
 }
+
 // For directly user facing endpoints
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
@@ -123,6 +124,7 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 		next();
 	}
 }
+
 import * as Handlebars from "handlebars";
 import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
