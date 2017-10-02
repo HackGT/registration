@@ -13,7 +13,7 @@ type Query {
   # seen from the latest page retrieved, if you want the first page leave this out.
   users(last_id: ID, n: Int!): [User!]!
   # Search through a user's name and email through regex
-  search_user(search: String!, offset: Int!, n: Int!): [User!]!
+  search_user(search: String!, use_regex: Boolean = false, offset: Int!, n: Int!): [User!]!
   # All possible question branches
   question_branches: [String!]!
   # All possible question names, or names of question in a branch

@@ -44,7 +44,10 @@ const resolvers: IResolver = {
 			return allUsers.map(userRecordToGraphql);
 		},
 		search_user: async (prev, args) => {
-			let escapedQuery: string = args.search.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
+			let escapedQuery: string = args.search;
+			if (!args.use_regex) {
+				escapedQuery = escapedQuery.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
+			}
 			const queryRegExp = new RegExp(escapedQuery, "i");
 
 			const results = await User
