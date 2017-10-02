@@ -10,8 +10,6 @@ import { User, IUser, IFormItem } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
 import { schema as types } from "./api.graphql.types";
 
-import escapeStringRegexp = require("escape-string-regexp");
-
 const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphql"), "utf8");
 
 type Ctx = express.Request;
@@ -46,7 +44,8 @@ const resolvers: IResolver = {
 			return allUsers.map(userRecordToGraphql);
 		},
 		search_user: async (prev, args) => {
-			const queryRegExp = new RegExp(escapeStringRegexp(args.search.trim()), "i");
+			let escapedQuery: string = args.search.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
+			const queryRegExp = new RegExp(escapedQuery, "i");
 
 			const results = await User
 				.find()
