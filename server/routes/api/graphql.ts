@@ -44,23 +44,29 @@ const resolvers: IResolver = {
 			return allUsers.map(userRecordToGraphql);
 		},
 		search_user: async (prev, args) => {
+			let escapedQuery: string = args.search;
+			if (!args.use_regex) {
+				escapedQuery = escapedQuery.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
+			}
+			const queryRegExp = new RegExp(escapedQuery, "i");
+
 			const results = await User
-				.find({
-					$text: {
-						$search: args.search
+				.find()
+				.or([
+					{
+						name: {
+							$regex: queryRegExp
+						}
+					},
+					{
+						email: {
+							$regex: queryRegExp
+						}
 					}
-				}, {
-					score: {
-						$meta: "textScore"
-					}
-				})
-				.sort({
-					score: {
-						$meta: "textScore"
-					}
-				})
+				])
 				.skip(args.offset)
-				.limit(args.n);
+				.limit(args.n)
+				.exec();
 
 			return results.map(userRecordToGraphql);
 		},
@@ -129,7 +135,13 @@ export function setupRoutes(app: express.Express) {
  */
 
 function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
-	if (typeof item.value === "string") {
+	if (!item.value) {
+		return {
+			name: item.name,
+			type: item.type
+		};
+	}
+	else if (typeof item.value === "string") {
 		return {
 			name: item.name,
 			type: item.type,
