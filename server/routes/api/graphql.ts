@@ -133,7 +133,13 @@ export function setupRoutes(app: express.Express) {
  */
 
 function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
-	if (typeof item.value === "string") {
+	if (!item.value) {
+		return {
+			name: item.name,
+			type: item.type
+		};
+	}
+	else if (typeof item.value === "string") {
 		return {
 			name: item.name,
 			type: item.type,
