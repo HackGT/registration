@@ -24,7 +24,7 @@ import { setupRoutes as graphQlRoutes } from "./routes/api/graphql";
 export let app = express();
 
 app.use(compression());
-let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS);
+let cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS as cookieParser.CookieParseOptions);
 app.use(cookieParserInstance);
 morgan.token("sessionid", (request, response) => {
 	const FAILURE_MESSAGE = "Unknown session";
