@@ -139,13 +139,24 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		confirmBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
 	}
 
-	interface IDeadlineMap {
-		[name: string]: {
-			name: string;
-			open: Date;
-			close: Date;
-		};
+	// Filter out branches user does not have access to based on apply branch
+	if (user.applicationBranch) {
+		let appliedBranch = applyBranches[0];
+		confirmBranches = confirmBranches.filter((branch) => {
+			return appliedBranch.confirmationBranches.indexOf(branch.name) > -1;
+		});
 	}
+
+	interface IBranchOpenClose {
+		name: string;
+		open: Date;
+		close: Date;
+	}
+
+	interface IDeadlineMap {
+		[name: string]: IBranchOpenClose;
+	}
+
 	let confirmTimes = confirmBranches.reduce((map, branch) => {
 		map[branch.name] = branch;
 		return map;
@@ -154,12 +165,17 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		confirmTimes[branchTimes.name] = branchTimes;
 	}
 
+	let confirmTimesArr: IBranchOpenClose[] = [];
+	for (let confirmTime of Object.keys(confirmTimes)) {
+		confirmTimesArr.push(confirmTimes[confirmTime]);
+	}
+
 	let dateComparator = (a: Date, b: Date) => (a.valueOf() - b.valueOf());
 
 	let applicationOpenDate = moment(applyBranches.map(b => b.open).sort(dateComparator)[0]);
 	let applicationCloseDate = moment(applyBranches.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
-	let confirmationOpenDate = moment(confirmBranches.map(b => b.open).sort(dateComparator)[0]);
-	let confirmationCloseDate = moment(confirmBranches.map(b => b.close).sort(dateComparator)[confirmBranches.length - 1]);
+	let confirmationOpenDate = moment(confirmTimesArr.map(b => b.open).sort(dateComparator)[0]);
+	let confirmationCloseDate = moment(confirmTimesArr.map(b => b.close).sort(dateComparator)[confirmBranches.length - 1]);
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
