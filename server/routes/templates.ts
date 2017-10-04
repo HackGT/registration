@@ -152,7 +152,6 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		open: Date;
 		close: Date;
 	}
-
 	interface IDeadlineMap {
 		[name: string]: IBranchOpenClose;
 	}
@@ -164,18 +163,30 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	for (let branchTimes of user.confirmationDeadlines) {
 		confirmTimes[branchTimes.name] = branchTimes;
 	}
+	let confirmTimesArr: IBranchOpenClose[] = Object.keys(confirmTimes).map(name => confirmTimes[name]);
 
-	let confirmTimesArr: IBranchOpenClose[] = [];
-	for (let confirmTime of Object.keys(confirmTimes)) {
-		confirmTimesArr.push(confirmTimes[confirmTime]);
+	const dateComparator = (a: Date, b: Date) => (a.valueOf() - b.valueOf());
+
+	let applicationOpenDate: moment.Moment | null = null;
+	let applicationCloseDate: moment.Moment | null = null;
+	if (applyBranches.length > 0) {
+		applicationOpenDate = moment(applyBranches.map(b => b.open).sort(dateComparator)[0]);
+		applicationCloseDate = moment(applyBranches.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
+	}
+	let confirmationOpenDate: moment.Moment | null = null;
+	let confirmationCloseDate: moment.Moment | null = null;
+	if (confirmBranches.length > 0) {
+		confirmationOpenDate = moment(confirmTimesArr.map(b => b.open).sort(dateComparator)[0]);
+		confirmationCloseDate = moment(confirmTimesArr.map(b => b.close).sort(dateComparator)[confirmBranches.length - 1]);
 	}
 
-	let dateComparator = (a: Date, b: Date) => (a.valueOf() - b.valueOf());
-
-	let applicationOpenDate = moment(applyBranches.map(b => b.open).sort(dateComparator)[0]);
-	let applicationCloseDate = moment(applyBranches.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
-	let confirmationOpenDate = moment(confirmTimesArr.map(b => b.open).sort(dateComparator)[0]);
-	let confirmationCloseDate = moment(confirmTimesArr.map(b => b.close).sort(dateComparator)[confirmBranches.length - 1]);
+	function formatMoment(date: moment.Moment | null): string {
+		const FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
+		if (date) {
+			return date.tz(moment.tz.guess()).format(FORMAT);
+		}
+		return "(No branches configured)";
+	}
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
@@ -185,20 +196,20 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
 
-		applicationOpen: applicationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
-		applicationClose: applicationCloseDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		applicationOpen: formatMoment(applicationOpenDate),
+		applicationClose: formatMoment(applicationCloseDate),
 		applicationStatus: {
-			areOpen: moment().isBetween(applicationOpenDate, applicationCloseDate),
-			beforeOpen: moment().isBefore(applicationOpenDate),
-			afterClose: moment().isAfter(applicationCloseDate)
+			areOpen: applicationOpenDate && applicationCloseDate ? moment().isBetween(applicationOpenDate, applicationCloseDate) : false,
+			beforeOpen: applicationOpenDate ? moment().isBefore(applicationOpenDate) : true,
+			afterClose: applicationCloseDate ? moment().isAfter(applicationCloseDate) : false
 		},
 
-		confirmationOpen: confirmationOpenDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
-		confirmationClose: confirmationCloseDate.tz(moment.tz.guess()).format("dddd, MMMM Do YYYY [at] h:mm a z"),
+		confirmationOpen: formatMoment(confirmationOpenDate),
+		confirmationClose: formatMoment(confirmationCloseDate),
 		confirmationStatus: {
-			areOpen: moment().isBetween(confirmationOpenDate, confirmationCloseDate),
-			beforeOpen: moment().isBefore(confirmationOpenDate),
-			afterClose: moment().isAfter(confirmationCloseDate)
+			areOpen: confirmationOpenDate && confirmationCloseDate ? moment().isBetween(confirmationOpenDate, confirmationCloseDate) : false,
+			beforeOpen: confirmationOpenDate ? moment().isBefore(confirmationOpenDate) : true,
+			afterClose: confirmationCloseDate ? moment().isAfter(confirmationCloseDate) : false
 		}
 	};
 	response.send(indexTemplate(templateData));
