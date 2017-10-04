@@ -187,6 +187,17 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		}
 		return "(No branches configured)";
 	}
+	function formatMoments(open: moment.Moment, close: moment.Moment): { open: string; close: string } {
+		let openString = formatMoment(open);
+		let closeString = formatMoment(close);
+		if (!moment().isBetween(open, close)) {
+			closeString += " (Closed)";
+		}
+		return {
+			open: openString,
+			close: closeString
+		};
+	}
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
@@ -213,15 +224,13 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		allApplicationTimes: applyBranches.map(branch => {
 			return {
 				name: branch.name,
-				open: formatMoment(moment(branch.open)),
-				close: formatMoment(moment(branch.close))
+				...formatMoments(moment(branch.open), moment(branch.close))
 			};
 		}),
 		allConfirmationTimes: confirmBranches.map(branch => {
 			return {
 				name: branch.name,
-				open: formatMoment(moment(branch.open)),
-				close: formatMoment(moment(branch.close))
+				...formatMoments(moment(branch.open), moment(branch.close))
 			};
 		})
 	};
