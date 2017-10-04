@@ -45,7 +45,7 @@
 						<p>Application type: <b>{{user.applicationBranch}}</b></p>
 						<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 						{{#if confirmationStatus.areOpen}}
-							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it any further.</p>
+							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
 							<a class="btn" href="/confirm">Edit your confirmation</a>
 						{{else}}
 							<p>RSVPing closed on {{confirmationClose}}.</p>
@@ -69,7 +69,7 @@
 								<p>RSVPing will open on {{confirmationOpen}}.</p>
 							{{/if}}
 							{{#if confirmationStatus.afterClose}}
-								<p>RSVPs closed on {{confirmationClose}}. Unfortunately, since you did not RSVP in time, you will be unable to attend {{siteTitle}}.</p>
+								<p>RSVPs closed on {{confirmationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
 							{{/if}}
 						{{/if}}
 					{{else if user.applied}}
@@ -91,7 +91,7 @@
 								<p>Applications are currently closed and will open on {{applicationOpen}}.</p>
 							{{/if}}
 							{{#if applicationStatus.afterClose}}
-								<p>Applications closed on {{applicationClose}}. Unfortunately, because you did not submit an application, you will not be eligible for {{siteTitle}}.</p>
+								<p>Applications closed on {{applicationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
 							{{/if}}
 						{{/if}}
 					{{/if}}
