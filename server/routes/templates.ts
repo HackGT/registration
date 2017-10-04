@@ -203,14 +203,27 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			beforeOpen: applicationOpenDate ? moment().isBefore(applicationOpenDate) : true,
 			afterClose: applicationCloseDate ? moment().isAfter(applicationCloseDate) : false
 		},
-
 		confirmationOpen: formatMoment(confirmationOpenDate),
 		confirmationClose: formatMoment(confirmationCloseDate),
 		confirmationStatus: {
 			areOpen: confirmationOpenDate && confirmationCloseDate ? moment().isBetween(confirmationOpenDate, confirmationCloseDate) : false,
 			beforeOpen: confirmationOpenDate ? moment().isBefore(confirmationOpenDate) : true,
 			afterClose: confirmationCloseDate ? moment().isAfter(confirmationCloseDate) : false
-		}
+		},
+		allApplicationTimes: applyBranches.map(branch => {
+			return {
+				name: branch.name,
+				open: formatMoment(moment(branch.open)),
+				close: formatMoment(moment(branch.close))
+			};
+		}),
+		allConfirmationTimes: confirmBranches.map(branch => {
+			return {
+				name: branch.name,
+				open: formatMoment(moment(branch.open)),
+				close: formatMoment(moment(branch.close))
+			};
+		})
 	};
 	response.send(indexTemplate(templateData));
 });
