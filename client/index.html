@@ -45,7 +45,7 @@
 						<p>Application type: <b>{{user.applicationBranch}}</b></p>
 						<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 						{{#if confirmationStatus.areOpen}}
-							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it any further.</p>
+							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
 							<a class="btn" href="/confirm">Edit your confirmation</a>
 						{{else}}
 							<p>RSVPing closed on {{confirmationClose}}.</p>
@@ -60,16 +60,43 @@
 						{{#if confirmationStatus.areOpen}}
 							<p>You've been accepted but you still need to RSVP!</p>
 							<p>Application type: <b>{{user.applicationBranch}}</b></p>
-							<p>If you do not RSVP before {{confirmationClose}}, you will not be able to attend {{siteTitle}}!</p>
+							{{#ifCond allConfirmationTimes.length 1}}
+								<p>If you do not RSVP before {{confirmationClose}}, you will not be able to attend {{siteTitle}}!</p>
+							{{else}}
+								<p>If you do not RSVP before the deadline for your confirmation type, you will not be able to attend {{siteTitle}}!</p>
+								<ul>
+									{{#each allConfirmationTimes}}
+										<li><strong>{{this.name}}</strong>: {{this.open}} until {{this.close}}</li>
+									{{/each}}
+								</ul>
+							{{/ifCond}}
 							<a class="btn" href="/confirm">Confirm your attendance</a>
 						{{else}}
 							<p>You've been accepted!</p>
 							<p>Application type: <b>{{user.applicationBranch}}</b></p>
 							{{#if confirmationStatus.beforeOpen}}
-								<p>RSVPing will open on {{confirmationOpen}}.</p>
+								{{#ifCond allConfirmationTimes.length 1}}
+									<p>RSVPing will open on {{confirmationOpen}}.</p>
+								{{else}}
+									<p>RSVPing will be open during the following times:</p>
+									<ul>
+										{{#each allConfirmationTimes}}
+											<li><strong>{{this.name}}</strong>: {{this.open}} until {{this.close}}</li>
+										{{/each}}
+									</ul>
+								{{/ifCond}}
 							{{/if}}
 							{{#if confirmationStatus.afterClose}}
-								<p>RSVPs closed on {{confirmationClose}}. Unfortunately, since you did not RSVP in time, you will be unable to attend {{siteTitle}}.</p>
+								{{#ifCond allConfirmationTimes.length 1}}
+									<p>RSVPs closed on {{confirmationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
+								{{else}}
+									<p>RSVPs closed at the following times. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
+									<ul>
+										{{#each allConfirmationTimes}}
+											<li><strong>{{this.name}}</strong>: {{this.close}}</li>
+										{{/each}}
+									</ul>
+								{{/ifCond}}
 							{{/if}}
 						{{/if}}
 					{{else if user.applied}}
@@ -84,14 +111,41 @@
 					{{else}}
 						{{#if applicationStatus.areOpen}}
 							<p>You still need to complete your application!</p>
-							<p>If you do not complete your application before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
+							{{#ifCond allApplicationTimes.length 1}}
+								<p>If you do not complete your application before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
+							{{else}}
+								<p>If you do not complete your application before the following times, you will not be considered for {{siteTitle}}:</p>
+								<ul>
+									{{#each allApplicationTimes}}
+										<li><strong>{{this.name}}</strong>: {{this.close}}</li>
+									{{/each}}
+								</ul>
+							{{/ifCond}}
 							<a class="btn" href="/apply">Complete your application</a>
 						{{else}}
 							{{#if applicationStatus.beforeOpen}}
-								<p>Applications are currently closed and will open on {{applicationOpen}}.</p>
+								{{#ifCond allApplicationTimes.length 1}}
+									<p>Applications are currently closed and will open on {{applicationOpen}}.</p>
+								{{else}}
+									<p>Applications are currently closed and will open at the following times:</p>
+									<ul>
+										{{#each allApplicationTimes}}
+											<li><strong>{{this.name}}</strong>: {{this.open}}</li>
+										{{/each}}
+									</ul>
+								{{/ifCond}}
 							{{/if}}
 							{{#if applicationStatus.afterClose}}
-								<p>Applications closed on {{applicationClose}}. Unfortunately, because you did not submit an application, you will not be eligible for {{siteTitle}}.</p>
+								{{#ifCond allApplicationTimes.length 1}}
+									<p>Applications closed on {{applicationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
+								{{else}}
+									<p>Applications closed at the following times. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
+									<ul>
+										{{#each allApplicationTimes}}
+											<li><strong>{{this.name}}</strong>: {{this.close}}</li>
+										{{/each}}
+									</ul>
+								{{/ifCond}}
 							{{/if}}
 						{{/if}}
 					{{/if}}

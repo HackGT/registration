@@ -279,6 +279,16 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+	allApplicationTimes: {
+		name: string;
+		open: string;
+		close: string;
+	}[];
+	allConfirmationTimes: {
+		name: string;
+		open: string;
+		close: string;
+	}[];
 }
 export interface ITeamTemplate extends ICommonTemplate {
 	team?: ITeamMongoose | null;
