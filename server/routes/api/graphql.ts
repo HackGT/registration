@@ -18,6 +18,7 @@ interface IResolver {
 	Query: types.Query<Ctx>;
 	User: {
 		question: types.GraphqlField<{name: string}, types.FormItem<Ctx> | undefined, Ctx>;
+		questions: types.GraphqlField<{names: string[]}, types.FormItem<Ctx>[], Ctx>;
 	};
 }
 
@@ -101,21 +102,32 @@ const resolvers: IResolver = {
 	},
 	User: {
 		question: async (prev, args) => {
-			prev = prev as types.User<express.Request>;
-			const user = await User.findById(prev.id);
-			if (!user) return undefined;
-
-			const found = user.confirmationData.concat(user.applicationData).find(question => {
-				return question.name === args.name;
-			});
-
-			if (found) {
-				return recordToFormItem(found);
-			}
-			return undefined;
+			return (await findQuestions(prev, { names: [args.name] }))[0];
+		},
+		questions: async (prev, args) => {
+			return await findQuestions(prev, args);
 		}
 	}
 };
+
+async function findQuestions(
+	target: types.User<express.Request>,
+	args: { names: string[] }
+): Promise<types.FormItem<Ctx>[]> {
+	const user = await User.findById(target.id);
+	if (!user) return [];
+
+	const names = new Set(args.names);
+
+	return user.confirmationData.concat(user.applicationData)
+		.reduce((results, question) => {
+			if (names.has(question.name)) {
+				results.push(question);
+			}
+			return results;
+		}, [] as IFormItem[])
+		.map(recordToFormItem);
+}
 
 export const schema = makeExecutableSchema({
 	typeDefs,
@@ -238,6 +250,9 @@ function userRecordToGraphql(user: IUser): types.User<Ctx> {
 
 		application,
 		confirmation,
+
+		// Will be filled in child resolver.
+		questions: [],
 
 		team: user.teamId && {
 			id: user.teamId.toHexString()

@@ -54,8 +54,11 @@ type User {
   confirmation: Branch
 
   # Get the answer to one of the questions asked of this user.
-  # If branch is not given, find this question name in any branch.
   question(name: String!): FormItem
+
+  # Get the answer to multiple questions asked of this user, userful
+  # when the set of questions you want to receive is set by the user.
+  questions(names: [String!]!): [FormItem!]!
 
   # What team, if any, is the user a part of?
   team: Team
