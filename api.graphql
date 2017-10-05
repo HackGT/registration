@@ -62,6 +62,9 @@ type User {
 
   # What team, if any, is the user a part of?
   team: Team
+
+  # User's uuid
+  uuid: String
 }
 
 # Filter users by this criterea.

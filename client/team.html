@@ -47,9 +47,9 @@
 
 				<div class="center">
 					{{#if isCurrentUserTeamLeader}}
-						<button id="renameTeam" action="/api/user/{{user._id}}/team/rename/">Rename</button>
+						<button id="renameTeam" action="/api/user/{{user.uuid}}/team/rename/">Rename</button>
 					{{/if}}
-					<button id="leaveTeam" action="/api/user/{{user._id}}/team/leave/" style="background-color: #FF4136;">Leave Team</button>
+					<button id="leaveTeam" action="/api/user/{{user.uuid}}/team/leave/" style="background-color: #FF4136;">Leave Team</button>
 				</div>
 			{{else}}
 				<h3>Let's get you in a team</h3>
@@ -61,7 +61,7 @@
 						<label for="joinTeamInput">Team name to join</label>
 						<input type="text" id="joinTeamInput" />
 						<div class="center">
-							<button id="joinTeam" action="/api/user/{{user._id}}/team/join/"/>Join Team</button>
+							<button id="joinTeam" action="/api/user/{{user.uuid}}/team/join/"/>Join Team</button>
 						</div>
 					</div>
 					<div class="col">
@@ -69,7 +69,7 @@
 						<label for="teamNameInput">Your new team name</label>
 						<input type="text" id="teamNameInput" />
 						<div class="center">
-							<button id="createTeam" action="/api/user/{{user._id}}/team/create/">Create Team</button>
+							<button id="createTeam" action="/api/user/{{user.uuid}}/team/create/">Create Team</button>
 						</div>
 					</div>
 				</div>

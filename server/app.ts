@@ -101,7 +101,7 @@ app.use((request, response, next) => {
 let apiRouter = express.Router();
 // API routes go here
 import {userRoutes} from "./routes/api/user";
-apiRouter.use("/user/:id", userRoutes);
+apiRouter.use("/user/:uuid", userRoutes);
 import {adminRoutes} from "./routes/api/admin";
 apiRouter.use("/admin", adminRoutes);
 import {settingsRoutes} from "./routes/api/settings";

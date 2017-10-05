@@ -78,7 +78,7 @@ userRoutes.route("/confirmation/:branch")
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let user = await User.findById(request.params.id) as IUserMongoose;
+	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	let branchName = request.params.branch as string;
 	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 		response.status(400).json({
@@ -248,7 +248,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 async function deleteApplicationBranchHandler(request: express.Request, response: express.Response) {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let user = await User.findById(request.params.id) as IUserMongoose;
+	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		user.applied = false;
 		user.applicationBranch = "";
@@ -281,12 +281,12 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 }
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id);
+	let user = await User.findOne({uuid: request.params.uuid});
 	let status = request.body.status as ("accepted" | "no-decision");
 
 	if (!user) {
 		response.status(400).json({
-			"error": `No such user with id ${request.params.id}`
+			"error": `No such user with id ${request.params.uuid}`
 		});
 		return;
 	}
@@ -487,7 +487,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		Else if the user's in a team, take them out of it
 		Else make them a new team
 	 */
-	let user = await User.findById(request.params.id) as IUserMongoose;
+	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	let decodedTeamName = decodeURI(request.params.teamName);
 
 	let existingTeam = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
@@ -542,7 +542,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 });
 
 userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id) as IUserMongoose;
+	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	let decodedTeamName = decodeURI(request.params.teamName);
 
 	if (user.teamId) {
@@ -595,7 +595,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 });
 
 userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id) as IUserMongoose;
+	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	await removeUserFromAllTeams(user);
 
 	response.status(200).json({
@@ -604,7 +604,7 @@ userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): P
 });
 
 userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findById(request.params.id) as IUserMongoose;
+	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 
 	if (!user.teamId) {
 		response.status(400).json({

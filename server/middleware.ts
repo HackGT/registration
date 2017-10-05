@@ -60,7 +60,7 @@ export function isUserOrAdmin(request: express.Request, response: express.Respon
 			"error": "You must log in to access this endpoint"
 		});
 	}
-	else if (user._id.toString() !== request.params.id && !user.admin) {
+	else if (user.uuid !== request.params.uuid && !user.admin) {
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"
 		});
