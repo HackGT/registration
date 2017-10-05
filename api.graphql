@@ -14,7 +14,11 @@ type Query {
   users(last_id: ID, n: Int!, filter: UserFilter): [User!]!
   # Search through a user's name and email through regex
   search_user(search: String!, use_regex: Boolean = false, offset: Int!, n: Int!, filter: UserFilter): [User!]!
-  # All possible question branches
+  # All possible application question branches
+  application_branches: [String!]!
+  # All possible confirmation question branches
+  confirmation_branches: [String!]!
+  # All possible question branches from all types!
   question_branches: [String!]!
   # All possible question names, or names of question in a branch
   question_names(branch: String): [String!]

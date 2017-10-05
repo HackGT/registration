@@ -6,7 +6,7 @@ import * as express from "express";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import { makeExecutableSchema } from "graphql-tools";
 import { isAdmin, authenticateWithRedirect } from "../../middleware";
-import { User, IUser, IFormItem } from "../../schema";
+import { User, IUser, IFormItem, QuestionBranchConfig } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
 import { schema as types } from "./api.graphql.types";
 
@@ -75,6 +75,22 @@ const resolvers: IResolver = {
 		},
 		question_branches: () => {
 			return Branches;
+		},
+		application_branches: async () => {
+			const branches = await QuestionBranchConfig.find({
+				type: "Application"
+			}, {
+				name: true
+			});
+			return branches.map(b => b.name);
+		},
+		confirmation_branches: async () => {
+			const branches = await QuestionBranchConfig.find({
+				type: "Confirmation"
+			}, {
+				name: true
+			});
+			return branches.map(b => b.name);
 		},
 		question_names: (prev, args) => {
 			if (args.branch) {
