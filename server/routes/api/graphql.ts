@@ -6,7 +6,7 @@ import * as express from "express";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import { makeExecutableSchema } from "graphql-tools";
 import { isAdmin, authenticateWithRedirect } from "../../middleware";
-import { User, IUser, IFormItem } from "../../schema";
+import { User, IUser, IFormItem, QuestionBranchConfig } from "../../schema";
 import { Branches, Tags, AllTags } from "../../branch";
 import { schema as types } from "./api.graphql.types";
 
@@ -32,12 +32,15 @@ const resolvers: IResolver = {
 			return user ? userRecordToGraphql(user) : undefined;
 		},
 		users: async (prev, args) => {
+			const lastIdQuery = args.last_id ? {
+				_id: {
+					$gt: args.last_id
+				}
+			} : {};
 			const allUsers = await User
-				.find(args.last_id ? {
-					_id: {
-						$gt: args.last_id
-					}
-				} : {}, {
+				.find({
+					...lastIdQuery,
+					...userFilterToMongo(args.filter)
 				})
 				.limit(args.n);
 
@@ -51,7 +54,7 @@ const resolvers: IResolver = {
 			const queryRegExp = new RegExp(escapedQuery, "i");
 
 			const results = await User
-				.find()
+				.find(userFilterToMongo(args.filter))
 				.or([
 					{
 						name: {
@@ -72,6 +75,22 @@ const resolvers: IResolver = {
 		},
 		question_branches: () => {
 			return Branches;
+		},
+		application_branches: async () => {
+			const branches = await QuestionBranchConfig.find({
+				type: "Application"
+			}, {
+				name: true
+			});
+			return branches.map(b => b.name);
+		},
+		confirmation_branches: async () => {
+			const branches = await QuestionBranchConfig.find({
+				type: "Confirmation"
+			}, {
+				name: true
+			});
+			return branches.map(b => b.name);
 		},
 		question_names: (prev, args) => {
 			if (args.branch) {
@@ -133,6 +152,20 @@ export function setupRoutes(app: express.Express) {
 /**
  * Util and Types
  */
+
+function userFilterToMongo(filter: types.UserFilter | undefined) {
+	if (!filter) {
+		return {};
+	}
+	const query: { [name: string]: any } = {};
+	const setIf = (key: string, val: any) => val ? query[key] = val : undefined;
+	setIf("applied", filter.applied);
+	setIf("accepted", filter.accepted);
+	setIf("attending", filter.attending);
+	setIf("applicationBranch", filter.application_branch);
+	setIf("confirmationBranch", filter.confirmation_branch);
+	return query;
+}
 
 function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
 	if (!item.value) {
