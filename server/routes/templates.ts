@@ -227,7 +227,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 				...formatMoments(moment(branch.open), moment(branch.close))
 			};
 		}),
-		allConfirmationTimes: confirmBranches.map(branch => {
+		allConfirmationTimes: confirmTimesArr.map(branch => {
 			return {
 				name: branch.name,
 				...formatMoments(moment(branch.open), moment(branch.close))
