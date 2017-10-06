@@ -253,7 +253,7 @@ function userRecordToGraphql(user: IUser): types.User<Ctx> {
 
 		// Will be filled in child resolver.
 		questions: [],
-
+		uuid: user.uuid,
 		team: user.teamId && {
 			id: user.teamId.toHexString()
 		}

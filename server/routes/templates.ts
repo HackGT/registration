@@ -143,7 +143,8 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	if (user.applicationBranch) {
 		let appliedBranch = applyBranches[0];
 		confirmBranches = confirmBranches.filter((branch) => {
-			return appliedBranch.confirmationBranches.indexOf(branch.name) > -1;
+			// TODO, verify template looks reasonable
+			return appliedBranch.confirmationBranches && appliedBranch.confirmationBranches.indexOf(branch.name) > -1;
 		});
 	}
 

@@ -223,7 +223,7 @@ class ApplicantEntries {
 					generalNode.style.display = "table-row";
 					detailsNode.style.display = "table-row";
 
-					generalNode.dataset.id = user._id;
+					generalNode.dataset.id = user.uuid;
 					generalNode.querySelector("td.name")!.textContent = user.name;
 					generalNode.querySelector("td.team")!.textContent = "";
 					if (user.teamName) {

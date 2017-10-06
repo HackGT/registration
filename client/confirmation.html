@@ -24,7 +24,7 @@
 				Set data-action and not action so that verification of the form still occurs but the form is actually submitted via an XHR.
 				Running event.preventDefault() in the submit button's click handler also disables validation for some reason
 			-->
-			<form method="post" data-action="/api/user/{{user._id}}/confirmation/{{slug branch}}">
+			<form method="post" data-action="/api/user/{{user.uuid}}/confirmation/{{slug branch}}">
 				{{#each questionData}}
 					{{#if this.textContent}}
 						{{{this.textContent}}}
