@@ -111,6 +111,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 		}
 		if (!user) {
 			user = new User({
+				"uuid": uuid(),
 				"email": email,
 				"name": profile.displayName,
 				"verifiedEmail": true,
@@ -215,6 +216,7 @@ passport.use(new LocalStrategy({
 		let salt = crypto.randomBytes(32);
 		let hash = await pbkdf2Async(password, salt, PBKDF2_ROUNDS);
 		user = new User({
+			"uuid": uuid(),
 			"email": email,
 			"name": request.body.name,
 			"verifiedEmail": false,
@@ -236,8 +238,7 @@ passport.use(new LocalStrategy({
 			"applicationStartTime": undefined,
 			"applicationSubmitTime": undefined,
 
-			"admin": isAdmin,
-			"uuid": uuid()
+			"admin": isAdmin
 		});
 		try {
 			await user.save();
