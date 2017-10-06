@@ -201,7 +201,12 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	confirmationSubmitTime: Date,
 
 	admin: Boolean,
-	uuid: String
+	uuid: {
+		type: String,
+		required: true,
+		index: true,
+		unique: true
+	}
 }).index({
 	email: 'text',
 	name: 'text'
