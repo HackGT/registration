@@ -33,9 +33,9 @@ const resolvers: IResolver = {
 			return user ? userRecordToGraphql(user) : undefined;
 		},
 		users: async (prev, args) => {
-			const lastIdQuery = args.last_id ? {
+			const lastIdQuery = args.pagination_token ? {
 				_id: {
-					$gt: args.last_id
+					$gt: args.pagination_token
 				}
 			} : {};
 			const allUsers = await User
