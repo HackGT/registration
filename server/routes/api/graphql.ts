@@ -114,7 +114,7 @@ async function findQuestions(
 	target: types.User<express.Request>,
 	args: { names: string[] }
 ): Promise<types.FormItem<Ctx>[]> {
-	const user = await User.findById(target.id);
+	const user = await User.findOne({uuid: target.id});
 	if (!user) return [];
 
 	const names = new Set(args.names);
