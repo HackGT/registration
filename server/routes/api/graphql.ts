@@ -28,8 +28,8 @@ interface IResolver {
 const resolvers: IResolver = {
 	Query: {
 		user: async (prev, args, request) => {
-			const id = args.id || (request.user as IUser)._id;
-			const user = await User.findById(id);
+			const id = args.id || (request.user as IUser).uuid;
+			const user = await User.findOne({uuid: id});
 			return user ? userRecordToGraphql(user) : undefined;
 		},
 		users: async (prev, args) => {
@@ -237,7 +237,7 @@ function userRecordToGraphql(user: IUser): types.User<Ctx> {
 	} : undefined;
 
 	return {
-		id: user._id.toHexString(),
+		id: user.uuid,
 
 		name: user.name,
 		email: user.email,
@@ -253,9 +253,10 @@ function userRecordToGraphql(user: IUser): types.User<Ctx> {
 
 		// Will be filled in child resolver.
 		questions: [],
-		uuid: user.uuid,
 		team: user.teamId && {
 			id: user.teamId.toHexString()
-		}
+		},
+
+		pagination_token: user._id.toHexString()
 	};
 }
