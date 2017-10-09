@@ -139,7 +139,7 @@
 				<div class="center">
 					<button id="send-acceptances">Send acceptance emails</button>
 				</div>
-				<div class="center" class="search">
+				<div class="center search">
 					<input id="applicant-search" type="text" placeholder="Search applicants" />
 					<label for="applicant-search-regex">Use regex</label>
 					<input id="applicant-search-regex" type="checkbox" />
@@ -154,15 +154,24 @@
 						<th>
 							<select id="branch-filter">
 								<option value="*">All types</option>
-								{{#each branchNames}}
-									<option value="{{this}}">{{this}}</span>
-								{{/each}}
+								<optgroup label="Application">
+									{{#each settings.branches.application}}
+										<option value="application-{{this.name}}">{{this.name}}</option>
+									{{/each}}
+								</optgroup>
+								<optgroup label="Confirmation">
+									{{#each settings.branches.confirmation}}
+										<option value="confirmation-{{this.name}}">{{this.name}}</option>
+									{{/each}}
+								</optgroup>
 							</select>
 						</th>
 						<th>
 							<select id="status-filter">
 								<option value="no-decision">No decision</option>
 								<option value="accepted">Accepted</option>
+								<option value="not-confirmed">Not confirmed</option>
+								<option value="confirmed">Confirmed</option>
 								<!--<option value="rejected">Rejected</option>-->
 								<option value="*">All</option>
 							</select>
