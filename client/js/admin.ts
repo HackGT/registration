@@ -253,7 +253,18 @@ class ApplicantEntries {
 						}
 					},
 					confirmation {
-						type
+						type,
+						data {
+							name,
+							label,
+							value,
+							values,
+							file {
+								mimetype,
+								size_formatted,
+								path
+							}
+						}
 					}
 				}
 			}
@@ -290,6 +301,56 @@ class ApplicantEntries {
 			};
 		}) => {
 			let res = response.data.search_user;
+
+			interface IFormItem {
+				name: string;
+				label: string;
+				type: string;
+				value?: string;
+				values?: string[];
+				file?: {
+					original_name: string;
+					encoding: string;
+					mimetype: string;
+					path: string;
+					size: number;
+					size_formatted: string;
+				};
+			}
+			function addApplicationData(dataSection: HTMLDivElement, applicationData: IFormItem[]): void {
+				for (let answer of applicationData as IFormItem[]) {
+					let row = document.createElement("p");
+					let label = document.createElement("b");
+					label.innerHTML = answer.label;
+					row.appendChild(label);
+					let value = "";
+					if (answer.value) {
+						value = answer.value;
+					}
+					else if (answer.values) {
+						value = answer.values.join(", ");
+					}
+					else if (answer.file) {
+						value = `[${answer.file.mimetype} | ${answer.file.size_formatted}]: ${answer.file.path}`;
+					}
+					row.appendChild(document.createTextNode(` → ${value}`));
+					if (answer.file) {
+						row.appendChild(document.createTextNode(" ("));
+						let link = document.createElement("a");
+						link.setAttribute("href", `/${answer.file.path}`);
+						link.textContent = "Download";
+						row.appendChild(link);
+						row.appendChild(document.createTextNode(")"));
+					}
+					dataSection.appendChild(row);
+				}
+			}
+			function addApplicationDataHeader(dataSection: HTMLDivElement, content: string): void {
+				let header = document.createElement("h4");
+				header.textContent = content;
+				dataSection.appendChild(header);
+			}
+
 			for (let i = 0; i < this.NODE_COUNT; i++) {
 				let generalNode = this.generalNodes[i];
 				let detailsNode = this.detailsNodes[i];
@@ -330,46 +391,19 @@ class ApplicantEntries {
 						dataSection.removeChild(dataSection.lastChild!);
 					}
 
-					interface IFormItem {
-						name: string;
-						label: string;
-						type: string;
-						value?: string;
-						values?: string[];
-						file?: {
-							original_name: string;
-							encoding: string;
-							mimetype: string;
-							path: string;
-							size: number;
-							size_formatted: string;
-						};
+					if (user.application) {
+						addApplicationDataHeader(dataSection, `Application data (${user.application.type})`);
+						addApplicationData(dataSection, user.application.data);
 					}
-					for (let answer of user.application.data as IFormItem[]) {
-						let row = document.createElement("p");
-						let label = document.createElement("b");
-						label.innerHTML = answer.label;
-						row.appendChild(label);
-						let value = "";
-						if (answer.value) {
-							value = answer.value;
-						}
-						else if (answer.values) {
-							value = answer.values.join(", ");
-						}
-						else if (answer.file) {
-							value = `[${answer.file.mimetype} | ${answer.file.size_formatted}]: ${answer.file.path}`;
-						}
-						row.appendChild(document.createTextNode(` → ${value}`));
-						if (answer.file) {
-							row.appendChild(document.createTextNode(" ("));
-							let link = document.createElement("a");
-							link.setAttribute("href", `/${answer.file.path}`);
-							link.textContent = "Download";
-							row.appendChild(link);
-							row.appendChild(document.createTextNode(")"));
-						}
-						dataSection.appendChild(row);
+					else {
+						addApplicationDataHeader(dataSection, "No application data");
+					}
+					if (user.confirmation) {
+						addApplicationDataHeader(dataSection, `Confirmation data (${user.confirmation.type})`);
+						addApplicationData(dataSection, user.confirmation.data);
+					}
+					else {
+						addApplicationDataHeader(dataSection, "No confirmation data");
 					}
 				}
 				else {
@@ -678,8 +712,8 @@ declare let data: {
 declare const Chart: any;
 
 // Get the text color and use that for graphs
-const header = document.querySelector("#sidebar > h1") as HTMLHeadingElement;
-const color = window.getComputedStyle(header).getPropertyValue("color");
+const pageHeader = document.querySelector("#sidebar > h1") as HTMLHeadingElement;
+const color = window.getComputedStyle(pageHeader).getPropertyValue("color");
 
 for (let i = 0; i < data.length; i++) {
 	let context = document.getElementById(`chart-${i}`) as HTMLCanvasElement | null;
