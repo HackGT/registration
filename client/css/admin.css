@@ -21,6 +21,16 @@ table td:last-child {
     width: 50px;
     text-align: center;
 }
+#applicants > .search > * {
+    padding: 10px;
+}
+#applicants > .search > label {
+    min-width: 60px;
+    text-align: right;
+}
+#applicants > .search > button {
+    min-width: 100px;
+}
 #applicants table td:last-child {
     width: 140px;
 }
