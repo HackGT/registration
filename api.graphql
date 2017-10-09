@@ -13,7 +13,7 @@ type Query {
   # seen from the latest page retrieved, if you want the first page leave this out.
   users(pagination_token: ID, n: Int!, filter: UserFilter): [User!]!
   # Search through a user's name and email through regex
-  search_user(search: String!, use_regex: Boolean = false, offset: Int!, n: Int!, filter: UserFilter): [User!]!
+  search_user(search: String!, use_regex: Boolean = false, offset: Int!, n: Int!, filter: UserFilter): SearchResult!
   # All possible application question branches
   application_branches: [String!]!
   # All possible confirmation question branches
@@ -22,6 +22,18 @@ type Query {
   question_branches: [String!]!
   # All possible question names, or names of question in a branch
   question_names(branch: String): [String!]
+}
+
+# A search result containing the results and associated data
+type SearchResult {
+  # The offset passed to the search
+  offset: Int!
+  # The number of users returned by this query (limited by n)
+  count: Int!
+  # The total number of users that match this query (but not necessarily returned)
+  total: Int!
+  # The array of matching users
+  users: [User!]!
 }
 
 # Registration info about the user
@@ -35,6 +47,11 @@ type User {
   email: String!
   # If the user's email is a verified email
   email_verified: Boolean!
+  # Login method(s) this user uses (merged by email address)
+  login_methods: [String!]!
+
+  # If the user has admin privileges
+  admin: Boolean!
 
   # If the user has applied to the event
   applied: Boolean!
@@ -100,12 +117,16 @@ type Branch {
 type Team {
   # ID of the Team
   id: ID!
+  # Name of the Team
+  name: String!
 }
 
 # Entries to various forms (application, confirmation, etc.)
 type FormItem {
-  # Name of the question / form item
+  # Name (basically the ID) of the question / form item
   name: String!
+  # Label of form item
+  label: String!
   # Type of form item (textbox, checkbox, phone no.)
   type: String!
   # Value (if just one string)
@@ -128,5 +149,7 @@ type File {
   path: String!
   # The size of the file in bytes
   size: Int!
+  # The formatted size of the file in human-readable units
+  size_formatted: String!
 }
 
