@@ -138,8 +138,13 @@
 			<section id="applicants">
 				<h2>Applicants</h2>
 				<div class="center">
-					<a href="/api/user/all/export" class="btn">Export for check in</a>
 					<button id="send-acceptances">Send acceptance emails</button>
+				</div>
+				<div class="center" class="search">
+					<input id="applicant-search" type="text" placeholder="Search applicants" />
+					<label for="applicant-search-regex">Use regex</label>
+					<input id="applicant-search-regex" type="checkbox" />
+					<button id="applicant-search-execute">Search</button>
 				</div>
 				<table>
 					<thead>
