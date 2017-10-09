@@ -195,7 +195,12 @@ function userFilterToMongo(filter: types.UserFilter | undefined) {
 		return {};
 	}
 	const query: { [name: string]: any } = {};
-	const setIf = (key: string, val: any) => val ? query[key] = val : undefined;
+	
+	function setIf(key: string, val: any): void {
+		if (val !== null && val !== undefined) {
+			query[key] = val;
+		}
+	}
 	setIf("applied", filter.applied);
 	setIf("accepted", filter.accepted);
 	setIf("attending", filter.attending);
