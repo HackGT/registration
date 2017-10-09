@@ -47,33 +47,69 @@ class UserEntries {
 		const status = document.getElementById("users-entries-status") as HTMLParagraphElement;
 		status.textContent = "Loading...";
 
-		let query: { [index: string]: any } = {
+		let query = `
+		query($offset: Int!, $count: Int!) {
+			search_user(search: "", offset: $offset, n: $count) {
+				offset,
+				count,
+				total,
+				users {
+					id,
+					name,
+					email,
+					email_verified,
+					admin,
+					login_methods,
+
+					application {
+						type
+					},
+					confirmation {
+						type
+					},
+					applied,
+					accepted,
+					attending
+				}
+			}
+		}`;
+		let variables = {
 			offset: this.offset,
 			count: this.NODE_COUNT
 		};
-		let params = Object.keys(query)
-			.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
-			.join("&")
-			.replace(/%20/g, "+");
-		fetch(`/api/admin/users?${params}`, {
+
+		fetch("/graphql", {
 			credentials: "same-origin",
-			method: "GET"
+			method: "POST",
+			headers: new Headers({
+				"Content-Type": "application/json"
+			}),
+			body: JSON.stringify({
+				query,
+				variables
+			})
 		}).then(checkStatus).then(parseJSON).then((response: {
-			offset: number;
-			count: number;
-			total: number;
-			data: any[];
+			data: {
+				search_user: {
+					offset: number;
+					count: number;
+					total: number;
+					users: any[];
+				};
+			};
 		}) => {
+			let res = response.data.search_user;
+
 			for (let i = 0; i < this.NODE_COUNT; i++) {
 				let node = this.nodes[i];
-				let user = response.data[i];
+				let user = res.users[i];
 
 				if (user) {
 					node.style.display = "table-row";
 					node.querySelector("td.name")!.textContent = user.name;
 					node.querySelector("td.email > span")!.textContent = user.email;
 					node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
-					if (user.verifiedEmail) {
+					if (user.email_verified) {
 						node.querySelector("td.email")!.classList.add("verified");
 					}
 					else {
@@ -82,33 +118,44 @@ class UserEntries {
 					if (user.admin) {
 						node.querySelector("td.email")!.classList.add("admin");
 					}
-					node.querySelector("td.status")!.textContent = user.status;
-					node.querySelector("td.login-method")!.textContent = user.loginMethods;
+
+					let userStatus = "Signed up";
+					if (user.applied) {
+						userStatus = `Applied (${user.application.type})`;
+					}
+					if (user.applied && user.accepted) {
+						userStatus = `Accepted (${user.application.type})`;
+					}
+					if (user.applied && user.accepted && user.attending) {
+						userStatus = `Accepted (${user.application.type}) / Confirmed (${user.confirmation.type})`;
+					}
+					node.querySelector("td.status")!.textContent = userStatus;
+					node.querySelector("td.login-method")!.textContent = user.login_methods.join(", ");
 				}
 				else {
 					node.style.display = "none";
 				}
 			}
 
-			if (response.offset <= 0) {
+			if (res.offset <= 0) {
 				this.previousButton.disabled = true;
 			}
 			else {
 				this.previousButton.disabled = false;
 			}
-			let upperBound = response.offset + response.count;
-			if (upperBound >= response.total) {
-				upperBound = response.total;
+			let upperBound = res.offset + res.count;
+			if (upperBound >= res.total) {
+				upperBound = res.total;
 				this.nextButton.disabled = true;
 			}
 			else {
 				this.nextButton.disabled = false;
 			}
-			let lowerBound = response.offset + 1;
-			if (response.data.length <= 0) {
+			let lowerBound = res.offset + 1;
+			if (res.users.length <= 0) {
 				lowerBound = 0;
 			}
-			status.textContent = `${lowerBound} – ${upperBound} of ${response.total.toLocaleString()}`;
+			status.textContent = `${lowerBound} – ${upperBound} of ${res.total.toLocaleString()}`;
 		}).catch(async err => {
 			console.error(err);
 			await sweetAlert("Oh no!", err.message, "error");
@@ -280,7 +327,7 @@ class ApplicantEntries {
 			}
 		};
 
-		fetch(`/graphql`, {
+		fetch("/graphql", {
 			credentials: "same-origin",
 			method: "POST",
 			headers: new Headers({
