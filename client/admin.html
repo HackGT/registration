@@ -11,7 +11,6 @@
 		<link rel="stylesheet" href="/css/main.css" />
 		<link rel="stylesheet" href="/css/admin.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
-		<script src="/node_modules/es6-promise/dist/es6-promise.auto.min.js"></script>
 		<script src="/node_modules/whatwg-fetch/fetch.js"></script>
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
@@ -138,8 +137,13 @@
 			<section id="applicants">
 				<h2>Applicants</h2>
 				<div class="center">
-					<a href="/api/user/all/export" class="btn">Export for check in</a>
 					<button id="send-acceptances">Send acceptance emails</button>
+				</div>
+				<div class="center search">
+					<input id="applicant-search" type="text" placeholder="Search applicants" />
+					<label for="applicant-search-regex">Use regex</label>
+					<input id="applicant-search-regex" type="checkbox" />
+					<button id="applicant-search-execute">Search</button>
 				</div>
 				<table>
 					<thead>
@@ -150,15 +154,24 @@
 						<th>
 							<select id="branch-filter">
 								<option value="*">All types</option>
-								{{#each branchNames}}
-									<option value="{{this}}">{{this}}</span>
-								{{/each}}
+								<optgroup label="Application">
+									{{#each settings.branches.application}}
+										<option value="application-{{this.name}}">{{this.name}}</option>
+									{{/each}}
+								</optgroup>
+								<optgroup label="Confirmation">
+									{{#each settings.branches.confirmation}}
+										<option value="confirmation-{{this.name}}">{{this.name}}</option>
+									{{/each}}
+								</optgroup>
 							</select>
 						</th>
 						<th>
 							<select id="status-filter">
 								<option value="no-decision">No decision</option>
 								<option value="accepted">Accepted</option>
+								<option value="not-confirmed">Not confirmed</option>
+								<option value="confirmed">Confirmed</option>
 								<!--<option value="rejected">Rejected</option>-->
 								<option value="*">All</option>
 							</select>

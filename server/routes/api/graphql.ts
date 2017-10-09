@@ -6,9 +6,10 @@ import * as express from "express";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import { makeExecutableSchema } from "graphql-tools";
 import { isAdmin, authenticateWithRedirect } from "../../middleware";
-import { User, IUser, IFormItem, QuestionBranchConfig } from "../../schema";
-import { Branches, Tags, AllTags } from "../../branch";
+import { User, IUser, Team, IFormItem, QuestionBranchConfig } from "../../schema";
+import { Branches, Tags, AllTags, BranchConfig, ApplicationBranch, ConfirmationBranch, NoopBranch } from "../../branch";
 import { schema as types } from "./api.graphql.types";
+import { formatSize } from "../../common";
 
 const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphql"), "utf8");
 
@@ -30,7 +31,7 @@ const resolvers: IResolver = {
 		user: async (prev, args, request) => {
 			const id = args.id || (request.user as IUser).uuid;
 			const user = await User.findOne({uuid: id});
-			return user ? userRecordToGraphql(user) : undefined;
+			return user ? await userRecordToGraphql(user) : undefined;
 		},
 		users: async (prev, args) => {
 			const lastIdQuery = args.pagination_token ? {
@@ -45,7 +46,7 @@ const resolvers: IResolver = {
 				})
 				.limit(args.n);
 
-			return allUsers.map(userRecordToGraphql);
+			return await Promise.all(allUsers.map(userRecordToGraphql));
 		},
 		search_user: async (prev, args) => {
 			let escapedQuery: string = args.search;
@@ -53,26 +54,35 @@ const resolvers: IResolver = {
 				escapedQuery = escapedQuery.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
 			}
 			const queryRegExp = new RegExp(escapedQuery, "i");
-
+			const query = [
+				{
+					name: {
+						$regex: queryRegExp
+					}
+				},
+				{
+					email: {
+						$regex: queryRegExp
+					}
+				}
+			];
+			const total = await User.find(userFilterToMongo(args.filter))
+				.or(query)
+				.count();
 			const results = await User
 				.find(userFilterToMongo(args.filter))
-				.or([
-					{
-						name: {
-							$regex: queryRegExp
-						}
-					},
-					{
-						email: {
-							$regex: queryRegExp
-						}
-					}
-				])
+				.or(query)
+				.collation({ "locale": "en" }).sort({ name: "asc" })
 				.skip(args.offset)
 				.limit(args.n)
 				.exec();
 
-			return results.map(userRecordToGraphql);
+			return {
+				offset: args.offset,
+				count: results.length,
+				total,
+				users: await Promise.all(results.map(userRecordToGraphql))
+			};
 		},
 		question_branches: () => {
 			return Branches;
@@ -115,18 +125,33 @@ async function findQuestions(
 	args: { names: string[] }
 ): Promise<types.FormItem<Ctx>[]> {
 	const user = await User.findOne({uuid: target.id});
-	if (!user) return [];
+	if (!user) {
+		return [];
+	}
 
 	const names = new Set(args.names);
 
-	return user.confirmationData.concat(user.applicationData)
-		.reduce((results, question) => {
-			if (names.has(question.name)) {
-				results.push(question);
-			}
-			return results;
-		}, [] as IFormItem[])
-		.map(recordToFormItem);
+	function questionFilter(results: IFormItem[], question: IFormItem): IFormItem[] {
+		if (names.has(question.name)) {
+			results.push(question);
+		}
+		return results;
+	}
+
+	let items: types.FormItem<Ctx>[] = [];
+	if (user.accepted) {
+		items = items.concat(await Promise.all(user.applicationData
+			.reduce(questionFilter, [])
+			.map(item => recordToFormItem(item, user.applicationBranch))
+		));
+	}
+	if (user.attending) {
+		items = items.concat(await Promise.all(user.confirmationData
+			.reduce(questionFilter, [])
+			.map(item => recordToFormItem(item, user.confirmationBranch))
+		));
+	}
+	return items;
 }
 
 export const schema = makeExecutableSchema({
@@ -170,7 +195,12 @@ function userFilterToMongo(filter: types.UserFilter | undefined) {
 		return {};
 	}
 	const query: { [name: string]: any } = {};
-	const setIf = (key: string, val: any) => val ? query[key] = val : undefined;
+
+	function setIf(key: string, val: any): void {
+		if (val !== null && val !== undefined) {
+			query[key] = val;
+		}
+	}
 	setIf("applied", filter.applied);
 	setIf("accepted", filter.accepted);
 	setIf("attending", filter.attending);
@@ -179,16 +209,26 @@ function userFilterToMongo(filter: types.UserFilter | undefined) {
 	return query;
 }
 
-function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
+let cachedBranches: {
+	[name: string]: NoopBranch | ApplicationBranch | ConfirmationBranch;
+} = {};
+async function recordToFormItem(item: IFormItem, branchName: string): Promise<types.FormItem<Ctx>> {
+	if (!cachedBranches[branchName]) {
+		cachedBranches[branchName] = await BranchConfig.loadBranchFromDB(branchName);
+	}
+	let label: string = cachedBranches[branchName].questionLabels[item.name] || item.name;
+
 	if (!item.value) {
 		return {
 			name: item.name,
+			label,
 			type: item.type
 		};
 	}
 	else if (typeof item.value === "string") {
 		return {
 			name: item.name,
+			label,
 			type: item.type,
 			value: item.value
 		};
@@ -196,6 +236,7 @@ function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
 	else if (item.value instanceof Array) {
 		return {
 			name: item.name,
+			label,
 			type: item.type,
 			values: item.value
 		};
@@ -205,22 +246,24 @@ function recordToFormItem(item: IFormItem): types.FormItem<Ctx> {
 		const file = item.value as Express.Multer.File;
 		return {
 			name: item.name,
+			label,
 			type: item.type,
 			file: {
 				original_name: file.originalname,
 				encoding: file.encoding,
 				mimetype: file.mimetype,
 				path: file.path,
-				size: file.size
+				size: file.size,
+				size_formatted: formatSize(file.size)
 			}
 		};
 	}
 }
 
-function userRecordToGraphql(user: IUser): types.User<Ctx> {
+async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 	const application: types.Branch<Ctx> | undefined = user.applied ? {
 			type: user.applicationBranch,
-			data: user.applicationData.map(recordToFormItem),
+			data: await Promise.all(user.applicationData.map(item => recordToFormItem(item, user.applicationBranch))),
 			start_time: user.applicationStartTime &&
 				user.applicationStartTime.toDateString(),
 			submit_time: user.applicationSubmitTime &&
@@ -229,19 +272,37 @@ function userRecordToGraphql(user: IUser): types.User<Ctx> {
 
 	const confirmation: types.Branch<Ctx> | undefined = user.attending ? {
 		type: user.confirmationBranch,
-		data: user.confirmationData.map(recordToFormItem),
+		data: await Promise.all(user.confirmationData.map(item => recordToFormItem(item, user.confirmationBranch))),
 		start_time: user.confirmationStartTime &&
 			user.confirmationStartTime.toDateString(),
 		submit_time: user.confirmationSubmitTime &&
 			user.confirmationSubmitTime.toDateString()
 	} : undefined;
 
+	let loginMethods: string[] = [];
+	if (user.githubData && user.githubData.id) {
+		loginMethods.push("GitHub");
+	}
+	if (user.googleData && user.googleData.id) {
+		loginMethods.push("Google");
+	}
+	if (user.facebookData && user.facebookData.id) {
+		loginMethods.push("Facebook");
+	}
+	if (user.localData && user.localData.hash) {
+		loginMethods.push("Local");
+	}
+
+	let team = user.teamId ? await Team.findById(user.teamId) : null;
+
 	return {
 		id: user.uuid,
 
-		name: user.name,
+		name: user.name || "",
 		email: user.email,
 		email_verified: !!user.verifiedEmail,
+		admin: !!user.admin,
+		login_methods: loginMethods,
 
 		applied: !!user.applied,
 		accepted: !!user.accepted,
@@ -254,7 +315,8 @@ function userRecordToGraphql(user: IUser): types.User<Ctx> {
 		// Will be filled in child resolver.
 		questions: [],
 		team: user.teamId && {
-			id: user.teamId.toHexString()
+			id: user.teamId.toHexString(),
+			name: team ? team.teamName : "(Missing team)"
 		},
 
 		pagination_token: user._id.toHexString()
