@@ -141,14 +141,17 @@ class UserEntries {
 }
 
 class ApplicantEntries {
-	private static readonly NODE_COUNT = 100;
+	private static readonly NODE_COUNT = 10;
 	private static generalNodes: HTMLTableRowElement[] = [];
 	private static detailsNodes: HTMLTableRowElement[] = [];
 	private static offset: number = 0;
+	private static readonly searchButton = document.getElementById("applicant-search-execute") as HTMLButtonElement;
 	private static readonly previousButton = document.getElementById("applicants-entries-previous") as HTMLButtonElement;
 	private static readonly nextButton = document.getElementById("applicants-entries-next") as HTMLButtonElement;
 	private static readonly branchFilter = document.getElementById("branch-filter") as HTMLInputElement;
 	private static readonly statusFilter = document.getElementById("status-filter") as HTMLInputElement;
+	private static readonly searchBox = document.getElementById("applicant-search") as HTMLInputElement;
+	private static readonly searchRegex = document.getElementById("applicant-search-regex") as HTMLInputElement;
 	private static filter: any = {};
 
 	private static instantiate() {
@@ -182,12 +185,34 @@ class ApplicantEntries {
 	}
 	private static updateFilter() {
 		this.filter = {};
+
 		if (this.branchFilter.value !== "*") {
-			this.filter.branch = this.branchFilter.value;
+			let [, type, branchName] = this.branchFilter.value.match(/^(application|confirmation)-(.*)$/)!;
+			if (type === "application") {
+				this.filter.application_branch = branchName;
+			}
+			else if (type === "confirmation") {
+				this.filter.confirmation_branch = branchName;
+			}
 		}
-		if (this.statusFilter.value !== "*") {
-			this.filter.status = this.statusFilter.value;
+
+		switch (this.statusFilter.value) {
+			case "no-decision":
+				this.filter.accepted = false;
+				break;
+			case "accepted":
+				this.filter.accepted = true;
+				break;
+			case "not-confirmed":
+				this.filter.accepted = true;
+				this.filter.attending = false;
+				break;
+			case "confirmed":
+				this.filter.accepted = true;
+				this.filter.attending = true;
+				break;
 		}
+
 		this.offset = 0;
 		this.load();
 	}
@@ -195,40 +220,91 @@ class ApplicantEntries {
 		const status = document.getElementById("applicants-entries-status") as HTMLParagraphElement;
 		status.textContent = "Loading...";
 
-		let query: { [index: string]: any } = {
+		let query = `
+		query($search: String!, $useRegex: Boolean!, $offset: Int!, $count: Int!, $filter: UserFilter!) {
+			search_user(search: $search, use_regex: $useRegex, offset: $offset, n: $count, filter: $filter) {
+				offset,
+				count,
+				total,
+				users {
+					id,
+					name,
+					email,
+					email_verified,
+					admin,
+					team {
+						id,
+						name
+					},
+					accepted,
+					attending,
+					application {
+						type,
+						data {
+							name,
+							label,
+							value,
+							values,
+							file {
+								mimetype,
+								size_formatted,
+								path
+							}
+						}
+					},
+					confirmation {
+						type
+					}
+				}
+			}
+		}`;
+		let variables = {
+			search: this.searchBox.value,
+			useRegex: this.searchRegex.checked,
 			offset: this.offset,
 			count: this.NODE_COUNT,
-			applied: true,
-			...this.filter
+			filter: {
+				applied: true,
+				...this.filter
+			}
 		};
-		let params = Object.keys(query)
-			.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
-			.join("&")
-			.replace(/%20/g, "+");
-		fetch(`/api/admin/users?${params}`, {
+
+		fetch(`/graphql`, {
 			credentials: "same-origin",
-			method: "GET"
+			method: "POST",
+			headers: new Headers({
+				"Content-Type": "application/json"
+			}),
+			body: JSON.stringify({
+				query,
+				variables
+			})
 		}).then(checkStatus).then(parseJSON).then((response: {
-			offset: number;
-			count: number;
-			total: number;
-			data: any[];
+			data: {
+				search_user: {
+					offset: number;
+					count: number;
+					total: number;
+					users: any[];
+				};
+			};
 		}) => {
+			let res = response.data.search_user;
 			for (let i = 0; i < this.NODE_COUNT; i++) {
 				let generalNode = this.generalNodes[i];
 				let detailsNode = this.detailsNodes[i];
-				let user = response.data[i];
+				let user = res.users[i];
 
 				if (user) {
 					generalNode.style.display = "table-row";
 					detailsNode.style.display = "table-row";
 
-					generalNode.dataset.id = user.uuid;
+					generalNode.dataset.id = user.id;
 					generalNode.querySelector("td.name")!.textContent = user.name;
 					generalNode.querySelector("td.team")!.textContent = "";
-					if (user.teamName) {
+					if (user.team) {
 						let teamContainer = document.createElement("b");
-						teamContainer.textContent = user.teamName;
+						teamContainer.textContent = user.team.name;
 						generalNode.querySelector("td.team")!.appendChild(teamContainer);
 					}
 					else {
@@ -236,7 +312,7 @@ class ApplicantEntries {
 					}
 					generalNode.querySelector("td.email > span")!.textContent = user.email;
 					generalNode.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
-					if (user.verifiedEmail) {
+					if (user.email_verified) {
 						generalNode.querySelector("td.email")!.classList.add("verified");
 					}
 					else {
@@ -245,7 +321,7 @@ class ApplicantEntries {
 					if (user.admin) {
 						generalNode.querySelector("td.email")!.classList.add("admin");
 					}
-					generalNode.querySelector("td.branch")!.textContent = user.applicationBranch;
+					generalNode.querySelector("td.branch")!.textContent = user.application.type;
 					let statusSelect = generalNode.querySelector("select.status") as HTMLSelectElement;
 					statusSelect.value = user.accepted ? "accepted" : "no-decision";
 
@@ -253,16 +329,42 @@ class ApplicantEntries {
 					while (dataSection.hasChildNodes()) {
 						dataSection.removeChild(dataSection.lastChild!);
 					}
-					for (let answer of user.applicationDataFormatted as { label: string; value: string; filename?: string }[]) {
+
+					interface IFormItem {
+						name: string;
+						label: string;
+						type: string;
+						value?: string;
+						values?: string[];
+						file?: {
+							original_name: string;
+							encoding: string;
+							mimetype: string;
+							path: string;
+							size: number;
+							size_formatted: string;
+						};
+					}
+					for (let answer of user.application.data as IFormItem[]) {
 						let row = document.createElement("p");
 						let label = document.createElement("b");
 						label.innerHTML = answer.label;
 						row.appendChild(label);
-						row.appendChild(document.createTextNode(` → ${answer.value}`));
-						if (answer.filename) {
+						let value = "";
+						if (answer.value) {
+							value = answer.value;
+						}
+						else if (answer.values) {
+							value = answer.values.join(", ");
+						}
+						else if (answer.file) {
+							value = `[${answer.file.mimetype} | ${answer.file.size_formatted}]: ${answer.file.path}`;
+						}
+						row.appendChild(document.createTextNode(` → ${value}`));
+						if (answer.file) {
 							row.appendChild(document.createTextNode(" ("));
 							let link = document.createElement("a");
-							link.setAttribute("href", `/uploads/${answer.filename}`);
+							link.setAttribute("href", `/${answer.file.path}`);
 							link.textContent = "Download";
 							row.appendChild(link);
 							row.appendChild(document.createTextNode(")"));
@@ -276,25 +378,25 @@ class ApplicantEntries {
 				}
 			}
 
-			if (response.offset <= 0) {
+			if (res.offset <= 0) {
 				this.previousButton.disabled = true;
 			}
 			else {
 				this.previousButton.disabled = false;
 			}
-			let upperBound = response.offset + response.count;
-			if (upperBound >= response.total) {
-				upperBound = response.total;
+			let upperBound = res.offset + res.count;
+			if (upperBound >= res.total) {
+				upperBound = res.total;
 				this.nextButton.disabled = true;
 			}
 			else {
 				this.nextButton.disabled = false;
 			}
-			let lowerBound = response.offset + 1;
-			if (response.data.length <= 0) {
+			let lowerBound = res.offset + 1;
+			if (res.users.length <= 0) {
 				lowerBound = 0;
 			}
-			status.textContent = `${lowerBound} – ${upperBound} of ${response.total.toLocaleString()}`;
+			status.textContent = `${lowerBound} – ${upperBound} of ${res.total.toLocaleString()}`;
 		}).catch(async err => {
 			console.error(err);
 			await sweetAlert("Oh no!", err.message, "error");
@@ -305,7 +407,15 @@ class ApplicantEntries {
 		this.generalNodes = [];
 		this.instantiate();
 		this.offset = 0;
-		this.load();
+		this.updateFilter();
+		this.searchButton.addEventListener("click", () => {
+			this.updateFilter();
+		});
+		this.searchBox.addEventListener("keydown", event => {
+			if (event.key === "Enter") {
+				this.updateFilter();
+			}
+		});
 		this.previousButton.addEventListener("click", () => {
 			this.previous();
 		});
@@ -320,10 +430,12 @@ class ApplicantEntries {
 		});
 	}
 	public static next() {
+		document.querySelector("#applicants > table")!.scrollIntoView();
 		this.offset += this.NODE_COUNT;
 		this.load();
 	}
 	public static previous() {
+		document.querySelector("#applicants > table")!.scrollIntoView();
 		this.offset -= this.NODE_COUNT;
 		if (this.offset < 0) {
 			this.offset = 0;

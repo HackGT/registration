@@ -548,7 +548,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user,
-		branchNames: await Branches.BranchConfig.getNames(),
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),

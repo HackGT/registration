@@ -131,7 +131,7 @@ async function findQuestions(
 
 	const names = new Set(args.names);
 
-	function questionFilter (results: IFormItem[], question: IFormItem): IFormItem[] {
+	function questionFilter(results: IFormItem[], question: IFormItem): IFormItem[] {
 		if (names.has(question.name)) {
 			results.push(question);
 		}
@@ -195,7 +195,7 @@ function userFilterToMongo(filter: types.UserFilter | undefined) {
 		return {};
 	}
 	const query: { [name: string]: any } = {};
-	
+
 	function setIf(key: string, val: any): void {
 		if (val !== null && val !== undefined) {
 			query[key] = val;
