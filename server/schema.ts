@@ -326,7 +326,6 @@ export interface StatisticEntry {
 	"responses": ResponseCount[];
 }
 export interface IAdminTemplate extends ICommonTemplate {
-	branchNames: string[];
 	applicationStatistics: {
 		totalUsers: number;
 		appliedUsers: number;
