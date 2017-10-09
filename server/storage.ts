@@ -13,7 +13,7 @@ import * as AWS from "aws-sdk";
 export interface IStorageEngine {
 	uploadRoot: string;
 	saveFile(currentPath: string, name: string): Promise<void>;
-	readFile(name: string): Readable;
+	readFile(name: string): Promise<Readable>;
 }
 interface ICommonOptions {
 	uploadDirectory: string;
@@ -56,7 +56,7 @@ class DiskStorageEngine implements IStorageEngine {
 			readStream.pipe(writeStream);
 		});
 	}
-	public readFile(name: string): Readable {
+	public async readFile(name: string): Promise<Readable> {
 		return fs.createReadStream(path.join(this.options.uploadDirectory, name));
 	}
 }
@@ -101,7 +101,7 @@ class S3StorageEngine implements IStorageEngine {
 			}).catch(reject);
 		});
 	}
-	public readFile(name: string): Readable {
+	public async readFile(name: string): Promise<Readable> {
 		AWS.config.update({
 			region: this.options.region,
 			credentials: new AWS.Credentials({
@@ -110,14 +110,13 @@ class S3StorageEngine implements IStorageEngine {
 			})
 		});
 		let s3 = new AWS.S3();
-		let stream = s3.getObject({
+		const object = {
 			Bucket: this.options.bucket,
 			Key: name
-		}).createReadStream();
-		stream.on("error", err => {
-			throw err;
-		});
-		return stream;
+		};
+		// Will throw if the object does not exist
+		await s3.headObject(object).promise();
+		return s3.getObject(object).createReadStream();
 	}
 }
 
