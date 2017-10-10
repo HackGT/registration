@@ -48,41 +48,9 @@ const resolvers: IResolver = {
 
 			return await Promise.all(allUsers.map(userRecordToGraphql));
 		},
-		search_user: async (prev, args) => {
-			let escapedQuery: string = args.search;
-			if (!args.use_regex) {
-				escapedQuery = escapedQuery.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
-			}
-			const queryRegExp = new RegExp(escapedQuery, "i");
-			const query = [
-				{
-					name: {
-						$regex: queryRegExp
-					}
-				},
-				{
-					email: {
-						$regex: queryRegExp
-					}
-				}
-			];
-			const total = await User.find(userFilterToMongo(args.filter))
-				.or(query)
-				.count();
-			const results = await User
-				.find(userFilterToMongo(args.filter))
-				.or(query)
-				.collation({ "locale": "en" }).sort({ name: "asc" })
-				.skip(args.offset)
-				.limit(args.n)
-				.exec();
-
-			return {
-				offset: args.offset,
-				count: results.length,
-				total,
-				users: await Promise.all(results.map(userRecordToGraphql))
-			};
+		search_user: searchUser,
+		search_user_simple: async (prev, args) => {
+			return (await searchUser(prev, args)).users;
 		},
 		question_branches: () => {
 			return Branches;
@@ -119,6 +87,49 @@ const resolvers: IResolver = {
 		}
 	}
 };
+
+async function searchUser(prev: any, args: {
+	search: string;
+	use_regex: boolean;
+	offset: number;
+	n: number;
+	filter: types.UserFilter;
+}) {
+	let escapedQuery: string = args.search;
+	if (!args.use_regex) {
+		escapedQuery = escapedQuery.trim().replace(/[|\\{()[^$+*?.-]/g, "\\$&");
+	}
+	const queryRegExp = new RegExp(escapedQuery, "i");
+	const query = [
+		{
+			name: {
+				$regex: queryRegExp
+			}
+		},
+		{
+			email: {
+				$regex: queryRegExp
+			}
+		}
+	];
+	const total = await User.find(userFilterToMongo(args.filter))
+		.or(query)
+		.count();
+	const results = await User
+		.find(userFilterToMongo(args.filter))
+		.or(query)
+		.collation({ "locale": "en" }).sort({ name: "asc" })
+		.skip(args.offset)
+		.limit(args.n)
+		.exec();
+
+	return {
+		offset: args.offset,
+		count: results.length,
+		total,
+		users: await Promise.all(results.map(userRecordToGraphql))
+	};
+}
 
 async function findQuestions(
 	target: types.User<express.Request>,
