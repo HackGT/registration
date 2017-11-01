@@ -150,7 +150,7 @@ async function findQuestions(
 	}
 
 	let items: types.FormItem<Ctx>[] = [];
-	if (user.accepted) {
+	if (user.applied) {
 		items = items.concat(await Promise.all(user.applicationData
 			.reduce(questionFilter, [])
 			.map(item => recordToFormItem(item, user.applicationBranch))
