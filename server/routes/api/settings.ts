@@ -280,5 +280,7 @@ settingsRoutes.route("/send_batch_email")
 		});
 
 		console.log(`Batch email sent by ${request.user.email}`);
-		return "";
+		return response.json({
+			"success": true
+		});
 	});
