@@ -272,15 +272,18 @@ settingsRoutes.route("/send_batch_email")
 			userEmails += user.email + ",";
 		}
 
-		await sendMailAsync({
-			from: config.email.from,
-			to: userEmails,
-			subject,
-			html,
-			text
-		});
+		if (userEmails.length > 0) {
+			await sendMailAsync({
+				from: config.email.from,
+				to: userEmails,
+				subject,
+				html,
+				text
+			});
 
-		console.log(`Batch email sent by ${request.user.email}`);
+			console.log(`Batch email sent by ${request.user.email}`);
+		}
+
 		return response.json({
 			"success": true
 		});
