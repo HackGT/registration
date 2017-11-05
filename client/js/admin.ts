@@ -890,14 +890,15 @@ sendEmailButton.addEventListener("click", () => {
 
 	let filter = generateFilter(emailBranchFilter, emailStatusFilter);
 
+	let content = new FormData();
+	content.append("filter", JSON.stringify(filter));
+	content.append("subject", subject);
+	content.append("markdownContent", markdownContent);
+
 	return fetch(`/api/settings/send_batch_email`, {
 		credentials: "same-origin",
 		method: "POST",
-		body: {
-			filter,
-			subject,
-			markdownContent
-		}
+		body: content
 	}).then(checkStatus).then(parseJSON).then((result: string) => {
 		console.log(result);
 		sweetAlert("Dank!", "Successfully sent out your batch email!", "success");

@@ -243,19 +243,20 @@ settingsRoutes.route("/email_content/rendered")
 
 settingsRoutes.route("/send_batch_email")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
-		let filter = request.body.filter;
+
+		let filter = JSON.parse(request.body.filter);
 		let subject = request.body.subject;
-		let markdownContent = request.body.content;
+		let markdownContent = request.body.markdownContent;
 
 		if (typeof filter !== "object") {
 			return response.status(400).json({
 				"error": `Your query '${filter}' is not a valid MongoDB query`
 			});
-		} else if (subject === "") {
+		} else if (subject === "" || subject === undefined) {
 			return response.status(400).json({
 				"error": "Can't have an empty subject!"
 			});
-		} else if (markdownContent === "") {
+		} else if (markdownContent === "" || markdownContent === undefined) {
 			return response.status(400).json({
 				"error": "Can't have an empty email body!"
 			});
