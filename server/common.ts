@@ -433,7 +433,9 @@ export async function renderMarkdown(markdown: string, options?: MarkedOptions, 
 		});
 	});
 }
-export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
+export async function renderEmailHTML(markdown: string, user: IUser, generalize = false): Promise<string> {
+	// The `generalize` parameter represents whether we add user templates or not
+
 	let teamName: string;
 	if (await getSetting<boolean>("teamsEnabled")) {
 		teamName = "No team created or joined";
@@ -469,26 +471,29 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 
 	// Interpolate and sanitize variables
 	markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
-	markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
-	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
-	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
-	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
-	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
-	markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
-		let question = user.applicationData.find(data => data.name === name);
-		return formatFormItem(question);
-	});
-	markdown = markdown.replace(/{{confirmation\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
-		let question = user.confirmationData.find(data => data.name === name);
-		return formatFormItem(question);
-	});
+
+	if (!generalize) {
+		markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
+		markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
+		markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
+		markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
+		markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+		markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
+			let question = user.applicationData.find(data => data.name === name);
+			return formatFormItem(question);
+		});
+		markdown = markdown.replace(/{{confirmation\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
+			let question = user.confirmationData.find(data => data.name === name);
+			return formatFormItem(question);
+		});
+	}
 
 	return await renderMarkdown(markdown);
 }
-export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
+export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false, generalize = false): Promise<string> {
 	let html: string;
 	if (!markdownRendered) {
-		html = await renderEmailHTML(markdown, user);
+		html = await renderEmailHTML(markdown, user, generalize);
 	}
 	else {
 		html = markdown;

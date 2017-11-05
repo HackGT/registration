@@ -37,6 +37,7 @@
 				<a href="#applicants" class="btn">Applicants</a>
 				<a href="#batch-accept" class="btn">Batch Accept</a>
 				<a href="#settings" class="btn">Settings</a>
+				<a href="#emails" class="btn">Emails</a>
 			</nav>
 
 			<section id="statistics">
@@ -374,6 +375,43 @@
 					<textarea id="batch-accept-ids" required></textarea>
 					<input type="submit" class="btn" value="Accept"/>
 				</form>
+			</section>
+
+			<section id="emails">
+				<h2>Batch Emails - BE CAREFUL</h2>
+				<select id="email-branch-filter">
+					<option value="*">All types</option>
+					<optgroup label="Application">
+						{{#each settings.branches.application}}
+						<option value="application-{{this.name}}">{{this.name}}</option>
+						{{/each}}
+					</optgroup>
+					<optgroup label="Confirmation">
+						{{#each settings.branches.confirmation}}
+						<option value="confirmation-{{this.name}}">{{this.name}}</option>
+						{{/each}}
+					</optgroup>
+				</select>
+				<select id="email-status-filter">
+					<option value="no-decision">No decision</option>
+					<option value="accepted">Accepted</option>
+					<option value="not-confirmed">Not confirmed</option>
+					<option value="confirmed">Confirmed</option>
+					<!--<option value="rejected">Rejected</option>-->
+					<option value="*">All</option>
+				</select>
+
+				<input type="text" id="batch-email-subject" placeholder="Email Subject"/>
+				<textarea id="batch-email-content"></textarea>
+				<h5>Rendered HTML and text:</h5>
+				<section id="batch-email-rendered"></section>
+
+				<h5>List of variables:</h5>
+				<ul>
+					<li><strong>\{{eventName}}</strong>: The name of the event, configured by the <code>eventName</code> key-value pair in the <code>config.json</code> and displayed at the top of the page.</li>
+				</ul>
+
+				<button id="sendEmail">Hello world</button>
 			</section>
 		{{/sidebar}}
 	</body>

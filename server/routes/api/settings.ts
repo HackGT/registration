@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
+	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText, sendMailAsync, config
 } from "../../common";
 import {
 	isAdmin, uploadHandler
@@ -210,8 +210,8 @@ settingsRoutes.route("/email_content/:type/rendered")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		try {
 			let markdown: string = request.body.content;
-			let html: string = await renderEmailHTML(markdown, request.user);
-			let text: string = await renderEmailText(html, request.user, true);
+			let html: string = await renderEmailHTML(markdown, request.user, false);
+			let text: string = await renderEmailText(html, request.user, true, false);
 
 			response.json({ html, text });
 		}
@@ -221,4 +221,64 @@ settingsRoutes.route("/email_content/:type/rendered")
 				"error": "An error occurred while rendering the email content"
 			});
 		}
+	});
+
+settingsRoutes.route("/email_content/rendered")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		// Endpoint for generalized email, without templating for user args; meant for batch sending email
+		try {
+			let markdown: string = request.body.content;
+			let html: string = await renderEmailHTML(markdown, request.user, true);
+			let text: string = await renderEmailText(html, request.user, true, true);
+
+			response.json({ html, text });
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while rendering the email content"
+			});
+		}
+	});
+
+settingsRoutes.route("/send_batch_email")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		let filter = request.body.filter;
+		let subject = request.body.subject;
+		let markdownContent = request.body.content;
+
+		if (typeof filter !== "object") {
+			return response.status(400).json({
+				"error": `Your query '${filter}' is not a valid MongoDB query`
+			});
+		} else if (subject === "") {
+			return response.status(400).json({
+				"error": "Can't have an empty subject!"
+			});
+		} else if (markdownContent === "") {
+			return response.status(400).json({
+				"error": "Can't have an empty email body!"
+			});
+		}
+
+		let html: string = await renderEmailHTML(markdownContent, request.user, true);
+		let text: string = await renderEmailText(html, request.user, true, true);
+
+		let users = await User.find(filter);
+
+		let userEmails: string = "";
+		for (let user of users) {
+			userEmails += user.email + ",";
+		}
+
+		await sendMailAsync({
+			from: config.email.from,
+			to: userEmails,
+			subject,
+			html,
+			text
+		});
+
+		console.log(`Batch email sent by ${request.user.email}`);
+		return "";
 	});
