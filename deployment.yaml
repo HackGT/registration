@@ -10,8 +10,7 @@ health:
 secrets:
   - ADMIN_KEY_SECRET
   - SESSION_SECRET
-  - EMAIL_USERNAME
-  - EMAIL_PASSWORD
+  - EMAIL_KEY
   - GOOGLE_CLIENT_ID
   - GOOGLE_CLIENT_SECRET
   - GITHUB_CLIENT_ID
@@ -24,8 +23,6 @@ env:
   STORAGE_ENGINE: s3
   COOKIE_SECURE_ONLY: true
   EMAIL_FROM: "HackGT Team <hello@hackgt.com>"
-  EMAIL_HOST: smtp.sendgrid.net
-  EMAIL_PORT: 465
   PRODUCTION: true
   ADMIN_EMAILS:
     - petschekr@gmail.com

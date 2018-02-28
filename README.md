@@ -110,10 +110,7 @@ GOOGLE_CLIENT_SECRET | OAuth client secret for Google *required*
 FACEBOOK_CLIENT_ID | OAuth client ID for Facebook *required*
 FACEBOOK_CLIENT_SECRET | OAuth client secret for Facebook *required*
 EMAIL_FROM | The `From` header for sent emails (default: `HackGT Team <hello@hackgt.com>`)
-EMAIL_HOST | The SMTP email server's hostname (default: *none*)
-EMAIL_PORT | The SMTP email server's port (default: `465`)
-EMAIL_USERNAME | The username for the SMTP email server (default: *none*)
-EMAIL_PASSWORD | The password for the SMTP email server (default: *none*)
+EMAIL_KEY | The SendGrid API key for sending emails (default: *none*)
 ADMIN_EMAILS | A JSON array of the emails of the users that you want promoted to admin status when they create their account (default: none)
 EVENT_NAME | The current event's name which affects rendered templates and sent emails (default: `Untitled Event`)
 STORAGE_ENGINE | The name of the storage engine that handles file uploads as defined in [storage.ts](server/storage.ts) (default: `disk`)
