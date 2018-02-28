@@ -24,10 +24,7 @@ export namespace IConfig {
 	}
 	export interface Email {
 		from: string;
-		host: string;
-		username: string;
-		password: string;
-		port: number;
+		key: string;
 	}
 	export interface Server {
 		isProduction: boolean;
