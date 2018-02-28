@@ -28,10 +28,7 @@ class Config implements IConfig.Main {
 	};
 	public email: IConfig.Email = {
 		from: "HackGT Team <hello@hackgt.com>",
-		host: "",
-		username: "",
-		password: "",
-		port: 465
+		key: ""
 	};
 	public server: IConfig.Server = {
 		isProduction: false,
@@ -159,20 +156,8 @@ class Config implements IConfig.Main {
 		if (process.env.EMAIL_FROM) {
 			this.email.from = process.env.EMAIL_FROM!;
 		}
-		if (process.env.EMAIL_HOST) {
-			this.email.host = process.env.EMAIL_HOST!;
-		}
-		if (process.env.EMAIL_USERNAME) {
-			this.email.username = process.env.EMAIL_USERNAME!;
-		}
-		if (process.env.EMAIL_PASSWORD) {
-			this.email.password = process.env.EMAIL_PASSWORD!;
-		}
-		if (process.env.EMAIL_PORT) {
-			let port = parseInt(process.env.EMAIL_PORT!, 10);
-			if (!isNaN(port) && port > 0) {
-				this.email.port = port;
-			}
+		if (process.env.EMAIL_KEY) {
+			this.email.key = process.env.EMAIL_KEY!;
 		}
 		// Server
 		if (process.env.PRODUCTION && process.env.PRODUCTION!.toLowerCase() === "true") {
@@ -384,31 +369,22 @@ export function unbase64File(filename: string): string {
 //
 // Email
 //
-import * as nodemailer from "nodemailer";
+import * as sendgrid from "@sendgrid/mail";
+sendgrid.setApiKey(config.email.key);
 import * as marked from "marked";
 // tslint:disable-next-line:no-var-requires
 const striptags = require("striptags");
 import { IUser, Team, IFormItem } from "./schema";
 
-export let emailTransporter = nodemailer.createTransport({
-	host: config.email.host,
-	port: config.email.port,
-	secure: true,
-	auth: {
-		user: config.email.username,
-		pass: config.email.password
-	}
-});
-export async function sendMailAsync(mail: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo>  {
-	return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
-		emailTransporter.sendMail(mail, (err, info) => {
-			if (err) {
-				reject(err);
-				return;
-			}
-			resolve(info);
-		});
-	});
+interface IMailObject {
+	to: string;
+	from: string;
+	subject: string;
+	html: string;
+	text: string;
+}
+export async function sendMailAsync(mail: IMailObject): Promise<void>  {
+	await sendgrid.send(mail);
 }
 export function sanitize(input: string): string {
 	if (typeof input !== "string") {
