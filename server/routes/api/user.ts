@@ -207,7 +207,9 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			user.applicationSubmitTime = new Date();
 
 			// Generate tags for metrics support
-			let tags: {[index: string]: string} = {};
+			let tags: {[index: string]: string} = {
+				branch: questionBranch.name
+			};
 			for (let ele of data) {
 				if (ele && ele.name && ele.value) {
 					tags[ele.name.toString()] = ele.value.toString();
@@ -230,6 +232,16 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			user.confirmationData = data;
 			user.markModified("confirmationData");
 			user.confirmationSubmitTime = new Date();
+
+			let tags: {[index: string]: string} = {
+				branch: questionBranch.name
+			};
+			for (let ele of data) {
+				if (ele && ele.name && ele.value) {
+					tags[ele.name.toString()] = ele.value.toString();
+				}
+			}
+			trackEvent("submitted confirmation", request, user.email, tags);
 		}
 
 		await user.save();
