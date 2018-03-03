@@ -25,7 +25,7 @@ class State {
 		this.sectionElement.style.display = "block";
 	}
 }
-const states: State[] = ["statistics", "users", "applicants", "batch-accept", "settings"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "applicants", "teams", "settings"].map(id => new State(id));
 
 class UserEntries {
 	private static readonly NODE_COUNT = 20;
@@ -809,25 +809,3 @@ for (let i = 0; i < data.length; i++) {
 		}
 	});
 }
-
-//
-// Batch Accept TODO: DELETE THIS "FEATURE"
-//
-
-let batchAcceptButton = document.querySelector("#batch-accept input[type=submit]") as HTMLInputElement;
-let batchAcceptForm = document.querySelector("#batch-accept form") as HTMLFormElement;
-batchAcceptButton.addEventListener("click", async e => {
-	e.preventDefault();
-	if (!batchAcceptForm.checkValidity()) {
-		await sweetAlert("Fail!", "Need to list user id's one per line", "error");
-	}
-	let userIds = (batchAcceptForm["batch-accept-ids"]).value.split("\n").map((id: string) => id.trim());
-	let formData = new FormData();
-	formData.append("userIds", userIds);
-	let acceptedCount: number = (await fetch("/api/user/all/batch_accept", {
-		credentials: "same-origin",
-		method: "POST",
-		body: formData
-	}).then(checkStatus).then(parseJSON)).count;
-	await sweetAlert("Success!", `Batch accepted (${acceptedCount} applicants in all).`, "success");
-});
