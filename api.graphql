@@ -24,6 +24,10 @@ type Query {
   question_branches: [String!]!
   # All possible question names, or names of question in a branch
   question_names(branch: String): [String!]
+  # Retrieve details of team via an ID or name
+  # Leave id empty if you'd like to view the currently logged in
+  # user's team
+  team(id: ID, name: String): Team
   # All teams in the database
   # This is paginated, n is the number of results, and pagination_token is the last ID
   # seen from the latest page retrieved, if you want the first page leave this argument out.

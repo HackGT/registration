@@ -43,6 +43,20 @@ const resolvers: IResolver = {
 
 			return await Promise.all(allUsers.map(userRecordToGraphql));
 		},
+		team: async (prev, args, request) => {
+			const currentUserTeamID = (request.user as IUser).teamId;
+			let team: ITeam | null = null;
+			if (args.id) {
+				team = await Team.findById(args.id);
+			}
+			else if (args.name) {
+				team = await Team.findOne({ teamName: args.name });
+			}
+			else if (currentUserTeamID) {
+				team = await Team.findById(currentUserTeamID.toHexString());
+			}
+			return team ? await teamRecordToGraphql(team) : undefined;
+		},
 		teams: async (prev, args) => {
 			let teams = await Team.find(getPaginationQuery(args)).limit(args.n);
 			return await Promise.all(teams.map(teamRecordToGraphql));
@@ -87,7 +101,7 @@ const resolvers: IResolver = {
 	}
 };
 
-function getPaginationQuery(args: { pagination_token: string, [key: string]: any }): { _id?: any } {
+function getPaginationQuery(args: { pagination_token: string; [key: string]: any }): { _id?: any } {
 	return args.pagination_token ? {
 		_id: {
 			$gt: args.pagination_token
