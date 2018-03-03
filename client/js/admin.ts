@@ -25,7 +25,40 @@ class State {
 		this.sectionElement.style.display = "block";
 	}
 }
-const states: State[] = ["statistics", "users", "applicants", "batch-accept", "settings"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "applicants", "batch-accept", "settings", "emails"].map(id => new State(id));
+
+function generateFilter(branchFilter: HTMLInputElement, statusFilter: HTMLInputElement) {
+	let filter: any = {};
+
+	if (branchFilter.value !== "*") {
+		let [, type, branchName] = branchFilter.value.match(/^(application|confirmation)-(.*)$/)!;
+		if (type === "application") {
+			filter.application_branch = branchName;
+		}
+		else if (type === "confirmation") {
+			filter.confirmation_branch = branchName;
+		}
+	}
+
+	switch (statusFilter.value) {
+		case "no-decision":
+			filter.accepted = false;
+			break;
+		case "accepted":
+			filter.accepted = true;
+			break;
+		case "not-confirmed":
+			filter.accepted = true;
+			filter.attending = false;
+			break;
+		case "confirmed":
+			filter.accepted = true;
+			filter.attending = true;
+			break;
+	}
+
+	return filter;
+}
 
 class UserEntries {
 	private static readonly NODE_COUNT = 20;
@@ -231,34 +264,7 @@ class ApplicantEntries {
 		}
 	}
 	private static updateFilter() {
-		this.filter = {};
-
-		if (this.branchFilter.value !== "*") {
-			let [, type, branchName] = this.branchFilter.value.match(/^(application|confirmation)-(.*)$/)!;
-			if (type === "application") {
-				this.filter.application_branch = branchName;
-			}
-			else if (type === "confirmation") {
-				this.filter.confirmation_branch = branchName;
-			}
-		}
-
-		switch (this.statusFilter.value) {
-			case "no-decision":
-				this.filter.accepted = false;
-				break;
-			case "accepted":
-				this.filter.accepted = true;
-				break;
-			case "not-confirmed":
-				this.filter.accepted = true;
-				this.filter.attending = false;
-				break;
-			case "confirmed":
-				this.filter.accepted = true;
-				this.filter.attending = true;
-				break;
-		}
+		this.filter = generateFilter(this.branchFilter, this.statusFilter);
 
 		this.offset = 0;
 		this.load();
@@ -602,7 +608,7 @@ markdownEditor.codemirror.on("change", async () => {
 	}
 	catch {
 		emailRenderedArea.textContent = "Couldn't retrieve email content";
-	}
+}
 });
 
 async function emailTypeChange(): Promise<void> {
@@ -621,7 +627,7 @@ async function emailTypeChange(): Promise<void> {
 	}
 	catch {
 		markdownEditor.value("Couldn't retrieve email content");
-	}
+}
 	contentChanged = false;
 	lastSelected = emailTypeSelect.value;
 }
@@ -669,18 +675,18 @@ settingsUpdateButton.addEventListener("click", e => {
 		let branchName = branchRoles[i].dataset.name!;
 		let branchRole = branchRoles[i].querySelector("select")!.value;
 		let branchData: {
-				role: string;
-				open?: Date;
-				close?: Date;
-				usesRollingDeadline?: boolean;
-				confirmationBranches?: string[];
+			role: string;
+			open?: Date;
+			close?: Date;
+			usesRollingDeadline?: boolean;
+			confirmationBranches?: string[];
 		} = {role: branchRole};
 		// TODO this should probably be typed (not just strings)
 		if (branchRole !== "Noop") {
-				let openInputElem = branchRoles[i].querySelector("input.openTime") as HTMLInputElement;
-				let closeInputElem = branchRoles[i].querySelector("input.closeTime") as HTMLInputElement;
-				branchData.open = openInputElem ? new Date(openInputElem.value) : new Date();
-				branchData.close = closeInputElem ? new Date(closeInputElem.value) : new Date();
+			let openInputElem = branchRoles[i].querySelector("input.openTime") as HTMLInputElement;
+			let closeInputElem = branchRoles[i].querySelector("input.closeTime") as HTMLInputElement;
+			branchData.open = openInputElem ? new Date(openInputElem.value) : new Date();
+			branchData.close = closeInputElem ? new Date(closeInputElem.value) : new Date();
 		}
 		if (branchRole === "Application") {
 			let checkboxes = branchRoles[i].querySelectorAll("fieldset.availableConfirmationBranches input") as NodeListOf<HTMLInputElement>;
@@ -830,4 +836,71 @@ batchAcceptButton.addEventListener("click", async e => {
 		body: formData
 	}).then(checkStatus).then(parseJSON)).count;
 	await sweetAlert("Success!", `Batch accepted (${acceptedCount} applicants in all).`, "success");
+});
+
+//
+// Batch Emails!
+//
+
+let emailBranchFilter = document.getElementById("email-branch-filter") as HTMLInputElement;
+let emailStatusFilter = document.getElementById("email-status-filter") as HTMLInputElement;
+let sendEmailButton = document.getElementById("sendEmail") as HTMLButtonElement;
+let emailSubject = document.getElementById('batch-email-subject') as HTMLInputElement;
+let batchEmailEditor = new SimpleMDE({ element: document.getElementById("batch-email-content")! });
+let batchEmailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("batch-email-rendered") as HTMLElement;
+if (document.head.attachShadow) {
+	// Browser supports Shadow DOM
+	batchEmailRenderedArea = batchEmailRenderedArea.attachShadow({ mode: "open" });
+}
+
+batchEmailEditor.codemirror.on("change", async () => {
+
+	try {
+		let content = new FormData();
+		content.append("content", batchEmailEditor.value());
+
+		let { html, text }: { html: string; text: string } = (
+			await fetch(`/api/settings/email_content/rendered`, {
+				credentials: "same-origin",
+				method: "POST",
+				body: content
+			}).then(checkStatus).then(parseJSON)
+		);
+		batchEmailRenderedArea.innerHTML = html;
+		let hr = document.createElement("hr");
+		hr.style.border = "1px solid #737373";
+		batchEmailRenderedArea.appendChild(hr);
+		let textContainer = document.createElement("pre");
+		textContainer.textContent = text;
+		batchEmailRenderedArea.appendChild(textContainer);
+	}
+	catch {
+		batchEmailRenderedArea.textContent = "Couldn't retrieve email content";
+	}
+});
+
+sendEmailButton.addEventListener("click", () => {
+	let subject = emailSubject.value;
+	let markdownContent = batchEmailEditor.value();
+	if (subject === "") {
+		return sweetAlert("Oh no!", "You need an email subject", "error");
+	} else if (markdownContent  === "") {
+		return sweetAlert("Oh no!", "Your email body is empty.", "error");
+	}
+
+	let filter = generateFilter(emailBranchFilter, emailStatusFilter);
+
+	let content = new FormData();
+	content.append("filter", JSON.stringify(filter));
+	content.append("subject", subject);
+	content.append("markdownContent", markdownContent);
+
+	return fetch(`/api/settings/send_batch_email`, {
+		credentials: "same-origin",
+		method: "POST",
+		body: content
+	}).then(checkStatus).then(parseJSON).then((result: string) => {
+		console.log(result);
+		sweetAlert("Dank!", "Successfully sent out your batch email!", "success");
+	});
 });
