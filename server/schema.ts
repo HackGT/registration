@@ -75,14 +75,12 @@ export interface ITeam {
 export type ITeamMongoose = ITeam & mongoose.Document;
 
 export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
-	teamLeader: {
-		type: mongoose.Schema.Types.ObjectId
-	},
-	members: [{
-		type: mongoose.Schema.Types.ObjectId
-	}],
+	teamLeader: mongoose.Schema.Types.ObjectId,
+	members: [mongoose.Schema.Types.ObjectId],
 	teamName: {
-		type: mongoose.Schema.Types.String
+		type: String,
+		required: true,
+		unique: true
 	}
 }));
 

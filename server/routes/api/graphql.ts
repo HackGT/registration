@@ -6,7 +6,7 @@ import * as express from "express";
 import { graphqlExpress, graphiqlExpress } from "graphql-server-express";
 import { makeExecutableSchema } from "graphql-tools";
 import { isAdmin, authenticateWithRedirect } from "../../middleware";
-import { User, IUser, Team, IFormItem, QuestionBranchConfig } from "../../schema";
+import { User, IUser, IUserMongoose, Team, ITeam, IFormItem, QuestionBranchConfig } from "../../schema";
 import { Branches, Tags, AllTags, BranchConfig, ApplicationBranch, ConfirmationBranch, NoopBranch } from "../../branch";
 import { schema as types } from "./api.graphql.types";
 import { formatSize } from "../../common";
@@ -34,19 +34,18 @@ const resolvers: IResolver = {
 			return user ? await userRecordToGraphql(user) : undefined;
 		},
 		users: async (prev, args) => {
-			const lastIdQuery = args.pagination_token ? {
-				_id: {
-					$gt: args.pagination_token
-				}
-			} : {};
 			const allUsers = await User
 				.find({
-					...lastIdQuery,
+					...getPaginationQuery(args),
 					...userFilterToMongo(args.filter)
 				})
 				.limit(args.n);
 
 			return await Promise.all(allUsers.map(userRecordToGraphql));
+		},
+		teams: async (prev, args) => {
+			let teams = await Team.find(getPaginationQuery(args)).limit(args.n);
+			return await Promise.all(teams.map(teamRecordToGraphql));
 		},
 		search_user: searchUser,
 		search_user_simple: async (prev, args) => {
@@ -87,6 +86,14 @@ const resolvers: IResolver = {
 		}
 	}
 };
+
+function getPaginationQuery(args: { pagination_token: string, [key: string]: any }): { _id?: any } {
+	return args.pagination_token ? {
+		_id: {
+			$gt: args.pagination_token
+		}
+	} : {};
+}
 
 async function searchUser(prev: any, args: {
 	search: string;
@@ -327,9 +334,24 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 		questions: [],
 		team: user.teamId && {
 			id: user.teamId.toHexString(),
-			name: team ? team.teamName : "(Missing team)"
+			name: team ? team.teamName : "(Missing team)",
+			size: team ? team.members.length : 0
 		},
 
 		pagination_token: user._id.toHexString()
+	};
+}
+
+async function teamRecordToGraphql(team: ITeam): Promise<types.Team<Ctx>> {
+	let leader = await User.findById(team.teamLeader);
+	let membersRaw = await Promise.all(team.members.map(async member => User.findById(member)));
+	let members: IUserMongoose[] = membersRaw.filter((member): member is IUserMongoose => member !== null);
+
+	return {
+		id: team._id.toHexString(),
+		name: team.teamName,
+		size: team.members.length + (leader ? 1 : 0),
+		leader: leader ? await userRecordToGraphql(leader) : undefined,
+		members: await Promise.all(members.map(userRecordToGraphql))
 	};
 }

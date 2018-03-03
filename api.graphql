@@ -9,8 +9,8 @@ type Query {
   # user.
   user(id: ID): User
   # All the users in the database, useful for polling for new user information.
-  # This is paginated, n is the number of results, and last_id is the last ID
-  # seen from the latest page retrieved, if you want the first page leave this out.
+  # This is paginated, n is the number of results, and pagination_token is the last ID
+  # seen from the latest page retrieved, if you want the first page leave this argument out.
   users(pagination_token: ID, n: Int!, filter: UserFilter): [User!]!
   # Search for users by name and email
   search_user(search: String!, use_regex: Boolean = false, offset: Int!, n: Int!, filter: UserFilter): SearchResult!
@@ -24,6 +24,10 @@ type Query {
   question_branches: [String!]!
   # All possible question names, or names of question in a branch
   question_names(branch: String): [String!]
+  # All teams in the database
+  # This is paginated, n is the number of results, and pagination_token is the last ID
+  # seen from the latest page retrieved, if you want the first page leave this argument out.
+  teams(pagination_token: ID, n: Int!): [Team!]!
 }
 
 # A search result containing the results and associated data
@@ -80,7 +84,7 @@ type User {
   questions(names: [String!]!): [FormItem!]!
 
   # What team, if any, is the user a part of?
-  team: Team
+  team: SimpleTeam
 
   # ID used for pagination
   pagination_token: ID!
@@ -116,11 +120,26 @@ type Branch {
 }
 
 # Application teams
+type SimpleTeam {
+  # ID of the team
+  id: ID!
+  # Name of the team
+  name: String!
+  # Number of users in team
+  size: Int!
+}
+
 type Team {
-  # ID of the Team
+  # ID of the Team (also used for pagination)
   id: ID!
   # Name of the Team
   name: String!
+  # Leader (creator) of the team
+  leader: User
+  # Members of Team
+  members: [User!]!
+  # Number of users in Team
+  size: Int!
 }
 
 # Entries to various forms (application, confirmation, etc.)
