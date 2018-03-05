@@ -127,6 +127,9 @@ class UserEntries {
 						userStatus = `Accepted (${user.application.type})`;
 					}
 					if (user.applied && user.accepted && user.attending) {
+						userStatus = `Accepted (${user.application.type}) / Confirmed`;
+					}
+					if (user.applied && user.accepted && user.attending && user.confirmation) {
 						userStatus = `Accepted (${user.application.type}) / Confirmed (${user.confirmation.type})`;
 					}
 					node.querySelector("td.status")!.textContent = userStatus;

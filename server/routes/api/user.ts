@@ -352,7 +352,11 @@ async function updateUserStatus(user: IUserMongoose, status: ("accepted" | "no-d
 			user.acceptedEmailSent = true;
 		}
 
-		// TODO andrew: add no confirmation branch support here
+		// Automatically mark user as "attending" if application branch skips confirmation
+		if (applicationBranch.noConfirmation) {
+			user.attending = true;
+		}
+
 		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
 				.filter(c => c.usesRollingDeadline)
 				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
