@@ -160,6 +160,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 	if (errored) {
 		return;
 	}
+
 	try {
 		let data = rawData as IFormItem[]; // Nulls are only inserted when an error has occurred
 		// Move files to permanent, requested location
@@ -230,6 +231,10 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 				}
 			}
 			trackEvent("submitted application", request, user.email, tags);
+
+			if (questionBranch.autoAccept) {
+				await updateUserStatus(user, "accepted");
+			}
 
 		} else if (questionBranch instanceof Branches.ConfirmationBranch) {
 			if (!user.attending) {
@@ -340,6 +345,13 @@ async function updateUserStatus(user: IUserMongoose, status: ("accepted" | "no-d
 	} else if (status === "accepted") {
 		user.accepted = true;
 		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+
+		// Do not send "you are accepted" emails to auto-accept branches
+		// Admins should add the information into the "post-apply" email
+		if (applicationBranch.autoAccept) {
+			user.acceptedEmailSent = true;
+		}
+
 		// TODO andrew: add no confirmation branch support here
 		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
 				.filter(c => c.usesRollingDeadline)
