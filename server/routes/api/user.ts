@@ -7,7 +7,7 @@ import * as moment from "moment-timezone";
 import {
 	STORAGE_ENGINE,
 	formatSize,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects
 } from "../../common";
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
@@ -177,12 +177,19 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			return item;
 		});
 		// Email the applicant to confirm
+		let type = requestType === ApplicationType.Application ? "apply" : "attend";
+		let emailSubject: string | null;
+		try {
+			emailSubject = await getSetting<string>(`${questionBranch.name}-${type}-email-subject`, false);
+		}
+		catch {
+			emailSubject = null;
+		}
 		let emailMarkdown: string;
 		try {
-			let type = requestType === ApplicationType.Application ? "apply" : "attend";
 			emailMarkdown = await getSetting<string>(`${questionBranch.name}-${type}-email`, false);
 		}
-		catch (err) {
+		catch {
 			// Content not set yet
 			emailMarkdown = "";
 		}
@@ -195,7 +202,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 				await sendMailAsync({
 					from: config.email.from,
 					to: user.email,
-					subject: `[${config.eventName}] - Thank you for applying!`,
+					subject: emailSubject || defaultEmailSubjects.apply,
 					html: emailHTML,
 					text: emailText
 				});
@@ -222,7 +229,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 				await sendMailAsync({
 					from: config.email.from,
 					to: user.email,
-					subject: `[${config.eventName}] - Thank you for RSVPing!`,
+					subject: emailSubject || defaultEmailSubjects.attend,
 					html: emailHTML,
 					text: emailText
 				});
@@ -337,11 +344,18 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 		let users = await User.find({ "accepted": true, "acceptedEmailSent": { $ne: true } });
 		for (let user of users) {
 			// Email the applicant about their acceptance
+			let emailSubject: string | null;
+			try {
+				emailSubject = await getSetting<string>(`${user.applicationBranch}-accept-email-subject`, false);
+			}
+			catch {
+				emailSubject = null;
+			}
 			let emailMarkdown: string;
 			try {
 				emailMarkdown = await getSetting<string>(`${user.applicationBranch}-accept-email`, false);
 			}
-			catch (err) {
+			catch {
 				// Content not set yet
 				emailMarkdown = "";
 			}
@@ -352,7 +366,7 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 			await sendMailAsync({
 				from: config.email.from,
 				to: user.email,
-				subject: `[${config.eventName}] - You've been accepted!`,
+				subject: emailSubject || defaultEmailSubjects.accept,
 				html: emailHTML,
 				text: emailText
 			});
