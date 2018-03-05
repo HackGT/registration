@@ -525,6 +525,166 @@ class ApplicantEntries {
 	}
 }
 
+class TeamEntries {
+	private static readonly NODE_COUNT = 10;
+	private static nodes: HTMLTableRowElement[] = [];
+	private static offset: number = 0;
+	private static readonly previousButton = document.getElementById("teams-entries-previous") as HTMLButtonElement;
+	private static readonly nextButton = document.getElementById("teams-entries-next") as HTMLButtonElement;
+
+	private static instantiate() {
+		const teamEntryTemplate = document.getElementById("user-entry") as HTMLTemplateElement;
+		const teamEntryTableBody = document.querySelector("#teams > table > tbody") as HTMLTableSectionElement;
+		for (let i = this.nodes.length; i < this.NODE_COUNT; i++) {
+			let node = document.importNode(teamEntryTemplate.content, true);
+			teamEntryTableBody.appendChild(node);
+			this.nodes.push(teamEntryTableBody.querySelectorAll("tr")[i]);
+		}
+	}
+	private static load() {
+		const status = document.getElementById("users-entries-status") as HTMLParagraphElement;
+		status.textContent = "Loading...";
+
+		let query = `
+		query($offset: Int!, $count: Int!) {
+			search_user(search: "", offset: $offset, n: $count) {
+				offset,
+				count,
+				total,
+				users {
+					id,
+					name,
+					email,
+					email_verified,
+					admin,
+					login_methods,
+
+					application {
+						type
+					},
+					confirmation {
+						type
+					},
+					applied,
+					accepted,
+					attending
+				}
+			}
+		}`;
+		let variables = {
+			offset: this.offset,
+			count: this.NODE_COUNT
+		};
+
+		fetch("/graphql", {
+			credentials: "same-origin",
+			method: "POST",
+			headers: new Headers({
+				"Content-Type": "application/json"
+			}),
+			body: JSON.stringify({
+				query,
+				variables
+			})
+		}).then(checkStatus).then(parseJSON).then((response: {
+			data: {
+				search_user: {
+					offset: number;
+					count: number;
+					total: number;
+					users: any[];
+				};
+			};
+		}) => {
+			let res = response.data.search_user;
+
+			for (let i = 0; i < this.NODE_COUNT; i++) {
+				let node = this.nodes[i];
+				let user = res.users[i];
+
+				if (user) {
+					node.style.display = "table-row";
+					node.querySelector("td.name")!.textContent = user.name;
+					node.querySelector("td.email > span")!.textContent = user.email;
+					node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
+					if (user.email_verified) {
+						node.querySelector("td.email")!.classList.add("verified");
+					}
+					else {
+						node.querySelector("td.email")!.classList.add("notverified");
+					}
+					if (user.admin) {
+						node.querySelector("td.email")!.classList.add("admin");
+					}
+
+					let userStatus = "Signed up";
+					if (user.applied) {
+						userStatus = `Applied (${user.application.type})`;
+					}
+					if (user.applied && user.accepted) {
+						userStatus = `Accepted (${user.application.type})`;
+					}
+					if (user.applied && user.accepted && user.attending) {
+						userStatus = `Accepted (${user.application.type}) / Confirmed (${user.confirmation.type})`;
+					}
+					node.querySelector("td.status")!.textContent = userStatus;
+					node.querySelector("td.login-method")!.textContent = user.login_methods.join(", ");
+				}
+				else {
+					node.style.display = "none";
+				}
+			}
+
+			if (res.offset <= 0) {
+				this.previousButton.disabled = true;
+			}
+			else {
+				this.previousButton.disabled = false;
+			}
+			let upperBound = res.offset + res.count;
+			if (upperBound >= res.total) {
+				upperBound = res.total;
+				this.nextButton.disabled = true;
+			}
+			else {
+				this.nextButton.disabled = false;
+			}
+			let lowerBound = res.offset + 1;
+			if (res.users.length <= 0) {
+				lowerBound = 0;
+			}
+			status.textContent = `${lowerBound} – ${upperBound} of ${res.total.toLocaleString()}`;
+		}).catch(async err => {
+			console.error(err);
+			await sweetAlert("Oh no!", err.message, "error");
+		});
+	}
+
+	public static setup() {
+		this.nodes = [];
+		this.instantiate();
+		this.offset = 0;
+		this.load();
+		this.previousButton.addEventListener("click", () => {
+			this.previous();
+		});
+		this.nextButton.addEventListener("click", () => {
+			this.next();
+		});
+	}
+	public static next() {
+		this.offset += this.NODE_COUNT;
+		this.load();
+	}
+	public static previous() {
+		this.offset -= this.NODE_COUNT;
+		if (this.offset < 0) {
+			this.offset = 0;
+		}
+		this.load();
+	}
+}
+
 // Set the correct state on page load
 function readURLHash() {
 	let urlState: State | null = null;
