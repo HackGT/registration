@@ -76,26 +76,33 @@ userRoutes.route("/confirmation/:branch")
 	.delete(isUserOrAdmin, applicationTimeRestriction, deleteApplicationBranchHandler);
 
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
-	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
-
 	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	let branchName = request.params.branch as string;
-	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
-		response.status(400).json({
-			"error": "You can only edit the application branch that you originally submitted"
-		});
-		return;
-	}
-	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
-		response.status(400).json({
-			"error": "You can only edit the confirmation branch that you originally submitted"
-		});
-		return;
-	}
 
 	// TODO embed branchname in the form so we don't have to do this
 	let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
 	if (!questionBranch) {
+		response.status(400).json({
+			"error": "Invalid application branch"
+		});
+		return;
+	}
+
+	if (questionBranch instanceof Branches.ApplicationBranch) {
+		if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+			response.status(400).json({
+				"error": "You can only edit the application branch that you originally submitted"
+			});
+			return;
+		}
+	} else if (questionBranch instanceof Branches.ConfirmationBranch) {
+		if (user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+			response.status(400).json({
+				"error": "You can only edit the confirmation branch that you originally submitted"
+			});
+			return;
+		}
+	} else {
 		response.status(400).json({
 			"error": "Invalid application branch"
 		});
@@ -177,7 +184,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 			return item;
 		});
 		// Email the applicant to confirm
-		let type = requestType === ApplicationType.Application ? "apply" : "attend";
+		let type = questionBranch instanceof Branches.ApplicationBranch ? "apply" : "attend";
 		let emailSubject: string | null;
 		try {
 			emailSubject = await getSetting<string>(`${questionBranch.name}-${type}-email-subject`, false);
@@ -197,7 +204,7 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 		let emailHTML = await renderEmailHTML(emailMarkdown, user);
 		let emailText = await renderEmailText(emailHTML, user, true);
 
-		if (requestType === ApplicationType.Application) {
+		if (questionBranch instanceof Branches.ApplicationBranch) {
 			if (!user.applied) {
 				await sendMailAsync({
 					from: config.email.from,
@@ -223,8 +230,8 @@ async function postApplicationBranchHandler(request: express.Request, response: 
 				}
 			}
 			trackEvent("submitted application", request, user.email, tags);
-		}
-		else if (requestType === ApplicationType.Confirmation) {
+
+		} else if (questionBranch instanceof Branches.ConfirmationBranch) {
 			if (!user.attending) {
 				await sendMailAsync({
 					from: config.email.from,
@@ -333,6 +340,7 @@ async function updateUserStatus(user: IUserMongoose, status: ("accepted" | "no-d
 	} else if (status === "accepted") {
 		user.accepted = true;
 		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+		// TODO andrew: add no confirmation branch support here
 		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
 				.filter(c => c.usesRollingDeadline)
 				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
