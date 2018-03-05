@@ -570,6 +570,7 @@ sendAcceptancesButton.addEventListener("click", async e => {
 declare let SimpleMDE: any;
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+const emailSubject = document.getElementById("email-subject") as HTMLInputElement;
 let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
 if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
@@ -616,8 +617,9 @@ async function emailTypeChange(): Promise<void> {
 
 	// Load editor content via AJAX
 	try {
-		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
-		markdownEditor.value(content);
+		let emailSettings: { subject: string; content: string } = await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON);
+		emailSubject.value = emailSettings.subject;
+		markdownEditor.value(emailSettings.content);
 	}
 	catch {
 		markdownEditor.value("Couldn't retrieve email content");
@@ -700,6 +702,7 @@ settingsUpdateButton.addEventListener("click", e => {
 	}
 
 	let emailContentData = new FormData();
+	emailContentData.append("subject", emailSubject.value);
 	emailContentData.append("content", markdownEditor.value());
 
 	const defaultOptions: RequestInit = {

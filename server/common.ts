@@ -376,6 +376,11 @@ import * as marked from "marked";
 const striptags = require("striptags");
 import { IUser, Team, IFormItem } from "./schema";
 
+export const defaultEmailSubjects = {
+	apply: `[${config.eventName}] - Thank you for applying!`,
+	accept: `[${config.eventName}] - You've been accepted!`,
+	attend: `[${config.eventName}] - Thank you for RSVPing!`
+};
 interface IMailObject {
 	to: string;
 	from: string;
