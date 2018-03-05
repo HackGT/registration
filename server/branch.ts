@@ -177,11 +177,16 @@ abstract class TimedBranch extends NoopBranch {
 export class ApplicationBranch extends TimedBranch {
 	public readonly type: keyof QuestionBranchTypes = "Application";
 
+	public autoAccept: boolean;
+
+	public noConfirmation: boolean;
 	public confirmationBranches: string[];
 
 	protected async loadSettings(): Promise<void> {
 		await super.loadSettings();
 		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
+		this.autoAccept = branchConfig && branchConfig.settings && branchConfig.settings.autoAccept || false;
+		this.noConfirmation = branchConfig && branchConfig.settings && branchConfig.settings.noConfirmation || false;
 		this.confirmationBranches = branchConfig && branchConfig.settings && branchConfig.settings.confirmationBranches || [];
 	}
 	protected serializeSettings(): QuestionBranchSettings {
