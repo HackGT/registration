@@ -582,7 +582,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						name: branch.name,
 						open: branch.open.toISOString(),
 						close: branch.close.toISOString(),
-						confirmationBranches: branch.confirmationBranches
+						confirmationBranches: branch.confirmationBranches,
+						autoAccept: branch.autoAccept,
+						noConfirmation: branch.noConfirmation
 					};
 				}),
 				confirmation: confirmationBranches.map((branch: Branches.ConfirmationBranch) => {

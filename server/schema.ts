@@ -357,6 +357,8 @@ export interface IAdminTemplate extends ICommonTemplate {
 				open: string;
 				close: string;
 				confirmationBranches: string[];
+				autoAccept: boolean;
+				noConfirmation: boolean;
 			}[];
 			confirmation: {
 				open: string;
