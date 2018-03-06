@@ -282,6 +282,8 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 	if (requestType === ApplicationType.Application) {
 		user.applied = false;
+		user.accepted = false;
+		user.attending = false;
 		user.applicationBranch = "";
 		user.applicationData = [];
 		user.markModified("applicationData");
