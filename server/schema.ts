@@ -231,6 +231,7 @@ type QuestionBranchType = "Application" | "Confirmation" | "Noop";
 export interface QuestionBranchSettings {
 	open?: Date; // Used by all except noop
 	close?: Date; // Used by all except noop
+	allowAnonymous?: boolean; // Used by application branch
 	autoAccept?: boolean; // Used by application branch
 	noConfirmation?: boolean; // Used by application branch
 	confirmationBranches?: string[]; // Used by application branch
@@ -255,6 +256,7 @@ export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose
 	settings: {
 		open: Date,
 		close: Date,
+		allowAnonymous: Boolean,
 		autoAccept: Boolean,
 		noConfirmation: Boolean,
 		confirmationBranches: [String],
@@ -357,6 +359,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 				open: string;
 				close: string;
 				confirmationBranches: string[];
+				allowAnonymous: boolean;
 				autoAccept: boolean;
 				noConfirmation: boolean;
 			}[];

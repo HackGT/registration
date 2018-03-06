@@ -157,6 +157,7 @@ settingsRoutes.route("/branch_roles")
 				// Set available confirmation branches (if application branch)
 				if (branch instanceof Branches.ApplicationBranch) {
 					branch.confirmationBranches = branchData.confirmationBranches || [];
+					branch.allowAnonymous = branchData.allowAnonymous || false;
 					branch.autoAccept = branchData.autoAccept || false;
 					branch.noConfirmation = branchData.noConfirmation || false;
 				}
