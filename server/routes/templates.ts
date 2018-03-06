@@ -11,7 +11,7 @@ import {
 } from "../common";
 import {
 	authenticateWithRedirect,
-	timeLimited, ApplicationType
+	branchRedirector, timeLimited, ApplicationType
 } from "../middleware";
 import {
 	IUser, IUserMongoose, User,
@@ -311,30 +311,23 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 
 templateRoutes.route("/apply").get(
 	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Application),
 	timeLimited,
 	applicationHandler(ApplicationType.Application)
 );
 templateRoutes.route("/confirm").get(
 	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Confirmation),
 	timeLimited,
 	applicationHandler(ApplicationType.Confirmation)
 );
 
 function applicationHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request: express.Request, response: express.Response) => {
-		// TODO: fix branch names so they have a machine ID and human label
 		let user = request.user as IUser;
-		if (requestType === ApplicationType.Application && user.accepted) {
-			response.redirect("/confirm");
-			return;
-		}
-		if (requestType === ApplicationType.Confirmation && !user.accepted) {
-			response.redirect("/apply");
-			return;
-		}
 
+		// TODO: integrate this logic with `middleware.branchRedirector` and `middleware.timeLimited`
 		let questionBranches: string[] = [];
-
 		// Filter to only show application / confirmation branches
 		// NOTE: this assumes the user is still able to apply as this type at this point
 		if (requestType === ApplicationType.Application) {
@@ -392,19 +385,23 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 	};
 }
 
-templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
-templateRoutes.route("/confirm/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
+templateRoutes.route("/apply/:branch").get(
+	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Application),
+	timeLimited,
+	applicationBranchHandler
+);
+templateRoutes.route("/confirm/:branch").get(
+	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Confirmation),
+	timeLimited,
+	applicationBranchHandler
+);
 
 async function applicationBranchHandler(request: express.Request, response: express.Response) {
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
 	let user = request.user as IUser;
-
-	// Redirect to application screen if confirmation was requested and user has not applied/been accepted
-	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
-		response.redirect("/apply");
-		return;
-	}
 
 	// Redirect directly to branch if there is an existing application or confirmation
 	let branchName = request.params.branch as string;

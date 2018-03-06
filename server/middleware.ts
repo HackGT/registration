@@ -130,6 +130,32 @@ import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
 	Application, Confirmation
 }
+
+export function branchRedirector(requestType: ApplicationType): (request: express.Request, response: express.Response, next: express.NextFunction) => Promise<void> {
+	return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+		// TODO: fix branch names so they have a machine ID and human label
+		let user = request.user as IUser;
+		if (requestType === ApplicationType.Application && user.accepted) {
+			// Do not redirect of application branch has "no confirmation" enabled
+			// ^ This is inferred from a user with `attending=true` and empty string for `confirmationBranch`
+			if (!(user.attending && !user.confirmationBranch)) {
+				response.redirect("/confirm");
+				return;
+			}
+		}
+		if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
+			response.redirect("/apply");
+			return;
+		}
+		if (requestType === ApplicationType.Confirmation && user.attending && !user.confirmationBranch) {
+			response.redirect("/apply");
+			return;
+		}
+
+		next();
+	};
+}
+
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
