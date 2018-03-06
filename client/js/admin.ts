@@ -645,6 +645,36 @@ for (let i = 0; i < timeInputs.length; i++) {
 	timeInputs[i].value = moment(new Date(timeInputs[i].dataset.rawValue || "")).format("Y-MM-DDTHH:mm:00");
 }
 
+// Uncheck available confirmation branches for application branch when "skip confirmation" option is selected
+function uncheckConfirmationBranches(applicationBranch: string) {
+	let checkboxes = document.querySelectorAll(`.branch-role[data-name="${applicationBranch}"] .availableConfirmationBranches input[type="checkbox"]`);
+	for (let input of Array.from(checkboxes)) {
+		(input as HTMLInputElement).checked = false;
+	}
+}
+let skipConfirmationToggles = document.querySelectorAll(".branch-role input[type=\"checkbox\"].noConfirmation");
+for (let input of Array.from(skipConfirmationToggles)) {
+	let checkbox = input as HTMLInputElement;
+	checkbox.onclick = () => {
+		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
+			uncheckConfirmationBranches((checkbox.dataset.branchName as string));
+		}
+	};
+}
+
+function uncheckSkipConfirmation(applicationBranch: string) {
+	(document.querySelector(`.branch-role[data-name="${applicationBranch}"] input[type="checkbox"].noConfirmation`) as HTMLInputElement).checked = false;
+}
+let availableConfirmationBranchCheckboxes = document.querySelectorAll(".branch-role fieldset.availableConfirmationBranches input[type=\"checkbox\"]");
+for (let input of Array.from(availableConfirmationBranchCheckboxes)) {
+	let checkbox = input as HTMLInputElement;
+	checkbox.onclick = () => {
+		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
+			uncheckSkipConfirmation((checkbox.dataset.branchName as string));
+		}
+	};
+}
+
 // Settings update
 function parseDateTime(dateTime: string) {
 	let digits = dateTime.split(/\D+/).map(num => parseInt(num, 10));
@@ -683,11 +713,13 @@ function settingsUpdate(e: MouseEvent) {
 		let branchName = branchRoles[i].dataset.name!;
 		let branchRole = branchRoles[i].querySelector("select")!.value;
 		let branchData: {
-				role: string;
-				open?: Date;
-				close?: Date;
-				usesRollingDeadline?: boolean;
-				confirmationBranches?: string[];
+			role: string;
+			open?: Date;
+			close?: Date;
+			usesRollingDeadline?: boolean;
+			confirmationBranches?: string[];
+			noConfirmation?: boolean;
+			autoAccept?: boolean;
 		} = {role: branchRole};
 		// TODO this should probably be typed (not just strings)
 		if (branchRole !== "Noop") {
@@ -705,6 +737,14 @@ function settingsUpdate(e: MouseEvent) {
 				}
 			}
 			branchData.confirmationBranches = allowedConfirmationBranches;
+
+			try {
+				branchData.autoAccept = (branchRoles[i].querySelector("fieldset.applicationBranchOptions input[type=\"checkbox\"].autoAccept") as HTMLInputElement).checked;
+				branchData.noConfirmation = (branchRoles[i].querySelector("fieldset.applicationBranchOptions input[type=\"checkbox\"].noConfirmation") as HTMLInputElement).checked;
+			} catch {
+				branchData.autoAccept = false;
+				branchData.noConfirmation = false;
+			}
 		}
 		if (branchRole === "Confirmation") {
 			let usesRollingDeadlineCheckbox = (branchRoles[i].querySelectorAll("input.usesRollingDeadline") as NodeListOf<HTMLInputElement>);

@@ -243,13 +243,24 @@
 									<option value="Application" selected>Application</option>
 									<option value="Confirmation">Confirmation</option>
 								</select>
+								<label>Options</label>
+								<fieldset class="applicationBranchOptions">
+									<div>
+										<input type="checkbox" id="{{removeSpaces this.name}}-auto-accept" class="autoAccept" {{#if this.autoAccept}}checked{{/if}} />
+										<label for="{{removeSpaces this.name}}-auto-accept">Auto-accept applicants</label>
+									</div>
+									<div>
+										<input type="checkbox" id="{{removeSpaces this.name}}-no-confirmation" class="noConfirmation" data-branch-name="{{this.name}}" {{#if this.noConfirmation}}checked{{/if}} />
+										<label for="{{removeSpaces this.name}}-no-confirmation">Skip Confirmation</label>
+									</div>
+								</fieldset>
 								<label>Available confirmation branches</label>
 								<fieldset class="availableConfirmationBranches">
 									{{#each ../settings.branches.confirmation}}
-										<div>
-											<input type="checkbox" id="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}" data-confirmation="{{this.name}}" {{branchChecked  ../this.confirmationBranches this.name}} />
-											<label for="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}">{{this.name}}</label>
-										</div>
+									<div>
+										<input type="checkbox" id="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}" data-confirmation="{{this.name}}" data-branch-name="{{../this.name}}"{{branchChecked  ../this.confirmationBranches this.name}} />
+										<label for="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}">{{this.name}}</label>
+									</div>
 									{{/each}}
 								</fieldset>
 								<label>Open/Close Times</label>
@@ -298,8 +309,10 @@
 							<select id="email-type">
 								<optgroup label="Application branches">
 									{{#each settings.branches.application}}
-										<option value="{{this.name}}-apply">{{this.name}} Post-Apply Email</option>
-										<option value="{{this.name}}-accept">{{this.name}} Accepted Email</option>
+									<option value="{{this.name}}-apply">{{this.name}} Post-Apply Email</option>
+									{{#unless this.autoAccept}}
+									<option value="{{this.name}}-accept">{{this.name}} Accepted Email</option>
+									{{/unless}}
 									{{/each}}
 								</optgroup>
 								<optgroup label="Confirmation branches">

@@ -155,7 +155,7 @@ export class NoopBranch {
 	}
 }
 
-abstract class TimedBranch extends NoopBranch {
+export abstract class TimedBranch extends NoopBranch {
 	public open: Date;
 	public close: Date;
 
@@ -192,7 +192,9 @@ export class ApplicationBranch extends TimedBranch {
 	protected serializeSettings(): QuestionBranchSettings {
 		return {
 			...super.serializeSettings(),
-			confirmationBranches: this.confirmationBranches
+			confirmationBranches: this.confirmationBranches,
+			autoAccept: this.autoAccept,
+			noConfirmation: this.noConfirmation
 		};
 	}
 }
