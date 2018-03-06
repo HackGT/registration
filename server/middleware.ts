@@ -135,21 +135,67 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 	return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 		// TODO: fix branch names so they have a machine ID and human label
 		let user = request.user as IUser;
-		if (requestType === ApplicationType.Application && user.accepted) {
-			// Do not redirect of application branch has "no confirmation" enabled
-			// ^ This is inferred from a user with `attending=true` and empty string for `confirmationBranch`
-			if (!(user.attending && !user.confirmationBranch)) {
-				response.redirect("/confirm");
+		if (requestType === ApplicationType.Application) {
+			if (user.accepted) {
+				// Do not redirect of application branch has "no confirmation" enabled
+				// ^ This is inferred from a user with `attending=true` and empty string for `confirmationBranch`
+				if (!(user.attending && !user.confirmationBranch)) {
+					response.redirect("/confirm");
+					return;
+				}
+			}
+		}
+
+		if (requestType === ApplicationType.Confirmation) {
+			if (!user.accepted || !user.applied) {
+				response.redirect("/apply");
+				return;
+			}
+			if (user.attending && !user.confirmationBranch) {
+				response.redirect("/apply");
 				return;
 			}
 		}
-		if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
-			response.redirect("/apply");
-			return;
+
+		let questionBranches: string[];
+		if (requestType === ApplicationType.Application) {
+			questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).map(branch => branch.name.toLowerCase());
+		} else {
+			questionBranches = ((await BranchConfig.loadBranchFromDB(user.applicationBranch)) as ApplicationBranch).confirmationBranches.map(branchName => branchName.toLowerCase());
 		}
-		if (requestType === ApplicationType.Confirmation && user.attending && !user.confirmationBranch) {
-			response.redirect("/apply");
-			return;
+
+		if (request.params.branch) {
+			let branchName = request.params.branch as string;
+			if (requestType === ApplicationType.Application) {
+				// Redirect directly to branch if there is an existing application or confirmation
+				if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+					response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+					return;
+				}
+				let questionBranch = questionBranches.find(branch => branch === branchName.toLowerCase())!;
+				if (!questionBranch) {
+					response.redirect("/apply");
+					return;
+				}
+			}
+			if (requestType === ApplicationType.Confirmation) {
+				// Redirect directly to branch if there is an existing application or confirmation
+				if (user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+					response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
+					return;
+				}
+				if (questionBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
+					response.redirect("/confirm");
+					return;
+				}
+			}
+		} else {
+			if (questionBranches.length === 1) {
+				const uriBranch = encodeURIComponent(questionBranches[0]);
+				const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
+				response.redirect(`/${redirPath}/${uriBranch}`);
+				return;
+			}
 		}
 
 		next();
