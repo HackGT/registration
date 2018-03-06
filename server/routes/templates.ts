@@ -361,13 +361,6 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 			}
 		}
 
-		// If there's only one path, redirect to that
-		if (questionBranches.length === 1) {
-			const uriBranch = encodeURIComponent(questionBranches[0]);
-			const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
-			response.redirect(`/${redirPath}/${uriBranch}`);
-			return;
-		}
 		let templateData: IRegisterBranchChoiceTemplate = {
 			siteTitle: config.eventName,
 			user,
@@ -405,35 +398,11 @@ async function applicationBranchHandler(request: express.Request, response: expr
 
 	let user = request.user as IUser;
 
-	// Redirect directly to branch if there is an existing application or confirmation
 	let branchName = request.params.branch as string;
-	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
-		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
-		return;
-	}
-	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
-		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
-		return;
-	}
-
-	// Redirect to confirmation selection screen if no match is found
-	if (requestType === ApplicationType.Confirmation) {
-		// We know that `user.applicationBranch` exists because the user has applied and was accepted
-		let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
-		allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
-		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
-			response.redirect("/confirm");
-			return;
-		}
-	}
 
 	let questionBranches = await Branches.BranchConfig.loadAllBranches();
-
 	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
-	if (!questionBranch) {
-		response.status(400).send("Invalid application branch");
-		return;
-	}
+
 	// tslint:disable:no-string-literal
 	let questionData = await Promise.all(questionBranch.questions.map(async question => {
 		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
