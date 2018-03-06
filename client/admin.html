@@ -245,6 +245,10 @@
 								</select>
 								<label>Options</label>
 								<fieldset class="applicationBranchOptions">
+                                    <div>
+                                        <input type="checkbox" id="{{removeSpaces this.name}}-allow-anonymous" class="allowAnonymous" data-branch-name="{{this.name}}" {{#if this.allowAnonymous}}checked{{/if}} />
+                                        <label for="{{removeSpaces this.name}}-allow-anonymous">Allow anonymous submissions</label>
+                                    </div>
 									<div>
 										<input type="checkbox" id="{{removeSpaces this.name}}-auto-accept" class="autoAccept" {{#if this.autoAccept}}checked{{/if}} />
 										<label for="{{removeSpaces this.name}}-auto-accept">Auto-accept applicants</label>
