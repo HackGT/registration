@@ -280,6 +280,7 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+	skipConfirmation: boolean;
 	confirmationOpen: string;
 	confirmationClose: string;
 	confirmationStatus: {

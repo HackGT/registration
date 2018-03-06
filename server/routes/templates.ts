@@ -127,8 +127,10 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	let user = request.user as IUser;
 
 	let applyBranches: Branches.ApplicationBranch[];
+	let skipConfirmation = false;
 	if (user.applicationBranch) {
 		applyBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch))] as Branches.ApplicationBranch[];
+		skipConfirmation = applyBranches[0].noConfirmation;
 	} else {
 		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
 	}
@@ -207,7 +209,6 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
-
 		applicationOpen: formatMoment(applicationOpenDate),
 		applicationClose: formatMoment(applicationCloseDate),
 		applicationStatus: {
@@ -215,6 +216,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			beforeOpen: applicationOpenDate ? moment().isBefore(applicationOpenDate) : true,
 			afterClose: applicationCloseDate ? moment().isAfter(applicationCloseDate) : false
 		},
+		skipConfirmation,
 		confirmationOpen: formatMoment(confirmationOpenDate),
 		confirmationClose: formatMoment(confirmationCloseDate),
 		confirmationStatus: {
