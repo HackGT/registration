@@ -570,6 +570,7 @@ sendAcceptancesButton.addEventListener("click", async e => {
 declare let SimpleMDE: any;
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
+const emailSubject = document.getElementById("email-subject") as HTMLInputElement;
 let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
 if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
@@ -616,8 +617,9 @@ async function emailTypeChange(): Promise<void> {
 
 	// Load editor content via AJAX
 	try {
-		let content = (await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON)).content as string;
-		markdownEditor.value(content);
+		let emailSettings: { subject: string; content: string } = await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON);
+		emailSubject.value = emailSettings.subject;
+		markdownEditor.value(emailSettings.content);
 	}
 	catch {
 		markdownEditor.value("Couldn't retrieve email content");
@@ -645,14 +647,23 @@ function parseDateTime(dateTime: string) {
 	let digits = dateTime.split(/\D+/).map(num => parseInt(num, 10));
 	return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
 }
-let settingsUpdateButton = document.querySelector("#settings input[type=submit]") as HTMLInputElement;
+let settingsUpdateButtons = document.querySelectorAll("#settings input[type=submit]") as NodeListOf<HTMLInputElement>;
 let settingsForm = document.querySelector("#settings form") as HTMLFormElement;
-settingsUpdateButton.addEventListener("click", e => {
+for (let i = 0; i < settingsUpdateButtons.length; i++) {
+	settingsUpdateButtons[i].addEventListener("click", settingsUpdate);
+}
+function settingsUpdateButtonDisabled(disabled: boolean) {
+	for (let i = 0; i < settingsUpdateButtons.length; i++) {
+		settingsUpdateButtons[i].disabled = disabled;
+	}
+}
+
+function settingsUpdate(e: MouseEvent) {
 	if (!settingsForm.checkValidity() || !settingsForm.dataset.action) {
 		return;
 	}
 	e.preventDefault();
-	settingsUpdateButton.disabled = true;
+	settingsUpdateButtonDisabled(true);
 
 	let teamsEnabledData = new FormData();
 	teamsEnabledData.append("enabled", (document.getElementById("teams-enabled") as HTMLInputElement).checked ? "true" : "false");
@@ -700,6 +711,7 @@ settingsUpdateButton.addEventListener("click", e => {
 	}
 
 	let emailContentData = new FormData();
+	emailContentData.append("subject", emailSubject.value);
 	emailContentData.append("content", markdownEditor.value());
 
 	const defaultOptions: RequestInit = {
@@ -739,9 +751,9 @@ settingsUpdateButton.addEventListener("click", e => {
 		window.location.reload();
 	}).catch(async (err: Error) => {
 		await sweetAlert("Oh no!", err.message, "error");
-		settingsUpdateButton.disabled = false;
+		settingsUpdateButtonDisabled(false);
 	});
-});
+}
 
 //
 // Graphs

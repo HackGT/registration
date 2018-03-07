@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText
+	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText, defaultEmailSubjects
 } from "../../common";
 import {
 	isAdmin, uploadHandler
@@ -180,19 +180,41 @@ settingsRoutes.route("/branch_roles")
 settingsRoutes.route("/email_content/:type")
 	.get(isAdmin, async (request, response) => {
 		let content: string;
+		let subject: string;
 		try {
 			content = await getSetting<string>(`${request.params.type}-email`, false);
 		}
-		catch (err) {
+		catch {
 			// Content not set yet
 			content = "";
 		}
+		try {
+			subject = await getSetting<string>(`${request.params.type}-email-subject`, false);
+		}
+		catch {
+			// Subject not set yet
+			let type: string = request.params.type;
+			if (type.match(/-apply$/)) {
+				subject = defaultEmailSubjects.apply;
+			}
+			else if (type.match(/-accept$/)) {
+				subject = defaultEmailSubjects.accept;
+			}
+			else if (type.match(/-attend$/)) {
+				subject = defaultEmailSubjects.attend;
+			}
+			else {
+				subject = "";
+			}
+		}
 
-		response.json({ content });
+		response.json({ subject, content });
 	})
 	.put(isAdmin, uploadHandler.any(), async (request, response) => {
-		let content = request.body.content as string;
+		let subject: string = request.body.subject;
+		let content: string = request.body.content;
 		try {
+			await updateSetting<string>(`${request.params.type}-email-subject`, subject);
 			await updateSetting<string>(`${request.params.type}-email`, content);
 			response.json({
 				"success": true
