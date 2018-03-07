@@ -655,11 +655,11 @@ function uncheckConfirmationBranches(applicationBranch: string) {
 let skipConfirmationToggles = document.querySelectorAll(".branch-role input[type=\"checkbox\"].noConfirmation");
 for (let input of Array.from(skipConfirmationToggles)) {
 	let checkbox = input as HTMLInputElement;
-	checkbox.onclick = () => {
+	checkbox.addEventListener("click", () => {
 		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
 			uncheckConfirmationBranches((checkbox.dataset.branchName as string));
 		}
-	};
+	});
 }
 
 // Uncheck "skip confirmation" option when a confirmation branch is selected
@@ -672,11 +672,11 @@ function setClickSkipConfirmation(applicationBranch: string, checked: boolean) {
 let availableConfirmationBranchCheckboxes = document.querySelectorAll(".branch-role fieldset.availableConfirmationBranches input[type=\"checkbox\"]");
 for (let input of Array.from(availableConfirmationBranchCheckboxes)) {
 	let checkbox = input as HTMLInputElement;
-	checkbox.onclick = () => {
+	checkbox.addEventListener("click", () => {
 		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
 			setClickSkipConfirmation((checkbox.dataset.branchName as string), false);
 		}
-	};
+	});
 }
 
 // Select "skip confirmation" option when "allow anonymous" option is selected
