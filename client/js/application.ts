@@ -2,7 +2,10 @@ enum FormType {
 	Application,
 	Confirmation
 }
-let formType = window.location.pathname.match(/^\/apply/) ? FormType.Application : FormType.Confirmation;
+declare let formTypeString: keyof typeof FormType;
+let formType = FormType[formTypeString];
+
+declare let unauthenticated: (boolean | undefined);
 
 let form = document.querySelector("form") as HTMLFormElement | null;
 let submitButton = document.querySelector("form input[type=submit]") as HTMLInputElement;
@@ -19,11 +22,16 @@ submitButton.addEventListener("click", e => {
 		body: new FormData(form)
 	}).then(checkStatus).then(parseJSON).then(async () => {
 		let successMessage: string = formType === FormType.Application ?
-			"Your application has been saved. Feel free to come back here and edit it at any time." :
+			"Your application has been saved." + (!unauthenticated ? "Feel free to come back here and edit it at any time." : "") :
 			"Your RSVP has been saved. Feel free to come back here and edit it at any time. We look forward to seeing you!";
 
 		await sweetAlert("Awesome!", successMessage, "success");
-		window.location.assign("/");
+
+		if (unauthenticated) {
+			(document.querySelector("form") as HTMLFormElement).reset();
+		} else {
+			window.location.assign("/");
+		}
 	}).catch(async (err: Error) => {
 		await sweetAlert("Oh no!", err.message, "error");
 		submitButton.disabled = false;
