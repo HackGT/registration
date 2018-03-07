@@ -140,4 +140,4 @@ If you have some time and want to help us out with development, thank you! You c
 
 ## License
 
-Copyright &copy; 2017 HackGT. Released under the MIT license. See [LICENSE](LICENSE) for more information.
+Copyright &copy; 2018 HackGT. Released under the MIT license. See [LICENSE](LICENSE) for more information.

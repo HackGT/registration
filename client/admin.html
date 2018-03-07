@@ -220,6 +220,10 @@
 				<h2>Settings</h2>
 
 				<form method="post" data-action="/">
+					<div class="row center">
+						<input type="submit" class="btn" value="Save" />
+					</div>
+
 					<div class="row" style="text-align: center;">
 						<div class="col-6">
 							<label for="teams-enabled">Enable teams?</label>
@@ -304,6 +308,9 @@
 									{{/each}}
 								</optgroup>
 							</select>
+							<label for="email-subject">Subject:</label>
+							<input type="text" id="email-subject" />
+							<label for="email-content">Body:</label>
 							<textarea id="email-content"></textarea>
 							<h5>Rendered HTML and text:</h5>
 							<section id="email-rendered"></section>
@@ -361,7 +368,7 @@
 					</div>
 
 					<div class="row center">
-						<input type="submit" class="btn" value="Update" />
+						<input type="submit" class="btn" value="Save" />
 					</div>
 				</form>
 			</section>
