@@ -680,12 +680,17 @@ for (let input of Array.from(availableConfirmationBranchCheckboxes)) {
 }
 
 // Select "skip confirmation" option when "allow anonymous" option is selected
+// Hide/show public link when "allow anonymous" is clicked
 let allowAnonymousCheckboxes = document.querySelectorAll(".branch-role input[type=\"checkbox\"].allowAnonymous");
 for (let input of Array.from(allowAnonymousCheckboxes)) {
 	let checkbox = input as HTMLInputElement;
 	checkbox.onclick = () => {
-		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
-			setClickSkipConfirmation((checkbox.dataset.branchName as string), true);
+		if (checkbox.dataset.branchName !== undefined) {
+			let branchName = checkbox.dataset.branchName as string;
+			if (checkbox.checked) {
+				setClickSkipConfirmation(branchName, true);
+			}
+			(document.querySelector(`.branch-role[data-name="${branchName}"] .public-link`) as HTMLDivElement).hidden = !checkbox.checked;
 		}
 	};
 }

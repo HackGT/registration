@@ -245,10 +245,10 @@
 								</select>
 								<label>Options</label>
 								<fieldset class="applicationBranchOptions">
-                                    <div>
-                                        <input type="checkbox" id="{{removeSpaces this.name}}-allow-anonymous" class="allowAnonymous" data-branch-name="{{this.name}}" {{#if this.allowAnonymous}}checked{{/if}} />
-                                        <label for="{{removeSpaces this.name}}-allow-anonymous">Allow anonymous submissions</label>
-                                    </div>
+									<div>
+										<input type="checkbox" id="{{removeSpaces this.name}}-allow-anonymous" class="allowAnonymous" data-branch-name="{{this.name}}" {{#if this.allowAnonymous}}checked{{/if}} />
+										<label for="{{removeSpaces this.name}}-allow-anonymous">Allow anonymous submissions</label>
+									</div>
 									<div>
 										<input type="checkbox" id="{{removeSpaces this.name}}-auto-accept" class="autoAccept" {{#if this.autoAccept}}checked{{/if}} />
 										<label for="{{removeSpaces this.name}}-auto-accept">Auto-accept applicants</label>
@@ -274,6 +274,12 @@
 									<label for="{{removeSpaces this.name}}-close">Close</label>
 									<input type="datetime-local" id="{{removeSpaces this.name}}-close" class="closeTime" data-raw-value="{{this.close}}"/>
 								</fieldset>
+								<div class="public-link" {{#unless this.allowAnonymous}}hidden{{/unless}}>
+									<label>Public Link</label>
+									<fieldset>
+										<pre><a href="/register/{{this.name}}">/register/{{this.name}}</a></pre>
+									</fieldset>
+								</div>
 							</div>
 						{{/each}}
 						{{#each settings.branches.confirmation}}
