@@ -3,6 +3,7 @@ import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
 import * as moment from "moment-timezone";
+import * as uuid from "uuid/v4";
 
 import {
 	STORAGE_ENGINE,
@@ -22,6 +23,7 @@ import {
 import * as Branches from "../../branch";
 
 export let userRoutes = express.Router({ "mergeParams": true });
+export let registrationRoutes = express.Router({ "mergeParams": true });
 
 let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, request, response, next) => {
 	if (err.code === "LIMIT_FILE_SIZE") {
@@ -34,49 +36,85 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 	}
 };
 
-let applicationTimeRestriction: express.RequestHandler = async (request, response, next) => {
-	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
-	let branchName = request.params.branch as string;
-	let branch = (await Branches.BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (Branches.ApplicationBranch | Branches.ConfirmationBranch);
-	if (!branch) {
-		response.status(400).json({
+// TODO what is the difference between this and `middleware.timeLimited`? - related to #206
+function applicationTimeRestriction(requestType: ApplicationType): express.RequestHandler {
+	return async (request, response, next) => {
+		let branchName = request.params.branch as string;
+		let branch = (await Branches.BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (Branches.ApplicationBranch | Branches.ConfirmationBranch);
+		if (!branch) {
+			response.status(400).json({
 			"error": "Invalid application branch"
-		});
-		return;
-	}
-
-	let user = request.user as IUserMongoose;
-
-	let openDate = branch.open;
-	let closeDate = branch.close;
-	if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
-		let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
-		if (times) {
-			openDate = times.open;
-			closeDate = times.close;
+			});
+			return;
 		}
-	}
 
-	if (moment().isBetween(openDate, closeDate) || request.user.isAdmin) {
-		next();
-	}
-	else {
-		response.status(408).json({
-			"error": `${requestType === ApplicationType.Application ? "Applications" : "Confirmations"} are currently closed`
-		});
-		return;
-	}
-};
+		let user = request.user as IUserMongoose;
 
-userRoutes.route("/application/:branch")
-	.post(isUserOrAdmin, applicationTimeRestriction, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
-	.delete(isUserOrAdmin, applicationTimeRestriction, deleteApplicationBranchHandler);
-userRoutes.route("/confirmation/:branch")
-	.post(isUserOrAdmin, applicationTimeRestriction, postParser, uploadHandler.any(), postApplicationBranchErrorHandler, postApplicationBranchHandler)
-	.delete(isUserOrAdmin, applicationTimeRestriction, deleteApplicationBranchHandler);
+		let openDate = branch.open;
+		let closeDate = branch.close;
+		if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
+			let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
+			if (times) {
+				openDate = times.open;
+				closeDate = times.close;
+			}
+		}
+
+		if (moment().isBetween(openDate, closeDate) || request.user.isAdmin) {
+			next();
+		}
+		else {
+			response.status(408).json({
+				"error": `${requestType === ApplicationType.Application ? "Applications" : "Confirmations"} are currently closed`
+			});
+			return;
+		}
+	};
+}
+
+registrationRoutes.route("/:branch").post(
+	applicationTimeRestriction(ApplicationType.Application),
+	postParser,
+	uploadHandler.any(),
+	postApplicationBranchErrorHandler,
+	postApplicationBranchHandler
+);
+
+userRoutes.route("/application/:branch").post(
+	isUserOrAdmin,
+	applicationTimeRestriction(ApplicationType.Application),
+	postParser,
+	uploadHandler.any(),
+	postApplicationBranchErrorHandler,
+	postApplicationBranchHandler
+).delete(
+	isUserOrAdmin,
+	applicationTimeRestriction,
+	deleteApplicationBranchHandler);
+userRoutes.route("/confirmation/:branch").post(
+	isUserOrAdmin,
+	applicationTimeRestriction(ApplicationType.Confirmation),
+	postParser,
+	uploadHandler.any(),
+	postApplicationBranchErrorHandler,
+	postApplicationBranchHandler
+).delete(
+	isUserOrAdmin,
+	applicationTimeRestriction,
+	deleteApplicationBranchHandler
+);
 
 async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
-	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+	let user: IUserMongoose;
+	if (request.isAuthenticated()) {
+		user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+	} else {
+		user = new User({
+			uuid: uuid(),
+			email: request.body["anonymous-registration-email"]
+		}) as IUserMongoose;
+	}
+
 	let branchName = request.params.branch as string;
 
 	// TODO embed branchname in the form so we don't have to do this

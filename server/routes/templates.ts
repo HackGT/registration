@@ -4,6 +4,7 @@ import * as express from "express";
 import * as Handlebars from "handlebars";
 import * as moment from "moment-timezone";
 import * as bowser from "bowser";
+import * as uuid from "uuid/v4";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
@@ -11,13 +12,14 @@ import {
 } from "../common";
 import {
 	authenticateWithRedirect,
-	branchRedirector, timeLimited, ApplicationType
+	onlyAllowAnonymousBranch, branchRedirector, timeLimited, ApplicationType
 } from "../middleware";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
+	IFormItem
 } from "../schema";
 import * as Branches from "../branch";
 
@@ -380,115 +382,141 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 	};
 }
 
+templateRoutes.route("/register/:branch").get(
+	onlyAllowAnonymousBranch,
+	timeLimited,
+	applicationBranchHandler(ApplicationType.Application)
+);
+
 templateRoutes.route("/apply/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Application),
 	timeLimited,
-	applicationBranchHandler
+	applicationBranchHandler(ApplicationType.Application)
 );
 templateRoutes.route("/confirm/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Confirmation),
 	timeLimited,
-	applicationBranchHandler
+	applicationBranchHandler(ApplicationType.Confirmation)
 );
 
-async function applicationBranchHandler(request: express.Request, response: express.Response) {
-	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
-
-	let user = request.user as IUser;
-
-	let branchName = request.params.branch as string;
-
-	let questionBranches = await Branches.BranchConfig.loadAllBranches();
-	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
-
-	// tslint:disable:no-string-literal
-	let questionData = await Promise.all(questionBranch.questions.map(async question => {
-		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
-		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
-			question["multi"] = true;
-			question["selected"] = question.options.map(option => {
-				if (savedValue && Array.isArray(savedValue.value)) {
-					return savedValue.value.indexOf(option) !== -1;
-				}
-				else if (savedValue !== undefined) {
-					return option === savedValue.value;
-				}
-				return false;
+function applicationBranchHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
+	return async (request: express.Request, response: express.Response) => {
+		let user: IUser;
+		if (request.user) {
+			user = request.user as IUser;
+		} else {
+			user = new User({
+				uuid: uuid(),
+				email: ""
 			});
-			if (question.hasOther && savedValue) {
-				if (!Array.isArray(savedValue.value)) {
-					// Select / radio buttons
-					if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
-						question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
-						question["otherSelected"] = true;
-						question["otherValue"] = savedValue.value;
+		}
+
+		let branchName = request.params.branch as string;
+
+		let questionBranches = await Branches.BranchConfig.loadAllBranches();
+		let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
+
+		// tslint:disable:no-string-literal
+		let questionData = await Promise.all(questionBranch.questions.map(async question => {
+			let savedValue: IFormItem | undefined;
+			if (user) {
+				savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
+			}
+
+			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
+				question["multi"] = true;
+				question["selected"] = question.options.map(option => {
+					if (savedValue && Array.isArray(savedValue.value)) {
+						return savedValue.value.indexOf(option) !== -1;
 					}
-				}
-				else {
-					// Checkboxes
-					for (let value of savedValue.value as string[]) {
-						if (question.options.indexOf(value) === -1) {
+					else if (savedValue !== undefined) {
+						return option === savedValue.value;
+					}
+					return false;
+				});
+				if (question.hasOther && savedValue) {
+					if (!Array.isArray(savedValue.value)) {
+						// Select / radio buttons
+						if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
 							question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
 							question["otherSelected"] = true;
-							question["otherValue"] = value;
+							question["otherValue"] = savedValue.value;
+						}
+					}
+					else {
+						// Checkboxes
+						for (let value of savedValue.value as string[]) {
+							if (question.options.indexOf(value) === -1) {
+								question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
+								question["otherSelected"] = true;
+								question["otherValue"] = value;
+							}
 						}
 					}
 				}
 			}
-		}
-		else {
-			question["multi"] = false;
-		}
-		if (savedValue && question.type === "file" && savedValue.value) {
-			savedValue = {
+			else {
+				question["multi"] = false;
+			}
+			if (savedValue && question.type === "file" && savedValue.value) {
+				savedValue = {
 				...savedValue,
-				value: (savedValue.value as Express.Multer.File).originalname
-			};
-		}
-		question["value"] = savedValue ? savedValue.value : "";
+					value: (savedValue.value as Express.Multer.File).originalname
+				};
+			}
+			question["value"] = savedValue ? savedValue.value : "";
 
+			if (questionBranch.textBlocks) {
+				let textContent: string = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === question.name).map(async text => {
+					return `<${text.type}>${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
+				}))).join("\n");
+				question["textContent"] = textContent;
+			}
+
+			return question;
+		}));
+		// tslint:enable:no-string-literal
+
+		let endText: string = "";
 		if (questionBranch.textBlocks) {
-			let textContent: string = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === question.name).map(async text => {
-				return `<${text.type}>${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
+			endText = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === "end").map(async text => {
+				return `<${text.type} style="font-size: 90%; text-align: center;">${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
 			}))).join("\n");
-			question["textContent"] = textContent;
 		}
 
-		return question;
-	}));
-	// tslint:enable:no-string-literal
+		if (request.isAuthenticated()) {
+			let thisUser = await User.findById(user._id) as IUserMongoose;
+			// TODO this is a bug - dates are wrong
+			if (requestType === ApplicationType.Application && !thisUser.applicationStartTime) {
+				thisUser.applicationStartTime = new Date();
+			}
+			else if (requestType === ApplicationType.Confirmation && !thisUser.confirmationStartTime) {
+				thisUser.confirmationStartTime = new Date();
+			}
+			await thisUser.save();
+		}
 
-	let endText: string = "";
-	if (questionBranch.textBlocks) {
-		endText = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === "end").map(async text => {
-			return `<${text.type} style="font-size: 90%; text-align: center;">${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
-		}))).join("\n");
-	}
+		let templateData: IRegisterTemplate = {
+			siteTitle: config.eventName,
+			unauthenticated: !request.isAuthenticated(),
+			user: request.user,
+			settings: {
+				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+				qrEnabled: await getSetting<boolean>("qrEnabled")
+			},
+			branch: questionBranch.name,
+			questionData,
+			endText
+		};
 
-	let thisUser = await User.findById(user._id) as IUserMongoose;
-	if (requestType === ApplicationType.Application) {
-		thisUser.applicationStartTime = new Date();
-	}
-	else if (requestType === ApplicationType.Confirmation) {
-		thisUser.confirmationStartTime = new Date();
-	}
-	await thisUser.save();
-
-	let templateData: IRegisterTemplate = {
-		siteTitle: config.eventName,
-		user: request.user,
-		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled")
-		},
-		branch: questionBranch.name,
-		questionData,
-		endText
+		if (requestType === ApplicationType.Application) {
+			response.send(registerTemplate(templateData));
+		} else if (requestType === ApplicationType.Confirmation) {
+			response.send(confirmTemplate(templateData));
+		}
 	};
-
-	response.send(requestType === ApplicationType.Application ? registerTemplate(templateData) : confirmTemplate(templateData));
 }
 
 templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {

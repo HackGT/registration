@@ -2,10 +2,11 @@ import * as fs from "fs";
 import * as moment from "moment-timezone";
 import * as path from "path";
 import * as os from "os";
+import * as uuid from "uuid/v4";
 
 import { config, getSetting, readFileAsync, STATIC_ROOT } from "./common";
 import { getOpenConfirmationBranches, BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
-import { IUser } from "./schema";
+import { IUser, User } from "./schema";
 
 //
 // Express middleware
@@ -131,8 +132,32 @@ export enum ApplicationType {
 	Application, Confirmation
 }
 
+export async function onlyAllowAnonymousBranch(request: express.Request, response: express.Response, next: express.NextFunction) {
+	let branchName = request.params.branch as string;
+	console.log(branchName);
+	let questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).filter(br => {
+
+		console.log(br.name.toLowerCase());
+		return br.name.toLowerCase() === branchName.toLowerCase();
+	});
+	console.log(questionBranches);
+	if (questionBranches.length !== 1) {
+		response.redirect("/apply");
+		return;
+	}
+
+	let branch = questionBranches[0] as ApplicationBranch;
+	if (!branch.allowAnonymous) {
+		response.redirect("/apply");
+		return;
+	}
+
+	next();
+}
+
 export function branchRedirector(requestType: ApplicationType): (request: express.Request, response: express.Response, next: express.NextFunction) => Promise<void> {
 	return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+		// TODO refactor redirection code and consolidate here (#206)
 		// TODO: fix branch names so they have a machine ID and human label
 		let user = request.user as IUser;
 		if (requestType === ApplicationType.Application) {
@@ -165,7 +190,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 		}
 
 		if (request.params.branch) {
-			let branchName = request.params.branch as string;
+			let branchName = (request.params.branch as string).toLowerCase();
 			if (requestType === ApplicationType.Application) {
 				// Redirect directly to branch if there is an existing application or confirmation
 				if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
@@ -190,6 +215,20 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 				}
 			}
 		} else {
+			if (requestType === ApplicationType.Application && user.applied && user.applicationBranch) {
+				questionBranches = [user.applicationBranch];
+			}
+
+			// Redirect for applications on "skip confirmation" branches
+			if (requestType === ApplicationType.Confirmation && user.attending && !user.confirmationBranch && user.applicationBranch) {
+				questionBranches = [user.applicationBranch];
+				requestType = ApplicationType.Application;
+			}
+
+			if (requestType === ApplicationType.Confirmation && user.attending && user.confirmationBranch) {
+				questionBranches = [user.confirmationBranch];
+			}
+
 			if (questionBranches.length === 1) {
 				const uriBranch = encodeURIComponent(questionBranches[0]);
 				const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
@@ -205,19 +244,33 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let user = request.user as IUser;
+	let user: IUser;
+	if (request.isAuthenticated()) {
+		user = request.user as IUser;
+	} else {
+		user = new User({
+			uuid: uuid(),
+			email: ""
+		});
+	}
 
 	let openBranches: (ApplicationBranch | ConfirmationBranch)[];
 	if (requestType === ApplicationType.Application) {
 		openBranches = await BranchConfig.getOpenBranches<ApplicationBranch>("Application");
-		if (user.applied) {
-			openBranches = openBranches.filter((b => b.name === user.applicationBranch));
+		if (request.isAuthenticated() && user.applied && user.applicationBranch) {
+			let applicationBranch = user.applicationBranch;
+			openBranches = openBranches.filter((b => b.name === applicationBranch));
 		}
-	}
-	else {
-		openBranches = await getOpenConfirmationBranches(request.user as IUser);
-		if (user.attending) {
-			openBranches = openBranches.filter((b => b.name === user.confirmationBranch));
+	} else {
+		if (request.isAuthenticated()) {
+			openBranches = await getOpenConfirmationBranches(user);
+		} else {
+			openBranches = await BranchConfig.getOpenBranches<ConfirmationBranch>("Confirmation");
+		}
+
+		if (request.isAuthenticated() && user.attending && user.confirmationBranch) {
+			let confirmationBranch = user.confirmationBranch;
+			openBranches = openBranches.filter((b => b.name === confirmationBranch));
 		}
 	}
 

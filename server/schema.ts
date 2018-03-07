@@ -319,6 +319,7 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 	endText: string;
+	unauthenticated: boolean;
 }
 export interface ResponseCount {
 	"response": string;

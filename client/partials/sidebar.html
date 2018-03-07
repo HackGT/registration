@@ -1,6 +1,7 @@
 <div class="container">
 	<aside id="sidebar">
 		<h1>{{siteTitle}}</h1>
+		{{#unless unauthenticated}}
 		<nav id="sidebar-nav">
 			<a href="/">Dashboard</a>
 			<span class="divider"></span>
@@ -33,6 +34,7 @@
 			<a href="/auth/logout">Log out</a>
 		</nav>
 		<p>{{user.name}} ({{user.email}})</p>
+		{{/unless}}
 	</aside>
 	<main class="col-9">
 		{{> @partial-block }}
