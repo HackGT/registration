@@ -277,7 +277,7 @@
 								<div class="public-link" {{#unless this.allowAnonymous}}hidden{{/unless}}>
 									<label>Public Link</label>
 									<fieldset>
-										<pre><a href="/register/{{this.name}}">/register/{{this.name}}</a></pre>
+										<pre><a href="/register/{{encodeURI this.name}}">/register/{{encodeURI this.name}}</a></pre>
 									</fieldset>
 								</div>
 							</div>
