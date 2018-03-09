@@ -134,13 +134,11 @@ export enum ApplicationType {
 
 export async function onlyAllowAnonymousBranch(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let branchName = request.params.branch as string;
-	console.log(branchName);
 	let questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).filter(br => {
 
 		console.log(br.name.toLowerCase());
 		return br.name.toLowerCase() === branchName.toLowerCase();
 	});
-	console.log(questionBranches);
 	if (questionBranches.length !== 1) {
 		response.redirect("/apply");
 		return;
