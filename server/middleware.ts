@@ -135,8 +135,6 @@ export enum ApplicationType {
 export async function onlyAllowAnonymousBranch(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let branchName = request.params.branch as string;
 	let questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).filter(br => {
-
-		console.log(br.name.toLowerCase());
 		return br.name.toLowerCase() === branchName.toLowerCase();
 	});
 	if (questionBranches.length !== 1) {
@@ -160,7 +158,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 		let user = request.user as IUser;
 		if (requestType === ApplicationType.Application) {
 			if (user.accepted) {
-				// Do not redirect of application branch has "no confirmation" enabled
+				// Do not redirect to application branch has "no confirmation" enabled
 				// ^ This is inferred from a user with `attending=true` and empty string for `confirmationBranch`
 				if (!(user.attending && !user.confirmationBranch)) {
 					response.redirect("/confirm");
