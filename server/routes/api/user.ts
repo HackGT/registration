@@ -108,9 +108,16 @@ function postApplicationBranchHandler(anonymous: boolean): express.Handler {
 	return async (request: express.Request, response: express.Response): Promise<void> => {
 		let user: IUserMongoose;
 		if (anonymous) {
+			let email = request.body["anonymous-registration-email"] as string;
+			if (await User.findOne({email})) {
+				response.status(400).json({
+					"error": `User with email "${email}" already exists`
+				});
+				return;
+			}
 			user = new User({
 				uuid: uuid(),
-				email: request.body["anonymous-registration-email"]
+				email
 			}) as IUserMongoose;
 		} else {
 			user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
