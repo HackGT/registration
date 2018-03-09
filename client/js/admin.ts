@@ -656,8 +656,13 @@ let skipConfirmationToggles = document.querySelectorAll(".branch-role input[type
 for (let input of Array.from(skipConfirmationToggles)) {
 	let checkbox = input as HTMLInputElement;
 	checkbox.addEventListener("click", () => {
-		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
-			uncheckConfirmationBranches((checkbox.dataset.branchName as string));
+		if (checkbox.dataset.branchName !== undefined) {
+			let branchName = checkbox.dataset.branchName as string;
+			if (checkbox.checked) {
+				uncheckConfirmationBranches(branchName);
+			} else {
+				(document.querySelector(`.branch-role[data-name="${branchName}"] input[type="checkbox"].allowAnonymous`) as HTMLInputElement).checked = false;
+			}
 		}
 	});
 }
