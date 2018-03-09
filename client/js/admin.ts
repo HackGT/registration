@@ -647,12 +647,12 @@ for (let i = 0; i < timeInputs.length; i++) {
 
 // Uncheck available confirmation branches for application branch when "skip confirmation" option is selected
 function uncheckConfirmationBranches(applicationBranch: string) {
-	let checkboxes = document.querySelectorAll(`.branch-role[data-name="${applicationBranch}"] .availableConfirmationBranches input[type="checkbox"]`);
+	let checkboxes = document.querySelectorAll(`.branch-role[data-name="${applicationBranch}"] .availableConfirmationBranches input[type="checkbox"]`) as NodeListOf<HTMLInputElement>;
 	for (let input of Array.from(checkboxes)) {
 		(input as HTMLInputElement).checked = false;
 	}
 }
-let skipConfirmationToggles = document.querySelectorAll(".branch-role input[type=\"checkbox\"].noConfirmation");
+let skipConfirmationToggles = document.querySelectorAll(".branch-role input[type=\"checkbox\"].noConfirmation") as NodeListOf<HTMLInputElement>;
 for (let input of Array.from(skipConfirmationToggles)) {
 	let checkbox = input as HTMLInputElement;
 	checkbox.addEventListener("click", () => {
@@ -674,9 +674,9 @@ function setClickSkipConfirmation(applicationBranch: string, checked: boolean) {
 		checkbox.click();
 	}
 }
-let availableConfirmationBranchCheckboxes = document.querySelectorAll(".branch-role fieldset.availableConfirmationBranches input[type=\"checkbox\"]");
+let availableConfirmationBranchCheckboxes = document.querySelectorAll(".branch-role fieldset.availableConfirmationBranches input[type=\"checkbox\"]") as NodeListOf<HTMLInputElement>;
 for (let input of Array.from(availableConfirmationBranchCheckboxes)) {
-	let checkbox = input as HTMLInputElement;
+	let checkbox = input;
 	checkbox.addEventListener("click", () => {
 		if (checkbox.checked && checkbox.dataset.branchName !== undefined) {
 			setClickSkipConfirmation((checkbox.dataset.branchName as string), false);
@@ -686,9 +686,9 @@ for (let input of Array.from(availableConfirmationBranchCheckboxes)) {
 
 // Select "skip confirmation" option when "allow anonymous" option is selected
 // Hide/show public link when "allow anonymous" is clicked
-let allowAnonymousCheckboxes = document.querySelectorAll(".branch-role input[type=\"checkbox\"].allowAnonymous");
+let allowAnonymousCheckboxes = document.querySelectorAll(".branch-role input[type=\"checkbox\"].allowAnonymous") as NodeListOf<HTMLInputElement>;
 for (let input of Array.from(allowAnonymousCheckboxes)) {
-	let checkbox = input as HTMLInputElement;
+	let checkbox = input;
 	checkbox.onclick = () => {
 		if (checkbox.dataset.branchName !== undefined) {
 			let branchName = checkbox.dataset.branchName as string;
@@ -766,9 +766,10 @@ function settingsUpdate(e: MouseEvent) {
 
 			// This operation is all or nothing because it will only error if a branch was just made into an Application branch
 			try {
-				branchData.allowAnonymous = (branchRoles[i].querySelector("fieldset.applicationBranchOptions input[type=\"checkbox\"].allowAnonymous") as HTMLInputElement).checked;
-				branchData.autoAccept = (branchRoles[i].querySelector("fieldset.applicationBranchOptions input[type=\"checkbox\"].autoAccept") as HTMLInputElement).checked;
-				branchData.noConfirmation = (branchRoles[i].querySelector("fieldset.applicationBranchOptions input[type=\"checkbox\"].noConfirmation") as HTMLInputElement).checked;
+				let applicationBranchOptions = branchRoles[i].querySelector("fieldset.applicationBranchOptions") as Element;
+				branchData.allowAnonymous = (applicationBranchOptions.querySelector("input[type=\"checkbox\"].allowAnonymous") as HTMLInputElement).checked;
+				branchData.autoAccept = (applicationBranchOptions.querySelector("input[type=\"checkbox\"].autoAccept") as HTMLInputElement).checked;
+				branchData.noConfirmation = (applicationBranchOptions.querySelector("input[type=\"checkbox\"].noConfirmation") as HTMLInputElement).checked;
 			} catch {
 				branchData.allowAnonymous = false;
 				branchData.autoAccept = false;

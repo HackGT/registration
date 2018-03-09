@@ -64,7 +64,7 @@ function applicationTimeRestriction(requestType: ApplicationType): express.Reque
 			next();
 		}
 		else {
-			response.status(408).json({
+			response.status(400).json({
 				"error": `${requestType === ApplicationType.Application ? "Applications" : "Confirmations"} are currently closed`
 			});
 			return;
