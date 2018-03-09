@@ -11,7 +11,7 @@ import {
 	config, getSetting, renderMarkdown
 } from "../common";
 import {
-	authenticateWithRedirect,
+	authenticateWithRedirect, isAdmin,
 	onlyAllowAnonymousBranch, branchRedirector, timeLimited, ApplicationType
 } from "../middleware";
 import {
@@ -384,34 +384,35 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 }
 
 templateRoutes.route("/register/:branch").get(
+	isAdmin,
 	onlyAllowAnonymousBranch,
 	timeLimited,
-	applicationBranchHandler(ApplicationType.Application)
+	applicationBranchHandler(ApplicationType.Application, true)
 );
 
 templateRoutes.route("/apply/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Application),
 	timeLimited,
-	applicationBranchHandler(ApplicationType.Application)
+	applicationBranchHandler(ApplicationType.Application, false)
 );
 templateRoutes.route("/confirm/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Confirmation),
 	timeLimited,
-	applicationBranchHandler(ApplicationType.Confirmation)
+	applicationBranchHandler(ApplicationType.Confirmation, false)
 );
 
-function applicationBranchHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
+function applicationBranchHandler(requestType: ApplicationType, anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request: express.Request, response: express.Response) => {
 		let user: IUser;
-		if (request.user) {
-			user = request.user as IUser;
-		} else {
+		if (anonymous) {
 			user = new User({
 				uuid: uuid(),
 				email: ""
 			});
+		} else {
+			user = request.user as IUser;
 		}
 
 		let branchName = request.params.branch as string;
@@ -487,7 +488,7 @@ function applicationBranchHandler(requestType: ApplicationType): (request: expre
 			}))).join("\n");
 		}
 
-		if (request.isAuthenticated()) {
+		if (!anonymous) {
 			let thisUser = await User.findById(user._id) as IUserMongoose;
 			// TODO this is a bug - dates are wrong
 			if (requestType === ApplicationType.Application && !thisUser.applicationStartTime) {
@@ -501,7 +502,7 @@ function applicationBranchHandler(requestType: ApplicationType): (request: expre
 
 		let templateData: IRegisterTemplate = {
 			siteTitle: config.eventName,
-			unauthenticated: !request.isAuthenticated(),
+			unauthenticated: anonymous,
 			user: request.user,
 			settings: {
 				teamsEnabled: await getSetting<boolean>("teamsEnabled"),

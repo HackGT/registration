@@ -73,11 +73,12 @@ function applicationTimeRestriction(requestType: ApplicationType): express.Reque
 }
 
 registrationRoutes.route("/:branch").post(
+	isAdmin,
 	applicationTimeRestriction(ApplicationType.Application),
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
-	postApplicationBranchHandler
+	postApplicationBranchHandler(true)
 );
 
 userRoutes.route("/application/:branch").post(
@@ -86,7 +87,7 @@ userRoutes.route("/application/:branch").post(
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
-	postApplicationBranchHandler
+	postApplicationBranchHandler(false)
 ).delete(
 	isUserOrAdmin,
 	applicationTimeRestriction,
@@ -97,223 +98,223 @@ userRoutes.route("/confirmation/:branch").post(
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
-	postApplicationBranchHandler
+	postApplicationBranchHandler(false)
 ).delete(
 	isUserOrAdmin,
 	applicationTimeRestriction,
 	deleteApplicationBranchHandler
 );
+function postApplicationBranchHandler(anonymous: boolean): express.Handler {
+	return async (request: express.Request, response: express.Response): Promise<void> => {
+		let user: IUserMongoose;
+		if (anonymous) {
+			user = new User({
+				uuid: uuid(),
+				email: request.body["anonymous-registration-email"]
+			}) as IUserMongoose;
+		} else {
+			user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+		}
 
-async function postApplicationBranchHandler(request: express.Request, response: express.Response): Promise<void> {
-	let user: IUserMongoose;
-	if (request.isAuthenticated()) {
-		user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
-	} else {
-		user = new User({
-			uuid: uuid(),
-			email: request.body["anonymous-registration-email"]
-		}) as IUserMongoose;
-	}
+		let branchName = request.params.branch as string;
 
-	let branchName = request.params.branch as string;
-
-	// TODO embed branchname in the form so we don't have to do this
-	let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
-	if (!questionBranch) {
-		response.status(400).json({
-			"error": "Invalid application branch"
-		});
-		return;
-	}
-
-	if (questionBranch instanceof Branches.ApplicationBranch) {
-		if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+		// TODO embed branchname in the form so we don't have to do this
+		let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+		if (!questionBranch) {
 			response.status(400).json({
-				"error": "You can only edit the application branch that you originally submitted"
+				"error": "Invalid application branch"
 			});
 			return;
 		}
-	} else if (questionBranch instanceof Branches.ConfirmationBranch) {
-		if (user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
-			response.status(400).json({
-				"error": "You can only edit the confirmation branch that you originally submitted"
-			});
-			return;
-		}
-	} else {
-		response.status(400).json({
-			"error": "Invalid application branch"
-		});
-		return;
-	}
-
-	let unchangedFiles: string[] = [];
-	let errored: boolean = false; // Used because .map() can't be broken out of
-	let rawData: (IFormItem | null)[] = questionBranch.questions.map(question => {
-		if (errored) {
-			return null;
-		}
-		let files = request.files as Express.Multer.File[];
-		let preexistingFile: boolean = question.type === "file" && user.applicationData && user.applicationData.some(entry => entry.name === question.name && !!entry.value);
-
-		if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
-			// Required field not filled in
-			if (preexistingFile) {
-				let previousValue = user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value as Express.Multer.File;
-				unchangedFiles.push(previousValue.filename);
-				return {
-					"name": question.name,
-					"type": "file",
-					"value": previousValue
-				};
-			}
-			else {
-				errored = true;
-				response.status(400).json({
-					"error": `'${question.label}' is a required field`
-				});
-				return null;
-			}
-		}
-		if ((question.type === "select" || question.type === "radio") && Array.isArray(request.body[question.name]) && question.hasOther) {
-			// "Other" option selected
-			request.body[question.name] = request.body[question.name].pop();
-		}
-		else if (question.type === "checkbox" && question.hasOther) {
-			if (!request.body[question.name]) {
-				request.body[question.name] = [];
-			}
-			if (!Array.isArray(request.body[question.name])) {
-				request.body[question.name] = [request.body[question.name]];
-			}
-			// Filter out "other" option
-			request.body[question.name] = (request.body[question.name] as string[]).filter(value => value !== "Other");
-		}
-		return {
-			"name": question.name,
-			"type": question.type,
-			"value": request.body[question.name] || files.find(file => file.fieldname === question.name)
-		};
-	});
-	if (errored) {
-		return;
-	}
-
-	try {
-		let data = rawData as IFormItem[]; // Nulls are only inserted when an error has occurred
-		// Move files to permanent, requested location
-		await Promise.all(data
-			.map(item => item.value)
-			.filter(possibleFile => possibleFile !== null && typeof possibleFile === "object" && !Array.isArray(possibleFile))
-			.map((file: Express.Multer.File): Promise<void> => {
-				if (unchangedFiles.indexOf(file.filename) === -1) {
-					return STORAGE_ENGINE.saveFile(file.path, file.filename);
-				}
-				else {
-					return Promise.resolve();
-				}
-			})
-		);
-		// Set the proper file locations in the data object
-		data = data.map(item => {
-			if (item.value !== null && typeof item.value === "object" && !Array.isArray(item.value)) {
-				item.value.destination = STORAGE_ENGINE.uploadRoot;
-				item.value.path = path.join(STORAGE_ENGINE.uploadRoot, item.value.filename);
-			}
-			return item;
-		});
-		// Email the applicant to confirm
-		let type = questionBranch instanceof Branches.ApplicationBranch ? "apply" : "attend";
-		let emailSubject: string | null;
-		try {
-			emailSubject = await getSetting<string>(`${questionBranch.name}-${type}-email-subject`, false);
-		}
-		catch {
-			emailSubject = null;
-		}
-		let emailMarkdown: string;
-		try {
-			emailMarkdown = await getSetting<string>(`${questionBranch.name}-${type}-email`, false);
-		}
-		catch {
-			// Content not set yet
-			emailMarkdown = "";
-		}
-
-		let emailHTML = await renderEmailHTML(emailMarkdown, user);
-		let emailText = await renderEmailText(emailHTML, user, true);
 
 		if (questionBranch instanceof Branches.ApplicationBranch) {
-			if (!user.applied) {
-				await sendMailAsync({
-					from: config.email.from,
-					to: user.email,
-					subject: emailSubject || defaultEmailSubjects.apply,
-					html: emailHTML,
-					text: emailText
+			if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+				response.status(400).json({
+					"error": "You can only edit the application branch that you originally submitted"
 				});
+				return;
 			}
-			user.applied = true;
-			user.applicationBranch = questionBranch.name;
-			user.applicationData = data;
-			user.markModified("applicationData");
-			user.applicationSubmitTime = new Date();
-
-			// Generate tags for metrics support
-			let tags: {[index: string]: string} = {
-				branch: questionBranch.name
-			};
-			for (let ele of data) {
-				if (ele && ele.name && ele.value) {
-					tags[ele.name.toString()] = ele.value.toString();
-				}
-			}
-			trackEvent("submitted application", request, user.email, tags);
-
-			if (questionBranch.autoAccept) {
-				await updateUserStatus(user, "accepted");
-			}
-
 		} else if (questionBranch instanceof Branches.ConfirmationBranch) {
-			if (!user.attending) {
-				await sendMailAsync({
-					from: config.email.from,
-					to: user.email,
-					subject: emailSubject || defaultEmailSubjects.attend,
-					html: emailHTML,
-					text: emailText
+			if (user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+				response.status(400).json({
+					"error": "You can only edit the confirmation branch that you originally submitted"
 				});
+				return;
 			}
-			user.attending = true;
-			user.confirmationBranch = questionBranch.name;
-			user.confirmationData = data;
-			user.markModified("confirmationData");
-			user.confirmationSubmitTime = new Date();
-
-			let tags: {[index: string]: string} = {
-				branch: questionBranch.name
-			};
-			for (let ele of data) {
-				if (ele && ele.name && ele.value) {
-					tags[ele.name.toString()] = ele.value.toString();
-				}
-			}
-			trackEvent("submitted confirmation", request, user.email, tags);
+		} else {
+			response.status(400).json({
+				"error": "Invalid application branch"
+			});
+			return;
 		}
 
-		await user.save();
-		response.status(200).json({
-			"success": true
-		});
-	}
-	catch (err) {
-		console.error(err);
-		response.status(500).json({
-			"error": "An error occurred while saving your application"
-		});
-	}
-}
+		let unchangedFiles: string[] = [];
+		let errored: boolean = false; // Used because .map() can't be broken out of
+		let rawData: (IFormItem | null)[] = questionBranch.questions.map(question => {
+			if (errored) {
+				return null;
+			}
+			let files = request.files as Express.Multer.File[];
+			let preexistingFile: boolean = question.type === "file" && user.applicationData && user.applicationData.some(entry => entry.name === question.name && !!entry.value);
 
+			if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
+				// Required field not filled in
+				if (preexistingFile) {
+					let previousValue = user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value as Express.Multer.File;
+					unchangedFiles.push(previousValue.filename);
+					return {
+						"name": question.name,
+						"type": "file",
+						"value": previousValue
+					};
+				}
+				else {
+					errored = true;
+					response.status(400).json({
+						"error": `'${question.label}' is a required field`
+					});
+					return null;
+				}
+			}
+			if ((question.type === "select" || question.type === "radio") && Array.isArray(request.body[question.name]) && question.hasOther) {
+				// "Other" option selected
+				request.body[question.name] = request.body[question.name].pop();
+			}
+			else if (question.type === "checkbox" && question.hasOther) {
+				if (!request.body[question.name]) {
+					request.body[question.name] = [];
+				}
+				if (!Array.isArray(request.body[question.name])) {
+					request.body[question.name] = [request.body[question.name]];
+				}
+				// Filter out "other" option
+				request.body[question.name] = (request.body[question.name] as string[]).filter(value => value !== "Other");
+			}
+			return {
+				"name": question.name,
+				"type": question.type,
+				"value": request.body[question.name] || files.find(file => file.fieldname === question.name)
+			};
+		});
+		if (errored) {
+			return;
+		}
+
+		try {
+			let data = rawData as IFormItem[]; // Nulls are only inserted when an error has occurred
+			// Move files to permanent, requested location
+			await Promise.all(data
+							.map(item => item.value)
+							.filter(possibleFile => possibleFile !== null && typeof possibleFile === "object" && !Array.isArray(possibleFile))
+							.map((file: Express.Multer.File): Promise<void> => {
+								if (unchangedFiles.indexOf(file.filename) === -1) {
+									return STORAGE_ENGINE.saveFile(file.path, file.filename);
+								}
+								else {
+									return Promise.resolve();
+								}
+							})
+							);
+			// Set the proper file locations in the data object
+			data = data.map(item => {
+				if (item.value !== null && typeof item.value === "object" && !Array.isArray(item.value)) {
+					item.value.destination = STORAGE_ENGINE.uploadRoot;
+					item.value.path = path.join(STORAGE_ENGINE.uploadRoot, item.value.filename);
+				}
+				return item;
+			});
+			// Email the applicant to confirm
+			let type = questionBranch instanceof Branches.ApplicationBranch ? "apply" : "attend";
+			let emailSubject: string | null;
+			try {
+				emailSubject = await getSetting<string>(`${questionBranch.name}-${type}-email-subject`, false);
+			}
+			catch {
+				emailSubject = null;
+			}
+			let emailMarkdown: string;
+			try {
+				emailMarkdown = await getSetting<string>(`${questionBranch.name}-${type}-email`, false);
+			}
+			catch {
+				// Content not set yet
+				emailMarkdown = "";
+			}
+
+			let emailHTML = await renderEmailHTML(emailMarkdown, user);
+			let emailText = await renderEmailText(emailHTML, user, true);
+
+			if (questionBranch instanceof Branches.ApplicationBranch) {
+				if (!user.applied) {
+					await sendMailAsync({
+						from: config.email.from,
+						to: user.email,
+						subject: emailSubject || defaultEmailSubjects.apply,
+						html: emailHTML,
+						text: emailText
+					});
+				}
+				user.applied = true;
+				user.applicationBranch = questionBranch.name;
+				user.applicationData = data;
+				user.markModified("applicationData");
+				user.applicationSubmitTime = new Date();
+
+				// Generate tags for metrics support
+				let tags: {[index: string]: string} = {
+					branch: questionBranch.name
+				};
+				for (let ele of data) {
+					if (ele && ele.name && ele.value) {
+						tags[ele.name.toString()] = ele.value.toString();
+					}
+				}
+				trackEvent("submitted application", request, user.email, tags);
+
+				if (questionBranch.autoAccept) {
+					await updateUserStatus(user, "accepted");
+				}
+
+			} else if (questionBranch instanceof Branches.ConfirmationBranch) {
+				if (!user.attending) {
+					await sendMailAsync({
+						from: config.email.from,
+						to: user.email,
+						subject: emailSubject || defaultEmailSubjects.attend,
+						html: emailHTML,
+						text: emailText
+					});
+				}
+				user.attending = true;
+				user.confirmationBranch = questionBranch.name;
+				user.confirmationData = data;
+				user.markModified("confirmationData");
+				user.confirmationSubmitTime = new Date();
+
+				let tags: {[index: string]: string} = {
+					branch: questionBranch.name
+				};
+				for (let ele of data) {
+					if (ele && ele.name && ele.value) {
+						tags[ele.name.toString()] = ele.value.toString();
+					}
+				}
+				trackEvent("submitted confirmation", request, user.email, tags);
+			}
+
+			await user.save();
+			response.status(200).json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while saving your application"
+			});
+		}
+	};
+}
 async function deleteApplicationBranchHandler(request: express.Request, response: express.Response) {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
 
