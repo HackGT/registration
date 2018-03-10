@@ -1,31 +1,40 @@
 <div class="container">
 	<aside id="sidebar">
 		<h1>{{siteTitle}}</h1>
+		{{#unless unauthenticated}}
 		<nav id="sidebar-nav">
 			<a href="/">Dashboard</a>
 			<span class="divider"></span>
 
 			{{#if user.accepted}}
-				<a href="/confirm">Confirmation</a>
-				<span class="divider"></span>
+				{{#if user.attending}}
+					{{#if user.confirmation}}
+						<a href="/confirm">Confirmation</a>
+					{{else}}
+						<a href="/apply">Application</a>
+					{{/if}}
+				{{else}}
+					<a href="/confirm">Confirmation</a>
+				{{/if}}
 			{{else}}
 				<a href="/apply">Application</a>
-				<span class="divider"></span>
 			{{/if}}
-			
+			<span class="divider"></span>
+
 			{{#if settings.teamsEnabled}}
 				<a href="/team">Team</a>
 				<span class="divider"></span>
 			{{/if}}
-			
+
 			{{#if user.admin}}
 				<a href="/admin">Admin</a>
 				<span class="divider"></span>
 			{{/if}}
-			
+
 			<a href="/auth/logout">Log out</a>
 		</nav>
 		<p>{{user.name}} ({{user.email}})</p>
+		{{/unless}}
 	</aside>
 	<main class="col-9">
 		{{> @partial-block }}

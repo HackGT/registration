@@ -43,6 +43,7 @@
 					{{#if user.attending}}
 						<p>You're all set!</p>
 						<p>Application type: <b>{{user.applicationBranch}}</b></p>
+						{{#unless skipConfirmation}}
 						<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 						{{#if confirmationStatus.areOpen}}
 							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
@@ -50,6 +51,7 @@
 						{{else}}
 							<p>RSVPing closed on {{confirmationClose}}.</p>
 						{{/if}}
+						{{/unless}}
 						<p>We look forward to seeing you!</p>
 
 						{{#if settings.qrEnabled}}

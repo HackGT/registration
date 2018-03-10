@@ -155,7 +155,7 @@ export class NoopBranch {
 	}
 }
 
-abstract class TimedBranch extends NoopBranch {
+export abstract class TimedBranch extends NoopBranch {
 	public open: Date;
 	public close: Date;
 
@@ -177,16 +177,27 @@ abstract class TimedBranch extends NoopBranch {
 export class ApplicationBranch extends TimedBranch {
 	public readonly type: keyof QuestionBranchTypes = "Application";
 
+	public allowAnonymous: boolean;
+
+	public autoAccept: boolean;
+
+	public noConfirmation: boolean;
 	public confirmationBranches: string[];
 
 	protected async loadSettings(): Promise<void> {
 		await super.loadSettings();
 		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
+		this.allowAnonymous = branchConfig && branchConfig.settings && branchConfig.settings.allowAnonymous || false;
+		this.autoAccept = branchConfig && branchConfig.settings && branchConfig.settings.autoAccept || false;
+		this.noConfirmation = branchConfig && branchConfig.settings && branchConfig.settings.noConfirmation || false;
 		this.confirmationBranches = branchConfig && branchConfig.settings && branchConfig.settings.confirmationBranches || [];
 	}
 	protected serializeSettings(): QuestionBranchSettings {
 		return {
 			...super.serializeSettings(),
+			allowAnonymous: this.allowAnonymous,
+			autoAccept: this.autoAccept,
+			noConfirmation: this.noConfirmation,
 			confirmationBranches: this.confirmationBranches
 		};
 	}

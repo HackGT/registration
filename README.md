@@ -58,7 +58,7 @@ Visit `http://localhost:3000` and you're good to go!
 
 A [Dockerfile](Dockerfile) is provided for convenience.
 
-Configuration should normally be done by editing the `config.json` file. Environment variables take precedence over `config.json` and should be used when those options need to be overridden or `config.json` can't be used for some reason (e.g. certain deployment scenarios).
+Configuration should normally be done by editing the `server/config/config.json` file. Environment variables take precedence over `config.json` and should be used when those options need to be overridden or `config.json` can't be used for some reason (e.g. certain deployment scenarios).
 
 ### OAuth IDs and secrets
 

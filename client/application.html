@@ -23,7 +23,14 @@
 				Set data-action and not action so that verification of the form still occurs but the form is actually submitted via an XHR.
 				Running event.preventDefault() in the submit button's click handler also disables validation for some reason
 			-->
+			{{#unless unauthenticated}}
 			<form method="post" data-action="/api/user/{{user.uuid}}/application/{{slug branch}}">
+			{{else}}
+			<form method="post" data-action="/api/registration/{{slug branch}}">
+				<label for="anonymous-registration-email" class="required">Email</label>
+				<input type="email" name="anonymous-registration-email" id="anonymous-registration-email" required/>
+			{{/unless}}
+
 				{{#each questionData}}
 					{{#if this.textContent}}
 						{{{this.textContent}}}
@@ -76,14 +83,23 @@
 				{{/each}}
 				{{{endText}}}
 				<div class="center">
+					{{#unless unauthenticated}}
 					{{#if user.applied}}
 						<input type="submit" value="Update" />
 						<button id="delete" style="background-color: #FF4136;">Delete</button>
 					{{else}}
 						<input type="submit" value="Submit" />
 					{{/if}}
+					{{else}}
+						<input type="submit" value="Submit" />
+					{{/unless}}
+
 				</div>
 			</form>
 		{{/sidebar}}
+		<script type="text/javascript">
+		formTypeString = "Application";
+		unauthenticated = {{unauthenticated}}
+		</script>
 	</body>
 </html>

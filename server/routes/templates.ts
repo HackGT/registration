@@ -4,20 +4,22 @@ import * as express from "express";
 import * as Handlebars from "handlebars";
 import * as moment from "moment-timezone";
 import * as bowser from "bowser";
+import * as uuid from "uuid/v4";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
 	config, getSetting, renderMarkdown
 } from "../common";
 import {
-	authenticateWithRedirect,
-	timeLimited, ApplicationType
+	authenticateWithRedirect, isAdmin,
+	onlyAllowAnonymousBranch, branchRedirector, timeLimited, ApplicationType
 } from "../middleware";
 import {
 	IUser, IUserMongoose, User,
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry
+	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
+	IFormItem
 } from "../schema";
 import * as Branches from "../branch";
 
@@ -120,6 +122,7 @@ Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 Handlebars.registerHelper("removeSpaces", (input: string): string => {
 	return input.replace(/ /g, "-");
 });
+Handlebars.registerHelper("encodeURI", encodeURI);
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
@@ -127,8 +130,10 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	let user = request.user as IUser;
 
 	let applyBranches: Branches.ApplicationBranch[];
+	let skipConfirmation = false;
 	if (user.applicationBranch) {
 		applyBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch))] as Branches.ApplicationBranch[];
+		skipConfirmation = applyBranches[0].noConfirmation;
 	} else {
 		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
 	}
@@ -207,7 +212,6 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 			qrEnabled: await getSetting<boolean>("qrEnabled")
 		},
-
 		applicationOpen: formatMoment(applicationOpenDate),
 		applicationClose: formatMoment(applicationCloseDate),
 		applicationStatus: {
@@ -215,6 +219,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			beforeOpen: applicationOpenDate ? moment().isBefore(applicationOpenDate) : true,
 			afterClose: applicationCloseDate ? moment().isAfter(applicationCloseDate) : false
 		},
+		skipConfirmation,
 		confirmationOpen: formatMoment(confirmationOpenDate),
 		confirmationClose: formatMoment(confirmationCloseDate),
 		confirmationStatus: {
@@ -311,30 +316,23 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 
 templateRoutes.route("/apply").get(
 	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Application),
 	timeLimited,
 	applicationHandler(ApplicationType.Application)
 );
 templateRoutes.route("/confirm").get(
 	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Confirmation),
 	timeLimited,
 	applicationHandler(ApplicationType.Confirmation)
 );
 
 function applicationHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request: express.Request, response: express.Response) => {
-		// TODO: fix branch names so they have a machine ID and human label
 		let user = request.user as IUser;
-		if (requestType === ApplicationType.Application && user.accepted) {
-			response.redirect("/confirm");
-			return;
-		}
-		if (requestType === ApplicationType.Confirmation && !user.accepted) {
-			response.redirect("/apply");
-			return;
-		}
 
+		// TODO: integrate this logic with `middleware.branchRedirector` and `middleware.timeLimited`
 		let questionBranches: string[] = [];
-
 		// Filter to only show application / confirmation branches
 		// NOTE: this assumes the user is still able to apply as this type at this point
 		if (requestType === ApplicationType.Application) {
@@ -366,13 +364,6 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 			}
 		}
 
-		// If there's only one path, redirect to that
-		if (questionBranches.length === 1) {
-			const uriBranch = encodeURIComponent(questionBranches[0]);
-			const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
-			response.redirect(`/${redirPath}/${uriBranch}`);
-			return;
-		}
 		let templateData: IRegisterBranchChoiceTemplate = {
 			siteTitle: config.eventName,
 			user,
@@ -392,135 +383,142 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 	};
 }
 
-templateRoutes.route("/apply/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
-templateRoutes.route("/confirm/:branch").get(authenticateWithRedirect, timeLimited, applicationBranchHandler);
+templateRoutes.route("/register/:branch").get(
+	isAdmin,
+	onlyAllowAnonymousBranch,
+	timeLimited,
+	applicationBranchHandler(ApplicationType.Application, true)
+);
 
-async function applicationBranchHandler(request: express.Request, response: express.Response) {
-	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
+templateRoutes.route("/apply/:branch").get(
+	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Application),
+	timeLimited,
+	applicationBranchHandler(ApplicationType.Application, false)
+);
+templateRoutes.route("/confirm/:branch").get(
+	authenticateWithRedirect,
+	branchRedirector(ApplicationType.Confirmation),
+	timeLimited,
+	applicationBranchHandler(ApplicationType.Confirmation, false)
+);
 
-	let user = request.user as IUser;
-
-	// Redirect to application screen if confirmation was requested and user has not applied/been accepted
-	if (requestType === ApplicationType.Confirmation && (!user.accepted || !user.applied)) {
-		response.redirect("/apply");
-		return;
-	}
-
-	// Redirect directly to branch if there is an existing application or confirmation
-	let branchName = request.params.branch as string;
-	if (requestType === ApplicationType.Application && user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
-		response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
-		return;
-	}
-	else if (requestType === ApplicationType.Confirmation && user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
-		response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
-		return;
-	}
-
-	// Redirect to confirmation selection screen if no match is found
-	if (requestType === ApplicationType.Confirmation) {
-		// We know that `user.applicationBranch` exists because the user has applied and was accepted
-		let allowedBranches = ((await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch).confirmationBranches;
-		allowedBranches = allowedBranches.map(allowedBranchName => allowedBranchName.toLowerCase());
-		if (allowedBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
-			response.redirect("/confirm");
-			return;
-		}
-	}
-
-	let questionBranches = await Branches.BranchConfig.loadAllBranches();
-
-	let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
-	if (!questionBranch) {
-		response.status(400).send("Invalid application branch");
-		return;
-	}
-	// tslint:disable:no-string-literal
-	let questionData = await Promise.all(questionBranch.questions.map(async question => {
-		let savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
-		if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
-			question["multi"] = true;
-			question["selected"] = question.options.map(option => {
-				if (savedValue && Array.isArray(savedValue.value)) {
-					return savedValue.value.indexOf(option) !== -1;
-				}
-				else if (savedValue !== undefined) {
-					return option === savedValue.value;
-				}
-				return false;
+function applicationBranchHandler(requestType: ApplicationType, anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
+	return async (request: express.Request, response: express.Response) => {
+		let user: IUser;
+		if (anonymous) {
+			user = new User({
+				uuid: uuid(),
+				email: ""
 			});
-			if (question.hasOther && savedValue) {
-				if (!Array.isArray(savedValue.value)) {
-					// Select / radio buttons
-					if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
-						question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
-						question["otherSelected"] = true;
-						question["otherValue"] = savedValue.value;
+		} else {
+			user = request.user as IUser;
+		}
+
+		let branchName = request.params.branch as string;
+
+		let questionBranches = await Branches.BranchConfig.loadAllBranches();
+		let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
+
+		// tslint:disable:no-string-literal
+		let questionData = await Promise.all(questionBranch.questions.map(async question => {
+			let savedValue: IFormItem | undefined;
+			if (user) {
+				savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
+			}
+
+			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
+				question["multi"] = true;
+				question["selected"] = question.options.map(option => {
+					if (savedValue && Array.isArray(savedValue.value)) {
+						return savedValue.value.indexOf(option) !== -1;
 					}
-				}
-				else {
-					// Checkboxes
-					for (let value of savedValue.value as string[]) {
-						if (question.options.indexOf(value) === -1) {
+					else if (savedValue !== undefined) {
+						return option === savedValue.value;
+					}
+					return false;
+				});
+				if (question.hasOther && savedValue) {
+					if (!Array.isArray(savedValue.value)) {
+						// Select / radio buttons
+						if (savedValue.value !== null && question.options.indexOf(savedValue.value as string) === -1) {
 							question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
 							question["otherSelected"] = true;
-							question["otherValue"] = value;
+							question["otherValue"] = savedValue.value;
+						}
+					}
+					else {
+						// Checkboxes
+						for (let value of savedValue.value as string[]) {
+							if (question.options.indexOf(value) === -1) {
+								question["selected"][question.options.length - 1] = true; // The "Other" pushed earlier
+								question["otherSelected"] = true;
+								question["otherValue"] = value;
+							}
 						}
 					}
 				}
 			}
-		}
-		else {
-			question["multi"] = false;
-		}
-		if (savedValue && question.type === "file" && savedValue.value) {
-			savedValue = {
+			else {
+				question["multi"] = false;
+			}
+			if (savedValue && question.type === "file" && savedValue.value) {
+				savedValue = {
 				...savedValue,
-				value: (savedValue.value as Express.Multer.File).originalname
-			};
-		}
-		question["value"] = savedValue ? savedValue.value : "";
+					value: (savedValue.value as Express.Multer.File).originalname
+				};
+			}
+			question["value"] = savedValue ? savedValue.value : "";
 
+			if (questionBranch.textBlocks) {
+				let textContent: string = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === question.name).map(async text => {
+					return `<${text.type}>${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
+				}))).join("\n");
+				question["textContent"] = textContent;
+			}
+
+			return question;
+		}));
+		// tslint:enable:no-string-literal
+
+		let endText: string = "";
 		if (questionBranch.textBlocks) {
-			let textContent: string = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === question.name).map(async text => {
-				return `<${text.type}>${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
+			endText = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === "end").map(async text => {
+				return `<${text.type} style="font-size: 90%; text-align: center;">${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
 			}))).join("\n");
-			question["textContent"] = textContent;
 		}
 
-		return question;
-	}));
-	// tslint:enable:no-string-literal
+		if (!anonymous) {
+			let thisUser = await User.findById(user._id) as IUserMongoose;
+			// TODO this is a bug - dates are wrong
+			if (requestType === ApplicationType.Application && !thisUser.applicationStartTime) {
+				thisUser.applicationStartTime = new Date();
+			}
+			else if (requestType === ApplicationType.Confirmation && !thisUser.confirmationStartTime) {
+				thisUser.confirmationStartTime = new Date();
+			}
+			await thisUser.save();
+		}
 
-	let endText: string = "";
-	if (questionBranch.textBlocks) {
-		endText = (await Promise.all(questionBranch.textBlocks.filter(text => text.for === "end").map(async text => {
-			return `<${text.type} style="font-size: 90%; text-align: center;">${await renderMarkdown(text.content, { sanitize: true }, true)}</${text.type}>`;
-		}))).join("\n");
-	}
+		let templateData: IRegisterTemplate = {
+			siteTitle: config.eventName,
+			unauthenticated: anonymous,
+			user: request.user,
+			settings: {
+				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+				qrEnabled: await getSetting<boolean>("qrEnabled")
+			},
+			branch: questionBranch.name,
+			questionData,
+			endText
+		};
 
-	let thisUser = await User.findById(user._id) as IUserMongoose;
-	if (requestType === ApplicationType.Application) {
-		thisUser.applicationStartTime = new Date();
-	}
-	else if (requestType === ApplicationType.Confirmation) {
-		thisUser.confirmationStartTime = new Date();
-	}
-	await thisUser.save();
-
-	let templateData: IRegisterTemplate = {
-		siteTitle: config.eventName,
-		user: request.user,
-		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled")
-		},
-		branch: questionBranch.name,
-		questionData,
-		endText
+		if (requestType === ApplicationType.Application) {
+			response.send(registerTemplate(templateData));
+		} else if (requestType === ApplicationType.Confirmation) {
+			response.send(confirmTemplate(templateData));
+		}
 	};
-
-	response.send(requestType === ApplicationType.Application ? registerTemplate(templateData) : confirmTemplate(templateData));
 }
 
 templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, response) => {
@@ -583,6 +581,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						name: branch.name,
 						open: branch.open.toISOString(),
 						close: branch.close.toISOString(),
+						allowAnonymous: branch.allowAnonymous,
+						autoAccept: branch.autoAccept,
+						noConfirmation: branch.noConfirmation,
 						confirmationBranches: branch.confirmationBranches
 					};
 				}),
