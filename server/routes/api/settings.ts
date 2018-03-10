@@ -150,13 +150,16 @@ settingsRoutes.route("/branch_roles")
 				}
 
 				// Set open/close times (if not noop)
-				if (branch instanceof Branches.ApplicationBranch || branch instanceof Branches.ConfirmationBranch) {
+				if (branch instanceof Branches.TimedBranch) {
 					branch.open = branchData.open ? new Date(branchData.open) : new Date();
 					branch.close = branchData.close ? new Date(branchData.close) : new Date();
 				}
 				// Set available confirmation branches (if application branch)
 				if (branch instanceof Branches.ApplicationBranch) {
 					branch.confirmationBranches = branchData.confirmationBranches || [];
+					branch.allowAnonymous = branchData.allowAnonymous || false;
+					branch.autoAccept = branchData.autoAccept || false;
+					branch.noConfirmation = branchData.noConfirmation || false;
 				}
 				// Set rolling deadline flag (if confirmation branch)
 				if (branch instanceof Branches.ConfirmationBranch) {

@@ -231,6 +231,9 @@ type QuestionBranchType = "Application" | "Confirmation" | "Noop";
 export interface QuestionBranchSettings {
 	open?: Date; // Used by all except noop
 	close?: Date; // Used by all except noop
+	allowAnonymous?: boolean; // Used by application branch
+	autoAccept?: boolean; // Used by application branch
+	noConfirmation?: boolean; // Used by application branch
 	confirmationBranches?: string[]; // Used by application branch
 	usesRollingDeadline?: boolean; // Used by confirmation branch
 }
@@ -253,6 +256,9 @@ export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose
 	settings: {
 		open: Date,
 		close: Date,
+		allowAnonymous: Boolean,
+		autoAccept: Boolean,
+		noConfirmation: Boolean,
 		confirmationBranches: [String],
 		usesRollingDeadline: Boolean
 	},
@@ -276,6 +282,7 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+	skipConfirmation: boolean;
 	confirmationOpen: string;
 	confirmationClose: string;
 	confirmationStatus: {
@@ -312,6 +319,7 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
 	endText: string;
+	unauthenticated: boolean;
 }
 export interface ResponseCount {
 	"response": string;
@@ -352,6 +360,9 @@ export interface IAdminTemplate extends ICommonTemplate {
 				open: string;
 				close: string;
 				confirmationBranches: string[];
+				allowAnonymous: boolean;
+				autoAccept: boolean;
+				noConfirmation: boolean;
 			}[];
 			confirmation: {
 				open: string;
