@@ -28,7 +28,7 @@ submitButton.addEventListener("click", e => {
 		await sweetAlert("Awesome!", successMessage, "success");
 
 		if (unauthenticated) {
-			(document.querySelector("form") as HTMLFormElement).reset();
+			document.querySelector("form")!.reset();
 		} else {
 			window.location.assign("/");
 		}
