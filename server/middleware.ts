@@ -173,20 +173,20 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 			questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).map(branch => branch.name.toLowerCase());
 		} else {
 			questionBranches = ((await BranchConfig.loadBranchFromDB(user.applicationBranch)) as ApplicationBranch).confirmationBranches.map(branchName => branchName.toLowerCase());
-			
+
 			// Check for open branches based on user's individual confirmation deadlines
 			questionBranches.filter((branch) => {
 				return isBranchOpen(branch, user, ApplicationType.Confirmation);
-			})
+			});
 		}
 
 		if (request.params.branch) {
 			let branchName = (request.params.branch as string).toLowerCase();
-			
+
 			if (!isBranchOpen(branchName, user, requestType)) {
-				response.redirect("/")
+				response.redirect("/");
 			}
-			
+
 			if (requestType === ApplicationType.Application) {
 				// Redirect directly to branch if there is an existing application or confirmation
 				if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
@@ -205,7 +205,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 					response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
 					return;
 				}
-				//TODO why is this !user.attending?
+				// TODO why is this !user.attending?
 				if (questionBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
 					response.redirect("/");
 					return;
@@ -232,7 +232,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 				response.redirect(`/${redirPath}/${uriBranch}`);
 				return;
 			}
-			
+
 			// If there are no valid branches, redirect to main page.
 			if (questionBranches.length === 0) {
 				response.redirect("/");

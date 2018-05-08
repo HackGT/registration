@@ -507,7 +507,7 @@ BranchConfig.verifyConfig().then(good => {
 import {ApplicationType} from "./middleware";
 import * as moment from "moment-timezone";
 
-export async function isBranchOpen(branchName: string, user : IUser, requestType: ApplicationType) {
+export async function isBranchOpen(branchName: string, user: IUser, requestType: ApplicationType) {
 	let branch = (await BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (ApplicationBranch | ConfirmationBranch);
 	if (!branch) {
 		return false;
