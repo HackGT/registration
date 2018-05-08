@@ -29,6 +29,7 @@ submitButton.addEventListener("click", e => {
 
 		if (unauthenticated) {
 			document.querySelector("form")!.reset();
+			submitButton.disabled = false;
 		} else {
 			window.location.assign("/");
 		}
@@ -71,11 +72,7 @@ if (deleteButton) {
 			credentials: "same-origin",
 			method: "DELETE"
 		}).then(checkStatus).then(parseJSON).then(async () => {
-			if (formType === FormType.Application) {
-				window.location.assign("/apply");
-			} else {
-				window.location.assign("/confirm");
-			}
+			window.location.assign("/");
 		}).catch(async (err: Error) => {
 			await sweetAlert("Oh no!", err.message, "error");
 			submitButton.disabled = false;
