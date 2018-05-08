@@ -98,7 +98,7 @@ function postApplicationBranchHandler(anonymous: boolean): express.Handler {
 				"error": "Branch is closed"
 			});
 			return;
-		} 
+		}
 
 		if (questionBranch instanceof Branches.ApplicationBranch) {
 			if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
