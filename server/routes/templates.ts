@@ -12,7 +12,7 @@ import {
 } from "../common";
 import {
 	authenticateWithRedirect, isAdmin,
-	onlyAllowAnonymousBranch, branchRedirector, timeLimited, ApplicationType
+	onlyAllowAnonymousBranch, branchRedirector, ApplicationType
 } from "../middleware";
 import {
 	IUser, IUserMongoose, User,
@@ -317,13 +317,11 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 templateRoutes.route("/apply").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Application),
-	timeLimited,
 	applicationHandler(ApplicationType.Application)
 );
 templateRoutes.route("/confirm").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Confirmation),
-	timeLimited,
 	applicationHandler(ApplicationType.Confirmation)
 );
 
@@ -386,20 +384,17 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 templateRoutes.route("/register/:branch").get(
 	isAdmin,
 	onlyAllowAnonymousBranch,
-	timeLimited,
 	applicationBranchHandler(ApplicationType.Application, true)
 );
 
 templateRoutes.route("/apply/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Application),
-	timeLimited,
 	applicationBranchHandler(ApplicationType.Application, false)
 );
 templateRoutes.route("/confirm/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Confirmation),
-	timeLimited,
 	applicationBranchHandler(ApplicationType.Confirmation, false)
 );
 

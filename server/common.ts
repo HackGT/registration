@@ -492,7 +492,7 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 }
 
 // Verify and load questions
-import { BranchConfig } from "./branch";
+import { BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
 BranchConfig.verifyConfig().then(good => {
 	if (good) {
 		console.log(`Question branches loaded from ${config.questionsLocation} to DB successfully`);
@@ -503,3 +503,29 @@ BranchConfig.verifyConfig().then(good => {
 }).catch(err => {
 	throw err;
 });
+
+import {ApplicationType} from "./middleware";
+import * as moment from "moment-timezone";
+
+export async function isBranchOpen(branchName: string, user : IUser, requestType: ApplicationType) {
+	let branch = (await BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (ApplicationBranch | ConfirmationBranch);
+	if (!branch) {
+		return false;
+	}
+
+	let openDate = branch.open;
+	let closeDate = branch.close;
+	if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
+		let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
+		if (times) {
+			openDate = times.open;
+			closeDate = times.close;
+		}
+	}
+
+	if (moment().isBetween(openDate, closeDate)) {
+		return true;
+	}
+
+	return false;
+}

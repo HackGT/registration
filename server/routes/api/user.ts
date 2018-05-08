@@ -2,13 +2,12 @@ import * as path from "path";
 import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
-import * as moment from "moment-timezone";
 import * as uuid from "uuid/v4";
 
 import {
 	STORAGE_ENGINE,
 	formatSize,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects, isBranchOpen
 } from "../../common";
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
@@ -36,45 +35,8 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 	}
 };
 
-// TODO what is the difference between this and `middleware.timeLimited`? - related to #206
-function applicationTimeRestriction(requestType: ApplicationType): express.RequestHandler {
-	return async (request, response, next) => {
-		let branchName = request.params.branch as string;
-		let branch = (await Branches.BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (Branches.ApplicationBranch | Branches.ConfirmationBranch);
-		if (!branch) {
-			response.status(400).json({
-			"error": "Invalid application branch"
-			});
-			return;
-		}
-
-		let user = request.user as IUserMongoose;
-
-		let openDate = branch.open;
-		let closeDate = branch.close;
-		if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
-			let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
-			if (times) {
-				openDate = times.open;
-				closeDate = times.close;
-			}
-		}
-
-		if (moment().isBetween(openDate, closeDate) || request.user.isAdmin) {
-			next();
-		}
-		else {
-			response.status(400).json({
-				"error": `${requestType === ApplicationType.Application ? "Applications" : "Confirmations"} are currently closed`
-			});
-			return;
-		}
-	};
-}
-
 registrationRoutes.route("/:branch").post(
 	isAdmin,
-	applicationTimeRestriction(ApplicationType.Application),
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
@@ -83,25 +45,21 @@ registrationRoutes.route("/:branch").post(
 
 userRoutes.route("/application/:branch").post(
 	isUserOrAdmin,
-	applicationTimeRestriction(ApplicationType.Application),
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
 	postApplicationBranchHandler(false)
 ).delete(
 	isUserOrAdmin,
-	applicationTimeRestriction,
 	deleteApplicationBranchHandler);
 userRoutes.route("/confirmation/:branch").post(
 	isUserOrAdmin,
-	applicationTimeRestriction(ApplicationType.Confirmation),
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
 	postApplicationBranchHandler(false)
 ).delete(
 	isUserOrAdmin,
-	applicationTimeRestriction,
 	deleteApplicationBranchHandler
 );
 function postApplicationBranchHandler(anonymous: boolean): express.Handler {
@@ -129,10 +87,18 @@ function postApplicationBranchHandler(anonymous: boolean): express.Handler {
 		let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
 		if (!questionBranch) {
 			response.status(400).json({
-				"error": "Invalid application branch"
+				"error": "Invalid branch"
 			});
 			return;
 		}
+
+		// Allow admin to submit an already closed branch (for anonymous submission purposes)
+		if (!user.admin && !isBranchOpen(request.params.branch, user, questionBranch instanceof Branches.ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation)) {
+			response.status(400).json({
+				"error": "Branch is closed"
+			});
+			return;
+		} 
 
 		if (questionBranch instanceof Branches.ApplicationBranch) {
 			if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
