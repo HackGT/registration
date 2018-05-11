@@ -156,14 +156,14 @@ settingsRoutes.route("/branch_roles")
 				}
 				// Set available confirmation branches (if application branch)
 				if (branch instanceof Branches.ApplicationBranch) {
-					branch.confirmationBranches = branchData.confirmationBranches || [];
 					branch.allowAnonymous = branchData.allowAnonymous || false;
-					branch.autoAccept = branchData.autoAccept || false;
-					branch.noConfirmation = branchData.noConfirmation || false;
+					branch.autoAccept = branchData.autoAccept || "disabled";
 				}
 				// Set rolling deadline flag (if confirmation branch)
 				if (branch instanceof Branches.ConfirmationBranch) {
 					branch.usesRollingDeadline = branchData.usesRollingDeadline || false;
+					branch.isAcceptance = branchData.isAcceptance || false;
+					branch.autoConfirm = branchData.autoConfirm || false;
 				}
 
 				await branch.save();
@@ -200,8 +200,8 @@ settingsRoutes.route("/email_content/:type")
 			if (type.match(/-apply$/)) {
 				subject = defaultEmailSubjects.apply;
 			}
-			else if (type.match(/-accept$/)) {
-				subject = defaultEmailSubjects.accept;
+			else if (type.match(/-pre-confirm$/)) {
+				subject = defaultEmailSubjects.preConfirm;
 			}
 			else if (type.match(/-attend$/)) {
 				subject = defaultEmailSubjects.attend;

@@ -156,10 +156,10 @@ async function findQuestions(
 			.map(item => recordToFormItem(item, user.applicationBranch))
 		));
 	}
-	if (user.attending) {
+	if (user.confirmed) {
 		items = items.concat(await Promise.all(user.confirmationData
 			.reduce(questionFilter, [])
-			.map(item => recordToFormItem(item, user.confirmationBranch))
+			.map(item => recordToFormItem(item, user.confirmationBranch!))
 		));
 	}
 	return items;
@@ -281,9 +281,9 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 				user.applicationSubmitTime.toDateString()
 	} : undefined;
 
-	const confirmation: types.Branch<Ctx> | undefined = user.attending ? {
-		type: user.confirmationBranch,
-		data: await Promise.all(user.confirmationData.map(item => recordToFormItem(item, user.confirmationBranch))),
+	const confirmation: types.Branch<Ctx> | undefined = user.confirmed ? {
+		type: user.confirmationBranch!,
+		data: await Promise.all(user.confirmationData.map(item => recordToFormItem(item, user.confirmationBranch!))),
 		start_time: user.confirmationStartTime &&
 			user.confirmationStartTime.toDateString(),
 		submit_time: user.confirmationSubmitTime &&
@@ -317,8 +317,9 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 
 		applied: !!user.applied,
 		accepted: !!user.accepted,
-		accepted_and_notified: !!user.acceptedEmailSent,
-		attending: !!user.attending,
+		accepted_and_notified: !!user.preConfirmEmailSent,
+		confirmed: !!user.confirmed,
+		confirmationBranch: user.confirmationBranch,
 
 		application,
 		confirmation,

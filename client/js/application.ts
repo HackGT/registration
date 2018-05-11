@@ -5,7 +5,7 @@ enum FormType {
 declare let formTypeString: keyof typeof FormType;
 let formType = FormType[formTypeString];
 
-declare let unauthenticated: (boolean | undefined);
+let unauthenticated: (boolean | null) = null;
 
 let form = document.querySelector("form") as HTMLFormElement | null;
 let submitButton = document.querySelector("form input[type=submit]") as HTMLInputElement;

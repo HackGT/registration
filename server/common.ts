@@ -378,7 +378,7 @@ import { IUser, Team, IFormItem } from "./schema";
 
 export const defaultEmailSubjects = {
 	apply: `[${config.eventName}] - Thank you for applying!`,
-	accept: `[${config.eventName}] - You've been accepted!`,
+	preConfirm: `[${config.eventName}] - Application Update`,
 	attend: `[${config.eventName}] - Thank you for RSVPing!`
 };
 interface IMailObject {
@@ -454,7 +454,7 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
 	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
 	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
-	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch || ""));
 	markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
 		let question = user.applicationData.find(data => data.name === name);
 		return formatFormItem(question);
@@ -515,12 +515,13 @@ export async function isBranchOpen(branchName: string, user: IUser, requestType:
 
 	let openDate = branch.open;
 	let closeDate = branch.close;
-	if (requestType === ApplicationType.Confirmation && user.confirmationDeadlines) {
-		let times = user.confirmationDeadlines.find((d) => d.name === branch.name);
-		if (times) {
-			openDate = times.open;
-			closeDate = times.close;
-		}
+	if (requestType === ApplicationType.Confirmation && user.confirmationDeadline && user.confirmationDeadline.name.toLowerCase() === branchName.toLowerCase()) {
+		openDate = user.confirmationDeadline.open;
+		closeDate = user.confirmationDeadline.close;
+	}
+
+	if (branch instanceof ConfirmationBranch && branch.autoConfirm) {
+		return false;
 	}
 
 	if (moment().isBetween(openDate, closeDate)) {

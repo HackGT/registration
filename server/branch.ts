@@ -179,26 +179,19 @@ export class ApplicationBranch extends TimedBranch {
 
 	public allowAnonymous: boolean;
 
-	public autoAccept: boolean;
-
-	public noConfirmation: boolean;
-	public confirmationBranches: string[];
+	public autoAccept: string;
 
 	protected async loadSettings(): Promise<void> {
 		await super.loadSettings();
 		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
 		this.allowAnonymous = branchConfig && branchConfig.settings && branchConfig.settings.allowAnonymous || false;
-		this.autoAccept = branchConfig && branchConfig.settings && branchConfig.settings.autoAccept || false;
-		this.noConfirmation = branchConfig && branchConfig.settings && branchConfig.settings.noConfirmation || false;
-		this.confirmationBranches = branchConfig && branchConfig.settings && branchConfig.settings.confirmationBranches || [];
+		this.autoAccept = branchConfig && branchConfig.settings && branchConfig.settings.autoAccept || "disabled";
 	}
 	protected serializeSettings(): QuestionBranchSettings {
 		return {
 			...super.serializeSettings(),
 			allowAnonymous: this.allowAnonymous,
-			autoAccept: this.autoAccept,
-			noConfirmation: this.noConfirmation,
-			confirmationBranches: this.confirmationBranches
+			autoAccept: this.autoAccept
 		};
 	}
 }
@@ -207,15 +200,21 @@ export class ConfirmationBranch extends TimedBranch {
 	public readonly type: keyof QuestionBranchTypes = "Confirmation";
 
 	public usesRollingDeadline: boolean;
+	public isAcceptance: boolean;
+	public autoConfirm: boolean;
 
 	protected async loadSettings(): Promise<void> {
 		await super.loadSettings();
 		let branchConfig = await QuestionBranchConfig.findOne({ "name": this.name });
 		this.usesRollingDeadline = branchConfig && branchConfig.settings && branchConfig.settings.usesRollingDeadline || false;
+		this.isAcceptance = branchConfig && branchConfig.settings && branchConfig.settings.isAcceptance || false;
+		this.autoConfirm = branchConfig && branchConfig.settings && branchConfig.settings.autoConfirm || false;
 	}
 	protected serializeSettings(): QuestionBranchSettings {
 		return {
 			...super.serializeSettings(),
+			isAcceptance: this.isAcceptance,
+			autoConfirm: this.autoConfirm,
 			usesRollingDeadline: this.usesRollingDeadline
 		};
 	}
@@ -293,10 +292,11 @@ export async function getOpenConfirmationBranches(user: IUser): Promise<Confirma
 			close: Date;
 		};
 	}
-	let deadlines = user.confirmationDeadlines.reduce((map, data) => {
-		map[data.name] = data;
-		return map;
-	}, {} as DeadlineMap);
+
+	let deadlines = {} as DeadlineMap;
+	if (user.confirmationDeadline) {
+		deadlines[user.confirmationDeadline.name] = user.confirmationDeadline;
+	}
 
 	let branches = await (BranchConfig.loadAllBranches("Confirmation")) as ConfirmationBranch[];
 
