@@ -7,12 +7,12 @@ import * as uuid from "uuid/v4";
 import {
 	STORAGE_ENGINE,
 	formatSize,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects, isBranchOpen
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects
 } from "../../common";
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
 	isAdmin, isUserOrAdmin, ApplicationType,
-	trackEvent
+	trackEvent, canUserModify
 } from "../../middleware";
 import {
 	IFormItem,
@@ -35,6 +35,7 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 	}
 };
 
+// We don't use canUserModify here, instead check for admin
 registrationRoutes.route("/:branch").post(
 	isAdmin,
 	postParser,
@@ -45,21 +46,25 @@ registrationRoutes.route("/:branch").post(
 
 userRoutes.route("/application/:branch").post(
 	isUserOrAdmin,
+	canUserModify,
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
 	postApplicationBranchHandler(false)
 ).delete(
 	isUserOrAdmin,
+	canUserModify,
 	deleteApplicationBranchHandler);
 userRoutes.route("/confirmation/:branch").post(
 	isUserOrAdmin,
+	canUserModify,
 	postParser,
 	uploadHandler.any(),
 	postApplicationBranchErrorHandler,
 	postApplicationBranchHandler(false)
 ).delete(
 	isUserOrAdmin,
+	canUserModify,
 	deleteApplicationBranchHandler
 );
 function postApplicationBranchHandler(anonymous: boolean): express.Handler {
@@ -88,35 +93,6 @@ function postApplicationBranchHandler(anonymous: boolean): express.Handler {
 		if (!questionBranch) {
 			response.status(400).json({
 				"error": "Invalid branch"
-			});
-			return;
-		}
-
-		// Allow admin to submit an already closed branch (for anonymous submission purposes)
-		if (!user.admin && !isBranchOpen(request.params.branch, user, questionBranch instanceof Branches.ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation)) {
-			response.status(400).json({
-				"error": "Branch is closed"
-			});
-			return;
-		}
-
-		if (questionBranch instanceof Branches.ApplicationBranch) {
-			if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
-				response.status(400).json({
-					"error": "You can only edit the application branch that you originally submitted"
-				});
-				return;
-			}
-		} else if (questionBranch instanceof Branches.ConfirmationBranch) {
-			if (user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
-				response.status(400).json({
-					"error": "You can only edit the confirmation branch that you originally submitted"
-				});
-				return;
-			}
-		} else {
-			response.status(400).json({
-				"error": "Invalid application branch"
 			});
 			return;
 		}
@@ -244,12 +220,12 @@ function postApplicationBranchHandler(anonymous: boolean): express.Handler {
 				}
 				trackEvent("submitted application", request, user.email, tags);
 
-				if (questionBranch.autoAccept) {
-					await updateUserStatus(user, "accepted");
+				if (questionBranch.autoAccept && questionBranch.autoAccept !== "disabled") {
+					await updateUserStatus(user, questionBranch.autoAccept);
 				}
 
 			} else if (questionBranch instanceof Branches.ConfirmationBranch) {
-				if (!user.attending) {
+				if (!user.confirmed) {
 					await sendMailAsync({
 						from: config.email.from,
 						to: user.email,
@@ -258,7 +234,7 @@ function postApplicationBranchHandler(anonymous: boolean): express.Handler {
 						text: emailText
 					});
 				}
-				user.attending = true;
+				user.confirmed = true;
 				user.confirmationBranch = questionBranch.name;
 				user.confirmationData = data;
 				user.markModified("confirmationData");
@@ -295,7 +271,7 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 	if (requestType === ApplicationType.Application) {
 		user.applied = false;
 		user.accepted = false;
-		user.attending = false;
+		user.confirmed = false;
 		user.applicationBranch = "";
 		user.applicationData = [];
 		user.markModified("applicationData");
@@ -303,8 +279,7 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 		user.applicationStartTime = undefined;
 	}
 	else if (requestType === ApplicationType.Confirmation) {
-		user.attending = false;
-		user.confirmationBranch = "";
+		user.confirmed = false;
 		user.confirmationData = [];
 		user.markModified("confirmationData");
 		user.confirmationSubmitTime = undefined;
@@ -327,7 +302,7 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
 	let user = await User.findOne({uuid: request.params.uuid});
-	let status = request.body.status as ("accepted" | "no-decision");
+	let status = request.body.status as string;
 
 	if (!user) {
 		response.status(400).json({
@@ -336,9 +311,8 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 		return;
 	}
 
-	await updateUserStatus(user, status);
-
 	try {
+		await updateUserStatus(user, status);
 		await user.save();
 		response.status(200).json({
 			"success": true
@@ -347,51 +321,77 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	catch (err) {
 		console.error(err);
 		response.status(500).json({
-			"error": "An error occurred while accepting or rejecting the user"
+			"error": "An error occurred while changing user status"
 		});
 	}
 });
 
-async function updateUserStatus(user: IUserMongoose, status: ("accepted" | "no-decision")): Promise<void> {
+async function updateUserStatus(user: IUserMongoose, status: string): Promise<void> {
 	if (status === "no-decision") {
+		// Clear all confirmation data
+		user.confirmationBranch = undefined;
+		user.confirmationData = [];
+		user.confirmationDeadline = undefined;
+		user.confirmationStartTime = undefined;
+		user.confirmationSubmitTime = undefined;
+		user.confirmed = false;
 		user.accepted = false;
-		user.confirmationDeadlines = [];
-	} else if (status === "accepted") {
-		user.accepted = true;
-		let applicationBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
+		user.preConfirmEmailSent = false;
+	} else {
+		let confirmationBranch = await Branches.BranchConfig.loadBranchFromDB(status) as Branches.ConfirmationBranch;
 
-		// Do not send "you are accepted" emails to auto-accept branches
-		// Admins should add the information into the "post-apply" email
-		if (applicationBranch.autoAccept) {
-			user.acceptedEmailSent = true;
+		if (confirmationBranch) {
+			// Clear all confirmation data
+			user.confirmationData = [];
+			user.confirmationDeadline = undefined;
+			user.confirmationStartTime = undefined;
+			user.confirmationSubmitTime = undefined;
+			user.confirmed = false;
+			user.accepted = false;
+			user.preConfirmEmailSent = false;
+
+			// Update branch
+			user.confirmationBranch = status;
+
+			// Handle rolling deadline
+			if (confirmationBranch.usesRollingDeadline) {
+				user.confirmationDeadline = {
+					name: confirmationBranch.name,
+					open: confirmationBranch.open,
+					close: confirmationBranch.close
+				};
+			}
+
+			// Handle accptance
+			if (confirmationBranch.isAcceptance) {
+				user.accepted = true;
+			}
+
+			// Handle no-op confirmation
+			if (confirmationBranch.autoConfirm) {
+				user.confirmed = true;
+			}
+		} else {
+			throw new Error("Confirmation branch not valid!");
 		}
-
-		// Automatically mark user as "attending" if application branch skips confirmation
-		if (applicationBranch.noConfirmation) {
-			user.attending = true;
-		}
-
-		user.confirmationDeadlines = ((await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[])
-				.filter(c => c.usesRollingDeadline)
-				.filter(c => applicationBranch.confirmationBranches.indexOf(c.name) > -1);
 	}
 }
 
 userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
 	try {
-		let users = await User.find({ "accepted": true, "acceptedEmailSent": { $ne: true } });
+		let users = await User.find({ "confirmationBranch": {$exists: true}, "preConfirmEmailSent": { $ne: true } });
 		for (let user of users) {
 			// Email the applicant about their acceptance
 			let emailSubject: string | null;
 			try {
-				emailSubject = await getSetting<string>(`${user.applicationBranch}-accept-email-subject`, false);
+				emailSubject = await getSetting<string>(`${user.confirmationBranch}-pre-confirm-email-subject`, false);
 			}
 			catch {
 				emailSubject = null;
 			}
 			let emailMarkdown: string;
 			try {
-				emailMarkdown = await getSetting<string>(`${user.applicationBranch}-accept-email`, false);
+				emailMarkdown = await getSetting<string>(`${user.confirmationBranch}-pre-confirm-email`, false);
 			}
 			catch {
 				// Content not set yet
@@ -404,12 +404,12 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 			await sendMailAsync({
 				from: config.email.from,
 				to: user.email,
-				subject: emailSubject || defaultEmailSubjects.accept,
+				subject: emailSubject || defaultEmailSubjects.preConfirm,
 				html: emailHTML,
 				text: emailText
 			});
 
-			user.acceptedEmailSent = true;
+			user.preConfirmEmailSent = true;
 			await user.save();
 		}
 

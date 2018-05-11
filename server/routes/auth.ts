@@ -232,7 +232,7 @@ passport.use(new LocalStrategy({
 
 			"applied": false,
 			"accepted": false,
-			"acceptedEmailSent": false,
+			"preConfirmEmailSent": false,
 			"attending": false,
 			"applicationData": [],
 			"applicationStartTime": undefined,

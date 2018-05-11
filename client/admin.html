@@ -166,16 +166,6 @@
 								</optgroup>
 							</select>
 						</th>
-						<th>
-							<select id="status-filter">
-								<option value="no-decision">No decision</option>
-								<option value="accepted">Accepted</option>
-								<option value="not-confirmed">Not confirmed</option>
-								<option value="confirmed">Confirmed</option>
-								<!--<option value="rejected">Rejected</option>-->
-								<option value="*">All</option>
-							</select>
-						</th>
 					</thead>
 					<tbody></tbody>
 				</table>
@@ -203,8 +193,9 @@
 							<!-- Set status -->
 							<select class="status">
 								<option value="no-decision">No decision</option>
-								<option value="accepted">Accepted</option>
-								<!--<option>Rejected</option>-->
+								{{#each settings.branches.confirmation}}
+									<option value="{{this.name}}">Confirm ({{this.name}})</option>
+								{{/each}}
 							</select>
 						</td>
 					</tr>
@@ -230,7 +221,7 @@
 							<input id="teams-enabled" type="checkbox" {{settings.teamsEnabledChecked}} />
 						</div>
 						<div class="col-6">
-							<label for="qr-enabled">Enable check-in QR Codes?</label>
+							<label for="qr-enabled">Enable check-in QR Codes for accepted and confirmed users: </label>
 							<input id="qr-enabled" type="checkbox" {{settings.qrEnabledChecked}} />
 						</div>
 					</div>
@@ -250,23 +241,16 @@
 										<label for="{{removeSpaces this.name}}-allow-anonymous">Allow anonymous submissions</label>
 									</div>
 									<div>
-										<input type="checkbox" id="{{removeSpaces this.name}}-auto-accept" class="autoAccept" {{#if this.autoAccept}}checked{{/if}} />
-										<label for="{{removeSpaces this.name}}-auto-accept">Auto-accept applicants</label>
-									</div>
-									<div>
-										<input type="checkbox" id="{{removeSpaces this.name}}-no-confirmation" class="noConfirmation" data-branch-name="{{this.name}}" {{#if this.noConfirmation}}checked{{/if}} />
-										<label for="{{removeSpaces this.name}}-no-confirmation">Skip Confirmation</label>
+										<label for="{{removeSpaces this.name}}-auto-accept">Automatic Decision</label>
+										<select id="{{removeSpaces this.name}}-auto-accept" class="autoAccept">
+											<option value="disabled">Disabled</option> 
+											{{#each ../settings.branches.confirmation}}
+											<option value="{{this.name}}" {{#ifCond this.name ../autoAccept }}selected{{/ifCond}}>{{this.name}}</option>
+											{{/each}}
+										</select>
 									</div>
 								</fieldset>
-								<label>Available confirmation branches</label>
-								<fieldset class="availableConfirmationBranches">
-									{{#each ../settings.branches.confirmation}}
-									<div>
-										<input type="checkbox" id="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}" data-confirmation="{{this.name}}" data-branch-name="{{../this.name}}"{{branchChecked  ../this.confirmationBranches this.name}} />
-										<label for="{{removeSpaces ../this.name}}-to-{{removeSpaces this.name}}">{{this.name}}</label>
-									</div>
-									{{/each}}
-								</fieldset>
+
 								<label>Open/Close Times</label>
 								<fieldset>
 									<label for="{{removeSpaces this.name}}-open">Open</label>
@@ -290,14 +274,27 @@
 									<option value="Application">Application</option>
 									<option value="Confirmation" selected>Confirmation</option>
 								</select>
+								<label>Options</label>
+								<fieldset class="confirmationBranchOptions">
+									<div>
+										<input type="checkbox" id="{{removeSpaces this.name}}-is-acceptance" class="isAcceptance" data-branch-name="{{this.name}}" {{#if this.isAcceptance}}checked{{/if}} />
+										<label for="{{removeSpaces this.name}}-is-acceptance">Accept applicants</label>
+									</div>
+									<div>
+										<input type="checkbox" id="{{removeSpaces this.name}}-auto-confirm" class="autoConfirm" {{#if this.autoConfirm}}checked{{/if}} />
+										<label for="{{removeSpaces this.name}}-auto-confirm">Auto-confirm applicants</label>
+									</div>
+									<div>
+										<input type="checkbox" id="{{removeSpaces this.name}}-usesRolling" class="usesRollingDeadline" {{#if this.usesRollingDeadline}}checked{{/if}}/>
+										<label for="{{removeSpaces this.name}}-usesRolling">Rolling Open/Close Times</label>
+									</div>
+								</fieldset>
 								<label>Open/Close Times</label>
 								<fieldset>
 									<label for="{{removeSpaces this.name}}-open">Open</label>
 									<input type="datetime-local" id="{{removeSpaces this.name}}-open" class="openTime" data-raw-value="{{this.open}}"/>
 									<label for="{{removeSpaces this.name}}-close">Close</label>
 									<input type="datetime-local" id="{{removeSpaces this.name}}-close" class="closeTime" data-raw-value="{{this.close}}"/>
-									<input type="checkbox" id="{{removeSpaces this.name}}-usesRolling" class="usesRollingDeadline" {{this.usesRollingDeadlineChecked}}/>
-									<label for="{{removeSpaces this.name}}-usesRolling">Rolling Open/Close Times</label>
 								</fieldset>
 							</div>
 						{{/each}}
@@ -320,14 +317,14 @@
 								<optgroup label="Application branches">
 									{{#each settings.branches.application}}
 									<option value="{{this.name}}-apply">{{this.name}} Post-Apply Email</option>
-									{{#unless this.autoAccept}}
-									<option value="{{this.name}}-accept">{{this.name}} Accepted Email</option>
-									{{/unless}}
 									{{/each}}
 								</optgroup>
 								<optgroup label="Confirmation branches">
 									{{#each settings.branches.confirmation}}
+										<option value="{{this.name}}-pre-confirm">{{this.name}} Pre-Confirm Email</option>
+										{{#unless this.autoConfirm}}
 										<option value="{{this.name}}-attend">{{this.name}} Post-Confirm Email</option>
+										{{/unless}}
 									{{/each}}
 								</optgroup>
 							</select>
