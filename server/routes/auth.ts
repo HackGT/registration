@@ -123,7 +123,7 @@ function useLoginStrategy(strategy: any, dataFieldName: "githubData" | "googleDa
 
 				"applied": false,
 				"accepted": false,
-				"attending": false,
+				"confirmed": false,
 				"applicationData": [],
 				"applicationStartTime": undefined,
 				"applicationSubmitTime": undefined,
@@ -233,7 +233,7 @@ passport.use(new LocalStrategy({
 			"applied": false,
 			"accepted": false,
 			"preConfirmEmailSent": false,
-			"attending": false,
+			"confirmed": false,
 			"applicationData": [],
 			"applicationStartTime": undefined,
 			"applicationSubmitTime": undefined,
