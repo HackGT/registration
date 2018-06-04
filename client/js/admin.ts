@@ -1,6 +1,6 @@
 class State {
 	public id: string;
-	private sectionElement: HTMLElement;
+	private readonly sectionElement: HTMLElement;
 
 	public static hideAll() {
 		// tslint:disable-next-line:no-use-before-declare
@@ -472,6 +472,7 @@ class ApplicantEntries {
 
 	public static setup() {
 		this.generalNodes = [];
+		this.detailsNodes = [];
 		this.instantiate();
 		this.offset = 0;
 		this.updateFilter();

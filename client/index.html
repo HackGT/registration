@@ -47,7 +47,7 @@
 						{{#if settings.qrEnabled}}
 							{{#if user.accepted}}
 								<p>Show your QR code to check in when you get here.</p>
-								<div id="qrCode" data="user:{{user.uuid}}"></div>
+								<div id="qrCode" data-encoded="user:{{user.uuid}}"></div>
 							{{/if}}
 						{{/if}}
 					{{else if user.confirmationBranch}}
