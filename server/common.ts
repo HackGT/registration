@@ -1,3 +1,5 @@
+// Needed so that common.ts <-> schema.ts cyclical dependencies don't cause problems
+/* tslint:disable:no-duplicate-imports */
 import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
@@ -464,7 +466,7 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 		return formatFormItem(question);
 	});
 
-	return await renderMarkdown(markdown);
+	return renderMarkdown(markdown);
 }
 export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
 	let html: string;

@@ -61,7 +61,6 @@
             "allow-undefined-check"
         ],
         "use-isnan": true,
-        "typeof-compare": true,
         "deprecation": true,
         "eofline": true,
         "linebreak-style": [
@@ -159,6 +158,19 @@
             "allow-declarations",
             "allow-named-functions"
         ],
-        "max-classes-per-file": [false]
+        "max-classes-per-file": [false],
+        "no-duplicate-imports": true,
+        "no-this-assignment": [
+            true,
+            {
+                "allow-destructuring": true
+            }
+        ],
+        "no-return-await": true,
+        "no-duplicate-switch-case": true,
+        "ban-comma-operator": true,
+        "no-dynamic-delete": true,
+        "prefer-readonly": true,
+        "prefer-while": true
     }
 }

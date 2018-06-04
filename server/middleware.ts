@@ -4,9 +4,8 @@ import * as path from "path";
 import * as os from "os";
 
 import { config, isBranchOpen } from "./common";
-import { BranchConfig, ApplicationBranch } from "./branch";
-import { User, IUser } from "./schema";
-import * as Branches from "./branch";
+import { BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
+import { User, IUser, DataLog, HackGTMetrics } from "./schema";
 
 //
 // Express middleware
@@ -151,16 +150,16 @@ export async function onlyAllowAnonymousBranch(request: express.Request, respons
 export async function canUserModify(request: express.Request, response: express.Response, next: express.NextFunction) {
 	let user = await User.findOne({uuid: request.params.uuid}) as IUser;
 	let branchName = request.params.branch as string;
-	let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	let questionBranch = (await BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
 
-	if (!(await isBranchOpen(request.params.branch, user, questionBranch instanceof Branches.ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation))) {
+	if (!(await isBranchOpen(request.params.branch, user, questionBranch instanceof ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation))) {
 		response.status(400).json({
 			"error": "Branch is closed"
 		});
 		return;
 	}
 
-	if (questionBranch instanceof Branches.ApplicationBranch) {
+	if (questionBranch instanceof ApplicationBranch) {
 		// Don't allow user to modify application if we assigned them a confirmation branch
 		if (user.confirmationBranch) {
 			response.status(400).json({
@@ -174,7 +173,7 @@ export async function canUserModify(request: express.Request, response: express.
 			});
 			return;
 		}
-	} else if (questionBranch instanceof Branches.ConfirmationBranch) {
+	} else if (questionBranch instanceof ConfirmationBranch) {
 		if (!user.confirmationBranch) {
 			response.status(400).json({
 				"error": "You can't confirm for that branch"
@@ -261,7 +260,6 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 	};
 }
 
-import { DataLog, HackGTMetrics } from "./schema";
 export function trackEvent(action: string, request: express.Request, user?: string, data?: object) {
 	let thisEvent: DataLog = {
 		action,

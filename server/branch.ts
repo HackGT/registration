@@ -248,7 +248,7 @@ export class BranchConfig {
 	public static async loadBranchFromDB(name: string, location: string = config.questionsLocation): Promise<QuestionBranch> {
 		let branchConfig = await QuestionBranchConfig.findOne({ name });
 		if (!branchConfig) {
-			return await new NoopBranch(name, location).loadFromSchema();
+			return new NoopBranch(name, location).loadFromSchema();
 		}
 
 		let instance: QuestionBranch;
