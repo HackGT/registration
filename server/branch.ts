@@ -225,6 +225,19 @@ export class BranchConfig {
 		let questionBranches: QuestionBranches = JSON.parse(await readFileAsync(config.questionsLocation));
 		return questionBranches.map(branch => branch.name);
 	}
+	public static async getCanonicalName(rawName: string): Promise<string | null> {
+		const branchNames = await BranchConfig.getNames();
+		try {
+			rawName = decodeURIComponent(rawName);
+		}
+		catch {
+			// DecodeURIComponent() will fail if branch name is already decoded and is supposed to have a % escape sequence in it
+		}
+		rawName = rawName.toLowerCase();
+		return branchNames.find(name => {
+			return rawName === name.toLowerCase();
+		}) || null;
+	}
 	public static async loadAllBranches(type: keyof QuestionBranchTypes | "All" = "All", location: string = config.questionsLocation): Promise<QuestionBranch[]> {
 		let names = await this.getNames();
 		let branches: QuestionBranch[] = [];

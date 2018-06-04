@@ -509,11 +509,12 @@ BranchConfig.verifyConfig().then(good => {
 import {ApplicationType} from "./middleware";
 import * as moment from "moment-timezone";
 
-export async function isBranchOpen(branchName: string, user: IUser, requestType: ApplicationType) {
-	let branch = (await BranchConfig.loadAllBranches()).find(b => b.name.toLowerCase() === branchName.toLowerCase()) as (ApplicationBranch | ConfirmationBranch);
-	if (!branch) {
+export async function isBranchOpen(rawBranchName: string, user: IUser, requestType: ApplicationType): Promise<boolean> {
+	const branchName = await BranchConfig.getCanonicalName(rawBranchName);
+	if (!branchName) {
 		return false;
 	}
+	let branch = await BranchConfig.loadBranchFromDB(branchName) as (ApplicationBranch | ConfirmationBranch);
 
 	let openDate = branch.open;
 	let closeDate = branch.close;
