@@ -552,8 +552,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
 			admittedUsers: await User.find({ "accepted": true }).count(),
-			attendingUsers: await User.find({ "attending": true }).count(),
-			declinedUsers: await User.find({ "accepted": true, "attending": false }).count(),
+			attendingUsers: await User.find({ "confirmed": true }).count(),
+			declinedUsers: await User.find({ "accepted": true, "confirmed": false }).count(),
 			applicationBranches: await Promise.all(applicationBranches.map(async branch => {
 				return {
 					"name": branch.name,

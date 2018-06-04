@@ -214,7 +214,7 @@ function userFilterToMongo(filter: types.UserFilter | undefined) {
 	}
 	setIf("applied", filter.applied);
 	setIf("accepted", filter.accepted);
-	setIf("attending", filter.attending);
+	setIf("confirmed", filter.confirmed);
 	setIf("applicationBranch", filter.application_branch);
 	setIf("confirmationBranch", filter.confirmation_branch);
 	return query;
