@@ -130,29 +130,30 @@ export enum ApplicationType {
 }
 
 export async function onlyAllowAnonymousBranch(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let branchName = request.params.branch as string;
-	let questionBranches = (await BranchConfig.loadAllBranches()).filter(br => {
-		return br.name.toLowerCase() === branchName.toLowerCase();
-	});
-	if (questionBranches.length !== 1) {
+	const branchName = await BranchConfig.getCanonicalName(request.params.branch);
+	if (!branchName) {
 		response.redirect("/");
 		return;
 	}
-
-	let branch = questionBranches[0] as ApplicationBranch;
+	const branch = await BranchConfig.loadBranchFromDB(branchName) as ApplicationBranch;
 	if (!branch.allowAnonymous) {
 		response.redirect("/");
 		return;
 	}
-
 	next();
 }
 export async function canUserModify(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let user = await User.findOne({uuid: request.params.uuid}) as IUser;
-	let branchName = request.params.branch as string;
-	let questionBranch = (await BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+	const user = await User.findOne({uuid: request.params.uuid}) as IUser;
+	const branchName = await BranchConfig.getCanonicalName(request.params.branch);
+	if (!branchName) {
+		response.status(400).json({
+			"error": "Invalid application branch name"
+		});
+		return;
+	}
+	let questionBranch = await BranchConfig.loadBranchFromDB(branchName);
 
-	if (!(await isBranchOpen(request.params.branch, user, questionBranch instanceof ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation))) {
+	if (!(await isBranchOpen(branchName, user, questionBranch instanceof ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation))) {
 		response.status(400).json({
 			"error": "Branch is closed"
 		});
@@ -209,8 +210,14 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 		}
 
 		if (request.params.branch) {
-			let branchName = (request.params.branch as string).toLowerCase();
-			let branch = (await BranchConfig.loadBranchFromDB(request.params.branch as string));
+			// Branch name from URL can be different from config in casing
+			let branchName = await BranchConfig.getCanonicalName(request.params.branch);
+			if (!branchName) {
+				// Invalid branch name
+				response.redirect("/");
+				return;
+			}
+			let branch = await BranchConfig.loadBranchFromDB(branchName);
 			if ((branch.type === "Application" && requestType !== ApplicationType.Application) || (branch.type === "Confirmation" && requestType !== ApplicationType.Confirmation)) {
 				response.redirect("/");
 				return;
@@ -229,7 +236,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 				}
 			}
 			if (requestType === ApplicationType.Confirmation) {
-				if (request.params.branch !== user.confirmationBranch ) {
+				if (!user.accepted || branchName.toLowerCase() !== (user.confirmationBranch || "").toLowerCase()) {
 					response.redirect("/");
 					return;
 				}
@@ -243,7 +250,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 			}
 
 			if (targetBranch) {
-				const uriBranch = encodeURIComponent(targetBranch);
+				const uriBranch = encodeURIComponent(targetBranch.toLowerCase());
 				const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
 				response.redirect(`/${redirPath}/${uriBranch}`);
 				return;
