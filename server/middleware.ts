@@ -195,7 +195,7 @@ export async function canUserModify(request: express.Request, response: express.
 	next();
 }
 export function branchRedirector(requestType: ApplicationType): (request: express.Request, response: express.Response, next: express.NextFunction) => Promise<void> {
-	return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+	return async (request, response, next) => {
 		// TODO: fix branch names so they have a machine ID and human label
 		let user = request.user as IUser;
 
