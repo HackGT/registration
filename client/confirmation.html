@@ -15,7 +15,7 @@
 		<script src="/js/common.js"></script>
 		<script src="/js/application.js" defer></script>
 	</head>
-	<body>
+	<body data-form-type="Confirmation" data-unauthenticated="{{unauthenticated}}">
 		{{#> sidebar}}
 			<h1 class="center">RSVP: {{branch}}</h1>
 
@@ -85,8 +85,5 @@
 				</div>
 			</form>
 		{{/sidebar}}
-		<script type="text/javascript">
-		formTypeString = "Confirmation";
-		</script>
 	</body>
 </html>
