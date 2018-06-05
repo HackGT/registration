@@ -55,16 +55,16 @@
 							<td>{{numberFormat applicationStatistics.appliedUsers}}</td>
 						</tr>
 						<tr>
-							<td>Admitted users</td>
-							<td>{{numberFormat applicationStatistics.admittedUsers}}</td>
+							<td>Accepted users</td>
+							<td>{{numberFormat applicationStatistics.acceptedUsers}}</td>
 						</tr>
 						<tr>
 							<td>Confirmed users</td>
-							<td>{{numberFormat applicationStatistics.attendingUsers}}</td>
+							<td>{{numberFormat applicationStatistics.confirmedUsers}}</td>
 						</tr>
 						<tr>
-							<td>Non-confirmed users</td>
-							<td>{{numberFormat applicationStatistics.declinedUsers}}</td>
+							<td>Non-confirmed accepted users</td>
+							<td>{{numberFormat applicationStatistics.nonConfirmedUsers}}</td>
 						</tr>
 						<tr><th colspan="2">Applications by branch</th></tr>
 						{{#each applicationStatistics.applicationBranches}}
@@ -77,7 +77,7 @@
 						{{#each applicationStatistics.confirmationBranches}}
 							<tr>
 								<td>{{this.name}}</td>
-								<td>{{numberFormat this.count}}</td>
+								<td>{{numberFormat this.confirmed}} of {{numberFormat this.count}}</td>
 							</tr>
 						{{/each}}
 					</tbody>
@@ -278,7 +278,7 @@
 								<fieldset class="confirmationBranchOptions">
 									<div>
 										<input type="checkbox" id="{{removeSpaces this.name}}-is-acceptance" class="isAcceptance" data-branch-name="{{this.name}}" {{#if this.isAcceptance}}checked{{/if}} />
-										<label for="{{removeSpaces this.name}}-is-acceptance">Accept applicants</label>
+										<label for="{{removeSpaces this.name}}-is-acceptance">Accepts applicants to event</label>
 									</div>
 									<div>
 										<input type="checkbox" id="{{removeSpaces this.name}}-auto-confirm" class="autoConfirm" {{#if this.autoConfirm}}checked{{/if}} />

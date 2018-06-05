@@ -337,15 +337,16 @@ export interface IAdminTemplate extends ICommonTemplate {
 	applicationStatistics: {
 		totalUsers: number;
 		appliedUsers: number;
-		admittedUsers: number;
-		attendingUsers: number;
-		declinedUsers: number;
+		acceptedUsers: number;
+		confirmedUsers: number;
+		nonConfirmedUsers: number;
 		applicationBranches: {
 			name: string;
 			count: number;
 		}[];
 		confirmationBranches: {
 			name: string;
+			confirmed: number;
 			count: number;
 		}[];
 	};
