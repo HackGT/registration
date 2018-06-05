@@ -67,8 +67,8 @@ userRoutes.route("/confirmation/:branch").post(
 	canUserModify,
 	deleteApplicationBranchHandler
 );
-function postApplicationBranchHandler(anonymous: boolean): express.Handler {
-	return async (request: express.Request, response: express.Response): Promise<void> => {
+function postApplicationBranchHandler(anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
+	return async (request, response) => {
 		let user: IUserMongoose;
 		if (anonymous) {
 			let email = request.body["anonymous-registration-email"] as string;

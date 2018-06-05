@@ -344,7 +344,7 @@ templateRoutes.route("/confirm").get(
 );
 
 function applicationHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
-	return async (request: express.Request, response: express.Response) => {
+	return async (request, response) => {
 		let user = request.user as IUser;
 
 		// TODO: integrate this logic with `middleware.branchRedirector` and `middleware.timeLimited`
@@ -406,7 +406,7 @@ templateRoutes.route("/confirm/:branch").get(
 );
 
 function applicationBranchHandler(requestType: ApplicationType, anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
-	return async (request: express.Request, response: express.Response) => {
+	return async (request, response) => {
 		let user: IUser;
 		if (anonymous) {
 			user = new User({
