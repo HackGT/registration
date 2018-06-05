@@ -119,7 +119,6 @@ Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 Handlebars.registerHelper("removeSpaces", (input: string): string => {
 	return input.replace(/ /g, "-");
 });
-Handlebars.registerHelper("encodeURI", encodeURI);
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));

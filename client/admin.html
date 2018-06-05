@@ -228,7 +228,7 @@
 					<div class="row row-flex">
 						{{#each settings.branches.application}}
 							<div class="col-4 branch-role" data-name="{{this.name}}">
-								<h4>{{this.name}}</h4>
+								<h4 title="{{this.name}}">{{this.name}}</h4>
 								<select>
 									<option value="Noop">Not used</option>
 									<option value="Application" selected>Application</option>
@@ -261,7 +261,7 @@
 								<div class="public-link" {{#unless this.allowAnonymous}}hidden{{/unless}}>
 									<label>Public Link</label>
 									<fieldset>
-										<pre><a href="/register/{{encodeURI this.name}}">/register/{{encodeURI this.name}}</a></pre>
+										<pre><a href="/register/{{slug this.name}}">/register/{{slug this.name}}</a></pre>
 									</fieldset>
 								</div>
 							</div>

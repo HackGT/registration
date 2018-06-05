@@ -80,6 +80,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			}
 			user = new User({
 				uuid: uuid(),
+				name: "Anonymous User",
 				email
 			}) as IUserMongoose;
 		} else {
