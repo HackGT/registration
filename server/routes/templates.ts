@@ -154,7 +154,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		return map;
 	}, {} as IDeadlineMap);
 
-	if (user.confirmationDeadline) {
+	if (user.confirmationDeadline && user.confirmationDeadline.name) {
 		confirmTimes[user.confirmationDeadline.name] = user.confirmationDeadline;
 	}
 	let confirmTimesArr: IBranchOpenClose[] = Object.keys(confirmTimes).map(name => confirmTimes[name]);

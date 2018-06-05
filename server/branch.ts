@@ -307,7 +307,7 @@ export async function getOpenConfirmationBranches(user: IUser): Promise<Confirma
 	}
 
 	let deadlines = {} as DeadlineMap;
-	if (user.confirmationDeadline) {
+	if (user.confirmationDeadline && user.confirmationDeadline.name) {
 		deadlines[user.confirmationDeadline.name] = user.confirmationDeadline;
 	}
 
