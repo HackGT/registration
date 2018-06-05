@@ -30,6 +30,7 @@ submitButton.addEventListener("click", e => {
 		if (unauthenticated) {
 			document.querySelector("form")!.reset();
 			submitButton.disabled = false;
+			window.scrollTo(0, 0);
 		} else {
 			window.location.assign("/");
 		}
