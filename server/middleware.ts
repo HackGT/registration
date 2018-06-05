@@ -236,7 +236,7 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 				}
 			}
 			if (requestType === ApplicationType.Confirmation) {
-				if (!user.accepted || branchName.toLowerCase() !== (user.confirmationBranch || "").toLowerCase()) {
+				if (!user.confirmationBranch || branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
 					response.redirect("/");
 					return;
 				}
