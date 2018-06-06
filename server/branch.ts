@@ -1,3 +1,4 @@
+/* tslint:disable:no-use-before-declare */
 import * as fs from "fs";
 import * as path from "path";
 import * as ajv from "ajv";
@@ -27,12 +28,12 @@ Branches.forEach(branch => {
 interface Labels {
 	[questionName: string]: string;
 }
-interface QuestionBranchTypes {
-	"Application": ApplicationBranch;
-	"Confirmation": ConfirmationBranch;
-	"Noop": NoopBranch;
-}
-type QuestionBranch = QuestionBranchTypes[keyof QuestionBranchTypes];
+
+type BranchTypeAsString<T extends QuestionBranch> =
+	T extends ApplicationBranch ? "Application" :
+	T extends ConfirmationBranch ? "Confirmation" :
+	"Noop";
+type BranchTypes = NoopBranch | ApplicationBranch | ConfirmationBranch;
 
 const SCHEMA_FILE: string = "./config/questions.schema.json";
 
@@ -41,9 +42,11 @@ interface IQuestionBranchCache {
 }
 let QuestionBranchCache: IQuestionBranchCache = {};
 
+// Super class for all other branches
+type QuestionBranch = NoopBranch;
 export class NoopBranch {
 	public readonly name: string;
-	public readonly type: keyof QuestionBranchTypes = "Noop";
+	public readonly type: BranchTypeAsString<BranchTypes> = "Noop";
 
 	public textBlocks: TextBlocks | undefined;
 	public questions: Questions;
@@ -123,11 +126,9 @@ export class NoopBranch {
 		return this;
 	}
 
-	public async convertTo<T extends QuestionBranch>(type: keyof QuestionBranchTypes): Promise<T> {
-		// TODO typecast and return if types match - do not need to save to DB
+	public async convertTo<T extends QuestionBranch>(type: BranchTypeAsString<T>): Promise<T> {
 		await this.save();
 		await QuestionBranchConfig.update({ "name": this.name }, { "$set": { "type": type } });
-		// tslint:disable-next-line:no-use-before-declare
 		return await BranchConfig.loadBranchFromDB(this.name) as T;
 	}
 
@@ -175,10 +176,9 @@ export abstract class TimedBranch extends NoopBranch {
 }
 
 export class ApplicationBranch extends TimedBranch {
-	public readonly type: keyof QuestionBranchTypes = "Application";
+	public readonly type: BranchTypeAsString<BranchTypes> = "Application";
 
 	public allowAnonymous: boolean;
-
 	public autoAccept: string;
 
 	protected async loadSettings(): Promise<void> {
@@ -197,7 +197,7 @@ export class ApplicationBranch extends TimedBranch {
 }
 
 export class ConfirmationBranch extends TimedBranch {
-	public readonly type: keyof QuestionBranchTypes = "Confirmation";
+	public readonly type: BranchTypeAsString<BranchTypes> = "Confirmation";
 
 	public usesRollingDeadline: boolean;
 	public isAcceptance: boolean;
@@ -238,7 +238,7 @@ export class BranchConfig {
 			return rawName === name.toLowerCase();
 		}) || null;
 	}
-	public static async loadAllBranches(type: keyof QuestionBranchTypes | "All" = "All", location: string = config.questionsLocation): Promise<QuestionBranch[]> {
+	public static async loadAllBranches(type: BranchTypeAsString<BranchTypes> | "All" = "All", location: string = config.questionsLocation): Promise<QuestionBranch[]> {
 		let names = await this.getNames();
 		let branches: QuestionBranch[] = [];
 		for (let name of names) {
@@ -279,7 +279,7 @@ export class BranchConfig {
 		return instance;
 	}
 
-	public static async getOpenBranches<T extends TimedBranch>(type: keyof QuestionBranchTypes): Promise<T[]> {
+	public static async getOpenBranches<T extends TimedBranch>(type: BranchTypeAsString<T>): Promise<T[]> {
 		let branches: TimedBranch[];
 		switch (type) {
 		case "Application":

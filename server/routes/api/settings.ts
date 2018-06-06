@@ -129,22 +129,21 @@ settingsRoutes.route("/branch_roles")
 		}
 
 		try {
-			// TODO use promises/async
 			for (let branchName of Object.keys(request.body)) {
 				let branchData = JSON.parse(request.body[branchName]);
 
-				let branch = await Branches.BranchConfig.loadBranchFromDB(branchName); // TODO type checker determines this to be always a NoopBranch - ensure that branch.type will be the real type everytime
+				let branch = await Branches.BranchConfig.loadBranchFromDB(branchName); // This to be always a NoopBranch because it is the super class - ensure that branch.type will be the real type everytime
 				// Convert the branch type (if not match)
 				if (branch.type !== branchData.role) {
 						switch (branchData.role) {
 						case "Application":
-							branch = await branch.convertTo<Branches.ApplicationBranch>("Application") as Branches.ApplicationBranch;
+							branch = await branch.convertTo<Branches.ApplicationBranch>("Application");
 							break;
 						case "Confirmation":
-							branch = await branch.convertTo<Branches.ConfirmationBranch>("Confirmation") as Branches.ConfirmationBranch;
+							branch = await branch.convertTo<Branches.ConfirmationBranch>("Confirmation");
 							break;
 						default:
-							branch = await branch.convertTo<Branches.NoopBranch>("Noop") as Branches.NoopBranch;
+							branch = await branch.convertTo<Branches.NoopBranch>("Noop");
 							break;
 						}
 				}

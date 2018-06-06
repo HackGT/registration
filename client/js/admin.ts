@@ -662,7 +662,7 @@ function settingsUpdate(e: MouseEvent) {
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
 	for (let i = 0; i < branchRoles.length; i++) {
 		let branchName = branchRoles[i].dataset.name!;
-		let branchRole = branchRoles[i].querySelector("select")!.value;
+		let branchRole = branchRoles[i].querySelector("select")!.value as "Noop" | "Application" | "Confirmation";
 		let branchData: {
 			role: string;
 			open?: Date;
@@ -673,7 +673,6 @@ function settingsUpdate(e: MouseEvent) {
 			autoAccept?: string;
 			allowAnonymous?: boolean;
 		} = {role: branchRole};
-		// TODO this should probably be typed (not just strings)
 		if (branchRole !== "Noop") {
 				let openInputElem = branchRoles[i].querySelector("input.openTime") as HTMLInputElement;
 				let closeInputElem = branchRoles[i].querySelector("input.closeTime") as HTMLInputElement;

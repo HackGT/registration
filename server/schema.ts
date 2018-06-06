@@ -398,8 +398,3 @@ export interface HackGTMetrics {
 	values: object;
 	hackgtmetricsversion: number;
 }
-
-// TODO remove this? deprecated?
-export interface ApplicationToConfirmationMap {
-	[applicationBranch: string]: string[];
-}

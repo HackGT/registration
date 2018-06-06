@@ -87,10 +87,8 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
 		}
 
-		let branchName = request.params.branch as string;
-
-		// TODO embed branchname in the form so we don't have to do this
-		let questionBranch = (await Branches.BranchConfig.loadAllBranches()).find(branch => branch.name.toLowerCase() === branchName.toLowerCase());
+		let branchName = await Branches.BranchConfig.getCanonicalName(request.params.branch);
+		let questionBranch = branchName ? await Branches.BranchConfig.loadBranchFromDB(branchName) : null;
 		if (!questionBranch) {
 			response.status(400).json({
 				"error": "Invalid branch"
