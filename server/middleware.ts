@@ -2,11 +2,10 @@ import * as fs from "fs";
 import * as moment from "moment-timezone";
 import * as path from "path";
 import * as os from "os";
-import * as uuid from "uuid/v4";
 
-import { config, getSetting, readFileAsync, STATIC_ROOT } from "./common";
-import { getOpenConfirmationBranches, BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
-import { IUser, User } from "./schema";
+import { config, isBranchOpen } from "./common";
+import { BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
+import { User, IUser, DataLog, HackGTMetrics } from "./schema";
 
 //
 // Express middleware
@@ -126,109 +125,140 @@ export function authenticateWithRedirect(request: express.Request, response: exp
 	}
 }
 
-import * as Handlebars from "handlebars";
-import { ICommonTemplate } from "./schema";
 export enum ApplicationType {
 	Application, Confirmation
 }
 
 export async function onlyAllowAnonymousBranch(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let branchName = request.params.branch as string;
-	let questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).filter(br => {
-		return br.name.toLowerCase() === branchName.toLowerCase();
-	});
-	if (questionBranches.length !== 1) {
-		response.redirect("/apply");
+	const branchName = await BranchConfig.getCanonicalName(request.params.branch);
+	if (!branchName) {
+		response.redirect("/");
+		return;
+	}
+	const branch = await BranchConfig.loadBranchFromDB(branchName) as ApplicationBranch;
+	if (!branch.allowAnonymous) {
+		response.redirect("/");
+		return;
+	}
+	next();
+}
+export async function canUserModify(request: express.Request, response: express.Response, next: express.NextFunction) {
+	const user = await User.findOne({uuid: request.params.uuid}) as IUser;
+	const branchName = await BranchConfig.getCanonicalName(request.params.branch);
+	if (!branchName) {
+		response.status(400).json({
+			"error": "Invalid application branch name"
+		});
+		return;
+	}
+	let questionBranch = await BranchConfig.loadBranchFromDB(branchName);
+
+	if (!(await isBranchOpen(branchName, user, questionBranch instanceof ApplicationBranch ? ApplicationType.Application : ApplicationType.Confirmation))) {
+		response.status(400).json({
+			"error": "Branch is closed"
+		});
 		return;
 	}
 
-	let branch = questionBranches[0] as ApplicationBranch;
-	if (!branch.allowAnonymous) {
-		response.redirect("/apply");
+	if (questionBranch instanceof ApplicationBranch) {
+		// Don't allow user to modify application if we assigned them a confirmation branch
+		if (user.confirmationBranch) {
+			response.status(400).json({
+				"error": "You can no longer edit this application"
+			});
+			return;
+		}
+		if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+			response.status(400).json({
+				"error": "You can only edit the application branch that you originally submitted"
+			});
+			return;
+		}
+	} else if (questionBranch instanceof ConfirmationBranch) {
+		if (!user.confirmationBranch) {
+			response.status(400).json({
+				"error": "You can't confirm for that branch"
+			});
+		} else if (user.confirmationBranch && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+			response.status(400).json({
+				"error": "You can only submit the confirmation branch you were assigned"
+			});
+			return;
+		}
+	} else {
+		response.status(400).json({
+			"error": "Invalid application branch"
+		});
 		return;
 	}
 
 	next();
 }
-
 export function branchRedirector(requestType: ApplicationType): (request: express.Request, response: express.Response, next: express.NextFunction) => Promise<void> {
-	return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-		// TODO refactor redirection code and consolidate here (#206)
+	return async (request, response, next) => {
 		// TODO: fix branch names so they have a machine ID and human label
 		let user = request.user as IUser;
-		if (requestType === ApplicationType.Application) {
-			if (user.accepted) {
-				// Do not redirect to application branch has "no confirmation" enabled
-				// ^ This is inferred from a user with `attending=true` and empty string for `confirmationBranch`
-				if (!(user.attending && !user.confirmationBranch)) {
-					response.redirect("/confirm");
-					return;
-				}
-			}
+
+		if (requestType === ApplicationType.Application && user.confirmationBranch) {
+			response.redirect("/");
+			return;
 		}
 
-		if (requestType === ApplicationType.Confirmation) {
-			if (!user.accepted || !user.applied) {
-				response.redirect("/apply");
-				return;
-			}
-			if (user.attending && !user.confirmationBranch) {
-				response.redirect("/apply");
-				return;
-			}
-		}
-
-		let questionBranches: string[];
-		if (requestType === ApplicationType.Application) {
-			questionBranches = (await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).map(branch => branch.name.toLowerCase());
-		} else {
-			questionBranches = ((await BranchConfig.loadBranchFromDB(user.applicationBranch)) as ApplicationBranch).confirmationBranches.map(branchName => branchName.toLowerCase());
+		if (requestType === ApplicationType.Confirmation && !user.confirmationBranch) {
+			response.redirect("/");
+			return;
 		}
 
 		if (request.params.branch) {
-			let branchName = (request.params.branch as string).toLowerCase();
+			// Branch name from URL can be different from config in casing
+			let branchName = await BranchConfig.getCanonicalName(request.params.branch);
+			if (!branchName) {
+				// Invalid branch name
+				response.redirect("/");
+				return;
+			}
+			let branch = await BranchConfig.loadBranchFromDB(branchName);
+			if ((branch.type === "Application" && requestType !== ApplicationType.Application) || (branch.type === "Confirmation" && requestType !== ApplicationType.Confirmation)) {
+				response.redirect("/");
+				return;
+			}
+
+			if (!(await isBranchOpen(branchName, user, requestType))) {
+				response.redirect("/");
+				return;
+			}
+
 			if (requestType === ApplicationType.Application) {
 				// Redirect directly to branch if there is an existing application or confirmation
 				if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
 					response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
 					return;
 				}
-				let questionBranch = questionBranches.find(branch => branch === branchName.toLowerCase())!;
-				if (!questionBranch) {
-					response.redirect("/apply");
-					return;
-				}
 			}
 			if (requestType === ApplicationType.Confirmation) {
-				// Redirect directly to branch if there is an existing application or confirmation
-				if (user.attending && branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
-					response.redirect(`/confirm/${encodeURIComponent(user.confirmationBranch.toLowerCase())}`);
-					return;
-				}
-				if (questionBranches.indexOf(branchName.toLowerCase()) === -1 && !user.attending) {
-					response.redirect("/confirm");
+				if (!user.confirmationBranch || branchName.toLowerCase() !== user.confirmationBranch.toLowerCase()) {
+					response.redirect("/");
 					return;
 				}
 			}
 		} else {
+			let targetBranch: string | undefined;
 			if (requestType === ApplicationType.Application && user.applied && user.applicationBranch) {
-				questionBranches = [user.applicationBranch];
+				targetBranch = user.applicationBranch;
+			} else if (requestType === ApplicationType.Confirmation) {
+				targetBranch = user.confirmationBranch;
 			}
 
-			// Redirect for applications on "skip confirmation" branches
-			if (requestType === ApplicationType.Confirmation && user.attending && !user.confirmationBranch && user.applicationBranch) {
-				questionBranches = [user.applicationBranch];
-				requestType = ApplicationType.Application;
-			}
-
-			if (requestType === ApplicationType.Confirmation && user.attending && user.confirmationBranch) {
-				questionBranches = [user.confirmationBranch];
-			}
-
-			if (questionBranches.length === 1) {
-				const uriBranch = encodeURIComponent(questionBranches[0]);
+			if (targetBranch) {
+				const uriBranch = encodeURIComponent(targetBranch.toLowerCase());
 				const redirPath = requestType === ApplicationType.Application ? "apply" : "confirm";
 				response.redirect(`/${redirPath}/${uriBranch}`);
+				return;
+			}
+
+			// If there are no open application branches, redirect to main page.
+			if ((await BranchConfig.getOpenBranches<ApplicationBranch>("Application")).length === 0) {
+				response.redirect("/");
 				return;
 			}
 		}
@@ -237,89 +267,6 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 	};
 }
 
-export async function timeLimited(request: express.Request, response: express.Response, next: express.NextFunction) {
-	let requestType: ApplicationType = request.url.match(/^\/apply/) ? ApplicationType.Application : ApplicationType.Confirmation;
-
-	let user: IUser;
-	if (request.isAuthenticated()) {
-		user = request.user as IUser;
-	} else {
-		user = new User({
-			uuid: uuid(),
-			email: ""
-		});
-	}
-
-	let openBranches: (ApplicationBranch | ConfirmationBranch)[];
-	if (requestType === ApplicationType.Application) {
-		openBranches = await BranchConfig.getOpenBranches<ApplicationBranch>("Application");
-		if (request.isAuthenticated() && user.applied && user.applicationBranch) {
-			let applicationBranch = user.applicationBranch;
-			openBranches = openBranches.filter((b => b.name === applicationBranch));
-		}
-	} else {
-		if (request.isAuthenticated()) {
-			openBranches = await getOpenConfirmationBranches(user);
-		} else {
-			openBranches = await BranchConfig.getOpenBranches<ConfirmationBranch>("Confirmation");
-		}
-
-		if (request.isAuthenticated() && user.attending && user.confirmationBranch) {
-			let confirmationBranch = user.confirmationBranch;
-			openBranches = openBranches.filter((b => b.name === confirmationBranch));
-		}
-	}
-
-	if (openBranches.length > 0) {
-		next();
-		return;
-	}
-
-	// TODO reimplement open and close times
-	/*
-	const TIME_FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
-	*/
-	interface IClosedTemplate extends ICommonTemplate {
-		type: string;
-		/*
-		open: {
-			time: string;
-			verb: string;
-		};
-		close: {
-			time: string;
-			verb: string;
-		};
-		*/
-		contactEmail: string;
-	}
-	let template = Handlebars.compile(await readFileAsync(path.resolve(STATIC_ROOT, "closed.html")));
-	let emailParsed = config.email.from.match(/<(.*?)>/);
-	let templateData: IClosedTemplate = {
-		siteTitle: config.eventName,
-		user: request.user,
-		settings: {
-			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled")
-		},
-
-		type: requestType === ApplicationType.Application ? "Application" : "Confirmation",
-		/*
-		open: {
-			time: openDate.tz(moment.tz.guess()).format(TIME_FORMAT),
-			verb: moment().isBefore(openDate) ? "will open" : "opened"
-		},
-		close: {
-			time: closeDate.tz(moment.tz.guess()).format(TIME_FORMAT),
-			verb: moment().isBefore(closeDate) ? "will close" : "closed"
-		},
-		*/
-		contactEmail: emailParsed ? emailParsed[1] : config.email.from
-	};
-	response.send(template(templateData));
-}
-
-import { DataLog, HackGTMetrics } from "./schema";
 export function trackEvent(action: string, request: express.Request, user?: string, data?: object) {
 	let thisEvent: DataLog = {
 		action,

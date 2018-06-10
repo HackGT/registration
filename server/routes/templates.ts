@@ -12,7 +12,7 @@ import {
 } from "../common";
 import {
 	authenticateWithRedirect, isAdmin,
-	onlyAllowAnonymousBranch, branchRedirector, timeLimited, ApplicationType
+	onlyAllowAnonymousBranch, branchRedirector, ApplicationType
 } from "../middleware";
 import {
 	IUser, IUserMongoose, User,
@@ -96,9 +96,6 @@ Handlebars.registerHelper("checked", (selected: boolean[], index: number) => {
 	// Adds the "checked" form attribute if the element was checked previously
 	return selected[index] ? "checked" : "";
 });
-Handlebars.registerHelper("branchChecked", (selectedBranches: string[], confirmationBranch: string) => {
-	return (selectedBranches.indexOf(confirmationBranch) !== -1) ? "checked" : "";
-});
 Handlebars.registerHelper("selected", (selected: boolean[], index: number) => {
 	// Adds the "selected" form attribute if the element was selected previously
 	return selected[index] ? "selected" : "";
@@ -122,7 +119,6 @@ Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 Handlebars.registerHelper("removeSpaces", (input: string): string => {
 	return input.replace(/ /g, "-");
 });
-Handlebars.registerHelper("encodeURI", encodeURI);
 Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
@@ -130,27 +126,17 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	let user = request.user as IUser;
 
 	let applyBranches: Branches.ApplicationBranch[];
-	let skipConfirmation = false;
+
 	if (user.applicationBranch) {
 		applyBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch))] as Branches.ApplicationBranch[];
-		skipConfirmation = applyBranches[0].noConfirmation;
 	} else {
 		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
 	}
-	let confirmBranches: Branches.ConfirmationBranch[];
-	if (user.confirmationBranch) {
-		confirmBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.confirmationBranch))] as Branches.ConfirmationBranch[];
-	} else {
-		confirmBranches = (await Branches.BranchConfig.loadAllBranches("Confirmation")) as Branches.ConfirmationBranch[];
-	}
 
-	// Filter out branches user does not have access to based on apply branch
-	if (user.applicationBranch) {
-		let appliedBranch = applyBranches[0];
-		confirmBranches = confirmBranches.filter((branch) => {
-			// TODO, verify template looks reasonable
-			return appliedBranch.confirmationBranches && appliedBranch.confirmationBranches.indexOf(branch.name) > -1;
-		});
+	let confirmBranches: Branches.ConfirmationBranch[] = [];
+
+	if (user.confirmationBranch) {
+		confirmBranches.push(await Branches.BranchConfig.loadBranchFromDB(user.confirmationBranch) as Branches.ConfirmationBranch);
 	}
 
 	interface IBranchOpenClose {
@@ -166,8 +152,9 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		map[branch.name] = branch;
 		return map;
 	}, {} as IDeadlineMap);
-	for (let branchTimes of user.confirmationDeadlines) {
-		confirmTimes[branchTimes.name] = branchTimes;
+
+	if (user.confirmationDeadline && user.confirmationDeadline.name) {
+		confirmTimes[user.confirmationDeadline.name] = user.confirmationDeadline;
 	}
 	let confirmTimesArr: IBranchOpenClose[] = Object.keys(confirmTimes).map(name => confirmTimes[name]);
 
@@ -204,9 +191,40 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			close: closeString
 		};
 	}
+	let status = "";
+
+	// Block of logic to dermine status:
+	if (!user.applied) {
+		status = "Incomplete";
+	} else if (user.applied && !user.confirmationBranch) {
+		status = "Pending Decision";
+	} else if (user.applied && user.confirmationBranch) {
+		// After confirmation - they either confirmed in time, did not, or branch did not require confirmation
+		if (user.confirmed) {
+			if (user.accepted) {
+				status = "Attending - " + user.confirmationBranch;
+			} else {
+				// For confirmation branches that do not accept such as Rejected/Waitlist
+				status = user.confirmationBranch;
+			}
+		} else if (moment().isAfter(confirmTimesArr[0].close)) {
+			status = "Confirmation Incomplete - " + user.confirmationBranch;
+		} else if (moment().isBefore(confirmTimesArr[0].open)) {
+			status = "Confirmation Opens Soon - " + user.confirmationBranch;
+		} else {
+			status = "Please Confirm - " + user.confirmationBranch;
+		}
+	}
+
+	let autoConfirm = false;
+	if (user.confirmationBranch) {
+		autoConfirm = confirmBranches[0].autoConfirm;
+	}
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
+		status,
+		autoConfirm,
 		user,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
@@ -219,7 +237,6 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			beforeOpen: applicationOpenDate ? moment().isBefore(applicationOpenDate) : true,
 			afterClose: applicationCloseDate ? moment().isAfter(applicationCloseDate) : false
 		},
-		skipConfirmation,
 		confirmationOpen: formatMoment(confirmationOpenDate),
 		confirmationClose: formatMoment(confirmationCloseDate),
 		confirmationStatus: {
@@ -317,18 +334,16 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 templateRoutes.route("/apply").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Application),
-	timeLimited,
 	applicationHandler(ApplicationType.Application)
 );
 templateRoutes.route("/confirm").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Confirmation),
-	timeLimited,
 	applicationHandler(ApplicationType.Confirmation)
 );
 
 function applicationHandler(requestType: ApplicationType): (request: express.Request, response: express.Response) => Promise<void> {
-	return async (request: express.Request, response: express.Response) => {
+	return async (request, response) => {
 		let user = request.user as IUser;
 
 		// TODO: integrate this logic with `middleware.branchRedirector` and `middleware.timeLimited`
@@ -346,21 +361,10 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 		}
 		// Additionally selectively allow confirmation branches based on what the user applied as
 		else if (requestType === ApplicationType.Confirmation) {
-			if (user.attending) {
+			if (user.confirmationBranch) {
 				questionBranches = [user.confirmationBranch.toLowerCase()];
-			}
-			else {
-				const branches = await Branches.getOpenConfirmationBranches(user);
-				questionBranches = branches.map(branch => branch.name.toLowerCase());
-
-				let appliedBranch = (await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch)) as Branches.ApplicationBranch;
-				if (appliedBranch) {
-					questionBranches = questionBranches.filter(branch => {
-						return !!appliedBranch.confirmationBranches.find(confirm => {
-							return confirm.toLowerCase() === branch;
-						});
-					});
-				}
+			} else {
+				response.redirect("/");
 			}
 		}
 
@@ -386,25 +390,22 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 templateRoutes.route("/register/:branch").get(
 	isAdmin,
 	onlyAllowAnonymousBranch,
-	timeLimited,
 	applicationBranchHandler(ApplicationType.Application, true)
 );
 
 templateRoutes.route("/apply/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Application),
-	timeLimited,
 	applicationBranchHandler(ApplicationType.Application, false)
 );
 templateRoutes.route("/confirm/:branch").get(
 	authenticateWithRedirect,
 	branchRedirector(ApplicationType.Confirmation),
-	timeLimited,
 	applicationBranchHandler(ApplicationType.Confirmation, false)
 );
 
 function applicationBranchHandler(requestType: ApplicationType, anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
-	return async (request: express.Request, response: express.Response) => {
+	return async (request, response) => {
 		let user: IUser;
 		if (anonymous) {
 			user = new User({
@@ -549,9 +550,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),
-			admittedUsers: await User.find({ "accepted": true }).count(),
-			attendingUsers: await User.find({ "attending": true }).count(),
-			declinedUsers: await User.find({ "accepted": true, "attending": false }).count(),
+			acceptedUsers: await User.find({ "accepted": true }).count(),
+			confirmedUsers: await User.find({ "accepted": true, "confirmed": true }).count(),
+			nonConfirmedUsers: await User.find({ "accepted": true, "confirmed": false }).count(),
 			applicationBranches: await Promise.all(applicationBranches.map(async branch => {
 				return {
 					"name": branch.name,
@@ -561,6 +562,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			confirmationBranches: await Promise.all(confirmationBranches.map(async branch => {
 				return {
 					"name": branch.name,
+					"confirmed": await User.find({ "confirmed": true, "confirmationBranch": branch.name }).count(),
 					"count": await User.find({ "confirmationBranch": branch.name }).count()
 				};
 			}))
@@ -582,9 +584,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						open: branch.open.toISOString(),
 						close: branch.close.toISOString(),
 						allowAnonymous: branch.allowAnonymous,
-						autoAccept: branch.autoAccept,
-						noConfirmation: branch.noConfirmation,
-						confirmationBranches: branch.confirmationBranches
+						autoAccept: branch.autoAccept
 					};
 				}),
 				confirmation: confirmationBranches.map((branch: Branches.ConfirmationBranch) => {
@@ -593,7 +593,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						open: branch.open.toISOString(),
 						close: branch.close.toISOString(),
 						usesRollingDeadline: branch.usesRollingDeadline,
-						usesRollingDeadlineChecked: branch.usesRollingDeadline ? "checked" : ""
+						autoConfirm: branch.autoConfirm,
+						isAcceptance: branch.isAcceptance
 					};
 				})
 			}

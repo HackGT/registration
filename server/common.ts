@@ -1,3 +1,5 @@
+// Needed so that common.ts <-> schema.ts cyclical dependencies don't cause problems
+/* tslint:disable:no-duplicate-imports */
 import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
@@ -378,7 +380,7 @@ import { IUser, Team, IFormItem } from "./schema";
 
 export const defaultEmailSubjects = {
 	apply: `[${config.eventName}] - Thank you for applying!`,
-	accept: `[${config.eventName}] - You've been accepted!`,
+	preConfirm: `[${config.eventName}] - Application Update`,
 	attend: `[${config.eventName}] - Thank you for RSVPing!`
 };
 interface IMailObject {
@@ -454,7 +456,7 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
 	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
 	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
-	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
+	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch || ""));
 	markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
 		let question = user.applicationData.find(data => data.name === name);
 		return formatFormItem(question);
@@ -464,7 +466,7 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 		return formatFormItem(question);
 	});
 
-	return await renderMarkdown(markdown);
+	return renderMarkdown(markdown);
 }
 export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
 	let html: string;
@@ -492,7 +494,7 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 }
 
 // Verify and load questions
-import { BranchConfig } from "./branch";
+import { BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
 BranchConfig.verifyConfig().then(good => {
 	if (good) {
 		console.log(`Question branches loaded from ${config.questionsLocation} to DB successfully`);
@@ -503,3 +505,34 @@ BranchConfig.verifyConfig().then(good => {
 }).catch(err => {
 	throw err;
 });
+
+import {ApplicationType} from "./middleware";
+import * as moment from "moment-timezone";
+
+export async function isBranchOpen(rawBranchName: string, user: IUser, requestType: ApplicationType): Promise<boolean> {
+	const branchName = await BranchConfig.getCanonicalName(rawBranchName);
+	if (!branchName) {
+		return false;
+	}
+	let branch = await BranchConfig.loadBranchFromDB(branchName) as (ApplicationBranch | ConfirmationBranch);
+
+	let openDate = branch.open;
+	let closeDate = branch.close;
+	if (requestType === ApplicationType.Confirmation
+		&& user.confirmationDeadline
+		&& user.confirmationDeadline.name
+		&& user.confirmationDeadline.name.toLowerCase() === branchName.toLowerCase()) {
+		openDate = user.confirmationDeadline.open;
+		closeDate = user.confirmationDeadline.close;
+	}
+
+	if (branch instanceof ConfirmationBranch && branch.autoConfirm) {
+		return false;
+	}
+
+	if (moment().isBetween(openDate, closeDate)) {
+		return true;
+	}
+
+	return false;
+}

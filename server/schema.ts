@@ -114,20 +114,20 @@ export interface IUser {
 
 	applied: boolean;
 	accepted: boolean;
-	acceptedEmailSent: boolean;
-	attending: boolean;
+	preConfirmEmailSent: boolean;
+	confirmed: boolean;
 	applicationBranch: string;
 	applicationData: IFormItem[];
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
 
-	confirmationDeadlines: {
+	confirmationDeadline?: {
 		name: string;
 		open: Date;
 		close: Date;
-	}[];
+	};
 
-	confirmationBranch: string;
+	confirmationBranch?: string;
 	confirmationData: IFormItem[];
 	confirmationStartTime?: Date;
 	confirmationSubmitTime?: Date;
@@ -179,18 +179,18 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 
 	applied: Boolean,
 	accepted: Boolean,
-	acceptedEmailSent: Boolean,
-	attending: Boolean,
+	preConfirmEmailSent: Boolean,
+	confirmed: Boolean,
 	applicationBranch: String,
 	applicationData: [mongoose.Schema.Types.Mixed],
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
 
-	confirmationDeadlines: [{
+	confirmationDeadline: {
 		name: String,
 		open: Date,
 		close: Date
-	}],
+	},
 
 	confirmationBranch: String,
 	confirmationData: [mongoose.Schema.Types.Mixed],
@@ -232,10 +232,11 @@ export interface QuestionBranchSettings {
 	open?: Date; // Used by all except noop
 	close?: Date; // Used by all except noop
 	allowAnonymous?: boolean; // Used by application branch
-	autoAccept?: boolean; // Used by application branch
-	noConfirmation?: boolean; // Used by application branch
+	autoAccept?: string; // Used by application branch
 	confirmationBranches?: string[]; // Used by application branch
 	usesRollingDeadline?: boolean; // Used by confirmation branch
+	isAcceptance?: boolean; // Used by confirmation branch
+	autoConfirm?: boolean; // Used by confirmation branch
 }
 export interface IQuestionBranchConfig {
 	_id: mongoose.Types.ObjectId;
@@ -257,10 +258,11 @@ export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose
 		open: Date,
 		close: Date,
 		allowAnonymous: Boolean,
-		autoAccept: Boolean,
-		noConfirmation: Boolean,
+		autoAccept: String,
 		confirmationBranches: [String],
-		usesRollingDeadline: Boolean
+		usesRollingDeadline: Boolean,
+		isAcceptance: Boolean,
+		autoConfirm: Boolean
 	},
 	location: String
 }));
@@ -275,6 +277,7 @@ export interface ICommonTemplate {
 	};
 }
 export interface IIndexTemplate extends ICommonTemplate {
+	status: string;
 	applicationOpen: string;
 	applicationClose: string;
 	applicationStatus: {
@@ -282,7 +285,6 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
-	skipConfirmation: boolean;
 	confirmationOpen: string;
 	confirmationClose: string;
 	confirmationStatus: {
@@ -290,6 +292,7 @@ export interface IIndexTemplate extends ICommonTemplate {
 		beforeOpen: boolean;
 		afterClose: boolean;
 	};
+	autoConfirm: boolean;
 	allApplicationTimes: {
 		name: string;
 		open: string;
@@ -334,15 +337,16 @@ export interface IAdminTemplate extends ICommonTemplate {
 	applicationStatistics: {
 		totalUsers: number;
 		appliedUsers: number;
-		admittedUsers: number;
-		attendingUsers: number;
-		declinedUsers: number;
+		acceptedUsers: number;
+		confirmedUsers: number;
+		nonConfirmedUsers: number;
 		applicationBranches: {
 			name: string;
 			count: number;
 		}[];
 		confirmationBranches: {
 			name: string;
+			confirmed: number;
 			count: number;
 		}[];
 	};
@@ -359,10 +363,8 @@ export interface IAdminTemplate extends ICommonTemplate {
 			application: {
 				open: string;
 				close: string;
-				confirmationBranches: string[];
 				allowAnonymous: boolean;
-				autoAccept: boolean;
-				noConfirmation: boolean;
+				autoAccept: string;
 			}[];
 			confirmation: {
 				open: string;
@@ -395,9 +397,4 @@ export interface HackGTMetrics {
 	serviceName: string;
 	values: object;
 	hackgtmetricsversion: number;
-}
-
-// TODO remove this? deprecated?
-export interface ApplicationToConfirmationMap {
-	[applicationBranch: string]: string[];
 }
