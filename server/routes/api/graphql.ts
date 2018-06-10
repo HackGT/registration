@@ -31,7 +31,7 @@ const resolvers: IResolver = {
 		user: async (prev, args, request) => {
 			const id = args.id || (request.user as IUser).uuid;
 			const user = await User.findOne({uuid: id});
-			return user ? await userRecordToGraphql(user) : undefined;
+			return user ? userRecordToGraphql(user) : undefined;
 		},
 		users: async (prev, args) => {
 			const lastIdQuery = args.pagination_token ? {
@@ -46,7 +46,7 @@ const resolvers: IResolver = {
 				})
 				.limit(args.n);
 
-			return await Promise.all(allUsers.map(userRecordToGraphql));
+			return Promise.all(allUsers.map(userRecordToGraphql));
 		},
 		search_user: searchUser,
 		search_user_simple: async (prev, args) => {
@@ -83,7 +83,7 @@ const resolvers: IResolver = {
 			return (await findQuestions(prev, { names: [args.name] }))[0];
 		},
 		questions: async (prev, args) => {
-			return await findQuestions(prev, args);
+			return findQuestions(prev, args);
 		}
 	}
 };
@@ -156,10 +156,10 @@ async function findQuestions(
 			.map(item => recordToFormItem(item, user.applicationBranch))
 		));
 	}
-	if (user.attending) {
+	if (user.confirmed) {
 		items = items.concat(await Promise.all(user.confirmationData
 			.reduce(questionFilter, [])
-			.map(item => recordToFormItem(item, user.confirmationBranch))
+			.map(item => recordToFormItem(item, user.confirmationBranch!))
 		));
 	}
 	return items;
@@ -214,7 +214,7 @@ function userFilterToMongo(filter: types.UserFilter | undefined) {
 	}
 	setIf("applied", filter.applied);
 	setIf("accepted", filter.accepted);
-	setIf("attending", filter.attending);
+	setIf("confirmed", filter.confirmed);
 	setIf("applicationBranch", filter.application_branch);
 	setIf("confirmationBranch", filter.confirmation_branch);
 	return query;
@@ -281,9 +281,9 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 				user.applicationSubmitTime.toDateString()
 	} : undefined;
 
-	const confirmation: types.Branch<Ctx> | undefined = user.attending ? {
-		type: user.confirmationBranch,
-		data: await Promise.all(user.confirmationData.map(item => recordToFormItem(item, user.confirmationBranch))),
+	const confirmation: types.Branch<Ctx> | undefined = user.confirmed ? {
+		type: user.confirmationBranch!,
+		data: await Promise.all(user.confirmationData.map(item => recordToFormItem(item, user.confirmationBranch!))),
 		start_time: user.confirmationStartTime &&
 			user.confirmationStartTime.toDateString(),
 		submit_time: user.confirmationSubmitTime &&
@@ -317,8 +317,9 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 
 		applied: !!user.applied,
 		accepted: !!user.accepted,
-		accepted_and_notified: !!user.acceptedEmailSent,
-		attending: !!user.attending,
+		accepted_and_notified: !!user.preConfirmEmailSent,
+		confirmed: !!user.confirmed,
+		confirmationBranch: user.confirmationBranch,
 
 		application,
 		confirmation,

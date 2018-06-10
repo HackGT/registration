@@ -15,7 +15,7 @@
 		<script src="/js/common.js"></script>
 		<script src="/js/application.js" defer></script>
 	</head>
-	<body>
+	<body data-form-type="Application" data-unauthenticated="{{unauthenticated}}">
 		{{#> sidebar}}
 			<h1 class="center">Apply: {{branch}}</h1>
 
@@ -24,11 +24,11 @@
 				Running event.preventDefault() in the submit button's click handler also disables validation for some reason
 			-->
 			{{#unless unauthenticated}}
-			<form method="post" data-action="/api/user/{{user.uuid}}/application/{{slug branch}}">
+				<form method="post" data-action="/api/user/{{user.uuid}}/application/{{slug branch}}">
 			{{else}}
-			<form method="post" data-action="/api/registration/{{slug branch}}">
-				<label for="anonymous-registration-email" class="required">Email</label>
-				<input type="email" name="anonymous-registration-email" id="anonymous-registration-email" required/>
+				<form method="post" data-action="/api/registration/{{slug branch}}">
+					<label for="anonymous-registration-email" class="required">Email</label>
+					<input type="email" name="anonymous-registration-email" id="anonymous-registration-email" required />
 			{{/unless}}
 
 				{{#each questionData}}
@@ -97,9 +97,5 @@
 				</div>
 			</form>
 		{{/sidebar}}
-		<script type="text/javascript">
-		formTypeString = "Application";
-		unauthenticated = {{unauthenticated}}
-		</script>
 	</body>
 </html>

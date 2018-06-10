@@ -2,10 +2,9 @@ enum FormType {
 	Application,
 	Confirmation
 }
-declare let formTypeString: keyof typeof FormType;
-let formType = FormType[formTypeString];
-
-declare let unauthenticated: (boolean | undefined);
+const formTypeString = document.body.dataset.formType as keyof typeof FormType;
+const formType = FormType[formTypeString];
+const unauthenticated = document.body.dataset.unauthenticated === "true";
 
 let form = document.querySelector("form") as HTMLFormElement | null;
 let submitButton = document.querySelector("form input[type=submit]") as HTMLInputElement;
@@ -21,14 +20,17 @@ submitButton.addEventListener("click", e => {
 		method: "POST",
 		body: new FormData(form)
 	}).then(checkStatus).then(parseJSON).then(async () => {
-		let successMessage: string = formType === FormType.Application ?
-			"Your application has been saved." + (!unauthenticated ? "Feel free to come back here and edit it at any time." : "") :
-			"Your RSVP has been saved. Feel free to come back here and edit it at any time. We look forward to seeing you!";
+		let successMessage: string = formType === FormType.Application ? "Your application has been saved." : "Your RSVP has been saved.";
+		if (!unauthenticated) {
+			successMessage += " Feel free to come back here and edit it at any time.";
+		}
 
 		await sweetAlert("Awesome!", successMessage, "success");
 
 		if (unauthenticated) {
 			document.querySelector("form")!.reset();
+			submitButton.disabled = false;
+			window.scrollTo(0, 0);
 		} else {
 			window.location.assign("/");
 		}
@@ -71,11 +73,7 @@ if (deleteButton) {
 			credentials: "same-origin",
 			method: "DELETE"
 		}).then(checkStatus).then(parseJSON).then(async () => {
-			if (formType === FormType.Application) {
-				window.location.assign("/apply");
-			} else {
-				window.location.assign("/confirm");
-			}
+			window.location.assign("/");
 		}).catch(async (err: Error) => {
 			await sweetAlert("Oh no!", err.message, "error");
 			submitButton.disabled = false;

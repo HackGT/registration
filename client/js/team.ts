@@ -13,7 +13,7 @@ joinTeamButton && joinTeamButton.addEventListener("click", e => {
 		return sweetAlert("Whoops!", "Please enter a team name!", "error");
 	}
 
-	fetch(joinTeamButton.getAttribute("action")! + encodeURI(joinTeamInput.value), {
+	fetch(joinTeamButton.getAttribute("action")! + encodeURIComponent(joinTeamInput.value), {
 		credentials: "same-origin",
 		method: "POST"
 	}).then(checkStatus).then(parseJSON).then(async () => {
@@ -46,7 +46,7 @@ renameTeamButton && renameTeamButton.addEventListener("click", e => {
 		return sweetAlert("Whoops!", "Please enter a team name!", "error");
 	}
 
-	fetch(renameTeamButton.getAttribute("action")! + encodeURI(renameTeamInput.value), {
+	fetch(renameTeamButton.getAttribute("action")! + encodeURIComponent(renameTeamInput.value), {
 		credentials: "same-origin",
 		method: "POST"
 	}).then(checkStatus).then(parseJSON).then(async () => {
@@ -64,7 +64,7 @@ createTeamButton && createTeamButton.addEventListener("click", e => {
 		return sweetAlert("Whoops!", "Please enter a team name!", "error");
 	}
 
-	fetch(createTeamButton.getAttribute("action")! + encodeURI(teamNameButton.value), {
+	fetch(createTeamButton.getAttribute("action")! + encodeURIComponent(teamNameButton.value), {
 		credentials: "same-origin",
 		method: "POST"
 	}).then(checkStatus).then(parseJSON).then(async () => {

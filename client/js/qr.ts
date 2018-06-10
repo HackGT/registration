@@ -14,7 +14,11 @@ let errorCorrectionLevel = "H";
 let qr = qrcode(typeNumber, errorCorrectionLevel);
 let qrElement = document.getElementById("qrCode") as HTMLElement;
 
-qr.addData(qrElement.attributes.getNamedItem("data").value);
+let encoded = qrElement.dataset.encoded;
+if (!encoded) {
+	throw new Error("Data for QR code missing");
+}
+qr.addData(encoded);
 qr.make();
 
 qrElement.innerHTML = qr.createSvgTag();

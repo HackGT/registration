@@ -10,7 +10,7 @@
 		<link rel="stylesheet" href="/css/index.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
-		{{#if user.attending}}
+		{{#if user.confirmed}}
 			{{#if settings.qrEnabled}}
 				<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.3.1/qrcode.min.js"></script>
 				<script src="/js/qr.js" defer></script>
@@ -27,41 +27,34 @@
 						<h2>Your status:</h2>
 					</div>
 					<div class="col-6">
-						{{#if user.attending}}
-							<h4>Attending</h4>
-						{{else if user.accepted}}
-							<h4>Accepted</h4>
-						{{else if user.applied}}
-							<h4>Submitted</h4>
-						{{else}}
-							<h4>Incomplete</h4>
-						{{/if}}
+						{{status}}
 					</div>
 				</div>
 				<div class="row">
 					<p>Welcome back, {{user.name}}!</p>
-					{{#if user.attending}}
-						<p>You're all set!</p>
+					{{#if user.confirmed}}
 						<p>Application type: <b>{{user.applicationBranch}}</b></p>
-						{{#unless skipConfirmation}}
 						<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
-						{{#if confirmationStatus.areOpen}}
-							<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
-							<a class="btn" href="/confirm">Edit your confirmation</a>
-						{{else}}
-							<p>RSVPing closed on {{confirmationClose}}.</p>
-						{{/if}}
+						{{#unless autoConfirm}}
+							{{#if confirmationStatus.areOpen}}
+								<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
+								<a class="btn" href="/confirm">Edit your confirmation</a>
+							{{else}}
+								<p>RSVPing closed on {{confirmationClose}}.</p>
+							{{/if}}
 						{{/unless}}
-						<p>We look forward to seeing you!</p>
 
 						{{#if settings.qrEnabled}}
-							<p>Show your QR code to check in when you get here.</p>
-							<div id="qrCode" data="user:{{user.uuid}}"></div>
+							{{#if user.accepted}}
+								<p>Show your QR code to check in when you get here.</p>
+								<div id="qrCode" data-encoded="user:{{user.uuid}}"></div>
+							{{/if}}
 						{{/if}}
-					{{else if user.accepted}}
+					{{else if user.confirmationBranch}}
 						{{#if confirmationStatus.areOpen}}
-							<p>You've been accepted but you still need to RSVP!</p>
+							<p>Please confirm your application decision.</p>
 							<p>Application type: <b>{{user.applicationBranch}}</b></p>
+							<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 							{{#ifCond allConfirmationTimes.length 1}}
 								<p>If you do not RSVP before {{confirmationClose}}, you will not be able to attend {{siteTitle}}!</p>
 							{{else}}
@@ -74,7 +67,6 @@
 							{{/ifCond}}
 							<a class="btn" href="/confirm">Confirm your attendance</a>
 						{{else}}
-							<p>You've been accepted!</p>
 							<p>Application type: <b>{{user.applicationBranch}}</b></p>
 							{{#if confirmationStatus.beforeOpen}}
 								{{#ifCond allConfirmationTimes.length 1}}
