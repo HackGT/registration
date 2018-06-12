@@ -305,7 +305,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 	let teamLeaderAsUser: IUserMongoose | null = null;
 	let isCurrentUserTeamLeader = false;
 
-	if (request.user.teamId) {
+	if (request.user && request.user.teamId) {
 		team = await Team.findById(request.user.teamId) as ITeamMongoose;
 		membersAsUsers = await User.find({
 			_id: {
@@ -318,7 +318,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 
 	let templateData: ITeamTemplate = {
 		siteTitle: config.eventName,
-		user: request.user,
+		user: request.user as IUser,
 		team,
 		membersAsUsers,
 		teamLeaderAsUser,
@@ -504,7 +504,7 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		let templateData: IRegisterTemplate = {
 			siteTitle: config.eventName,
 			unauthenticated: anonymous,
-			user: request.user,
+			user: request.user as IUser,
 			settings: {
 				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 				qrEnabled: await getSetting<boolean>("qrEnabled")
