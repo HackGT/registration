@@ -7,7 +7,7 @@ import {
 	isAdmin, uploadHandler
 } from "../../middleware";
 import * as Branches from "../../branch";
-import {User} from "../../schema";
+import { IUser, User } from "../../schema";
 
 setDefaultSettings().catch(err => {
 	throw err;
@@ -234,8 +234,8 @@ settingsRoutes.route("/email_content/:type/rendered")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		try {
 			let markdown: string = request.body.content;
-			let html: string = await renderEmailHTML(markdown, request.user);
-			let text: string = await renderEmailText(html, request.user, true);
+			let html: string = await renderEmailHTML(markdown, request.user as IUser);
+			let text: string = await renderEmailText(html, request.user as IUser, true);
 
 			response.json({ html, text });
 		}

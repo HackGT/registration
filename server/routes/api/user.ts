@@ -543,7 +543,7 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 	}
 
 	let query = {
-		teamLeader: request.user._id,
+		teamLeader: request.user && request.user._id,
 		members: {
 			$in: [user._id]
 		},
