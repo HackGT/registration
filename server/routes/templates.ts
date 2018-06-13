@@ -277,16 +277,16 @@ templateRoutes.route("/login/forgot").get((request, response) => {
 	response.send(forgotPasswordTemplate(templateData));
 });
 templateRoutes.get("/auth/forgot/:code", async (request, response) => {
-	let user = await User.findOne({ "localData.resetCode": request.params.code });
+	let user = await User.findOne({ "local.resetCode": request.params.code });
 	if (!user) {
 		request.flash("error", "Invalid password reset code");
 		response.redirect("/login");
 		return;
 	}
-	else if (!user.localData!.resetRequested || Date.now() - user.localData!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
+	else if (!user.local!.resetRequested || Date.now() - user.local!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
 		request.flash("error", "Your password reset link has expired. Please request a new one.");
-		user.localData!.resetCode = "";
-		user.localData!.resetRequested = false;
+		user.local!.resetCode = "";
+		user.local!.resetRequested = false;
 		await user.save();
 		response.redirect("/login");
 		return;

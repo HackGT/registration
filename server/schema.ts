@@ -6,20 +6,16 @@ import {Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export namespace IConfig {
+	export type Services = "github" | "google" | "facebook" | "local";
+	export type OAuthServices = Exclude<Services, "local">;
 	export interface Secrets {
 		adminKey: string;
 		session: string;
-		github: {
-			id: string;
-			secret: string;
-		};
-		google: {
-			id: string;
-			secret: string;
-		};
-		facebook: {
-			id: string;
-			secret: string;
+		oauth: {
+			[Service in OAuthServices]: {
+				id: string;
+				secret: string;
+			}
 		};
 	}
 	export interface Email {
@@ -88,11 +84,12 @@ export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
 
 export interface IUser {
 	_id: mongoose.Types.ObjectId;
+	uuid: string;
 	email: string;
 	name: string;
 	verifiedEmail: boolean;
 
-	localData?: {
+	local?: {
 		hash: string;
 		salt: string;
 		verificationCode: string;
@@ -100,15 +97,15 @@ export interface IUser {
 		resetCode: string;
 		resetRequestedTime: Date;
 	};
-	githubData?: {
+	github?: {
 		id: string;
 		username: string;
 		profileUrl: string;
 	};
-	googleData?: {
+	google?: {
 		id: string;
 	};
-	facebookData?: {
+	facebook?: {
 		id: string;
 	};
 
@@ -133,7 +130,6 @@ export interface IUser {
 	confirmationSubmitTime?: Date;
 
 	admin?: boolean;
-	uuid: string;
 
 	teamId?: mongoose.Types.ObjectId;
 }
@@ -141,6 +137,12 @@ export type IUserMongoose = IUser & mongoose.Document;
 
 // This is basically a type definition that exists at runtime and is derived manually from the IUser definition above
 export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
+	uuid: {
+		type: String,
+		required: true,
+		index: true,
+		unique: true
+	},
 	email: {
 		type: String,
 		required: true,
@@ -153,7 +155,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	},
 	verifiedEmail: Boolean,
 
-	localData: {
+	local: {
 		hash: String,
 		salt: String,
 		verificationCode: String,
@@ -161,15 +163,15 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		resetCode: String,
 		resetRequestedTime: Date
 	},
-	githubData: {
+	github: {
 		id: String,
 		username: String,
 		profileUrl: String
 	},
-	googleData: {
+	google: {
 		id: String
 	},
-	facebookData: {
+	facebook: {
 		id: String
 	},
 
@@ -197,13 +199,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	confirmationStartTime: Date,
 	confirmationSubmitTime: Date,
 
-	admin: Boolean,
-	uuid: {
-		type: String,
-		required: true,
-		index: true,
-		unique: true
-	}
+	admin: Boolean
 }).index({
 	email: 'text',
 	name: 'text'

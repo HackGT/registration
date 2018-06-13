@@ -291,16 +291,16 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 	} : undefined;
 
 	let loginMethods: string[] = [];
-	if (user.githubData && user.githubData.id) {
+	if (user.github && user.github.id) {
 		loginMethods.push("GitHub");
 	}
-	if (user.googleData && user.googleData.id) {
+	if (user.google && user.google.id) {
 		loginMethods.push("Google");
 	}
-	if (user.facebookData && user.facebookData.id) {
+	if (user.facebook && user.facebook.id) {
 		loginMethods.push("Facebook");
 	}
-	if (user.localData && user.localData.hash) {
+	if (user.local && user.local.hash) {
 		loginMethods.push("Local");
 	}
 
