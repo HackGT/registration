@@ -8,9 +8,8 @@
         "target": "es6",
         "lib": [
             "esnext.asynciterable",
-            "es6",
+            "es2017",
             "es2015.promise",
-            "dom"
         ],
         "sourceMap": true,
         "alwaysStrict": true,
