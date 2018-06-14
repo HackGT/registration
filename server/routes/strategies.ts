@@ -15,29 +15,43 @@ import { Request, Response, NextFunction, Router } from "express";
 import {Strategy as LocalStrategy} from "passport-local";
 import {Strategy as GitHubStrategy} from "passport-github2";
 import {Strategy as FacebookStrategy} from "passport-facebook";
-// No type definitions available yet for this module
-// tslint:disable-next-line:no-var-requires
+// No type definitions available yet for these modules
+// tslint:disable:no-var-requires
 const GoogleStrategy: StrategyConstructor = require("passport-google-oauth20").Strategy;
+const CASStrategyProvider: StrategyConstructor = require("passport-cas2").Strategy;
 
-type Strategy = passport.Strategy;
+type Strategy = passport.Strategy & {
+	logout?(request: Request, response: Response, returnURL: string): void;
+};
 type PassportDone = (err: Error | null, user?: IUserMongoose | false, errMessage?: { message: string }) => void;
-interface StrategyConstructor {
-	new(options: OAuthStrategyOptions, cb: (request: Request, accessToken: string, refreshToken: string, profile: Profile, done: PassportDone) => Promise<void>): Strategy;
-}
-interface OAuthStrategyOptions {
-	clientID: string;
-	clientSecret: string;
-	profileFields?: string[];
-	passReqToCallback: boolean;
-}
 type Profile = passport.Profile & {
 	profileUrl?: string;
 	_json: any;
 };
-interface LocalStrategyOptions {
+interface StrategyOptions {
+	passReqToCallback: true; // Forced to true for our usecase
+}
+interface OAuthStrategyOptions extends StrategyOptions {
+	clientID: string;
+	clientSecret: string;
+	profileFields?: string[];
+}
+interface CASStrategyOptions extends StrategyOptions {
+	casURL: string;
+	pgtURL?: string;
+	sessionKey?: string;
+	propertyMap?: object;
+	sslCA?: any[];
+}
+interface LocalStrategyOptions extends StrategyOptions {
 	usernameField: string;
 	passwordField: string;
-	passReqToCallback: true;
+}
+interface StrategyConstructor {
+	// OAuth constructor
+	new(options: OAuthStrategyOptions, cb: (request: Request, accessToken: string, refreshToken: string, profile: Profile, done: PassportDone) => Promise<void>): Strategy;
+	// CAS constructor
+	new(options: CASStrategyOptions, cb: (request: Request, username: string, profile: Profile, done: PassportDone) => Promise<void>): Strategy;
 }
 // Because the passport typedefs don't include this for some reason
 // Defined: https://github.com/jaredhanson/passport-oauth2/blob/9ddff909a992c3428781b7b2957ce1a97a924367/lib/strategy.js#L135
@@ -51,7 +65,6 @@ export interface RegistrationStrategy {
 	readonly name: string;
 	readonly passportStrategy: Strategy;
 	use(authRoutes: Router, scope?: string[]): void;
-	logout(request: Request, response: Response): void;
 }
 abstract class OAuthStrategy implements RegistrationStrategy {
 	public readonly passportStrategy: Strategy;
@@ -186,10 +199,6 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			response.redirect("/");
 		});
 	}
-
-	public logout() {
-		return;
-	}
 }
 
 export class GitHub extends OAuthStrategy {
@@ -212,10 +221,44 @@ export class Google extends OAuthStrategy {
 
 export class Facebook extends OAuthStrategy {
 	constructor() {
-		super("facebook", FacebookStrategy, ["id", "displayName", "email"]);
+		super("facebook", FacebookStrategy as any, ["id", "displayName", "email"]);
 	}
 	public use(authRoutes: Router) {
 		super.use(authRoutes, ["email"]);
+	}
+}
+
+abstract class CASStrategy implements RegistrationStrategy {
+	public readonly passportStrategy: Strategy;
+
+	constructor(public readonly name: IConfig.CASServices, url: string) {
+		this.passportStrategy = new CASStrategyProvider({
+			casURL: url,
+			passReqToCallback: true
+		}, this.passportCallback);
+	}
+
+	private async passportCallback(request: Request, username: string, profile: Profile, done: PassportDone) {
+		done(null, false, {message: "Not supported"});
+	}
+
+	public use(authRoutes: Router) {
+		passport.use(this.name, this.passportStrategy);
+
+		authRoutes.get(`/${this.name}`, passport.authenticate(this.name, {
+			failureRedirect: "/login",
+			failureFlash: true
+		}), (request, response) => {
+			// Successful authentication, redirect home
+			response.redirect("/");
+		});
+	}
+}
+
+export class GeorgiaTechCAS extends CASStrategy {
+	constructor() {
+		// Registration must be hosted on a *.hack.gt domain for this to work
+		super("gatech", "https://login.gatech.edu/cas");
 	}
 }
 
@@ -463,14 +506,11 @@ The ${config.eventName} Team.`;
 			}
 		});
 	}
-
-	public logout() {
-		return;
-	}
 }
 
 export const strategies = {
 	"local": Local,
+	"gatech": GeorgiaTechCAS,
 	"github": GitHub,
 	"google": Google,
 	"facebook": Facebook
@@ -539,7 +579,7 @@ function validateAndCacheHostName(request: Request, response: Response, next: Ne
 	}
 }
 
-export function createLink(request: Request, link: string): string {
+function createLink(request: Request, link: string): string {
 	if (link[0] === "/") {
 		link = link.substring(1);
 	}

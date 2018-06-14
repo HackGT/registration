@@ -52,6 +52,10 @@ let authenticationMethods: RegistrationStrategy[] = [];
 getSetting<(keyof typeof strategies)[]>("loginMethods").then(methods => {
 	console.info(`Using authentication methods: ${methods.join(", ")}`);
 	for (let methodName of methods) {
+		if (!strategies[methodName]) {
+			console.error(`Authentication method "${methodName}" is not available. Did you add it to the exported list of strategies?`);
+			continue;
+		}
 		let method = new strategies[methodName]();
 		authenticationMethods.push(method);
 		method.use(authRoutes);
@@ -69,9 +73,6 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 });
 
 authRoutes.all("/logout", (request, response) => {
-	for (let method of authenticationMethods) {
-		method.logout(request, response);
-	}
 	request.logout();
 	response.redirect("/login");
 });
