@@ -6,8 +6,9 @@ import {Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export namespace IConfig {
-	export type Services = "github" | "google" | "facebook" | "local";
-	export type OAuthServices = Exclude<Services, "local">;
+	export type OAuthServices = "github" | "google" | "facebook";
+	export type CASServices = "gatech";
+	export type Services = "local" | OAuthServices | CASServices;
 	export interface Secrets {
 		adminKey: string;
 		session: string;
