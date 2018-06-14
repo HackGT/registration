@@ -6,14 +6,13 @@ const MongoStore = connectMongo(session);
 import * as passport from "passport";
 
 import {
-	config, mongoose, COOKIE_OPTIONS
+	config, mongoose, COOKIE_OPTIONS, getSetting
 } from "../common";
 import {
 	IUser, User
 } from "../schema";
 import {
-	RegistrationStrategy,
-	GitHub, Google, Facebook, Local
+	RegistrationStrategy, strategies
 } from "./strategies";
 
 // Passport authentication
@@ -49,16 +48,17 @@ passport.deserializeUser<IUser, string>((id, done) => {
 
 export let authRoutes = express.Router();
 
-let authenticationMethods: RegistrationStrategy[] = [
-	new GitHub(),
-	new Google(),
-	new Facebook(),
-	new Local()
-];
-
-for (let method of authenticationMethods) {
-	method.use(authRoutes);
-}
+let authenticationMethods: RegistrationStrategy[] = [];
+getSetting<(keyof typeof strategies)[]>("loginMethods").then(methods => {
+	console.info(`Using authentication methods: ${methods.join(", ")}`);
+	for (let methodName of methods) {
+		let method = new strategies[methodName]();
+		authenticationMethods.push(method);
+		method.use(authRoutes);
+	}
+}).catch(err => {
+	throw err;
+});
 
 app.use(passport.initialize());
 app.use(passport.session());

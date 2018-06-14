@@ -48,6 +48,7 @@ type AuthenticateOptions = passport.AuthenticateOptions & {
 export const PBKDF2_ROUNDS: number = 300000;
 
 export interface RegistrationStrategy {
+	readonly name: string;
 	readonly passportStrategy: Strategy;
 	use(authRoutes: Router, scope?: string[]): void;
 	logout(request: Request, response: Response): void;
@@ -219,6 +220,7 @@ export class Facebook extends OAuthStrategy {
 }
 
 export class Local implements RegistrationStrategy {
+	public readonly name = "local";
 	public readonly passportStrategy: Strategy;
 
 	constructor() {
@@ -466,6 +468,13 @@ The ${config.eventName} Team.`;
 		return;
 	}
 }
+
+export const strategies = {
+	"local": Local,
+	"github": GitHub,
+	"google": Google,
+	"facebook": Facebook
+};
 
 // Authentication helpers
 function getExternalPort(request: Request): number {
