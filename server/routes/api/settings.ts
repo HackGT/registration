@@ -1,17 +1,13 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText, defaultEmailSubjects
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, defaultEmailSubjects
 } from "../../common";
 import {
 	isAdmin, uploadHandler
 } from "../../middleware";
 import * as Branches from "../../branch";
 import { IUser, User } from "../../schema";
-
-setDefaultSettings().catch(err => {
-	throw err;
-});
 
 export let settingsRoutes = express.Router();
 
