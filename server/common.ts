@@ -288,7 +288,7 @@ export {mongoose};
 
 import { Setting } from "./schema";
 
-export async function setDefaultSettings() {
+async function setDefaultSettings() {
 	async function doesNotExist(key: string): Promise<boolean> {
 		return await Setting.find({ "name": key }).count() === 0;
 	}
