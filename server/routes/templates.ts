@@ -80,7 +80,8 @@ templateRoutes.use(async (request, response, next) => {
 });
 
 // tslint:disable-next-line:no-any
-Handlebars.registerHelper("ifCond", function(v1: any, v2: any, options: any) {
+// tslint:disable:no-invalid-this
+Handlebars.registerHelper("ifCond", (v1: any, v2: any, options: any) => {
 	if (v1 === v2) {
 		// tslint:disable-next-line:no-invalid-this
 		return options.fn(this);
@@ -88,6 +89,13 @@ Handlebars.registerHelper("ifCond", function(v1: any, v2: any, options: any) {
 	// tslint:disable-next-line:no-invalid-this
 	return options.inverse(this);
 });
+Handlebars.registerHelper("ifIn", <T>(elem: T, list: T[], options: any) => {
+	if (list.includes(elem)) {
+		return options.fn(this);
+	}
+	return options.inverse(this);
+});
+// tslint:enable:no-invalid-this
 Handlebars.registerHelper("required", (isRequired: boolean) => {
 	// Adds the "required" form attribute if the element requests to be required
 	return isRequired ? "required" : "";
@@ -260,11 +268,12 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	response.send(indexTemplate(templateData));
 });
 
-templateRoutes.route("/login").get((request, response) => {
+templateRoutes.route("/login").get(async (request, response) => {
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
 		error: request.flash("error"),
-		success: request.flash("success")
+		success: request.flash("success"),
+		loginMethods: await getSetting<string[]>("loginMethods")
 	};
 	response.send(loginTemplate(templateData));
 });

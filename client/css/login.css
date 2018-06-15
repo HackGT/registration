@@ -18,6 +18,10 @@ a.facebook {
 	color: white;
 	background-color: #3b5998;
 }
+a.gatech {
+	color: black;
+	background-color: #eeb211;
+}
 #error, #success {
 	text-align: center;
 	margin-top: 1em;
@@ -42,7 +46,7 @@ main {
 	flex-direction: column-reverse;
 	align-items: center;
 }
-main > * {
+main > div {
 	box-sizing: border-box;
 	width: 100%;
 	display: none;

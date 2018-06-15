@@ -311,6 +311,7 @@ export interface ILoginTemplate {
 	siteTitle: string;
 	error?: string;
 	success?: string;
+	loginMethods?: string[];
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];
