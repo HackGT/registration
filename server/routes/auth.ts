@@ -46,10 +46,16 @@ passport.deserializeUser<IUser, string>((id, done) => {
 	});
 });
 
-export let authRoutes = express.Router();
+let router = express.Router();
+export let authRoutes: express.RequestHandler = (request, response, next) => {
+	// Allows for dynamic dispatch when authentication gets reloaded
+	router(request, response, next);
+};
 
-let authenticationMethods: RegistrationStrategy[] = [];
-getSetting<(keyof typeof strategies)[]>("loginMethods").then(methods => {
+export async function reloadAuthentication() {
+	router = express.Router();
+	let authenticationMethods: RegistrationStrategy[] = [];
+	let methods = await getSetting<(keyof typeof strategies)[]>("loginMethods");
 	console.info(`Using authentication methods: ${methods.join(", ")}`);
 	for (let methodName of methods) {
 		if (!strategies[methodName]) {
@@ -58,21 +64,23 @@ getSetting<(keyof typeof strategies)[]>("loginMethods").then(methods => {
 		}
 		let method = new strategies[methodName]();
 		authenticationMethods.push(method);
-		method.use(authRoutes);
+		method.use(router);
 	}
-}).catch(err => {
+
+	// Need to be redefined on every instance of a new router
+	router.get("/validatehost/:nonce", (request, response) => {
+		let nonce: string = request.params.nonce || "";
+		response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
+	});
+
+	router.all("/logout", (request, response) => {
+		request.logout();
+		response.redirect("/login");
+	});
+}
+reloadAuthentication().catch(err => {
 	throw err;
 });
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-authRoutes.get("/validatehost/:nonce", (request, response) => {
-	let nonce: string = request.params.nonce || "";
-	response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
-});
-
-authRoutes.all("/logout", (request, response) => {
-	request.logout();
-	response.redirect("/login");
-});
