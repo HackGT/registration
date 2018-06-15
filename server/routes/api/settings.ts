@@ -132,6 +132,7 @@ settingsRoutes.route("/login_methods")
 				return;
 			}
 			await updateSetting<string[]>("loginMethods", methods);
+			await (await import("../auth")).reloadAuthentication();
 			response.json({
 				"success": true
 			});
