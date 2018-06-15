@@ -658,6 +658,17 @@ function settingsUpdate(e: MouseEvent) {
 	let adminEmailData = new FormData();
 	adminEmailData.append("adminString", (document.getElementById("admin-emails") as HTMLInputElement).value);
 	adminEmailData.append("addAdmins", (document.getElementById("add-admins") as HTMLInputElement).checked ? "true" : "false");
+
+	let loginMethodsData = new FormData();
+	let loginMethods = document.querySelectorAll("div.auth-method") as NodeListOf<HTMLDivElement>;
+	let enabledMethods: string[] = [];
+	for (let i = 0; i < loginMethods.length; i++) {
+		if (loginMethods[i].querySelector("select")!.value === "enabled") {
+			enabledMethods.push(loginMethods[i].dataset.rawName!);
+		}
+	}
+	loginMethodsData.append("enabledMethods", JSON.stringify(enabledMethods));
+
 	let branchRoleData = new FormData();
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
 	for (let i = 0; i < branchRoles.length; i++) {
@@ -726,6 +737,11 @@ function settingsUpdate(e: MouseEvent) {
 		return fetch("/api/settings/admin_emails", {
 			...defaultOptions,
 			body: adminEmailData
+		});
+	}).then(checkStatus).then(parseJSON).then(() => {
+		return fetch("/api/settings/login_methods", {
+			...defaultOptions,
+			body: loginMethodsData
 		});
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/branch_roles", {

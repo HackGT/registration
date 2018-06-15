@@ -22,6 +22,7 @@ import {
 	IFormItem
 } from "../schema";
 import * as Branches from "../branch";
+import { strategies, prettyNames } from "../routes/strategies";
 
 export let templateRoutes = express.Router();
 
@@ -540,7 +541,17 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
 
-	let adminEmails = await User.find({admin: true}).select('email');
+	type StrategyNames = keyof typeof strategies;
+	let enabledMethods = await getSetting<StrategyNames[]>("loginMethods");
+	let loginMethodsInfo = Object.keys(strategies).map((name: StrategyNames) => {
+		return {
+			name: prettyNames[name],
+			raw: name,
+			enabled: enabledMethods.includes(name)
+		};
+	});
+
+	let adminEmails = await User.find({ admin: true }).select("email");
 
 	let noopBranches = (await Branches.BranchConfig.loadAllBranches("Noop")) as Branches.NoopBranch[];
 	let applicationBranches = (await Branches.BranchConfig.loadAllBranches("Application")) as Branches.ApplicationBranch[];
@@ -581,7 +592,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
 			qrEnabled,
-			adminEmails,
 			qrEnabledChecked: qrEnabled ? "checked" : "",
 			branches: {
 				noop: noopBranches.map(branch => {
@@ -606,7 +616,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						isAcceptance: branch.isAcceptance
 					};
 				})
-			}
+			},
+			loginMethodsInfo,
+			adminEmails
 		},
 		config: {
 			admins: config.admins.join(", "),
