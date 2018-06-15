@@ -108,6 +108,42 @@ settingsRoutes.route("/admin_emails")
 		});
 	});
 
+settingsRoutes.route("/login_methods")
+	.get(async (request, response) => {
+		let methods = await getSetting<string[]>("loginMethods");
+		response.json({
+			methods
+		});
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let { enabledMethods } = request.body;
+		if (!enabledMethods) {
+			response.status(400).json({
+				"error": "Missing value for enabled methods"
+			});
+			return;
+		}
+		try {
+			let methods = JSON.parse(enabledMethods);
+			if (!Array.isArray(methods)) {
+				response.status(400).json({
+					"error": "Invalid value for enabled methods"
+				});
+				return;
+			}
+			await updateSetting<string[]>("loginMethods", methods);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while changing available login methods"
+			});
+		}
+	});
+
 settingsRoutes.route("/branch_roles")
 	.get(isAdmin, async (request, response) => {
 		response.json({

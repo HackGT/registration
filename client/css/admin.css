@@ -137,16 +137,19 @@ canvas {
 
 }
 
-.branch-role:nth-of-type(3n + 1) {
+.branch-role:nth-of-type(3n + 1), .auth-method:nth-of-type(3n + 1) {
     margin-left: 0;
 }
-.branch-role > h4 {
+.branch-role > h4, .auth-method > h5 {
     height: 40px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: 2rem;
     margin-bottom: 1rem;
+}
+.auth-method > select {
+    width: 90%;
 }
 .row-flex {
     display: flex;

@@ -515,6 +515,13 @@ export const strategies = {
 	"google": Google,
 	"facebook": Facebook
 };
+export const prettyNames: Record<keyof typeof strategies, string> = {
+	"local": "Local",
+	"gatech": "Georgia Tech CAS",
+	"github": "GitHub",
+	"google": "Google",
+	"facebook": "Facebook"
+};
 
 // Authentication helpers
 function getExternalPort(request: Request): number {

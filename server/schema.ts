@@ -369,6 +369,11 @@ export interface IAdminTemplate extends ICommonTemplate {
 				close: string;
 			}[];
 		};
+		loginMethodsInfo: {
+			name: string;
+			raw: string;
+			enabled: boolean;
+		}[];
 		adminEmails: IUserMongoose[];
 	};
 	config: {
