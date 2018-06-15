@@ -22,7 +22,7 @@ a.facebook {
 	text-align: center;
 	margin-top: 1em;
 	font-size: 2rem;
-	margin-bottom: -1em;
+	margin-bottom: 1em;
 	color: white;
 	padding: 10px;
 	border-radius: 5px;
@@ -35,4 +35,40 @@ a.facebook {
 }
 #error:empty, #success:empty {
 	display: none;
+}
+
+main {
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: center;
+}
+main > * {
+	box-sizing: border-box;
+	width: 100%;
+	display: none;
+}
+main > .active {
+	display: block;
+}
+
+.simple-methods {
+	display: flex !important;
+	flex-direction: column;
+}
+
+/* Desktop styles */
+@media only screen and (min-width: 700px) {
+	main {
+		flex-direction: row;
+	}
+	main > * {
+		width: 50%;
+	}
+	main > .active.border {
+		border-right: 1px dashed #333030;
+		padding-right: 15px;
+	}
+	main > .active:last-of-type {
+		padding-left: 10px;
+	}
 }
