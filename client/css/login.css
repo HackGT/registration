@@ -60,6 +60,15 @@ main > .active {
 	flex-direction: column;
 }
 
+.unit {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+.unit > *:first-child {
+	width: 125px;
+}
+
 /* Desktop styles */
 @media only screen and (min-width: 700px) {
 	main {
@@ -75,12 +84,7 @@ main > .active {
 	main > .active:last-of-type {
 		padding-left: 10px;
 	}
-}
-
-.unit {
-	display: flex;
-	align-items: center;
-}
-.unit > *:first-child {
-	width: 125px;
+	.unit {
+		flex-direction: row;
+	}
 }
