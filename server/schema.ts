@@ -91,14 +91,14 @@ export interface IUser {
 	verifiedEmail: boolean;
 	accountConfirmed: boolean;
 
-	local?: {
+	local?: Partial<{
 		hash: string;
 		salt: string;
 		verificationCode: string;
 		resetRequested: boolean;
 		resetCode: string;
 		resetRequestedTime: Date;
-	};
+	}>;
 	services: {
 		[Service in Exclude<IConfig.Services, "local">]?: {
 			id: string;

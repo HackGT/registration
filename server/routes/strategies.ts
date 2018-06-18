@@ -101,7 +101,7 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			profileFields,
 			passReqToCallback: true
 		};
-		this.passportStrategy = new strategy(options, this.passportCallback);
+		this.passportStrategy = new strategy(options, this.passportCallback.bind(this));
 	}
 
 	protected async passportCallback(request: Request, accessToken: string, refreshToken: string, profile: Profile, done: PassportDone) {
@@ -232,15 +232,72 @@ export class Facebook extends OAuthStrategy {
 abstract class CASStrategy implements RegistrationStrategy {
 	public readonly passportStrategy: Strategy;
 
-	constructor(public readonly name: IConfig.CASServices, url: string) {
+	constructor(public readonly name: IConfig.CASServices, url: string, private readonly emailDomain: string) {
 		this.passportStrategy = new CASStrategyProvider({
 			casURL: url,
 			passReqToCallback: true
-		}, this.passportCallback);
+		}, this.passportCallback.bind(this));
 	}
 
 	private async passportCallback(request: Request, username: string, profile: Profile, done: PassportDone) {
-		done(null, false, {message: "Not supported"});
+		let user = await User.findOne({[`services.${this.name}.id`]: username});
+		let email = `${username}@${this.emailDomain}`;
+		let isAdmin = false;
+
+		if (config.admins.includes(email)) {
+			isAdmin = true;
+			if (!user || !user.admin) {
+				console.info(`Adding new admin: ${email}`);
+			}
+		}
+		if (!user) {
+			user = new User({
+				...OAuthStrategy.defaultUserProperties,
+				email,
+				name: "",
+				verifiedEmail: false,
+				admin: isAdmin
+			});
+			if (!user.services) {
+				user.services = {};
+			}
+			user.services[this.name] = {
+				id: username,
+				username
+			};
+			try {
+				user.markModified("services");
+				await user.save();
+				trackEvent("created account (auth)", request, email);
+			}
+			catch (err) {
+				done(err);
+				return;
+			}
+
+			done(null, user);
+		}
+		else {
+			if (!user.services) {
+				user.services = {};
+			}
+			if (!user.services[this.name]) {
+				user.services[this.name] = {
+					id: username,
+					username
+				};
+			}
+			if (!user.admin && isAdmin && user.email === email && user.verifiedEmail) {
+				user.admin = true;
+			}
+			user.markModified("services");
+			await user.save();
+			if (!user.verifiedEmail && user.accountConfirmed) {
+				done(null, false, { "message": "You must verify your email before you can sign in" });
+				return;
+			}
+			done(null, user);
+		}
 	}
 
 	public use(authRoutes: Router) {
@@ -259,7 +316,7 @@ abstract class CASStrategy implements RegistrationStrategy {
 export class GeorgiaTechCAS extends CASStrategy {
 	constructor() {
 		// Registration must be hosted on a *.hack.gt domain for this to work
-		super("gatech", "https://login.gatech.edu/cas");
+		super("gatech", "https://login.gatech.edu/cas", "gatech.edu");
 	}
 }
 
@@ -273,13 +330,13 @@ export class Local implements RegistrationStrategy {
 			passwordField: "password",
 			passReqToCallback: true
 		};
-		this.passportStrategy = new LocalStrategy(options, this.passportCallback);
+		this.passportStrategy = new LocalStrategy(options, this.passportCallback.bind(this));
 	}
 
 	protected async passportCallback(request: Request, email: string, password: string, done: PassportDone) {
 		let user = await User.findOne({ email });
 		if (user && request.path.match(/\/signup$/i)) {
-			done(null, false, { "message": "That email address is already in use" });
+			done(null, false, { "message": "That email address is already in use. You may already have an account from another login service." });
 		}
 		else if (user && !user.local!.hash) {
 			done(null, false, { "message": "Please log back in with an external provider" });

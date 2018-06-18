@@ -60,7 +60,7 @@ export function isUserOrAdmin(request: express.Request, response: express.Respon
 			"error": "You must log in to access this endpoint"
 		});
 	}
-	else if (user.uuid !== request.params.uuid && !user.admin) {
+	else if ((user.uuid !== request.params.uuid && !user.admin) || !user.verifiedEmail || !user.accountConfirmed) {
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"
 		});
@@ -91,7 +91,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 			"error": "You must log in to access this endpoint"
 		});
 	}
-	else if (!user.admin) {
+	else if (!user.admin || !user.verifiedEmail || !user.accountConfirmed) {
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"
 		});
@@ -104,7 +104,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 // For API endpoints
 export function authenticateWithReject(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "no-cache");
-	if (!request.isAuthenticated()) {
+	if (!request.isAuthenticated() || !request.user || !request.user.verifiedEmail || !request.user.accountConfirmed) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
 		});
@@ -117,7 +117,7 @@ export function authenticateWithReject(request: express.Request, response: expre
 // For directly user facing endpoints
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
-	if (!request.isAuthenticated()) {
+	if (!request.isAuthenticated() || !request.user || !request.user.verifiedEmail || !request.user.accountConfirmed) {
 		response.redirect("/login");
 	}
 	else {
