@@ -10,6 +10,7 @@ import { User, IUser, Team, IFormItem, QuestionBranchConfig } from "../../schema
 import { Branches, Tags, AllTags, BranchConfig, ApplicationBranch, ConfirmationBranch, NoopBranch } from "../../branch";
 import { schema as types } from "./api.graphql.types";
 import { formatSize } from "../../common";
+import { prettyNames as strategyNames } from "../strategies";
 
 const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphql"), "utf8");
 
@@ -291,17 +292,11 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 	} : undefined;
 
 	let loginMethods: string[] = [];
-	if (user.github && user.github.id) {
-		loginMethods.push("GitHub");
-	}
-	if (user.google && user.google.id) {
-		loginMethods.push("Google");
-	}
-	if (user.facebook && user.facebook.id) {
-		loginMethods.push("Facebook");
-	}
-	if (user.local && user.local.hash) {
+	if (user.local && user.local!.hash) {
 		loginMethods.push("Local");
+	}
+	for (let service of Object.keys(user.services) as (keyof typeof user.services)[]) {
+		loginMethods.push(strategyNames[service]);
 	}
 
 	let team = user.teamId ? await Team.findById(user.teamId) : null;

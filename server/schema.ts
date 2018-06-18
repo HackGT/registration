@@ -89,6 +89,7 @@ export interface IUser {
 	email: string;
 	name: string;
 	verifiedEmail: boolean;
+	accountConfirmed: boolean;
 
 	local?: {
 		hash: string;
@@ -98,16 +99,12 @@ export interface IUser {
 		resetCode: string;
 		resetRequestedTime: Date;
 	};
-	github?: {
-		id: string;
-		username: string;
-		profileUrl: string;
-	};
-	google?: {
-		id: string;
-	};
-	facebook?: {
-		id: string;
+	services: {
+		[Service in Exclude<IConfig.Services, "local">]?: {
+			id: string;
+			username?: string;
+			profileUrl?: string;
+		};
 	};
 
 	applied: boolean;
@@ -155,6 +152,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		index: true
 	},
 	verifiedEmail: Boolean,
+	accountConfirmed: Boolean,
 
 	local: {
 		hash: String,
@@ -164,17 +162,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		resetCode: String,
 		resetRequestedTime: Date
 	},
-	github: {
-		id: String,
-		username: String,
-		profileUrl: String
-	},
-	google: {
-		id: String
-	},
-	facebook: {
-		id: String
-	},
+	services: mongoose.Schema.Types.Mixed,
 
 	teamId: {
 		type: mongoose.Schema.Types.ObjectId
