@@ -87,6 +87,11 @@ export async function reloadAuthentication() {
 				response.redirect("/login/confirm");
 				return;
 			}
+			if (await User.count({ email }) > 0) {
+				request.flash("error", "That email address is already in use. You may already have an account from another login service.");
+				response.redirect("/login/confirm");
+				return;
+			}
 			user.admin = false;
 			user.verifiedEmail = false;
 			user.email = email;
