@@ -30,6 +30,7 @@ export let templateRoutes = express.Router();
 let [
 	indexTemplate,
 	loginTemplate,
+	postLoginTemplate,
 	forgotPasswordTemplate,
 	resetPasswordTemplate,
 	preregisterTemplate,
@@ -42,6 +43,7 @@ let [
 ] = [
 	"index.html",
 	"login.html",
+	"postlogin.html",
 	"forgotpassword.html",
 	"resetpassword.html",
 	"preapplication.html",
@@ -278,6 +280,35 @@ templateRoutes.route("/login").get(async (request, response) => {
 	};
 	response.send(loginTemplate(templateData));
 });
+templateRoutes.route("/login/confirm").get((request, response) => {
+	let user = request.user as IUser;
+	if (!user) {
+		response.redirect("/login");
+		return;
+	}
+	if (user.accountConfirmed) {
+		response.redirect("/");
+	}
+
+	let loginMethods: string[] = [];
+	if (user.local && user.local!.hash) {
+		loginMethods.push("Local");
+	}
+	for (let service of Object.keys(user.services || {}) as (keyof typeof user.services)[]) {
+		loginMethods.push(prettyNames[service]);
+	}
+
+	response.send(postLoginTemplate({
+		siteTitle: config.eventName,
+		error: request.flash("error"),
+		success: request.flash("success"),
+
+		name: user.name || "",
+		email: user.email || "",
+		verifiedEmail: user.verifiedEmail || false,
+		loginMethods: loginMethods.join(", ")
+	}));
+});
 templateRoutes.route("/login/forgot").get((request, response) => {
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
@@ -286,14 +317,14 @@ templateRoutes.route("/login/forgot").get((request, response) => {
 	};
 	response.send(forgotPasswordTemplate(templateData));
 });
-templateRoutes.get("/auth/forgot/:code", async (request, response) => {
+templateRoutes.route("/auth/forgot/:code").get(async (request, response) => {
 	let user = await User.findOne({ "local.resetCode": request.params.code });
 	if (!user) {
 		request.flash("error", "Invalid password reset code");
 		response.redirect("/login");
 		return;
 	}
-	else if (!user.local!.resetRequested || Date.now() - user.local!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
+	else if (!user.local!.resetRequested || Date.now() - user.local!.resetRequestedTime!.valueOf() > 1000 * 60 * 60) {
 		request.flash("error", "Your password reset link has expired. Please request a new one.");
 		user.local!.resetCode = "";
 		user.local!.resetRequested = false;

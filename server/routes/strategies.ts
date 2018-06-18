@@ -9,7 +9,7 @@ import * as uuid from "uuid/v4";
 
 import { config, pbkdf2Async, renderEmailHTML, renderEmailText, sendMailAsync } from "../common";
 import { postParser, trackEvent } from "../middleware";
-import { IConfig, IUserMongoose, User } from "../schema";
+import { IConfig, IUser, IUserMongoose, User } from "../schema";
 import { Request, Response, NextFunction, Router } from "express";
 
 import {Strategy as LocalStrategy} from "passport-local";
@@ -69,15 +69,13 @@ export interface RegistrationStrategy {
 abstract class OAuthStrategy implements RegistrationStrategy {
 	public readonly passportStrategy: Strategy;
 
-	public static get defaultUserProperties() {
+	public static get defaultUserProperties(): Partial<IUser> {
 		return {
 			"uuid": uuid(),
 			"verifiedEmail": false,
+			"accountConfirmed": false,
 
-			"local": {},
-			"github": {},
-			"google": {},
-			"facebook": {},
+			"services": {},
 
 			"applied": false,
 			"accepted": false,
@@ -117,10 +115,7 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			done(null, false, { message: "Your GitHub profile does not have any public email addresses. Please make an email address public before logging in with GitHub." });
 			return;
 		}
-		else if (!profile.displayName || !profile.displayName.trim()) {
-			done(null, false, { message: "Your profile does not have a publicly visible name. Please set a name on your account before logging in." });
-			return;
-		}
+
 		let user = await User.findOne({"email": email});
 		let isAdmin = false;
 		if (config.admins.includes(email)) {
@@ -133,16 +128,20 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			user = new User({
 				...OAuthStrategy.defaultUserProperties,
 				email,
-				name: profile.displayName,
+				name: profile.displayName ? profile.displayName.trim() : "",
 				verifiedEmail: true,
 				admin: isAdmin
 			});
-			user[serviceName]!.id = profile.id;
-			if (serviceName === "github" && profile.username && profile.profileUrl) {
-				user[serviceName]!.username = profile.username;
-				user[serviceName]!.profileUrl = profile.profileUrl;
+			if (!user.services) {
+				user.services = {};
 			}
+			user.services[serviceName] = {
+				id: profile.id,
+				username: profile.username,
+				profileUrl: profile.profileUrl
+			};
 			try {
+				user.markModified("services");
 				await user.save();
 				trackEvent("created account (auth)", request, email);
 			}
@@ -154,22 +153,24 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			done(null, user);
 		}
 		else {
-			if (!user[serviceName] || !user[serviceName]!.id) {
-				user[serviceName] = {
-					id: profile.id
+			if (!user.services) {
+				user.services = {};
+			}
+			if (!user.services[serviceName]) {
+				user.services[serviceName] = {
+					id: profile.id,
+					username: profile.username,
+					profileUrl: profile.profileUrl
 				};
 			}
 			if (!user.verifiedEmail) {
 				// We trust our OAuth provider to have verified the user's email for us
 				user.verifiedEmail = true;
 			}
-			if (serviceName === "github" && (!user.github || !user.github.username || !user.github.profileUrl) && (profile.username && profile.profileUrl)) {
-				user.github!.username = profile.username;
-				user.github!.profileUrl = profile.profileUrl;
-			}
 			if (!user.admin && isAdmin) {
 				user.admin = true;
 			}
+			user.markModified("services");
 			await user.save();
 			done(null, user);
 		}
@@ -305,8 +306,7 @@ export class Local implements RegistrationStrategy {
 				verifiedEmail: false,
 				local: {
 					"hash": hash.toString("hex"),
-					"salt": salt.toString("hex"),
-					"verificationCode": crypto.randomBytes(32).toString("hex")
+					"salt": salt.toString("hex")
 				}
 			});
 			try {
@@ -317,34 +317,11 @@ export class Local implements RegistrationStrategy {
 				done(err);
 				return;
 			}
-			// Send verification email (hostname validated by previous middleware)
-			let link = createLink(request, `/auth/verify/${user.local!.verificationCode}`);
-			let markdown =
-`Hi {{name}},
-
-Thanks for signing up for ${config.eventName}! To verify your email, please [click here](${link}).
-
-Sincerely,
-
-The ${config.eventName} Team.`;
-			try {
-				await sendMailAsync({
-					from: config.email.from,
-					to: email,
-					subject: `[${config.eventName}] - Verify your email`,
-					html: await renderEmailHTML(markdown, user),
-					text: await renderEmailText(markdown, user)
-				});
-			}
-			catch (err) {
-				done(err);
-				return;
-			}
 			done(null, user);
 		}
 		else {
 			// Log the user in
-			let hash = await pbkdf2Async(password, Buffer.from(user.local.salt, "hex"), PBKDF2_ROUNDS);
+			let hash = await pbkdf2Async(password, Buffer.from(user.local.salt || "", "hex"), PBKDF2_ROUNDS);
 			if (hash.toString("hex") === user.local.hash) {
 				if (user.verifiedEmail) {
 					done(null, user);
@@ -364,9 +341,7 @@ The ${config.eventName} Team.`;
 
 		authRoutes.post("/signup", validateAndCacheHostName, postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), (request, response) => {
 			// User is logged in automatically by Passport but we want them to verify their email first
-			request.logout();
-			request.flash("success", "Account created successfully. Please verify your email before logging in.");
-			response.redirect("/login");
+			response.redirect("/login/confirm");
 		});
 
 		authRoutes.post("/login", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true, successRedirect: "/" }));
@@ -547,7 +522,7 @@ function getExternalPort(request: Request): number {
 }
 
 let validatedHostNames: string[] = [];
-function validateAndCacheHostName(request: Request, response: Response, next: NextFunction) {
+export function validateAndCacheHostName(request: Request, response: Response, next: NextFunction) {
 	// Basically checks to see if the server behind the hostname has the same session key by HMACing a random nonce
 	if (validatedHostNames.find(hostname => hostname === request.hostname)) {
 		next();
@@ -596,4 +571,30 @@ function createLink(request: Request, link: string): string {
 	else {
 		return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
 	}
+}
+
+export async function sendVerificationEmail(request: Request, user: IUserMongoose) {
+	// Send verification email (hostname validated by previous middleware)
+	if (!user.local) {
+		user.local = {};
+	}
+	user.local.verificationCode = crypto.randomBytes(32).toString("hex");
+	await user.save();
+
+	let link = createLink(request, `/auth/verify/${user.local.verificationCode}`);
+	let markdown =
+`Hi {{name}},
+
+Thanks for signing up for ${config.eventName}! To verify your email, please [click here](${link}).
+
+Sincerely,
+
+The ${config.eventName} Team.`;
+	await sendMailAsync({
+		from: config.email.from,
+		to: user.email,
+		subject: `[${config.eventName}] - Verify your email`,
+		html: await renderEmailHTML(markdown, user),
+		text: await renderEmailText(markdown, user)
+	});
 }

@@ -76,3 +76,11 @@ main > .active {
 		padding-left: 10px;
 	}
 }
+
+.unit {
+	display: flex;
+	align-items: center;
+}
+.unit > *:first-child {
+	width: 125px;
+}

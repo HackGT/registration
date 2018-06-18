@@ -1,4 +1,5 @@
 import * as crypto from "crypto";
+import * as path from "path";
 import * as express from "express";
 import * as session from "express-session";
 import * as connectMongo from "connect-mongo";
@@ -9,10 +10,11 @@ import {
 	config, mongoose, COOKIE_OPTIONS, getSetting
 } from "../common";
 import {
-	IUser, User
+	IUser, User, IUserMongoose
 } from "../schema";
+import { postParser } from "../middleware";
 import {
-	RegistrationStrategy, strategies
+	RegistrationStrategy, strategies, validateAndCacheHostName, sendVerificationEmail
 } from "./strategies";
 
 // Passport authentication
@@ -67,7 +69,54 @@ export async function reloadAuthentication() {
 		method.use(router);
 	}
 
-	// Need to be redefined on every instance of a new router
+	// These routes need to be redefined on every instance of a new router
+	router.post("/confirm", validateAndCacheHostName, postParser, async (request, response) => {
+		let user = request.user as IUserMongoose;
+		let name = request.body.name as string;
+		if (!name || !name.trim()) {
+			request.flash("error", "Invalid name");
+			response.redirect("/login/confirm");
+			return;
+		}
+		user.name = name.trim();
+
+		let email = request.body.email as string | undefined;
+		if (email && email !== user.email) {
+			if (!email.trim()) {
+				request.flash("error", "Invalid email");
+				response.redirect("/login/confirm");
+				return;
+			}
+			user.admin = false;
+			user.verifiedEmail = false;
+			user.email = email;
+			if (config.admins.includes(email)) {
+				user.admin = true;
+				console.info(`Adding new admin: ${email}`);
+			}
+		}
+		user.accountConfirmed = true;
+
+		try {
+			await user.save();
+			if (email) {
+				await sendVerificationEmail(request, user);
+			}
+			if (!user.verifiedEmail) {
+				request.logout();
+				request.flash("success", "Account created successfully. Please verify your email before logging in.");
+				response.redirect("/login");
+				return;
+			}
+			response.redirect("/");
+		}
+		catch (err) {
+			console.error(err);
+			request.flash("error", "An error occurred while creating your account");
+			response.redirect("/login/confirm");
+		}
+	});
+
 	router.get("/validatehost/:nonce", (request, response) => {
 		let nonce: string = request.params.nonce || "";
 		response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
@@ -84,3 +133,18 @@ reloadAuthentication().catch(err => {
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((request, response, next) => {
+	// Only block requests for GET requests to non-auth pages
+	if (path.extname(request.url) !== "" || request.method !== "GET" || request.originalUrl.match(/^\/auth/)) {
+		next();
+		return;
+	}
+	let user = request.user as IUser;
+	if (user && !user.accountConfirmed && request.originalUrl !== "/login/confirm") {
+		response.redirect("/login/confirm");
+	}
+	else {
+		next();
+	}
+});
