@@ -19,7 +19,8 @@ import {
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
-	IFormItem
+	IFormItem,
+	IConfig
 } from "../schema";
 import * as Branches from "../branch";
 import { strategies, prettyNames } from "../routes/strategies";
@@ -130,7 +131,12 @@ Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 Handlebars.registerHelper("removeSpaces", (input: string): string => {
 	return input.replace(/ /g, "-");
 });
-Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
+Handlebars.registerHelper("join", <T>(arr: T[]): string  => {
+	return arr.join(", ");
+});
+for (let name of ["sidebar", "login-methods"]) {
+	Handlebars.registerPartial(name, fs.readFileSync(path.resolve(STATIC_ROOT, "partials", `${name}.html`), "utf8"));
+}
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
@@ -280,7 +286,7 @@ templateRoutes.route("/login").get(async (request, response) => {
 	};
 	response.send(loginTemplate(templateData));
 });
-templateRoutes.route("/login/confirm").get((request, response) => {
+templateRoutes.route("/login/confirm").get(async (request, response) => {
 	let user = request.user as IUser;
 	if (!user) {
 		response.redirect("/login");
@@ -290,13 +296,15 @@ templateRoutes.route("/login/confirm").get((request, response) => {
 		response.redirect("/");
 	}
 
-	let loginMethods: string[] = [];
+	let usedLoginMethods: string[] = [];
 	if (user.local && user.local!.hash) {
-		loginMethods.push("Local");
+		usedLoginMethods.push("Local");
 	}
-	for (let service of Object.keys(user.services || {}) as (keyof typeof user.services)[]) {
-		loginMethods.push(prettyNames[service]);
+	let services = Object.keys(user.services || {}) as (keyof typeof user.services)[];
+	for (let service of services) {
+		usedLoginMethods.push(prettyNames[service]);
 	}
+	let loginMethods = (await getSetting<IConfig.Services[]>("loginMethods")).filter(method => method !== "local" && !services.includes(method));
 
 	response.send(postLoginTemplate({
 		siteTitle: config.eventName,
@@ -306,7 +314,9 @@ templateRoutes.route("/login/confirm").get((request, response) => {
 		name: user.name || "",
 		email: user.email || "",
 		verifiedEmail: user.verifiedEmail || false,
-		loginMethods: loginMethods.join(", ")
+		usedLoginMethods,
+		loginMethods,
+		canAddLogins: loginMethods.length !== 0
 	}));
 });
 templateRoutes.route("/login/forgot").get((request, response) => {

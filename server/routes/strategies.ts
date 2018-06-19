@@ -116,7 +116,8 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			return;
 		}
 
-		let user = await User.findOne({"email": email});
+		let user = await User.findOne({ email });
+		let loggedInUser = request.user as IUserMongoose | undefined;
 		let isAdmin = false;
 		if (config.admins.includes(email)) {
 			isAdmin = true;
@@ -124,7 +125,7 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 				console.info(`Adding new admin: ${email}`);
 			}
 		}
-		if (!user) {
+		if (!user && !loggedInUser) {
 			user = new User({
 				...OAuthStrategy.defaultUserProperties,
 				email,
@@ -153,6 +154,19 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			done(null, user);
 		}
 		else {
+			if (user && loggedInUser) {
+				// Remove extra account represented by loggedInUser and merge into user
+				User.remove({ "uuid": loggedInUser.uuid });
+			}
+			else if (!user && loggedInUser) {
+				// Attach service info to logged in user instead of non-existant user pulled via email address
+				user = loggedInUser;
+			}
+			if (!user) {
+				done(null, false, { "message": "Shouldn't happen: no user defined" });
+				return;
+			}
+
 			if (!user.services) {
 				user.services = {};
 			}
@@ -240,6 +254,7 @@ abstract class CASStrategy implements RegistrationStrategy {
 	}
 
 	private async passportCallback(request: Request, username: string, profile: Profile, done: PassportDone) {
+		let loggedInUser = request.user as IUserMongoose | undefined;
 		let user = await User.findOne({[`services.${this.name}.id`]: username});
 		let email = `${username}@${this.emailDomain}`;
 		let isAdmin = false;
@@ -250,7 +265,7 @@ abstract class CASStrategy implements RegistrationStrategy {
 				console.info(`Adding new admin: ${email}`);
 			}
 		}
-		if (!user) {
+		if (!user && !loggedInUser) {
 			user = new User({
 				...OAuthStrategy.defaultUserProperties,
 				email,
@@ -278,6 +293,19 @@ abstract class CASStrategy implements RegistrationStrategy {
 			done(null, user);
 		}
 		else {
+			if (user && loggedInUser) {
+				// Remove extra account represented by loggedInUser and merge into user
+				User.remove({ "uuid": loggedInUser.uuid });
+			}
+			else if (!user && loggedInUser) {
+				// Attach service info to logged in user instead of non-existant user pulled via email address
+				user = loggedInUser;
+			}
+			if (!user) {
+				done(null, false, { "message": "Shouldn't happen: no user defined" });
+				return;
+			}
+
 			if (!user.services) {
 				user.services = {};
 			}
