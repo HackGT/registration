@@ -1,0 +1,23 @@
+{{#ifIn "gatech" loginMethods}}
+    <a class="gatech btn" href="/auth/gatech">
+        Connect with Georgia Tech
+    </a>
+{{/ifIn}}
+{{#ifIn "github" loginMethods}}
+    <a class="github btn" href="/auth/github">
+        <i class="fa fa-github" aria-hidden="true"></i>
+        Connect with GitHub
+    </a>
+{{/ifIn}}
+{{#ifIn "google" loginMethods}}
+    <a class="google btn" href="/auth/google">
+        <i class="fa fa-google" aria-hidden="true"></i>
+        Connect with Google
+    </a>
+{{/ifIn}}
+{{#ifIn "facebook" loginMethods}}
+    <a class="facebook btn" href="/auth/facebook">
+        <i class="fa fa-facebook-official" aria-hidden="true"></i>
+        Connect with Facebook
+    </a>
+{{/ifIn}}

@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
 		<link rel="stylesheet" href="/css/login.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
+		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -17,22 +18,27 @@
 			<section id="success">{{success}}</section>
 			<div class="row">
 				<div class="col-12 text-center">
-                    <h3>New Account</h3>
-                    <p>Please confirm a few things for us.</p>
-                    <p>If you already have an account, please <a href="/auth/logout">log in with the same authentication method you used originally</a>.</p>
-                    <form method="POST" action="/auth/confirm">
-                        <div class="unit">
-                            <label for="name">Full name:</label>
-                            <input type="text" id="name" name="name" value="{{name}}" required />
-                        </div>
-                        <div class="unit">
-                            <label for="email">Email:</label>
-                            <input type="email" name="email" value="{{email}}" {{#if verifiedEmail}}disabled{{/if}} required />
-                        </div>
-                        <div class="unit">
-                            <label for="login-methods">Login method(s):</label>
-                            <input type="text" name="login-methods" value="{{loginMethods}}" disabled />
-                        </div>
+					<h3>New Account</h3>
+					{{#if canAddLogins}}
+						<p>Connect your account with another provider or an existing account:</p>
+						<section id="additional-logins">
+							{{> login-methods}}
+						</section>
+					{{/if}}
+					<p>Please confirm a few things for us:</p>
+					<form method="POST" action="/auth/confirm">
+						<div class="unit">
+							<label for="name">Full name:</label>
+							<input type="text" id="name" name="name" value="{{name}}" required />
+						</div>
+						<div class="unit">
+							<label for="email">Email:</label>
+							<input type="email" name="email" value="{{email}}" {{#if verifiedEmail}}disabled{{/if}} required />
+						</div>
+						<div class="unit">
+							<label for="login-methods">Login method(s):</label>
+							<input type="text" name="login-methods" value="{{join usedLoginMethods}}" disabled />
+						</div>
 						<input type="submit" value="Submit" />
 					</form>
 				</div>
