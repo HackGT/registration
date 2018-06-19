@@ -116,7 +116,10 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			return;
 		}
 
-		let user = await User.findOne({ email });
+		let user = await User.findOne({[`services.${this.name}.id`]: profile.id});
+		if (!user) {
+			user = await User.findOne({ email });
+		}
 		let loggedInUser = request.user as IUserMongoose | undefined;
 		let isAdmin = false;
 		if (config.admins.includes(email)) {
@@ -154,9 +157,21 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			done(null, user);
 		}
 		else {
-			if (user && loggedInUser) {
+			if (user && loggedInUser && user.uuid !== loggedInUser.uuid) {
 				// Remove extra account represented by loggedInUser and merge into user
-				User.remove({ "uuid": loggedInUser.uuid });
+				user.services = {
+					...loggedInUser.services,
+					// Don't overwrite any existing services
+					...user.services
+				};
+				if (loggedInUser.local && loggedInUser.local.hash && (!user.local || !user.local.hash)) {
+					user.local = {
+						...loggedInUser.local
+					};
+				}
+				await User.findOneAndRemove({ "uuid": loggedInUser.uuid });
+				// So that the user has an indication of the linking
+				user.accountConfirmed = false;
 			}
 			else if (!user && loggedInUser) {
 				// Attach service info to logged in user instead of non-existant user pulled via email address
@@ -176,8 +191,10 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 					username: profile.username,
 					profileUrl: profile.profileUrl
 				};
+				// So that the user has an indication of the linking
+				user.accountConfirmed = false;
 			}
-			if (!user.verifiedEmail) {
+			if (!user.verifiedEmail && user.email === email) {
 				// We trust our OAuth provider to have verified the user's email for us
 				user.verifiedEmail = true;
 			}
@@ -293,9 +310,21 @@ abstract class CASStrategy implements RegistrationStrategy {
 			done(null, user);
 		}
 		else {
-			if (user && loggedInUser) {
+			if (user && loggedInUser && user.uuid !== loggedInUser.uuid) {
 				// Remove extra account represented by loggedInUser and merge into user
-				User.remove({ "uuid": loggedInUser.uuid });
+				user.services = {
+					...loggedInUser.services,
+					// Don't overwrite any existing services
+					...user.services
+				};
+				if (loggedInUser.local && loggedInUser.local.hash && (!user.local || !user.local.hash)) {
+					user.local = {
+						...loggedInUser.local
+					};
+				}
+				await User.findOneAndRemove({ "uuid": loggedInUser.uuid });
+				// So that the user has an indication of the linking
+				user.accountConfirmed = false;
 			}
 			else if (!user && loggedInUser) {
 				// Attach service info to logged in user instead of non-existant user pulled via email address
@@ -470,7 +499,7 @@ export class Local implements RegistrationStrategy {
 				response.redirect("/login");
 				return;
 			}
-			if (!user.local) {
+			if (!user.local || !user.local.hash) {
 				request.flash("error", "The account with the email that you submitted has no password set. Please log in with an external service like GitHub, Google, or Facebook instead.");
 				response.redirect("/login");
 				return;
