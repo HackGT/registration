@@ -85,15 +85,13 @@ templateRoutes.use(async (request, response, next) => {
 
 // tslint:disable-next-line:no-any
 // tslint:disable:no-invalid-this
-Handlebars.registerHelper("ifCond", (v1: any, v2: any, options: any) => {
+Handlebars.registerHelper("ifCond", function(v1: any, v2: any, options: any) {
 	if (v1 === v2) {
-		// tslint:disable-next-line:no-invalid-this
 		return options.fn(this);
 	}
-	// tslint:disable-next-line:no-invalid-this
 	return options.inverse(this);
 });
-Handlebars.registerHelper("ifIn", <T>(elem: T, list: T[], options: any) => {
+Handlebars.registerHelper("ifIn", function<T>(elem: T, list: T[], options: any) {
 	if (list.includes(elem)) {
 		return options.fn(this);
 	}
