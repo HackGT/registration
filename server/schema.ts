@@ -102,6 +102,8 @@ export interface IUser {
 	services: {
 		[Service in Exclude<IConfig.Services, "local">]?: {
 			id: string;
+			// OAuth account email can be different than registration account email
+			email: string;
 			username?: string;
 			profileUrl?: string;
 		};

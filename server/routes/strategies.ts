@@ -141,6 +141,7 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			}
 			user.services[serviceName] = {
 				id: profile.id,
+				email,
 				username: profile.username,
 				profileUrl: profile.profileUrl
 			};
@@ -188,6 +189,7 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 			if (!user.services[serviceName]) {
 				user.services[serviceName] = {
 					id: profile.id,
+					email,
 					username: profile.username,
 					profileUrl: profile.profileUrl
 				};
@@ -295,6 +297,7 @@ abstract class CASStrategy implements RegistrationStrategy {
 			}
 			user.services[this.name] = {
 				id: username,
+				email,
 				username
 			};
 			try {
@@ -341,6 +344,7 @@ abstract class CASStrategy implements RegistrationStrategy {
 			if (!user.services[this.name]) {
 				user.services[this.name] = {
 					id: username,
+					email,
 					username
 				};
 			}
