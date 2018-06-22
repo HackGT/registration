@@ -295,7 +295,7 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 	if (user.local && user.local!.hash) {
 		loginMethods.push("Local");
 	}
-	for (let service of Object.keys(user.services) as (keyof typeof user.services)[]) {
+	for (let service of Object.keys(user.services || {}) as (keyof typeof user.services)[]) {
 		loginMethods.push(strategyNames[service]);
 	}
 
