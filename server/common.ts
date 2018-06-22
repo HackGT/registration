@@ -280,11 +280,10 @@ export function formatSize(size: number, binary: boolean = true): string {
 // Database connection
 //
 import * as mongoose from "mongoose";
-(mongoose as any).Promise = global.Promise;
-mongoose.connect(config.server.mongoURL, {
-	useMongoClient: true
-} as mongoose.ConnectionOptions);
-export {mongoose};
+mongoose.connect(config.server.mongoURL).catch(err => {
+	throw err;
+});
+export { mongoose };
 
 import { Setting } from "./schema";
 
