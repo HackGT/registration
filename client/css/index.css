@@ -74,6 +74,7 @@ ul.timeline > li.complete > div::before {
 	border: none;
 }
 ul.timeline > li > div {
+	height: 85px;
 	padding: 0 40px;
 	display: flex;
 	justify-content: center;
