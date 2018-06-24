@@ -121,6 +121,10 @@ ul.timeline > li > div > h4 {
 }
 @media screen and (max-width: 768px) {
 	ul.timeline {
-		display: none;
+		flex-direction: column;
+	}
+	ul.timeline > li {
+		width: 100%;
+		margin-bottom: -10px;
 	}
 }
