@@ -50,7 +50,8 @@ ul.timeline {
 ul.timeline > li {
 	position: relative;
 }
-ul.timeline > li > span {
+ul.timeline > li::before {
+	content: attr(data-pending);
 	margin-bottom: 20px;
 	padding: 0 40px;
 	font-weight: 100;
@@ -77,6 +78,9 @@ ul.timeline > li > div {
 	border-top: 2px solid #D6DCE0;
 	text-align: center;
 }
+ul.timeline > li.complete::before {
+	content: attr(data-complete);
+}
 ul.timeline > li.complete > div {
 	border-top: 2px solid #66DC71;
 }
@@ -86,6 +90,9 @@ ul.timeline > li.complete > div::before {
 	color: white;
 	border: none;
 }
+ul.timeline > li.warning::before {
+	content: attr(data-warning);
+}
 ul.timeline > li.warning > div {
 	border-top: 2px solid #FFDC00;
 }
@@ -94,6 +101,9 @@ ul.timeline > li.warning > div::before {
 	background-color: #FFDC00;
 	color: black;
 	border: none;
+}
+ul.timeline > li.rejected::before {
+	content: attr(data-rejected);
 } 
 ul.timeline > li.rejected > div {
 	border-top: 2px solid #FF4136;

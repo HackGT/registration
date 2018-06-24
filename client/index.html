@@ -23,26 +23,22 @@
 
 			<section class="main">
 				<ul class="timeline">
-					<li class="complete">
-						<span>Not completed</span>
+					<li class="{{timeline.application}}" data-pending="Not completed" data-complete="Done!" data-warning="Applications closed" data-rejected="Not completed">
 						<div class="status">
 							<h4>Application Submission</h4>
 						</div>
 					</li>
-					<li>
-						<span>Pending</span>
+					<li class="{{timeline.decision}}" data-pending="Pending" data-complete="Accepted!" data-rejected="Not accepted">
 						<div class="status">
 							<h4>Application Decision</h4>
 						</div>
 					</li>
-					<li>
-						<span>Not completed</span>
+					<li class="{{timeline.confirmation}}" data-pending="Not completed" data-complete="Done!" data-rejected="Not completed">
 						<div class="status">
 							<h4>Confirmation Submission</h4>
 						</div>
 					</li>
-					<li>
-						<span>Not completed</span>
+					<li class="{{timeline.teamFormation}}" data-pending="Not completed" data-complete="Done!">
 						<div class="status">
 							<h4>Team Formation <small>(optional)</small></h4>
 						</div>
