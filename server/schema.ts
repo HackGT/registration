@@ -276,7 +276,14 @@ export interface ICommonTemplate {
 		qrEnabled: boolean;
 	};
 }
+type TimelineClass = "" | "complete" | "warning" | "rejected";
 export interface IIndexTemplate extends ICommonTemplate {
+	timeline: {
+		application: TimelineClass;
+		decision: TimelineClass;
+		confirmation: TimelineClass;
+		teamFormation: TimelineClass;
+	};
 	status: string;
 	applicationOpen: string;
 	applicationClose: string;
