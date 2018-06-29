@@ -1,6 +1,6 @@
 {
   "name": "registration",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Powerful and extensible registration system for hackathons and other large events",
   "main": "server/app.js",
   "scripts": {
