@@ -6,20 +6,17 @@ import {Questions} from "./config/questions.schema";
 
 // Secrets JSON file schema
 export namespace IConfig {
+	export type OAuthServices = "github" | "google" | "facebook";
+	export type CASServices = "gatech";
+	export type Services = "local" | OAuthServices | CASServices;
 	export interface Secrets {
 		adminKey: string;
 		session: string;
-		github: {
-			id: string;
-			secret: string;
-		};
-		google: {
-			id: string;
-			secret: string;
-		};
-		facebook: {
-			id: string;
-			secret: string;
+		oauth: {
+			[Service in OAuthServices]: {
+				id: string;
+				secret: string;
+			}
 		};
 	}
 	export interface Email {
@@ -88,28 +85,28 @@ export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
 
 export interface IUser {
 	_id: mongoose.Types.ObjectId;
+	uuid: string;
 	email: string;
 	name: string;
 	verifiedEmail: boolean;
+	accountConfirmed: boolean;
 
-	localData?: {
+	local?: Partial<{
 		hash: string;
 		salt: string;
 		verificationCode: string;
 		resetRequested: boolean;
 		resetCode: string;
 		resetRequestedTime: Date;
-	};
-	githubData?: {
-		id: string;
-		username: string;
-		profileUrl: string;
-	};
-	googleData?: {
-		id: string;
-	};
-	facebookData?: {
-		id: string;
+	}>;
+	services: {
+		[Service in Exclude<IConfig.Services, "local">]?: {
+			id: string;
+			// OAuth account email can be different than registration account email
+			email: string;
+			username?: string;
+			profileUrl?: string;
+		};
 	};
 
 	applied: boolean;
@@ -133,7 +130,6 @@ export interface IUser {
 	confirmationSubmitTime?: Date;
 
 	admin?: boolean;
-	uuid: string;
 
 	teamId?: mongoose.Types.ObjectId;
 }
@@ -141,6 +137,12 @@ export type IUserMongoose = IUser & mongoose.Document;
 
 // This is basically a type definition that exists at runtime and is derived manually from the IUser definition above
 export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
+	uuid: {
+		type: String,
+		required: true,
+		index: true,
+		unique: true
+	},
 	email: {
 		type: String,
 		required: true,
@@ -152,8 +154,9 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		index: true
 	},
 	verifiedEmail: Boolean,
+	accountConfirmed: Boolean,
 
-	localData: {
+	local: {
 		hash: String,
 		salt: String,
 		verificationCode: String,
@@ -161,17 +164,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		resetCode: String,
 		resetRequestedTime: Date
 	},
-	githubData: {
-		id: String,
-		username: String,
-		profileUrl: String
-	},
-	googleData: {
-		id: String
-	},
-	facebookData: {
-		id: String
-	},
+	services: mongoose.Schema.Types.Mixed,
 
 	teamId: {
 		type: mongoose.Schema.Types.ObjectId
@@ -197,13 +190,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	confirmationStartTime: Date,
 	confirmationSubmitTime: Date,
 
-	admin: Boolean,
-	uuid: {
-		type: String,
-		required: true,
-		index: true,
-		unique: true
-	}
+	admin: Boolean
 }).index({
 	email: 'text',
 	name: 'text'
@@ -321,6 +308,7 @@ export interface ILoginTemplate {
 	siteTitle: string;
 	error?: string;
 	success?: string;
+	loginMethods?: string[];
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];
@@ -378,6 +366,11 @@ export interface IAdminTemplate extends ICommonTemplate {
 				close: string;
 			}[];
 		};
+		loginMethodsInfo: {
+			name: string;
+			raw: string;
+			enabled: boolean;
+		}[];
 		adminEmails: IUserMongoose[];
 	};
 	config: {

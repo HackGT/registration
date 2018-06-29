@@ -15,17 +15,19 @@ class Config implements IConfig.Main {
 	public secrets: IConfig.Secrets = {
 		adminKey: crypto.randomBytes(32).toString("hex"),
 		session: crypto.randomBytes(32).toString("hex"),
-		github: {
-			id: "",
-			secret: ""
-		},
-		google: {
-			id: "",
-			secret: ""
-		},
-		facebook: {
-			id: "",
-			secret: ""
+		oauth: {
+			github: {
+				id: "",
+				secret: ""
+			},
+			google: {
+				id: "",
+				secret: ""
+			},
+			facebook: {
+				id: "",
+				secret: ""
+			}
 		}
 	};
 	public email: IConfig.Email = {
@@ -137,22 +139,22 @@ class Config implements IConfig.Main {
 			this.sessionSecretSet = true;
 		}
 		if (process.env.GITHUB_CLIENT_ID) {
-			this.secrets.github.id = process.env.GITHUB_CLIENT_ID!;
+			this.secrets.oauth.github.id = process.env.GITHUB_CLIENT_ID!;
 		}
 		if (process.env.GITHUB_CLIENT_SECRET) {
-			this.secrets.github.secret = process.env.GITHUB_CLIENT_SECRET!;
+			this.secrets.oauth.github.secret = process.env.GITHUB_CLIENT_SECRET!;
 		}
 		if (process.env.GOOGLE_CLIENT_ID) {
-			this.secrets.google.id = process.env.GOOGLE_CLIENT_ID!;
+			this.secrets.oauth.google.id = process.env.GOOGLE_CLIENT_ID!;
 		}
 		if (process.env.GOOGLE_CLIENT_SECRET) {
-			this.secrets.google.secret = process.env.GOOGLE_CLIENT_SECRET!;
+			this.secrets.oauth.google.secret = process.env.GOOGLE_CLIENT_SECRET!;
 		}
 		if (process.env.FACEBOOK_CLIENT_ID) {
-			this.secrets.facebook.id = process.env.FACEBOOK_CLIENT_ID!;
+			this.secrets.oauth.facebook.id = process.env.FACEBOOK_CLIENT_ID!;
 		}
 		if (process.env.FACEBOOK_CLIENT_SECRET) {
-			this.secrets.facebook.secret = process.env.FACEBOOK_CLIENT_SECRET!;
+			this.secrets.oauth.facebook.secret = process.env.FACEBOOK_CLIENT_SECRET!;
 		}
 		// Email
 		if (process.env.EMAIL_FROM) {
@@ -278,22 +280,22 @@ export function formatSize(size: number, binary: boolean = true): string {
 // Database connection
 //
 import * as mongoose from "mongoose";
-(mongoose as any).Promise = global.Promise;
-mongoose.connect(config.server.mongoURL, {
-	useMongoClient: true
-} as mongoose.ConnectionOptions);
-export {mongoose};
+mongoose.connect(config.server.mongoURL).catch(err => {
+	throw err;
+});
+export { mongoose };
 
 import { Setting } from "./schema";
 
-export async function setDefaultSettings() {
+async function setDefaultSettings() {
 	async function doesNotExist(key: string): Promise<boolean> {
 		return await Setting.find({ "name": key }).count() === 0;
 	}
 
 	const DEFAULTS: any = {
 		"teamsEnabled": true,
-		"qrEnabled": true
+		"qrEnabled": true,
+		"loginMethods": ["local", "github", "google", "facebook"]
 	};
 
 	for (let setting in DEFAULTS) {

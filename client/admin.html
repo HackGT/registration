@@ -346,6 +346,22 @@
 							</ul>
 						</div>
 					</div>
+					<div class="row">
+						<div class="col-12">
+							<h4>Change login methods</h4>
+						</div>
+					</div>
+					<div class="row row-flex">
+						{{#each settings.loginMethodsInfo}}
+							<div class="col-4 auth-method" data-raw-name="{{this.raw}}">
+								<h5>{{this.name}}</h5>
+								<select>
+									<option value="enabled" {{#if this.enabled}}selected{{/if}}>Enabled</option>
+									<option value="disabled" {{#unless this.enabled}}selected{{/unless}}>Disabled</option>
+								</select>
+							</div>
+						{{/each}}
+					</div>
 					<h4><code>config.json</code> options</h4>
 					<div class="row">
 						<div class="col-4">
