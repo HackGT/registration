@@ -144,7 +144,8 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 
 	if (user.applicationBranch) {
 		applyBranches = [(await Branches.BranchConfig.loadBranchFromDB(user.applicationBranch))] as Branches.ApplicationBranch[];
-	} else {
+	}
+	else {
 		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
 	}
 
@@ -211,22 +212,28 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	// Block of logic to dermine status:
 	if (!user.applied) {
 		status = "Incomplete";
-	} else if (user.applied && !user.confirmationBranch) {
+	}
+	else if (user.applied && !user.confirmationBranch) {
 		status = "Pending Decision";
-	} else if (user.applied && user.confirmationBranch) {
+	}
+	else if (user.applied && user.confirmationBranch) {
 		// After confirmation - they either confirmed in time, did not, or branch did not require confirmation
 		if (user.confirmed) {
 			if (user.accepted) {
 				status = "Attending - " + user.confirmationBranch;
-			} else {
+			}
+			else {
 				// For confirmation branches that do not accept such as Rejected/Waitlist
 				status = user.confirmationBranch;
 			}
-		} else if (moment().isAfter(confirmTimesArr[0].close)) {
+		}
+		else if (moment().isAfter(confirmTimesArr[0].close)) {
 			status = "Confirmation Incomplete - " + user.confirmationBranch;
-		} else if (moment().isBefore(confirmTimesArr[0].open)) {
+		}
+		else if (moment().isBefore(confirmTimesArr[0].open)) {
 			status = "Confirmation Opens Soon - " + user.confirmationBranch;
-		} else {
+		}
+		else {
 			status = "Please Confirm - " + user.confirmationBranch;
 		}
 	}
@@ -238,9 +245,15 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
+		user,
+		timeline: {
+			application: "",
+			decision: "",
+			confirmation: "",
+			teamFormation: ""
+		},
 		status,
 		autoConfirm,
-		user,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 			qrEnabled: await getSetting<boolean>("qrEnabled")
@@ -272,6 +285,35 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			};
 		})
 	};
+
+	// Timeline configuration
+	if (user.applied) {
+		templateData.timeline.application = "complete";
+	}
+	else if (templateData.applicationStatus.beforeOpen) {
+		templateData.timeline.application = "warning";
+	}
+	else if (templateData.applicationStatus.afterClose) {
+		templateData.timeline.application = "rejected";
+	}
+	if (user.applied && user.confirmationBranch) {
+		templateData.timeline.decision = user.accepted ? "complete" : "rejected";
+	}
+	if (user.confirmationBranch) {
+		if (user.confirmed) {
+			templateData.timeline.confirmation = "complete";
+		}
+		else if (templateData.confirmationStatus.beforeOpen) {
+			templateData.timeline.confirmation = "warning";
+		}
+		else if (templateData.confirmationStatus.afterClose) {
+			templateData.timeline.confirmation = "rejected";
+		}
+	}
+	if (user.teamId) {
+		templateData.timeline.teamFormation = "complete";
+	}
+
 	response.send(indexTemplate(templateData));
 });
 
