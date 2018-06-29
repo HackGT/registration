@@ -1,17 +1,13 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, setDefaultSettings, renderEmailHTML, renderEmailText, defaultEmailSubjects
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, defaultEmailSubjects
 } from "../../common";
 import {
 	isAdmin, uploadHandler
 } from "../../middleware";
 import * as Branches from "../../branch";
-import {User} from "../../schema";
-
-setDefaultSettings().catch(err => {
-	throw err;
-});
+import { IUser, User } from "../../schema";
 
 export let settingsRoutes = express.Router();
 
@@ -110,6 +106,43 @@ settingsRoutes.route("/admin_emails")
 		return response.json({
 			"success": true
 		});
+	});
+
+settingsRoutes.route("/login_methods")
+	.get(async (request, response) => {
+		let methods = await getSetting<string[]>("loginMethods");
+		response.json({
+			methods
+		});
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let { enabledMethods } = request.body;
+		if (!enabledMethods) {
+			response.status(400).json({
+				"error": "Missing value for enabled methods"
+			});
+			return;
+		}
+		try {
+			let methods = JSON.parse(enabledMethods);
+			if (!Array.isArray(methods)) {
+				response.status(400).json({
+					"error": "Invalid value for enabled methods"
+				});
+				return;
+			}
+			await updateSetting<string[]>("loginMethods", methods);
+			await (await import("../auth")).reloadAuthentication();
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while changing available login methods"
+			});
+		}
 	});
 
 settingsRoutes.route("/branch_roles")
@@ -234,8 +267,8 @@ settingsRoutes.route("/email_content/:type/rendered")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		try {
 			let markdown: string = request.body.content;
-			let html: string = await renderEmailHTML(markdown, request.user);
-			let text: string = await renderEmailText(html, request.user, true);
+			let html: string = await renderEmailHTML(markdown, request.user as IUser);
+			let text: string = await renderEmailText(html, request.user as IUser, true);
 
 			response.json({ html, text });
 		}

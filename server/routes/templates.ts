@@ -19,9 +19,11 @@ import {
 	ITeamMongoose, Team,
 	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
-	IFormItem
+	IFormItem,
+	IConfig
 } from "../schema";
 import * as Branches from "../branch";
+import { strategies, prettyNames } from "../routes/strategies";
 
 export let templateRoutes = express.Router();
 
@@ -29,6 +31,7 @@ export let templateRoutes = express.Router();
 let [
 	indexTemplate,
 	loginTemplate,
+	postLoginTemplate,
 	forgotPasswordTemplate,
 	resetPasswordTemplate,
 	preregisterTemplate,
@@ -41,6 +44,7 @@ let [
 ] = [
 	"index.html",
 	"login.html",
+	"postlogin.html",
 	"forgotpassword.html",
 	"resetpassword.html",
 	"preapplication.html",
@@ -80,14 +84,20 @@ templateRoutes.use(async (request, response, next) => {
 });
 
 // tslint:disable-next-line:no-any
+// tslint:disable:no-invalid-this
 Handlebars.registerHelper("ifCond", function(v1: any, v2: any, options: any) {
 	if (v1 === v2) {
-		// tslint:disable-next-line:no-invalid-this
 		return options.fn(this);
 	}
-	// tslint:disable-next-line:no-invalid-this
 	return options.inverse(this);
 });
+Handlebars.registerHelper("ifIn", function<T>(elem: T, list: T[], options: any) {
+	if (list.includes(elem)) {
+		return options.fn(this);
+	}
+	return options.inverse(this);
+});
+// tslint:enable:no-invalid-this
 Handlebars.registerHelper("required", (isRequired: boolean) => {
 	// Adds the "required" form attribute if the element requests to be required
 	return isRequired ? "required" : "";
@@ -119,7 +129,12 @@ Handlebars.registerHelper("toJSONString", (stat: StatisticEntry): string => {
 Handlebars.registerHelper("removeSpaces", (input: string): string => {
 	return input.replace(/ /g, "-");
 });
-Handlebars.registerPartial("sidebar", fs.readFileSync(path.resolve(STATIC_ROOT, "partials", "sidebar.html"), "utf8"));
+Handlebars.registerHelper("join", <T>(arr: T[]): string  => {
+	return arr.join(", ");
+});
+for (let name of ["sidebar", "login-methods"]) {
+	Handlebars.registerPartial(name, fs.readFileSync(path.resolve(STATIC_ROOT, "partials", `${name}.html`), "utf8"));
+}
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
@@ -302,13 +317,47 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	response.send(indexTemplate(templateData));
 });
 
-templateRoutes.route("/login").get((request, response) => {
+templateRoutes.route("/login").get(async (request, response) => {
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
 		error: request.flash("error"),
-		success: request.flash("success")
+		success: request.flash("success"),
+		loginMethods: await getSetting<string[]>("loginMethods")
 	};
 	response.send(loginTemplate(templateData));
+});
+templateRoutes.route("/login/confirm").get(async (request, response) => {
+	let user = request.user as IUser;
+	if (!user) {
+		response.redirect("/login");
+		return;
+	}
+	if (user.accountConfirmed) {
+		response.redirect("/");
+	}
+
+	let usedLoginMethods: string[] = [];
+	if (user.local && user.local!.hash) {
+		usedLoginMethods.push("Local");
+	}
+	let services = Object.keys(user.services || {}) as (keyof typeof user.services)[];
+	for (let service of services) {
+		usedLoginMethods.push(prettyNames[service]);
+	}
+	let loginMethods = (await getSetting<IConfig.Services[]>("loginMethods")).filter(method => method !== "local" && !services.includes(method));
+
+	response.send(postLoginTemplate({
+		siteTitle: config.eventName,
+		error: request.flash("error"),
+		success: request.flash("success"),
+
+		name: user.name || "",
+		email: user.email || "",
+		verifiedEmail: user.verifiedEmail || false,
+		usedLoginMethods,
+		loginMethods,
+		canAddLogins: loginMethods.length !== 0
+	}));
 });
 templateRoutes.route("/login/forgot").get((request, response) => {
 	let templateData: ILoginTemplate = {
@@ -318,17 +367,17 @@ templateRoutes.route("/login/forgot").get((request, response) => {
 	};
 	response.send(forgotPasswordTemplate(templateData));
 });
-templateRoutes.get("/auth/forgot/:code", async (request, response) => {
-	let user = await User.findOne({ "localData.resetCode": request.params.code });
+templateRoutes.route("/auth/forgot/:code").get(async (request, response) => {
+	let user = await User.findOne({ "local.resetCode": request.params.code });
 	if (!user) {
 		request.flash("error", "Invalid password reset code");
 		response.redirect("/login");
 		return;
 	}
-	else if (!user.localData!.resetRequested || Date.now() - user.localData!.resetRequestedTime.valueOf() > 1000 * 60 * 60) {
+	else if (!user.local!.resetRequested || Date.now() - user.local!.resetRequestedTime!.valueOf() > 1000 * 60 * 60) {
 		request.flash("error", "Your password reset link has expired. Please request a new one.");
-		user.localData!.resetCode = "";
-		user.localData!.resetRequested = false;
+		user.local!.resetCode = "";
+		user.local!.resetRequested = false;
 		await user.save();
 		response.redirect("/login");
 		return;
@@ -347,7 +396,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 	let teamLeaderAsUser: IUserMongoose | null = null;
 	let isCurrentUserTeamLeader = false;
 
-	if (request.user.teamId) {
+	if (request.user && request.user.teamId) {
 		team = await Team.findById(request.user.teamId) as ITeamMongoose;
 		membersAsUsers = await User.find({
 			_id: {
@@ -360,7 +409,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 
 	let templateData: ITeamTemplate = {
 		siteTitle: config.eventName,
-		user: request.user,
+		user: request.user as IUser,
 		team,
 		membersAsUsers,
 		teamLeaderAsUser,
@@ -546,7 +595,7 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		let templateData: IRegisterTemplate = {
 			siteTitle: config.eventName,
 			unauthenticated: anonymous,
-			user: request.user,
+			user: request.user as IUser,
 			settings: {
 				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 				qrEnabled: await getSetting<boolean>("qrEnabled")
@@ -573,7 +622,17 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
 
-	let adminEmails = await User.find({admin: true}).select('email');
+	type StrategyNames = keyof typeof strategies;
+	let enabledMethods = await getSetting<StrategyNames[]>("loginMethods");
+	let loginMethodsInfo = Object.keys(strategies).map((name: StrategyNames) => {
+		return {
+			name: prettyNames[name],
+			raw: name,
+			enabled: enabledMethods.includes(name)
+		};
+	});
+
+	let adminEmails = await User.find({ admin: true }).select("email");
 
 	let noopBranches = (await Branches.BranchConfig.loadAllBranches("Noop")) as Branches.NoopBranch[];
 	let applicationBranches = (await Branches.BranchConfig.loadAllBranches("Application")) as Branches.ApplicationBranch[];
@@ -614,7 +673,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			teamsEnabled,
 			teamsEnabledChecked: teamsEnabled ? "checked" : "",
 			qrEnabled,
-			adminEmails,
 			qrEnabledChecked: qrEnabled ? "checked" : "",
 			branches: {
 				noop: noopBranches.map(branch => {
@@ -639,7 +697,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						isAcceptance: branch.isAcceptance
 					};
 				})
-			}
+			},
+			loginMethodsInfo,
+			adminEmails
 		},
 		config: {
 			admins: config.admins.join(", "),

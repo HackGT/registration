@@ -9,67 +9,50 @@
 		<link rel="stylesheet" href="/css/login.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
 		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
-		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-				const submitButtons = document.querySelectorAll('input[type="submit"]');
-				const forms = document.getElementsByTagName("form");
-				
-				for (let i = 0; i < forms.length; i++) {
-					forms[i].addEventListener("submit", () => {
-						for (let j = 0; j < submitButtons.length; j++) {
-							submitButtons[j].disabled = true;
-						}
-					});
-				}
-			});
-		</script>
+		<script src="/js/login.js"></script>
 	</head>
 	<body>
 		<div class="container">
 			<h1 class="center">{{siteTitle}}</h1>
 
-			<div id="logins" class="row text-center">
-				<div class="col-4">
-					<a class="github btn" href="/auth/github">
-						<i class="fa fa-github" aria-hidden="true"></i>
-						Log in with GitHub
-					</a>
-				</div>
-				<div class="col-4">
-					<a class="google btn" href="/auth/google">
-						<i class="fa fa-google" aria-hidden="true"></i>
-						Log in with Google
-					</a>
-				</div>
-				<div class="col-4">
-					<a class="facebook btn" href="/auth/facebook">
-						<i class="fa fa-facebook-official" aria-hidden="true"></i>
-						Log in with Facebook
-					</a>
-				</div>
-			</div>
 			<section id="error">{{error}}</section>
 			<section id="success">{{success}}</section>
-			<div class="row">
-				<div class="col-6 text-center">
-					<h3>Sign Up</h3>
-					<form action="/auth/signup" method="POST">
-						<input type="text" name="name" placeholder="Name" required />
-						<input type="email" name="email" placeholder="Email" required />
-						<input type="password" name="password" placeholder="Password" required />
-						<input type="submit" value="Sign up" />
-					</form>
+			<main>
+				{{#ifIn "local" loginMethods}}
+					<div class="active border text-center" id="login">
+						<h3>Log In</h3>
+						<a href="/login/forgot">Forgot your password?</a>
+						<form action="/auth/login" method="POST">
+							<input type="email" name="email" placeholder="Email" required />
+							<input type="password" name="password" placeholder="Password" required />
+							<input type="submit" value="Log in" />
+						</form>
+						<p>
+							Don't have an account?
+							<br />
+							Connect with an external service or <a href="#" id="signup-link">sign up</a>.
+						</p>
+					</div>
+					<div class="border text-center" id="signup">
+						<h3>Sign Up</h3>
+						<form action="/auth/signup" method="POST">
+							<input type="text" name="name" placeholder="Name" required />
+							<input type="email" name="email" placeholder="Email" required />
+							<input type="password" name="password" placeholder="Password" required />
+							<input type="submit" value="Sign up" />
+						</form>
+						<p>
+							Already have a local account? <a href="#" id="login-link">Log in</a>.
+						</p>
+					</div>
+				{{/ifIn}}
+				<div class="active simple-methods text-center">
+					{{#ifIn "local" loginMethods}}{{else}}
+						<h3>Log In</h3>
+					{{/ifIn}}
+					{{> login-methods}}
 				</div>
-				<div class="col-6 text-center">
-					<h3>Log In</h3>
-					<a href="/login/forgot">Forgot your password?</a>
-					<form action="/auth/login" method="POST">
-						<input type="email" name="email" placeholder="Email" required />
-						<input type="password" name="password" placeholder="Password" required />
-						<input type="submit" value="Log in" />
-					</form>
-				</div>
-			</div>
+			</main>
 		</div>
 	</body>
 </html>

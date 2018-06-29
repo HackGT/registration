@@ -41,16 +41,16 @@ morgan.token("sessionid", (request, response) => {
 morgan.format("hackgt", (tokens, request, response) => {
 	let statusColorizer: (input: string) => string = input => input; // Default passthrough function
 	if (response.statusCode >= 500) {
-		statusColorizer = chalk.red;
+		statusColorizer = chalk.default.red;
 	}
 	else if (response.statusCode >= 400) {
-		statusColorizer = chalk.yellow;
+		statusColorizer = chalk.default.yellow;
 	}
 	else if (response.statusCode >= 300) {
-		statusColorizer = chalk.cyan;
+		statusColorizer = chalk.default.cyan;
 	}
 	else if (response.statusCode >= 200) {
-		statusColorizer = chalk.green;
+		statusColorizer = chalk.default.green;
 	}
 
 	return [
