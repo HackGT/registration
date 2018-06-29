@@ -471,6 +471,9 @@ export class Local implements RegistrationStrategy {
 			}
 			else {
 				user.verifiedEmail = true;
+				if (user.local) {
+					user.local.verificationCode = undefined;
+				}
 				// Possibly promote to admin status
 				if (config.admins.indexOf(user.email) !== -1) {
 					user.admin = true;

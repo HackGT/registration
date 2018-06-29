@@ -104,7 +104,7 @@ export async function reloadAuthentication() {
 
 		try {
 			await user.save();
-			if (email) {
+			if (!user.verifiedEmail && (!user.local || !user.local.verificationCode)) {
 				await sendVerificationEmail(request, user);
 			}
 			if (!user.verifiedEmail) {
