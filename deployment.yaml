@@ -25,12 +25,7 @@ env:
   EMAIL_FROM: "HackGT Team <hello@hackgt.com>"
   PRODUCTION: true
   ADMIN_EMAILS:
-    - petschekr@gmail.com
-    - a@andrewdai.co
-    - faizan.virani.44@gmail.com
-    - lesurasani@gmail.com
-    - arshiya.singh16@gmail.com
-    - ajoshi97@gatech.edu
-    - ehsanmasdar@gmail.com
-    - mjkaufer@gmail.com
+    - ehsan@hack.gt
+    - ryan@hack.gt
+    - julian@hack.gt
 
