@@ -33,6 +33,7 @@ export namespace IConfig {
 		cookieSecureOnly: boolean;
 		mongoURL: string;
 		passwordResetExpiration: number;
+		defaultTimezone: string;
 	}
 	export interface Style {
 		theme: string;
