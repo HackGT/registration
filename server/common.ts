@@ -43,7 +43,8 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/",
-		passwordResetExpiration: 1000 * 60 * 60 // 1 hour
+		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
+		defaultTimezone: "America/New_York"
 	};
 	public admins: string[] = [];
 	public eventName: string = "Untitled Event";
@@ -199,6 +200,9 @@ class Config implements IConfig.Main {
 		}
 		if (process.env.MONGO_URL) {
 			this.server.mongoURL = process.env.MONGO_URL!;
+		}
+		if (process.env.DEFAULT_TIMEZONE) {
+			this.server.defaultTimezone = process.env.DEFAULT_TIMEZONE;
 		}
 		if (process.env.PASSWORD_RESET_EXPIRATION) {
 			let expirationTime = parseInt(process.env.PASSWORD_RESET_EXPIRATION!, 10);
