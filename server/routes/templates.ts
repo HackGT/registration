@@ -192,7 +192,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	function formatMoment(date: moment.Moment | null): string {
 		const FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
 		if (date) {
-			return date.tz(moment.tz.guess()).format(FORMAT);
+			return date.tz(config.server.defaultTimezone).format(FORMAT);
 		}
 		return "(No branches configured)";
 	}
