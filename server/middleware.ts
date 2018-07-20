@@ -280,15 +280,14 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 	let tags = {
 		action,
 		url: request.path,
-		ip: request.ip,
-		user,
 		...data
 	};
 	let metricsEvent: HackGTMetrics = {
 		hackgtmetricsversion: 1,
 		serviceName: `registration-${config.eventName.replace(/[^a-zA-Z0-9]/g, "")}-${action}`,
 		values: {
-			value: 1
+			user,
+			ip: request.ip
 		},
 		tags
 	};
