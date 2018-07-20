@@ -12,7 +12,7 @@ import {
 import {
 	IUser, User, IUserMongoose
 } from "../schema";
-import { postParser, authenticateWithReject } from "../middleware";
+import { postParser } from "../middleware";
 import {
 	RegistrationStrategy, strategies, validateAndCacheHostName, sendVerificationEmail
 } from "./strategies";
@@ -70,12 +70,17 @@ export async function reloadAuthentication() {
 	}
 
 	// These routes need to be redefined on every instance of a new router
-	router.post("/confirm", authenticateWithReject, validateAndCacheHostName, postParser, async (request, response) => {
+	router.post("/confirm", validateAndCacheHostName, postParser, async (request, response) => {
 		let user = request.user as IUserMongoose;
 		let name = request.body.name as string;
 		if (!name || !name.trim()) {
 			request.flash("error", "Invalid name");
 			response.redirect("/login/confirm");
+			return;
+		}
+		if (!request.isAuthenticated() || !user) {
+			request.flash("error", "Must be logged in");
+			response.redirect("/login");
 			return;
 		}
 		user.name = name.trim();
