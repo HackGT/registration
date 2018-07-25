@@ -284,7 +284,8 @@ export function formatSize(size: number, binary: boolean = true): string {
 // Database connection
 //
 import * as mongoose from "mongoose";
-mongoose.connect(config.server.mongoURL).catch(err => {
+(mongoose as any).Promise = global.Promise;
+mongoose.connect(config.server.mongoURL, { useMongoClient: true }).catch(err => {
 	throw err;
 });
 export { mongoose };
