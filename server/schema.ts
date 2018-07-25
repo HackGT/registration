@@ -193,8 +193,8 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 
 	admin: Boolean
 }).index({
-	email: 'text',
-	name: 'text'
+	email: "text",
+	name: "text"
 }));
 
 export interface ISetting {
@@ -373,6 +373,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 			enabled: boolean;
 		}[];
 		adminEmails: IUserMongoose[];
+		apiKey: string;
 	};
 	config: {
 		admins: string;
