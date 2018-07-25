@@ -78,6 +78,11 @@ export async function reloadAuthentication() {
 			response.redirect("/login/confirm");
 			return;
 		}
+		if (!request.isAuthenticated() || !user) {
+			request.flash("error", "Must be logged in");
+			response.redirect("/login");
+			return;
+		}
 		user.name = name.trim();
 
 		let email = request.body.email as string | undefined;
