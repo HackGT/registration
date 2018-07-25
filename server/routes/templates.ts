@@ -699,7 +699,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 				})
 			},
 			loginMethodsInfo,
-			adminEmails
+			adminEmails,
+			apiKey: config.secrets.adminKey
 		},
 		config: {
 			admins: config.admins.join(", "),
