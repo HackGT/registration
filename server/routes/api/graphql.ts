@@ -111,6 +111,9 @@ async function searchUser(prev: any, args: {
 			email: {
 				$regex: queryRegExp
 			}
+		},
+		{
+			uuid: args.search
 		}
 	];
 	const total = await User.find(userFilterToMongo(args.filter))
