@@ -115,6 +115,7 @@ export interface IUser {
 	preConfirmEmailSent: boolean;
 	confirmed: boolean;
 	applicationBranch: string;
+	reimbursementAmount?: string;
 	applicationData: IFormItem[];
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
@@ -176,6 +177,7 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	preConfirmEmailSent: Boolean,
 	confirmed: Boolean,
 	applicationBranch: String,
+	reimbursementAmount: String,
 	applicationData: [mongoose.Schema.Types.Mixed],
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
