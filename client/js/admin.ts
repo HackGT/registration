@@ -571,7 +571,7 @@ markdownEditor.codemirror.on("change", async () => {
 		content.append("content", markdownEditor.value());
 
 		let { html, text }: { html: string; text: string } = (
-			await fetch(`/api/settings/email_content/${emailTypeSelect.value}/rendered`, {
+			await fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}/rendered`, {
 				credentials: "same-origin",
 				method: "POST",
 				body: content
@@ -601,7 +601,7 @@ async function emailTypeChange(): Promise<void> {
 
 	// Load editor content via AJAX
 	try {
-		let emailSettings: { subject: string; content: string } = await fetch(`/api/settings/email_content/${emailTypeSelect.value}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON);
+		let emailSettings: { subject: string; content: string } = await fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON);
 		emailSubject.value = emailSettings.subject;
 		markdownEditor.value(emailSettings.content);
 	}
@@ -750,7 +750,7 @@ function settingsUpdate(e: MouseEvent) {
 		});
 	}).then(checkStatus).then(parseJSON).then(() => {
 		if (emailTypeSelect.value) {
-			return fetch(`/api/settings/email_content/${emailTypeSelect.value}`, {
+			return fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}`, {
 				...defaultOptions,
 				body: emailContentData
 			}).then(checkStatus).then(parseJSON);
