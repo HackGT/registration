@@ -461,7 +461,7 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 	if (user.reimbursementAmount) {
 		markdown = markdown.replace(/{{reimbursementAmount}})/g, sanitize(user.reimbursementAmount));
 	} else {
-		markdown = markdown.replace(/{{reimbursementAmount}})/g, " ");
+		markdown = markdown.replace(/{{reimbursementAmount}})/g, "");
 	}
 	markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
 	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
