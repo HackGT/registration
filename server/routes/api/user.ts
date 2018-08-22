@@ -3,6 +3,7 @@ import * as express from "express";
 import * as json2csv from "json2csv";
 import * as archiver from "archiver";
 import * as uuid from "uuid/v4";
+import * as bodyParser from "body-parser";
 
 import {
 	STORAGE_ENGINE,
@@ -300,6 +301,32 @@ async function deleteApplicationBranchHandler(request: express.Request, response
 }
 
 userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, response): Promise<void> => {
+	let user = await User.findOne({uuid: request.params.uuid});
+	let status = request.body.status as string;
+
+	if (!user) {
+		response.status(400).json({
+			"error": `No such user with id ${request.params.uuid}`
+		});
+		return;
+	}
+
+	try {
+		await updateUserStatus(user, status);
+		await user.save();
+		response.status(200).json({
+			"success": true
+		});
+	}
+	catch (err) {
+		console.error(err);
+		response.status(500).json({
+			"error": "An error occurred while changing user status"
+		});
+	}
+});
+
+userRoutes.route("/status_api").post(isAdmin, bodyParser.json(), async (request, response): Promise<void> => {
 	let user = await User.findOne({uuid: request.params.uuid});
 	let status = request.body.status as string;
 
