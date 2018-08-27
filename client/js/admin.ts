@@ -25,7 +25,61 @@ class State {
 		this.sectionElement.style.display = "block";
 	}
 }
-const states: State[] = ["statistics", "users", "applicants", "settings"].map(id => new State(id));
+const states: State[] = ["statistics", "users", "applicants", "settings", "emails"].map(id => new State(id));
+
+function generateFilter(branchFilter: HTMLInputElement, statusFilter: HTMLInputElement) {
+	let filter: any = {};
+	if (branchFilter.value !== "*" && branchFilter.value !== "na") {
+		let [, type, branchName] = branchFilter.value.match(/^(application|confirmation)-(.*)$/)!;
+		if (type === "application") {
+			filter.applicationBranch = branchName;
+		}
+		else if (type === "confirmation") {
+			filter.confirmationBranch = branchName;
+		}
+		switch (statusFilter.value) {
+			case "no-submission":
+				if (type === "confirmation") {
+					filter.confirmed = false;
+				}
+				break;
+			case "submitted":
+				if (type === "confirmation") {
+					filter.confirmed = true;
+				} else {
+					filter.applied = true;
+				}
+				break;
+		}
+	} else if (branchFilter.value === "na") {
+		filter.applied = false;
+	}
+	return filter;
+}
+const batchEmailBranchFilterSelect = document.getElementById("email-branch-filter") as HTMLSelectElement;
+const batchEmailStatusFilterSelect = document.getElementById("email-status-filter") as HTMLSelectElement;
+async function batchEmailTypeChange(): Promise<void> {
+	if (batchEmailBranchFilterSelect.value === "*" || batchEmailBranchFilterSelect.value === "na") {
+		batchEmailStatusFilterSelect.style.display = "none";
+	} else {
+		for (let i = 0; i < batchEmailBranchFilterSelect.options.length; i++) {
+			batchEmailStatusFilterSelect.options.remove(0);
+		}
+		batchEmailStatusFilterSelect.style.display = "block";
+		let [, type ] = batchEmailBranchFilterSelect.value.match(/^(application|confirmation)-(.*)$/)!;
+		// Only confirmation branches have no-submission option since confirmation is manually assigned
+		if (type === "confirmation") {
+			let noSubmission = new Option('Have not submitted', 'no-submission');
+			batchEmailStatusFilterSelect.add(noSubmission);
+		}
+		let submitted = new Option('Submitted', 'submitted');
+		batchEmailStatusFilterSelect.add(submitted);
+	}
+}
+batchEmailBranchFilterSelect.addEventListener("change", batchEmailTypeChange);
+batchEmailTypeChange().catch(err => {
+	console.error(err);
+});
 
 class UserEntries {
 	private static readonly NODE_COUNT = 20;
@@ -833,3 +887,61 @@ for (let i = 0; i < data.length; i++) {
 		}
 	});
 }
+
+let emailBranchFilter = document.getElementById("email-branch-filter") as HTMLInputElement;
+let emailStatusFilter = document.getElementById("email-status-filter") as HTMLInputElement;
+let sendEmailButton = document.getElementById("sendEmail") as HTMLButtonElement;
+let batchEmailSubject = document.getElementById('batch-email-subject') as HTMLInputElement;
+let batchEmailEditor = new SimpleMDE({ element: document.getElementById("batch-email-content")! });
+let batchEmailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("batch-email-rendered") as HTMLElement;
+if (document.head.attachShadow) {
+	// Browser supports Shadow DOM
+	batchEmailRenderedArea = batchEmailRenderedArea.attachShadow({ mode: "open" });
+}
+batchEmailEditor.codemirror.on("change", async () => {
+	try {
+		let content = new FormData();
+		content.append("content", batchEmailEditor.value());
+		let { html, text }: { html: string; text: string } = (
+			await fetch(`/api/settings/email_content/batch_email/rendered`, {
+				credentials: "same-origin",
+				method: "POST",
+				body: content
+			}).then(checkStatus).then(parseJSON)
+		);
+		batchEmailRenderedArea.innerHTML = html;
+		let hr = document.createElement("hr");
+		hr.style.border = "1px solid #737373";
+		batchEmailRenderedArea.appendChild(hr);
+		let textContainer = document.createElement("pre");
+		textContainer.textContent = text;
+		batchEmailRenderedArea.appendChild(textContainer);
+	}
+	catch {
+		batchEmailRenderedArea.textContent = "Couldn't retrieve email content";
+	}
+});
+sendEmailButton.addEventListener("click", () => {
+	let subject = batchEmailSubject.value;
+	let markdownContent = batchEmailEditor.value();
+	if (subject === "") {
+		return sweetAlert("Oh no!", "You need an email subject", "error");
+	} else if (markdownContent  === "") {
+		return sweetAlert("Oh no!", "Your email body is empty.", "error");
+	}
+	let filter = generateFilter(emailBranchFilter, emailStatusFilter);
+	let content = new FormData();
+	content.append("filter", JSON.stringify(filter));
+	content.append("subject", subject);
+	content.append("markdownContent", markdownContent);
+	sendEmailButton.disabled = true;
+	return fetch(`/api/settings/send_batch_email`, {
+		credentials: "same-origin",
+		method: "POST",
+		body: content
+	}).then(checkStatus).then(parseJSON).then((result: string) => {
+		console.log(result);
+		sendEmailButton.disabled = false;
+		sweetAlert("Dank!", "Successfully sent out your batch email!", "success");
+	});
+});

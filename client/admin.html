@@ -36,6 +36,7 @@
 				<a href="#users" class="btn">Users</a>
 				<a href="#applicants" class="btn">Applicants</a>
 				<a href="#settings" class="btn">Settings</a>
+				<a href="#emails" class="btn">Emails</a>
 			</nav>
 
 			<section id="statistics">
@@ -411,6 +412,42 @@
 						<input type="submit" class="btn" value="Save" />
 					</div>
 				</form>
+			</section>
+			<section id="emails">
+				<h2>Batch Emails - BE CAREFUL</h2>
+				<select id="email-branch-filter">
+					<option value="*">All accounts</option>
+					<option value="na">Not Applied</option>
+					<optgroup label="Applicant Type">
+						{{#each settings.branches.application}}
+						<option value="application-{{this.name}}">{{this.name}}</option>
+						{{/each}}
+						{{#each settings.branches.confirmation}}
+						<option value="confirmation-{{this.name}}">{{this.name}}</option>
+						{{/each}}
+					</optgroup>
+				</select>
+				<select id="email-status-filter">
+				</select>
+
+				<input type="text" id="batch-email-subject" placeholder="Email Subject"/>
+				<textarea id="batch-email-content"></textarea>
+				<h5>Rendered HTML and text:</h5>
+				<section id="batch-email-rendered"></section>
+
+				<h5>List of variables:</h5>
+				<ul>
+					<li><strong>\{{eventName}}</strong>: The name of the event, configured by the <code>eventName</code> key-value pair in the <code>config.json</code> and displayed at the top of the page.</li>
+					<li><strong>\{{email}}</strong>: The user's email as reported by them or a 3rd party OAuth provider (i.e. Google, GitHub, Facebook).</li>
+					<li><strong>\{{name}}</strong>: The user's name as reported by them or a 3rd party OAuth provider (i.e. Google, GitHub, Facebook).</li>
+					<li><strong>\{{teamName}}</strong>: The user's team name if teams are enabled and the user has joined a team. Otherwise, will output <code>Teams not enabled</code> or <code>No team created or joined</code> respectively.</li>
+					<li><strong>\{{applicationBranch}}</strong>: The question branch name that the user applied / was accepted to.</li>
+					<li><strong>\{{confirmationBranch}}</strong>: The question branch name that the user RSVPed to.</li>
+					<li><strong>\{{application.<code>question-name</code>}}</strong>: Prints the user's response to the application question with the specified name from <code>questions.json</code>. Note that the question name is different from the question label. <a href="https://github.com/HackGT/registration/blob/master/server/config/questions.json" target="_blank">See the GitHub project</a> for details. Will print <code>N/A</code> if not yet answered.</li>
+					<li><strong>\{{confirmation.<code>question-name</code>}}</strong>: Prints the user's response to the confirmation question with the specified name from <code>questions.json</code>.</li>
+					<li><strong>\{{reimbursementAmount}}</strong>: A string representing how much a user should be reimbursed for.</li>
+				</ul>
+				<button id="sendEmail">Send Email</button>
 			</section>
 		{{/sidebar}}
 	</body>
