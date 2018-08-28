@@ -69,10 +69,10 @@ async function batchEmailTypeChange(): Promise<void> {
 		let [, type ] = batchEmailBranchFilterSelect.value.match(/^(application|confirmation)-(.*)$/)!;
 		// Only confirmation branches have no-submission option since confirmation is manually assigned
 		if (type === "confirmation") {
-			let noSubmission = new Option('Have not submitted', 'no-submission');
+			let noSubmission = new Option("Have not submitted", "no-submission");
 			batchEmailStatusFilterSelect.add(noSubmission);
 		}
-		let submitted = new Option('Submitted', 'submitted');
+		let submitted = new Option("Submitted", "submitted");
 		batchEmailStatusFilterSelect.add(submitted);
 	}
 }
@@ -891,7 +891,7 @@ for (let i = 0; i < data.length; i++) {
 let emailBranchFilter = document.getElementById("email-branch-filter") as HTMLInputElement;
 let emailStatusFilter = document.getElementById("email-status-filter") as HTMLInputElement;
 let sendEmailButton = document.getElementById("sendEmail") as HTMLButtonElement;
-let batchEmailSubject = document.getElementById('batch-email-subject') as HTMLInputElement;
+let batchEmailSubject = document.getElementById("batch-email-subject") as HTMLInputElement;
 let batchEmailEditor = new SimpleMDE({ element: document.getElementById("batch-email-content")! });
 let batchEmailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("batch-email-rendered") as HTMLElement;
 if (document.head.attachShadow) {
@@ -939,9 +939,8 @@ sendEmailButton.addEventListener("click", () => {
 		credentials: "same-origin",
 		method: "POST",
 		body: content
-	}).then(checkStatus).then(parseJSON).then((result: string) => {
-		console.log(result);
+	}).then(checkStatus).then(parseJSON).then((result: {success: boolean; count: number} ) => {
 		sendEmailButton.disabled = false;
-		sweetAlert("Dank!", "Successfully sent out your batch email!", "success");
+		sweetAlert("Success!", `Successfully sent ${result.count} email(s)!`, "success");
 	});
 });

@@ -396,11 +396,12 @@ export interface IMailObject {
 	html: string;
 	text: string;
 }
-export async function sendMailAsync(mail: IMailObject): Promise<void>  {
-	await sendgrid.send(mail);
+// Union types don't work well with overloaded method resolution in Typescript so we split into two methods
+export async function sendMailAsync(mail: IMailObject)  {
+	return sendgrid.send(mail);
 }
-export async function sendBatchMailAsync(mail: IMailObject[]): Promise<void>  {
-	await sendgrid.send(mail);
+export async function sendBatchMailAsync(mail: IMailObject[]) {
+	return sendgrid.send(mail);
 }
 export function sanitize(input?: string): string {
 	if (!input || typeof input !== "string") {

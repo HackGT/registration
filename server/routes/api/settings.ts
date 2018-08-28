@@ -263,23 +263,6 @@ settingsRoutes.route("/email_content/:type")
 		}
 	});
 
-settingsRoutes.route("/email_content/batch_email/rendered")
-	.post(isAdmin, uploadHandler.any(), async (request, response) => {
-		// Endpoint for generalized email, without templating for user args; meant for batch sending email
-		try {
-			let markdown: string = request.body.content;
-			let html: string = await renderEmailHTML(markdown, request.user as IUser);
-			let text: string = await renderEmailText(html, request.user as IUser, true);
-			response.json({ html, text });
-		}
-		catch (err) {
-			console.error(err);
-			response.status(500).json({
-				"error": "An error occurred while rendering the email content"
-			});
-		}
-	});
-
 settingsRoutes.route("/email_content/:type/rendered")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		try {
@@ -340,6 +323,7 @@ settingsRoutes.route("/send_batch_email")
 		}
 		console.log(`Sent ${emails.length} batch emails requested by ${(request.user as IUser).email}`);
 		return response.json({
-			"success": true
+			"success": true,
+			"count": emails.length
 		});
 	});
