@@ -35,8 +35,8 @@
 				<a href="#statistics" class="btn">Statistics</a>
 				<a href="#users" class="btn">Users</a>
 				<a href="#applicants" class="btn">Applicants</a>
-				<a href="#settings" class="btn">Settings</a>
 				<a href="#emails" class="btn">Emails</a>
+				<a href="#settings" class="btn">Settings</a>
 			</nav>
 
 			<section id="statistics">
@@ -447,7 +447,9 @@
 					<li><strong>\{{confirmation.<code>question-name</code>}}</strong>: Prints the user's response to the confirmation question with the specified name from <code>questions.json</code>.</li>
 					<li><strong>\{{reimbursementAmount}}</strong>: A string representing how much a user should be reimbursed for.</li>
 				</ul>
-				<button id="sendEmail">Send Email</button>
+				<div class="row center">
+					<button id="sendEmail">Send Email</button>
+				</div>
 			</section>
 		{{/sidebar}}
 	</body>
