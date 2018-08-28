@@ -69,10 +69,10 @@ async function batchEmailTypeChange(): Promise<void> {
 		let [, type ] = batchEmailBranchFilterSelect.value.match(/^(application|confirmation)-(.*)$/)!;
 		// Only confirmation branches have no-submission option since confirmation is manually assigned
 		if (type === "confirmation") {
-			let noSubmission = new Option("Have not submitted", "no-submission");
+			let noSubmission = new Option("Have not submitted (Confirmation)", "no-submission");
 			batchEmailStatusFilterSelect.add(noSubmission);
 		}
-		let submitted = new Option("Submitted", "submitted");
+		let submitted = new Option(`Submitted (${type.charAt(0).toUpperCase() + type.slice(1)})`, "submitted");
 		batchEmailStatusFilterSelect.add(submitted);
 	}
 }
