@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, renderEmailHTML, renderEmailText, defaultEmailSubjects
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, defaultEmailSubjects, sendBatchMailAsync, config, IMailObject
 } from "../../common";
 import {
 	isAdmin, uploadHandler
@@ -278,4 +278,52 @@ settingsRoutes.route("/email_content/:type/rendered")
 				"error": "An error occurred while rendering the email content"
 			});
 		}
+	});
+
+settingsRoutes.route("/send_batch_email")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		let filter = JSON.parse(request.body.filter);
+		let subject = request.body.subject;
+		let markdownContent = request.body.markdownContent;
+		if (typeof filter !== "object") {
+			return response.status(400).json({
+				"error": `Your query '${filter}' is not a valid MongoDB query`
+			});
+		} else if (subject === "" || subject === undefined) {
+			return response.status(400).json({
+				"error": "Can't have an empty subject!"
+			});
+		} else if (markdownContent === "" || markdownContent === undefined) {
+			return response.status(400).json({
+				"error": "Can't have an empty email body!"
+			});
+		}
+
+		let users = await User.find(filter);
+		let emails: IMailObject[] = [];
+		for (let user of users) {
+			let html: string = await renderEmailHTML(markdownContent, user);
+			let text: string = await renderEmailText(html, user, true);
+
+			emails.push({
+				from: config.email.from,
+				to: user.email,
+				subject,
+				html,
+				text
+			});
+		}
+		try {
+			await sendBatchMailAsync(emails);
+		} catch (e) {
+			console.error(e);
+			return response.status(500).json({
+				"error": "Error sending email!"
+			});
+		}
+		console.log(`Sent ${emails.length} batch emails requested by ${(request.user as IUser).email}`);
+		return response.json({
+			"success": true,
+			"count": emails.length
+		});
 	});

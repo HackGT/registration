@@ -389,18 +389,22 @@ export const defaultEmailSubjects = {
 	preConfirm: `[${config.eventName}] - Application Update`,
 	attend: `[${config.eventName}] - Thank you for RSVPing!`
 };
-interface IMailObject {
+export interface IMailObject {
 	to: string;
 	from: string;
 	subject: string;
 	html: string;
 	text: string;
 }
-export async function sendMailAsync(mail: IMailObject): Promise<void>  {
-	await sendgrid.send(mail);
+// Union types don't work well with overloaded method resolution in Typescript so we split into two methods
+export async function sendMailAsync(mail: IMailObject)  {
+	return sendgrid.send(mail);
 }
-export function sanitize(input: string): string {
-	if (typeof input !== "string") {
+export async function sendBatchMailAsync(mail: IMailObject[]) {
+	return sendgrid.send(mail);
+}
+export function sanitize(input?: string): string {
+	if (!input || typeof input !== "string") {
 		return "";
 	}
 	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -458,16 +462,12 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 
 	// Interpolate and sanitize variables
 	markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
-	if (user.reimbursementAmount) {
-		markdown = markdown.replace(/{{reimbursementAmount}}/g, sanitize(user.reimbursementAmount));
-	} else {
-		markdown = markdown.replace(/{{reimbursementAmount}}/g, "");
-	}
+	markdown = markdown.replace(/{{reimbursementAmount}}/g, sanitize(user.reimbursementAmount));
 	markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
 	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
 	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
 	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
-	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch || ""));
+	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
 	markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
 		let question = user.applicationData.find(data => data.name === name);
 		return formatFormItem(question);
