@@ -7,7 +7,7 @@ import * as uuid from "uuid/v4";
 import {
 	STORAGE_ENGINE,
 	formatSize,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects
+	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects, IMailObject, sendBatchMailAsync
 } from "../../common";
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
@@ -379,6 +379,7 @@ async function updateUserStatus(user: IUserMongoose, status: string): Promise<vo
 userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let users = await User.find({ "confirmationBranch": {$exists: true}, "preConfirmEmailSent": { $ne: true } });
+		let emails: IMailObject[] = [];
 		for (let user of users) {
 			// Email the applicant about their acceptance
 			let emailSubject: string | null;
@@ -397,24 +398,25 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 				emailMarkdown = "";
 			}
 
-			let emailHTML = await renderEmailHTML(emailMarkdown, user);
-			let emailText = await renderEmailText(emailHTML, user, true);
+			let html = await renderEmailHTML(emailMarkdown, user);
+			let text = await renderEmailText(html, user, true);
 
-			await sendMailAsync({
+			emails.push({
 				from: config.email.from,
 				to: user.email,
 				subject: emailSubject || defaultEmailSubjects.preConfirm,
-				html: emailHTML,
-				text: emailText
+				html,
+				text
 			});
 
 			user.preConfirmEmailSent = true;
 			await user.save();
 		}
 
+		await sendBatchMailAsync(emails);
 		response.json({
 			"success": true,
-			"count": users.length
+			"count": emails.length
 		});
 	}
 	catch (err) {
