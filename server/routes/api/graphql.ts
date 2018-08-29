@@ -40,9 +40,15 @@ const resolvers: IResolver = {
 					$gt: args.pagination_token
 				}
 			} : {};
+			const uuidQuery = args.ids ? {
+				uuid: {
+					$in: args.ids
+				}
+			} : {};
 			const allUsers = await User
 				.find({
 					...lastIdQuery,
+					...uuidQuery,
 					...userFilterToMongo(args.filter)
 				})
 				.limit(args.n);
