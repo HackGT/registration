@@ -283,7 +283,7 @@ settingsRoutes.route("/email_content/:type/rendered")
 settingsRoutes.route("/send_batch_email")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		let filter = JSON.parse(request.body.filter);
-		let subject = request.body.subject;
+		let subject = request.body.subject as string;
 		let markdownContent = request.body.markdownContent;
 		if (typeof filter !== "object") {
 			return response.status(400).json({
@@ -318,9 +318,9 @@ settingsRoutes.route("/send_batch_email")
 		for (let user of admins) {
 			let html: string = await renderEmailHTML(markdownContent, user);
 			let text: string = await renderEmailText(html, user, true);
-			subject = "[Admin FYI] " + subject
-			text = filter.toString() + "\n" + text
-			html = filter.toString() + "<br>" + html
+			subject = `[Admin FYI] ${subject}`;
+			text = `${filter.toString()}\n${text}`;
+			text = `${filter.toString()}<br>${text}`;
 			emails.push({
 				from: config.email.from,
 				to: user.email,
