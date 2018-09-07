@@ -300,7 +300,6 @@ settingsRoutes.route("/send_batch_email")
 		}
 
 		let users = await User.find(filter);
-		
 		let emails: IMailObject[] = [];
 		for (let user of users) {
 			let html: string = await renderEmailHTML(markdownContent, user);
@@ -315,8 +314,8 @@ settingsRoutes.route("/send_batch_email")
 			});
 		}
 
-		let adminEmails = await User.find({ admin: true }).select("email");
-		for (let user of adminEmails) {
+		let admins = await User.find({ admin: true });
+		for (let user of admins) {
 			let html: string = await renderEmailHTML(markdownContent, user);
 			let text: string = await renderEmailText(html, user, true);
 			subject = "[Admin FYI] " + subject
