@@ -283,6 +283,8 @@ settingsRoutes.route("/email_content/:type/rendered")
 settingsRoutes.route("/send_batch_email")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		let filter = JSON.parse(request.body.filter);
+		filter.verifiedEmail = true;
+		filter.accountConfirmed = true;
 		let subject = request.body.subject as string;
 		let markdownContent = request.body.markdownContent;
 		if (typeof filter !== "object") {
