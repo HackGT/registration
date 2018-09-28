@@ -334,6 +334,7 @@ templateRoutes.route("/login/confirm").get(async (request, response) => {
 	}
 	if (user.accountConfirmed) {
 		response.redirect("/");
+		return;
 	}
 
 	let usedLoginMethods: string[] = [];

@@ -109,7 +109,7 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 
 		let email: string = "";
 		if (profile.emails && profile.emails.length > 0) {
-			email = profile.emails[0].value;
+			email = profile.emails[0].value.trim();
 		}
 		else if (!profile.emails || profile.emails.length === 0) {
 			done(null, false, { message: "Your GitHub profile does not have any public email addresses. Please make an email address public before logging in with GitHub." });
@@ -273,6 +273,8 @@ abstract class CASStrategy implements RegistrationStrategy {
 	}
 
 	private async passportCallback(request: Request, username: string, profile: Profile, done: PassportDone) {
+		// GT login will pass long invalid usernames of different capitalizations
+		username = username.toLowerCase().trim();
 		let loggedInUser = request.user as IUserMongoose | undefined;
 		let user = await User.findOne({[`services.${this.name}.id`]: username});
 		let email = `${username}@${this.emailDomain}`;
@@ -395,6 +397,7 @@ export class Local implements RegistrationStrategy {
 	}
 
 	protected async passportCallback(request: Request, email: string, password: string, done: PassportDone) {
+		email = email.trim();
 		let user = await User.findOne({ email });
 		if (user && request.path.match(/\/signup$/i)) {
 			done(null, false, { "message": "That email address is already in use. You may already have an account from another login service." });
