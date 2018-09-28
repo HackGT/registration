@@ -321,8 +321,8 @@ settingsRoutes.route("/send_batch_email")
 		for (let user of admins) {
 			let html: string = await renderEmailHTML(markdownContent, user);
 			let text: string = await renderEmailText(html, user, true);
+			html = `${JSON.stringify(filter)}<br>${html}`;
 			text = `${JSON.stringify(filter)}\n${text}`;
-			html = `${JSON.stringify(filter)}<br>${text}`;
 			emails.push({
 				from: config.email.from,
 				to: user.email,
