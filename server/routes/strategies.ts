@@ -273,8 +273,9 @@ abstract class CASStrategy implements RegistrationStrategy {
 	}
 
 	private async passportCallback(request: Request, username: string, profile: Profile, done: PassportDone) {
+		// GT login will pass long invalid usernames of different capitalizations
+		username = username.toLowerCase().trim();
 		let loggedInUser = request.user as IUserMongoose | undefined;
-		username = username.trim();
 		let user = await User.findOne({[`services.${this.name}.id`]: username});
 		let email = `${username}@${this.emailDomain}`;
 		let isAdmin = false;
