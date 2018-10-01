@@ -12,6 +12,8 @@ type Query {
   # This is paginated, n is the number of results, and last_id is the last ID
   # seen from the latest page retrieved, if you want the first page leave this out.
   users(pagination_token: ID, n: Int!, filter: UserFilter, ids: [String]): [User!]!
+  # Query for sponsorship portal to fetch users by a list of user IDs
+  users_sportal(n: Int!, offset: Int!, filter: UserFilter, ids: [String!]!): SearchResult!
   # Search for users by name and email
   search_user(search: String!, use_regex: Boolean = false, offset: Int!, n: Int!, filter: UserFilter): SearchResult!
   # Simplified search_user that can be forwarded correctly from checkin2

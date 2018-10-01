@@ -55,6 +55,27 @@ const resolvers: IResolver = {
 
 			return Promise.all(allUsers.map(userRecordToGraphql));
 		},
+		users_sportal: async (prev, args) => {
+			const total = await User
+				.find(userFilterToMongo(args.filter))
+				.where('uuid')
+				.in(args.ids)
+				.count();
+			const results = await User
+				.find(userFilterToMongo(args.filter))
+				.where('uuid')
+				.in(args.ids)
+				.limit(args.n)
+				.skip(args.offset)
+				.exec();
+
+			return {
+				offset: args.offset,
+				count: results.length,
+				total,
+				users: Promise.all(results.map(userRecordToGraphql))
+			};
+		},
 		search_user: searchUser,
 		search_user_simple: async (prev, args) => {
 			return (await searchUser(prev, args)).users;
