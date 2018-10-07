@@ -79,7 +79,7 @@
 							<p>Application type: <b>{{user.applicationBranch}}</b></p>
 							<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 							{{#ifCond allConfirmationTimes.length 1}}
-								<p>If you do not RSVP before {{confirmationClose}}, you will not be able to attend {{siteTitle}}!</p>
+								<p>You must confirm your decision by {{confirmationClose}}.</p>
 							{{else}}
 								<p>If you do not RSVP before the deadline for your confirmation type, you will not be able to attend {{siteTitle}}!</p>
 								<ul>
