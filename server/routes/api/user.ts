@@ -677,3 +677,9 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		"success": true
 	});
 });
+
+userRoutes.get('/uuid', isUserOrAdmin, async (request, response) => {
+	response.json({
+		uuid: request.user!.uuid
+	});
+});
