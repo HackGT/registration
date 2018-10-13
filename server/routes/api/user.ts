@@ -677,3 +677,12 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		"success": true
 	});
 });
+
+userRoutes.get('/', isUserOrAdmin, async (request, response) => {
+	let user = await User.findOne({uuid: request.user!.uuid}) as IUserMongoose;
+	response.json({
+		uuid: user.uuid,
+		name: user.name,
+		email: user.email
+	});
+});
