@@ -461,12 +461,12 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 		}
 	}
 
-	let uuidCode = await qrcode.toDataURL("user:" + user.uuid);
+	let uuidCode = `![](${await qrcode.toDataURL("user:" + user.uuid)})`;
 
 	// Interpolate and sanitize variables
 	markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
 	markdown = markdown.replace(/{{reimbursementAmount}}/g, sanitize(user.reimbursementAmount));
-	markdown = markdown.replace(/{{qrcode}}/g, sanitize(uuidCode));
+	markdown = markdown.replace(/{{qrcode}}/g, uuidCode);
 	markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
 	markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
 	markdown = markdown.replace(/{{teamName}}/g, sanitize(teamName));
