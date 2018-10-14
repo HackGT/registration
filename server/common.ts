@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
 import * as tmp from "tmp";
-import * as qrcode from 'qrcode';
+import * as qrcode from "qrcode";
 import "passport";
 
 //
