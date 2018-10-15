@@ -9,8 +9,7 @@
         "lib": [
             "esnext.asynciterable",
             "es2017",
-            "es2015.promise",
-            "dom"
+            "es2015.promise"
         ],
         "sourceMap": true,
         "alwaysStrict": true,
