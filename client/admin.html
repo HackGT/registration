@@ -243,7 +243,7 @@
 									<div>
 										<label for="{{removeSpaces this.name}}-auto-accept">Automatic Decision</label>
 										<select id="{{removeSpaces this.name}}-auto-accept" class="autoAccept">
-											<option value="disabled">Disabled</option> 
+											<option value="disabled">Disabled</option>
 											{{#each ../settings.branches.confirmation}}
 											<option value="{{this.name}}" {{#ifCond this.name ../autoAccept }}selected{{/ifCond}}>{{this.name}}</option>
 											{{/each}}
@@ -345,6 +345,8 @@
 								<li><strong>\{{application.<code>question-name</code>}}</strong>: Prints the user's response to the application question with the specified name from <code>questions.json</code>. Note that the question name is different from the question label. <a href="https://github.com/HackGT/registration/blob/master/server/config/questions.json" target="_blank">See the GitHub project</a> for details. Will print <code>N/A</code> if not yet answered.</li>
 								<li><strong>\{{confirmation.<code>question-name</code>}}</strong>: Prints the user's response to the confirmation question with the specified name from <code>questions.json</code>.</li>
 								<li><strong>\{{reimbursementAmount}}</strong>: A string representing how much a user should be reimbursed for.</li>
+								<li><strong>\{{qrURI}}</strong>: A <a href="https://en.wikipedia.org/wiki/Data_URI_scheme" target="_blank">data URI</a> with the user's check-in QR code containing their UUID.</li>
+								<li><strong>\{{qrCode}}</strong>: Image with the user's check-in QR code containing their UUID.</li>
 							</ul>
 						</div>
 					</div>
@@ -401,9 +403,9 @@
 							<input id="admin-emails" value="" />
 							<label for="add-admins">Check box to add admins; leave unchecked to remove admins</label>
 							<input id="add-admins" type="checkbox" checked />
-							<br /> 
-							<br /> 
-							<label for="apikey">Your admin API key (do not share publicly):</label> 
+							<br />
+							<br />
+							<label for="apikey">Your admin API key (do not share publicly):</label>
 							<input id="apikey" value="{{settings.apiKey}}" readonly />
 						</div>
 					</div>
@@ -446,6 +448,9 @@
 					<li><strong>\{{application.<code>question-name</code>}}</strong>: Prints the user's response to the application question with the specified name from <code>questions.json</code>. Note that the question name is different from the question label. <a href="https://github.com/HackGT/registration/blob/master/server/config/questions.json" target="_blank">See the GitHub project</a> for details. Will print <code>N/A</code> if not yet answered.</li>
 					<li><strong>\{{confirmation.<code>question-name</code>}}</strong>: Prints the user's response to the confirmation question with the specified name from <code>questions.json</code>.</li>
 					<li><strong>\{{reimbursementAmount}}</strong>: A string representing how much a user should be reimbursed for.</li>
+					<li><strong>\{{qrURI}}</strong>: A <a href="https://en.wikipedia.org/wiki/Data_URI_scheme" target="_blank">data URI</a>
+						with the user's check-in QR code containing their UUID.</li>
+					<li><strong>\{{qrCode}}</strong>: Image with the user's check-in QR code containing their UUID.</li>
 				</ul>
 				<div class="row center">
 					<button id="sendEmail">Send Email</button>
