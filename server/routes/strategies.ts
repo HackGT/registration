@@ -226,11 +226,13 @@ abstract class OAuthStrategy implements RegistrationStrategy {
 
 			passport.authenticate(
 				this.name,
-				{ failureRedirect: "/login", failureFlash: true, callbackURL } as AuthenticateOptions
+				{
+					failureRedirect: "/login",
+					successReturnToOrRedirect: "/",
+					failureFlash: true,
+					callbackURL
+				} as AuthenticateOptions
 			)(request, response, next);
-		}, (request, response) => {
-			// Successful authentication, redirect home
-			response.redirect("/");
 		});
 	}
 }
@@ -368,11 +370,9 @@ abstract class CASStrategy implements RegistrationStrategy {
 
 		authRoutes.get(`/${this.name}`, passport.authenticate(this.name, {
 			failureRedirect: "/login",
+			successReturnToOrRedirect: "/",
 			failureFlash: true
-		}), (request, response) => {
-			// Successful authentication, redirect home
-			response.redirect("/");
-		});
+		}));
 	}
 }
 
@@ -465,7 +465,7 @@ export class Local implements RegistrationStrategy {
 			response.redirect("/login/confirm");
 		});
 
-		authRoutes.post("/login", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true, successRedirect: "/" }));
+		authRoutes.post("/login", postParser, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true, successReturnToOrRedirect: "/" }));
 
 		authRoutes.get("/verify/:code", async (request, response) => {
 			let user = await User.findOne({ "local.verificationCode": request.params.code });
