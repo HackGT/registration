@@ -318,6 +318,10 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 });
 
 templateRoutes.route("/login").get(async (request, response) => {
+	// Allow redirect to any subpath of registration
+	if (request.session && request.query.r && request.query.r.startsWith('/')) {
+		request.session.returnTo = request.query.r;
+	}
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
 		error: request.flash("error"),
