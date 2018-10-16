@@ -118,6 +118,9 @@ export function authenticateWithReject(request: express.Request, response: expre
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
 	if (!request.isAuthenticated() || !request.user || !request.user.verifiedEmail || !request.user.accountConfirmed) {
+		if (request.session) {
+			request.session.returnTo = request.originalUrl;
+		}
 		response.redirect("/login");
 	}
 	else {
