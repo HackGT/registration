@@ -683,6 +683,7 @@ userRoutes.get('/', isUserOrAdmin, async (request, response) => {
 	response.json({
 		uuid: user.uuid,
 		name: user.name,
-		email: user.email
+		email: user.email,
+		admin: user.admin || false
 	});
 });
