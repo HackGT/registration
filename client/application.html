@@ -29,6 +29,8 @@
 				<form method="post" data-action="/api/registration/{{slug branch}}">
 					<label for="anonymous-registration-email" class="required">Email</label>
 					<input type="email" name="anonymous-registration-email" id="anonymous-registration-email" required />
+					<label for="anonymous-registration-name" class="required">Name</label>
+					<input type="text" name="anonymous-registration-name" id="anonymous-registration-name" required />
 			{{/unless}}
 
 				{{#each questionData}}
