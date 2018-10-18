@@ -72,6 +72,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 		let user: IUserMongoose;
 		if (anonymous) {
 			let email = request.body["anonymous-registration-email"] as string;
+			let name = request.body["anonymous-registration-name"] as string;
 			if (await User.findOne({email})) {
 				response.status(400).json({
 					"error": `User with email "${email}" already exists`
@@ -80,7 +81,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			}
 			user = new User({
 				uuid: uuid(),
-				name: "Anonymous User",
+				name,
 				email
 			}) as IUserMongoose;
 		} else {
