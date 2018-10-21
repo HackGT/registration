@@ -805,31 +805,35 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	}).map(async statistic => {
 		let questions = (await Branches.BranchConfig.loadBranchFromDB(statistic.branch)).questions;
 		let question = questions.find(q => q.label === statistic.questionName)!;
+		try {
+			statistic.responses = statistic.responses.sort((a, b) => {
+				let aIndex: number = question.options.indexOf(a.response);
+				let bIndex: number = question.options.indexOf(b.response);
 
-		statistic.responses = statistic.responses.sort((a, b) => {
-			let aIndex: number = question.options.indexOf(a.response);
-			let bIndex: number = question.options.indexOf(b.response);
-
-			if (aIndex !== -1 && bIndex === -1) {
-				return -1;
-			}
-			if (aIndex === -1 && bIndex !== -1) {
-				return 1;
-			}
-			if (aIndex === -1 && bIndex === -1) {
-				if (a.response.trim() === "") {
-					return 1;
-				}
-				if (a.response.toLowerCase() < b.response.toLowerCase()) {
+				if (aIndex !== -1 && bIndex === -1) {
 					return -1;
 				}
-				if (a.response.toLowerCase() > b.response.toLowerCase()) {
+				if (aIndex === -1 && bIndex !== -1) {
 					return 1;
 				}
-				return 0;
-			}
-			return aIndex - bIndex;
-		});
+				if (aIndex === -1 && bIndex === -1) {
+					if (a.response.trim() === "") {
+						return 1;
+					}
+					if (a.response.toLowerCase() < b.response.toLowerCase()) {
+						return -1;
+					}
+					if (a.response.toLowerCase() > b.response.toLowerCase()) {
+						return 1;
+					}
+					return 0;
+				}
+				return aIndex - bIndex;
+			});
+		} catch(e) {
+			console.trace(e);
+			return {};
+		}
 
 		return statistic;
 	}));
