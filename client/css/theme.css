@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:300');
+@font-face {
+    font-family: "Bebas";
+    src:  url("https://storage.googleapis.com/hackgt/fonts/bebas.ttf");
+}
+/* Colors */
+html, body, #sidebar-nav {
+    background-image: url("../assets/logo.png");
+    background-color: #070607;
+    color: #F2F2F2;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+#sidebar a, #sidebar, .editor-toolbar > a {
+    color: #F2F2F2;
+    border: none;
+    text-decoration: initial;
+}
+.editor-toolbar > a {
+    color: #F2F2F2 !important;
+}
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
+}
+#sidebar-nav > span.divider, .main, table thead {
+    border-color: #000;
+}
+a {
+    color: #F2F2F2;
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
+}
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: #F2F2F2;
+}
+#email-rendered {
+    background-color: #F2F2F2;
+    border: 1px solid #F2F2F2;
+}
+/* Buttons */
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: #070607;
+    border: 2px solid #F2F2F2; 
+    color: #F2F2F2;
+    font-family: 'Bebas', sans-serif;
+}
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3 {
+    font-family: 'Bebas', sans-serif;
+}
+#sidebar > h1 {
+    text-decoration: underline;
+}
+code {
+    color: #F2F2F2;
+}
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
+    background-color: #070607;
+    color: #F2F2F2;
+    border-color: #F2F2F2;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: #F2F2F2;
+}
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, #E6E6E6, #E6E6E6 10px, #de8f6e 10px, #de8f6e 20px);
+    color: #e7e7e7 !important;
+}
+input:disabled::placeholder {
+    color: #e7e7e7;
+}
+
+/* Logo styling */
+#logo > img {
+    max-width: 100%;
+    max-height: 100%;
+}
