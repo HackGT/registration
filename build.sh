@@ -12,6 +12,4 @@ mv ./api.graphql.types.ts ./server/routes/api/
 
 ./node_modules/tslint/bin/tslint -p server/
 ./node_modules/tslint/bin/tslint -p client/
-./node_modules/typescript/bin/tsc -p server/
-./node_modules/typescript/bin/tsc -p client/
-
+./node_modules/typescript/bin/tsc -b

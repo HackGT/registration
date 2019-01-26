@@ -849,7 +849,7 @@ for (let i = 0; i < data.length; i++) {
 			"datasets": [{
 				"label": data[i].questionName,
 				"data": data[i].responses.map(response => response.count),
-				"backgroundColor": Array(data[i].responses.length).fill(color)
+				"backgroundColor": Array.apply(null, Array(data[i].responses.length)).map((_: undefined) => color) // ES5 version of Array(number).fill(color)
 			}]
 		},
 		"options": {

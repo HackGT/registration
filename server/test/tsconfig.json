@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig-base",
+	"compilerOptions": {
+		"rootDir": "../",
+		"lib": [
+			"dom",
+			"es2015.promise",
+			"esnext.asynciterable",
+			"es2017"
+		],
+		"noUnusedLocals": false
+	},
+	"include": [ "../" ]
+}

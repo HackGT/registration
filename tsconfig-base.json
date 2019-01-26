@@ -1,0 +1,39 @@
+{
+	"compilerOptions": {
+		"pretty": true,
+		"composite": true,
+
+		"module": "commonjs",
+		"moduleResolution": "node",
+
+		"target": "es6",
+		"lib": [
+			"es2015.promise"
+		],
+		"types": [],
+		"typeRoots": [
+			"../node_modules/@types"
+		],
+
+		"sourceMap": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noEmitOnError": true,
+		"noFallthroughCasesInSwitch": true,
+
+		"plugins": [
+			{
+				"name": "tslint-language-service",
+				"alwaysShowRuleFailuresAsWarnings": false,
+				"ignoreDefinitionFiles": true,
+				"configFile": "./tslint.json"
+			}
+		],
+	},
+	"exclude": [
+		"./node_modules/@types",
+	]
+}

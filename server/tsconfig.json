@@ -1,34 +1,19 @@
 {
+    "extends": "../tsconfig-base",
     "compilerOptions": {
-        "module": "commonjs",
-        "types": [],
-        "typeRoots": [
-            "../node_modules/@types"
-        ],
-        "target": "es6",
+        "composite": true,
+        "rootDir": ".",
         "lib": [
             "esnext.asynciterable",
             "es2017",
             "es2015.promise"
-        ],
-        "sourceMap": true,
-        "alwaysStrict": true,
-        "strictNullChecks": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noUnusedLocals": true,
-        "plugins": [
-            {
-				"name": "tslint-language-service",
-				"alwaysShowRuleFailuresAsWarnings": false,
-				"ignoreDefinitionFiles": true,
-				"configFile": "../tslint.json"
-			}
-        ],
-        "moduleResolution": "node"
+        ]
     },
+    "include": [
+        "**/*.ts"
+    ],
     "exclude": [
-        "../node_modules/@types/whatwg-fetch/index.d.ts",
-        "../node_modules/@types/whatwg-streams/index.d.ts"
+        "config/questions.schema.d.ts",
+        "test"
     ]
 }

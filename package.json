@@ -4,9 +4,10 @@
   "description": "Powerful and extensible registration system for hackathons and other large events",
   "main": "server/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run build && ./node_modules/typescript/bin/tsc -p server/test && npm run mocha",
+    "mocha": "./node_modules/mocha/bin/mocha ./server/test",
     "build": "bash ./build.sh",
-    "quickbuild": "./node_modules/typescript/bin/tsc -p server/ && ./node_modules/typescript/bin/tsc -p client/",
+    "quickbuild": "./node_modules/typescript/bin/tsc -b",
     "start": "node server/app.js",
     "build-start": "npm run build && npm start"
   },
@@ -74,7 +75,7 @@
     "@types/archiver": "^0.15.37",
     "@types/aws-sdk": "^2.7.0",
     "@types/body-parser": "1.16.0",
-    "@types/chai": "^3.4.35",
+    "@types/chai": "^3.5.2",
     "@types/cheerio": "^0.22.7",
     "@types/codemirror": "0.0.71",
     "@types/compression": "0.0.33",
@@ -99,15 +100,15 @@
     "@types/passport-local": "^1.0.33",
     "@types/qr-image": "^3.2.1",
     "@types/serve-static": "^1.13.2",
-    "@types/supertest": "^2.0.4",
+    "@types/supertest": "^2.0.7",
     "@types/tmp": "0.0.33",
     "@types/uuid": "^3.4.3",
     "@types/whatwg-fetch": "0.0.33",
-    "chai": "^4.0.0",
+    "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "supertest": "^3.1.0",
+    "supertest": "^3.4.2",
     "tslint": "^5.10.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^2.9.1"
+    "typescript": "^3.2.0"
   }
 }

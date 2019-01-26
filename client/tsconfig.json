@@ -1,31 +1,16 @@
 {
+	"extends": "../tsconfig-base",
 	"compilerOptions": {
-		"typeRoots": [
-			"../node_modules/*"
-		],
+		"composite": true,
+		"rootDir": ".",
+
 		"target": "es5",
+		"module": "es6",
 		"lib": [
 			"es5",
 			"es2015.promise",
-			"dom",
-			"es6"
-		],
-		"sourceMap": true,
-		"alwaysStrict": true,
-		"strictNullChecks": true,
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"noUnusedLocals": true,
-        "plugins": [
-			{
-				"name": "tslint-language-service",
-				"alwaysShowRuleFailuresAsWarnings": false,
-				"ignoreDefinitionFiles": true,
-				"configFile": "../tslint.json"
-			}
-        ],
-		"module": "es6",
-		"moduleResolution": "node"
+			"dom"
+		]
 	},
 	"include": [
 		"js/*.ts"
