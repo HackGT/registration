@@ -107,8 +107,8 @@
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "supertest": "^3.4.2",
-    "tslint": "^5.10.0",
-    "tslint-language-service": "^0.9.9",
+    "tslint": "^5.12.1",
+    "tslint-language-service-ts3": "^1.0.0",
     "typescript": "^3.2.0"
   }
 }

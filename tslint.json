@@ -171,6 +171,7 @@
         "ban-comma-operator": true,
         "no-dynamic-delete": true,
         "prefer-readonly": true,
-        "prefer-while": true
+        "prefer-while": true,
+        "callable-types": false
     }
 }

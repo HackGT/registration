@@ -26,7 +26,7 @@
 
 		"plugins": [
 			{
-				"name": "tslint-language-service",
+				"name": "tslint-language-service-ts3",
 				"alwaysShowRuleFailuresAsWarnings": false,
 				"ignoreDefinitionFiles": true,
 				"configFile": "./tslint.json"
