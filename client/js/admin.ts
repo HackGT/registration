@@ -837,8 +837,7 @@ declare let data: {
 declare const Chart: any;
 
 // Get the text color and use that for graphs
-const pageHeader = document.querySelector("#sidebar > h1") as HTMLHeadingElement;
-const color = window.getComputedStyle(pageHeader).getPropertyValue("color");
+const color = window.getComputedStyle(document.querySelector("thead")!).getPropertyValue("border-color");
 
 for (let i = 0; i < data.length; i++) {
 	let context = document.getElementById(`chart-${i}`) as HTMLCanvasElement | null;
