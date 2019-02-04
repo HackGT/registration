@@ -605,7 +605,7 @@ sendAcceptancesButton.addEventListener("click", async e => {
 //
 // Email content
 //
-declare let SimpleMDE: any;
+declare const EasyMDE: typeof import("easymde");
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
 const emailSubject = document.getElementById("email-subject") as HTMLInputElement;
@@ -614,7 +614,7 @@ if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
 	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
 }
-const markdownEditor = new SimpleMDE({ element: document.getElementById("email-content")! });
+const markdownEditor = new EasyMDE({ element: document.getElementById("email-content")! });
 let contentChanged = false;
 let lastSelected = emailTypeSelect.value;
 
@@ -681,10 +681,6 @@ for (let i = 0; i < timeInputs.length; i++) {
 }
 
 // Settings update
-function parseDateTime(dateTime: string) {
-	let digits = dateTime.split(/\D+/).map(num => parseInt(num, 10));
-	return new Date(digits[0], digits[1] - 1, digits[2], digits[3], digits[4], digits[5] || 0, digits[6] || 0);
-}
 let settingsUpdateButtons = document.querySelectorAll("#settings input[type=submit]") as NodeListOf<HTMLInputElement>;
 let settingsForm = document.querySelector("#settings form") as HTMLFormElement;
 for (let i = 0; i < settingsUpdateButtons.length; i++) {
@@ -891,7 +887,7 @@ let emailBranchFilter = document.getElementById("email-branch-filter") as HTMLIn
 let emailStatusFilter = document.getElementById("email-status-filter") as HTMLInputElement;
 let sendEmailButton = document.getElementById("sendEmail") as HTMLButtonElement;
 let batchEmailSubject = document.getElementById("batch-email-subject") as HTMLInputElement;
-let batchEmailEditor = new SimpleMDE({ element: document.getElementById("batch-email-content")! });
+let batchEmailEditor = new EasyMDE({ element: document.getElementById("batch-email-content")! });
 let batchEmailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("batch-email-rendered") as HTMLElement;
 if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
