@@ -64,13 +64,13 @@ main {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	
+
 	cursor: pointer;
 	user-select: none;
 
 	-webkit-transition: all 60ms ease-in-out;
 	transition: all 60ms ease-in-out;
-	
+
 	text-align: center;
 	white-space: nowrap;
 	text-decoration: none !important;
@@ -99,4 +99,12 @@ main {
 
 .btn, button {
 	font-size: 15px;
+}
+
+section.main {
+    padding: 40px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }

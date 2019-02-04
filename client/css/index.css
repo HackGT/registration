@@ -1,13 +1,6 @@
 h1 {
 	margin-bottom: 35px;
 }
-.main {
-    padding: 40px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
 .row:first-of-type h2, .row:first-of-type h4 {
 	margin: 0;
 }
@@ -106,7 +99,7 @@ ul.timeline > li.warning > div::before {
 }
 ul.timeline > li.rejected::before {
 	content: attr(data-rejected);
-} 
+}
 ul.timeline > li.rejected > div {
 	border-top: 2px solid #FF4136;
 }
