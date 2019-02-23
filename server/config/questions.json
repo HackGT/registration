@@ -42,13 +42,9 @@
                 "required": true
             },
             {
-                "name": "age",
-                "type": "radio",
-                "label": "Will you be over 18 years old on April 13th, 2019?",
-                "options": [
-                    "No, I will be under 18",
-                    "Yes, I will be over 18"
-                ],
+                "name": "birthday",
+                "type": "date",
+                "label": "Student Birthday",
                 "required": true
             },
             {
