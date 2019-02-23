@@ -3,9 +3,19 @@
         "name": "Participant",
         "text": [
             {
-                "for": "end",
+                "for": "name",
+                "type": "h5",
+                "content": "Welcome!"
+            },
+            {
+                "for": "name",
                 "type": "p",
-                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+                "content": "Thank you for registering to attend Catalyst. We can't wait to see you at the [Klaus Advanced Computing Building](https://goo.gl/maps/h8K3Ve32nTU2) on April 13th, 2019."
+            },
+            {
+                "for": "name",
+                "type": "p",
+                "content": "<Info about release forms>"
             }
         ],
         "questions": [
@@ -16,10 +26,155 @@
                 "required": true
             },
             {
-                "name": "gender",
-                "label": "Gender",
+                "name": "phone",
+                "type": "tel",
+                "label": "Phone number",
+                "required": true
+            },
+            {
+                "name": "phone-ownership",
+                "label": "Whose phone number is that?",
                 "type": "radio",
-                "options": ["Male", "Female", "Prefer not to answer"],
+                "options": [
+                    "Mine",
+                    "My parent's / guardian's"
+                ],
+                "required": true
+            },
+            {
+                "name": "school",
+                "label": "School",
+                "type": "select",
+                "options": [
+                    "Please select",
+                    "Allatoona High School",
+                    "Alpharetta High School",
+                    "Arabia Mountain High School - Academy of Engineering, Medicine and Environment",
+                    "Banneker High School",
+                    "Booker T. Washington - Early College Small School",
+                    "Booker T. Washington High School - Banking, Finance and Investment Small School",
+                    "Booker T. Washington High School - Health, Sciences and Nutrition Small School",
+                    "Cambridge High School",
+                    "Campbell High School",
+                    "Cedar Grove High School",
+                    "Centennial High School",
+                    "Chamblee Charter High School",
+                    "Charles R. Drew High School",
+                    "Chattahoochee High School",
+                    "Clarkston High School",
+                    "Collins Hill High School",
+                    "Columbia High School",
+                    "Creekside High School",
+                    "Crim High School",
+                    "Cross Keys High School",
+                    "DeKalb Alternative School",
+                    "Dekalb Early College Academy",
+                    "DeKalb School of the Arts",
+                    "Destiny Achievers Academy of Excellence",
+                    "Douglass High School",
+                    "Druid Hills High School",
+                    "Dunwoody High School",
+                    "Dutchtown High School",
+                    "Eagle's Landing High School",
+                    "Early College High School at Carver",
+                    "Elizabeth Andrews High School",
+                    "Fayette County High School",
+                    "Forest Park High School",
+                    "Gateway to College Academy",
+                    "Grady High School",
+                    "Hampton High School",
+                    "Hapeville Charter Career Academy",
+                    "Harrison High School",
+                    "Henry County High School",
+                    "Hillgrove High School",
+                    "Impact Academy",
+                    "Independence Alternative School",
+                    "Jonesboro High School",
+                    "Kell High School",
+                    "Kennesaw Mountain High School",
+                    "Lakeside High School",
+                    "Lassiter High School",
+                    "Lithonia High School",
+                    "Locust Grove High School",
+                    "Lovejoy High School",
+                    "Luella High School",
+                    "Martin Luther King, Jr. High School ",
+                    "Maynard H. Jackson, Jr. High School",
+                    "Mays High School",
+                    "McClarin Alternative School",
+                    "McEachern High School",
+                    "McNair High School",
+                    "Miller Grove High School",
+                    "Milton High School",
+                    "Morrow High School",
+                    "Mount Zion High School",
+                    "Mundy's Mill High School",
+                    "North Atlanta High School",
+                    "North Clayton High School",
+                    "North Cobb High School",
+                    "North Springs High School",
+                    "Northview High School",
+                    "Oakwood High School",
+                    "Ola High School",
+                    "Osborne High School",
+                    "Patrick Henry High School",
+                    "Pebblebrook High School",
+                    "Pope High School",
+                    "Redan High School",
+                    "Riverdale High School",
+                    "Roswell High School",
+                    "School of Health Sciences and Research at Carver",
+                    "School of Technology at Carver",
+                    "South Atlanta Law and Social Justice School",
+                    "South Atlanta School of Computer Animation and Design",
+                    "South Atlanta School of Health and Medical Science",
+                    "South Cobb High School",
+                    "Southwest DeKalb High School",
+                    "Sprayberry High School",
+                    "Stephenson High School",
+                    "Stockbridge High School",
+                    "Stone Mountain High School",
+                    "TEACH Charter High School",
+                    "The School of the Arts at Carver",
+                    "Therrell School of Engineering, Math, and Science",
+                    "Therrell School of Health and Science",
+                    "Therrell School of Law, Government and Public Policy",
+                    "Towers High School",
+                    "Tucker High School",
+                    "Union Grove High School",
+                    "W. Deen Mohammed High School",
+                    "Walton High School",
+                    "Westlake High School",
+                    "Wheeler High School",
+                    "Woodland High School"
+                ],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "grade",
+                "label": "Grade",
+                "type": "radio",
+                "options": [
+                    "9th grade",
+                    "10th grade",
+                    "11th grade",
+                    "12th grade"
+                ],
+                "required": true
+            },
+            {
+                "name": "referrer",
+                "label": "How did you hear about us?",
+                "type": "radio",
+                "options": [
+                    "Teacher / Counselor",
+                    "Friend",
+                    "Family",
+                    "I attended last year",
+                    "Snapchat",
+                    "Facebook"
+                ],
                 "hasOther": true,
                 "required": true
             },
@@ -28,46 +183,105 @@
                 "label": "Race / ethnicity",
                 "type": "checkbox",
                 "options": [
-                    "Non-Hispanic White",
+                    "White",
                     "Black or African American",
-                    "Latino, Latina, or Hispanic American",
-                    "South Asian or Indian American",
-                    "East Asian or Asian American",
-                    "Middle Eastern or Arab American",
-                    "Native American or Alaskan Native",
+                    "Hispanic / Latino / Latina",
+                    "Asian",
+                    "Native American / American Indian / Alaskan Native",
                     "Hawaiian or Pacific Islander"
+                ],
+                "hasOther": true
+            },
+            {
+                "name": "gender",
+                "label": "Gender",
+                "type": "radio",
+                "options": ["Male", "Female"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "dietary-restrictions",
+                "label": "Do you have any dietary restrictions?",
+                "type": "checkbox",
+                "options": [
+                    "Vegetarian",
+                    "Vegan",
+                    "No beef",
+                    "No pork",
+                    "Gluten-free"
                 ],
                 "hasOther": true,
                 "required": false
             },
             {
-                "name": "resume",
-                "label": "Please upload your resume or a skill sheet",
-                "type": "file",
-                "required": true
-            },
-            {
-                "name": "first-hackathon",
-                "label": "Will HackGT be your first hackathon?",
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
                 "type": "radio",
                 "options": [
-                    "Yes",
-                    "No, I've attended HackGT before",
-                    "No, I've attended other hackathons before"
+                    "Extra small",
+                    "Small",
+                    "Medium",
+                    "Large",
+                    "Extra large",
+                    "2XL",
+                    "3XL"
                 ],
                 "required": true
             },
             {
-                "name": "hope-to-learn",
-                "label": "What do you hope to learn at HackGT?",
-                "type": "textarea",
+                "name": "preference",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Which track do you prefer?",
+                "type": "radio",
+                "options": [
+                    "Design",
+                    "Gaming",
+                    "Hardware",
+                    "Software"
+                ],
                 "required": true
+            },
+            {
+                "name": "session",
+                "label": "This year, Catalyst will have two sessions. Which session do you prefer?",
+                "type": "radio",
+                "options": [
+                    "Session A: 9 AM - 7 PM",
+                    "Session B: 10 AM - 8 PM"
+                ]
+            },
+            {
+                "name": "other",
+                "label": "Anything else you'd like us to know?",
+                "type": "textarea",
+                "required": false
             }
         ]
     },
     {
         "name": "Mentor",
-        "text": [],
+        "text": [
+            {
+                "for": "confirmation",
+                "type": "h5",
+                "content": "A note about background checks:"
+            },
+            {
+                "for": "confirmation",
+                "type": "p",
+                "content": "Due to [Georgia Tech Youth Programs policy](http://www.policylibrary.gatech.edu/youth-programs-policy), all volunteers who will have direct contact with minors at this event must have a completed criminal background check on file with with the Georgia Tech Office of Human Resources (OHR)."
+            },
+            {
+                "for": "confirmation",
+                "type": "p",
+                "content": "Upon completion of this registration form, we will submit a request to initiate a background check on your behalf. Within the next few days, you will receive an email asking you to complete your background screening information. THIS MUST BE FILLED OUT WHEN YOU RECEIVE THIS EMAIL. If this is not completed by the deadline, your background check will not clear in time for Catalyst. If OHR already has a background check completed for you from the past 4 years, we will get those results and a new background check will not be initiated."
+            },
+            {
+                "for": "confirmation",
+                "type": "p",
+                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of ten to twelve students. The goal of these cohorts is to directly connect participants with each other and mentors."
+            }
+        ],
         "questions": [
             {
                 "name": "name",
@@ -76,11 +290,31 @@
                 "required": true
             },
             {
-                "name": "gender",
-                "label": "Gender",
+                "name": "phone",
+                "type": "tel",
+                "label": "Phone number",
+                "required": true
+            },
+            {
+                "name": "occupation",
                 "type": "radio",
-                "options": ["Male", "Female", "Prefer not to answer"],
+                "label": "I am a...",
+                "options": [
+                    "Georgia Tech student",
+                    "Georgia Tech faculty",
+                    "Teacher",
+                    "School Administrator",
+                    "School Counselor",
+                    "School Librarian",
+                    "A professional in industry"
+                ],
                 "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "essay",
+                "type": "textarea",
+                "label": "Why do you want to be a mentor?",
                 "required": true
             },
             {
@@ -88,90 +322,21 @@
                 "label": "Race / ethnicity",
                 "type": "checkbox",
                 "options": [
-                    "Non-Hispanic White",
+                    "White",
                     "Black or African American",
-                    "Latino, Latina, or Hispanic American",
-                    "South Asian or Indian American",
-                    "East Asian or Asian American",
-                    "Middle Eastern or Arab American",
-                    "Native American or Alaskan Native",
+                    "Hispanic / Latino / Latina",
+                    "Asian",
+                    "Native American / American Indian / Alaskan Native",
                     "Hawaiian or Pacific Islander"
                 ],
+                "hasOther": true
+            },
+            {
+                "name": "gender",
+                "label": "Gender",
+                "type": "radio",
+                "options": ["Male", "Female"],
                 "hasOther": true,
-                "required": false
-            },
-            {
-                "name": "is-student",
-                "label": "Are you currently a student?",
-                "type": "radio",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            },
-            {
-                "name": "job-if-not-student",
-                "label": "If not, what do you do?",
-                "type": "text",
-                "required": false
-            },
-            {
-                "name": "resume",
-                "label": "Please upload your resume or a skill sheet",
-                "type": "file",
-                "required": true
-            },
-            {
-                "name": "what-can-mentor",
-                "label": "What topics are you comfortable mentoring in? Please list most proficient first.",
-                "type": "textarea",
-                "required": true
-            },
-            {
-                "name": "github",
-                "label": "GitHub profile",
-                "type": "url",
-                "required": false
-            },
-            {
-                "name": "website",
-                "label": "Personal website",
-                "type": "url",
-                "required": false
-            },
-            {
-                "name": "other-links",
-                "label": "Other relevant links (e.g. LinkedIn)",
-                "type": "url",
-                "required": false
-            },
-            {
-                "name": "can-hold-workshop",
-                "label": "Would you be willing to hold a workshop?",
-                "type": "radio",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            },
-            {
-                "name": "workshop-if-willing",
-                "label": "If so, about what?",
-                "type": "text",
-                "required": false
-            },
-            {
-                "name": "teaching-experience",
-                "label": "Describe your previous experiences with teaching",
-                "type": "textarea",
-                "required": true
-            },
-            {
-                "name": "why-mentor",
-                "label": "Why do you want to be a mentor at HackGT?",
-                "type": "textarea",
                 "required": true
             },
             {
@@ -196,90 +361,192 @@
                 "options": [
                     "Vegetarian",
                     "Vegan",
+                    "No beef",
+                    "No pork",
                     "Gluten-free"
                 ],
                 "hasOther": true,
                 "required": false
             },
             {
+                "name": "confirmation",
+                "label": "We need you to confirm a few things",
+                "type": "checkbox",
+                "options": [
+                    "I'm OK with a (free) background check",
+                    "I can attend a 1.5 hour training session (several sessions will be offered)",
+                    "I can stay for all / most of the event and work closely with students to help and inspire"
+                ],
+                "required": true
+            },
+            {
                 "name": "other",
-                "label": "Anything else you want us to know?",
+                "label": "Anything else you'd like us to know?",
                 "type": "textarea",
                 "required": false
             }
         ]
     },
     {
-        "name": "Waitlist",
-        "text": [
-            {
-                "for": "confirmation",
-                "type": "h5",
-                "content": "We will notify you by 9 PM on the day the event starts"
-            }
-        ],
+        "name": "Chaperone",
         "questions": [
             {
-                "name": "phone",
-                "label": "Please give your phone number to confirm spot on the waitlist.",
+                "name": "name",
                 "type": "text",
+                "label": "Full name",
+                "required": true
+            },
+            {
+                "name": "phone",
+                "type": "tel",
+                "label": "Phone number",
+                "required": true
+            },
+            {
+                "name": "occupation",
+                "type": "radio",
+                "label": "I am a...",
+                "options": [
+                    "Teacher",
+                    "School Administrator",
+                    "School Counselor",
+                    "School Librarian",
+                    "Parent / Guardian"
+                ],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "school",
+                "label": "What school are you chaperoning?",
+                "type": "select",
+                "options": [
+                    "Please select",
+                    "Allatoona High School",
+                    "Alpharetta High School",
+                    "Arabia Mountain High School - Academy of Engineering, Medicine and Environment",
+                    "Banneker High School",
+                    "Booker T. Washington - Early College Small School",
+                    "Booker T. Washington High School - Banking, Finance and Investment Small School",
+                    "Booker T. Washington High School - Health, Sciences and Nutrition Small School",
+                    "Cambridge High School",
+                    "Campbell High School",
+                    "Cedar Grove High School",
+                    "Centennial High School",
+                    "Chamblee Charter High School",
+                    "Charles R. Drew High School",
+                    "Chattahoochee High School",
+                    "Clarkston High School",
+                    "Collins Hill High School",
+                    "Columbia High School",
+                    "Creekside High School",
+                    "Crim High School",
+                    "Cross Keys High School",
+                    "DeKalb Alternative School",
+                    "Dekalb Early College Academy",
+                    "DeKalb School of the Arts",
+                    "Destiny Achievers Academy of Excellence",
+                    "Douglass High School",
+                    "Druid Hills High School",
+                    "Dunwoody High School",
+                    "Dutchtown High School",
+                    "Eagle's Landing High School",
+                    "Early College High School at Carver",
+                    "Elizabeth Andrews High School",
+                    "Fayette County High School",
+                    "Forest Park High School",
+                    "Gateway to College Academy",
+                    "Grady High School",
+                    "Hampton High School",
+                    "Hapeville Charter Career Academy",
+                    "Harrison High School",
+                    "Henry County High School",
+                    "Hillgrove High School",
+                    "Impact Academy",
+                    "Independence Alternative School",
+                    "Jonesboro High School",
+                    "Kell High School",
+                    "Kennesaw Mountain High School",
+                    "Lakeside High School",
+                    "Lassiter High School",
+                    "Lithonia High School",
+                    "Locust Grove High School",
+                    "Lovejoy High School",
+                    "Luella High School",
+                    "Martin Luther King, Jr. High School ",
+                    "Maynard H. Jackson, Jr. High School",
+                    "Mays High School",
+                    "McClarin Alternative School",
+                    "McEachern High School",
+                    "McNair High School",
+                    "Miller Grove High School",
+                    "Milton High School",
+                    "Morrow High School",
+                    "Mount Zion High School",
+                    "Mundy's Mill High School",
+                    "North Atlanta High School",
+                    "North Clayton High School",
+                    "North Cobb High School",
+                    "North Springs High School",
+                    "Northview High School",
+                    "Oakwood High School",
+                    "Ola High School",
+                    "Osborne High School",
+                    "Patrick Henry High School",
+                    "Pebblebrook High School",
+                    "Pope High School",
+                    "Redan High School",
+                    "Riverdale High School",
+                    "Roswell High School",
+                    "School of Health Sciences and Research at Carver",
+                    "School of Technology at Carver",
+                    "South Atlanta Law and Social Justice School",
+                    "South Atlanta School of Computer Animation and Design",
+                    "South Atlanta School of Health and Medical Science",
+                    "South Cobb High School",
+                    "Southwest DeKalb High School",
+                    "Sprayberry High School",
+                    "Stephenson High School",
+                    "Stockbridge High School",
+                    "Stone Mountain High School",
+                    "TEACH Charter High School",
+                    "The School of the Arts at Carver",
+                    "Therrell School of Engineering, Math, and Science",
+                    "Therrell School of Health and Science",
+                    "Therrell School of Law, Government and Public Policy",
+                    "Towers High School",
+                    "Tucker High School",
+                    "Union Grove High School",
+                    "W. Deen Mohammed High School",
+                    "Walton High School",
+                    "Westlake High School",
+                    "Wheeler High School",
+                    "Woodland High School"
+                ],
+                "hasOther": true,
                 "required": true
             }
         ]
     },
     {
-        "name": "Rejected",
-        "text": [],
-        "questions": []
-    },
-    {
-        "name": "General Confirmation",
-        "text": [
+      "name": "Participant Confirmation",
+      "text": [
             {
-                "for": "confirmation",
-                "type": "h5",
-                "content": "Note that opening ceremonies will begin at approximately 7pm on Friday and closing ceremonies will end at approximately 2pm on Sunday"
-            },
-            {
-                "for": "required-items",
-                "type": "h5",
-                "content": "Please confirm some things"
+                "for": "parking",
+                "type": "p",
+                "content": "Thank your confirming your attendance to Catalyst 2018!"
             }
         ],
         "questions": [
             {
-                "name": "confirmation",
-                "label": "Will you be attending HackGT this year on October 13th to 15th?",
+                "name": "parking",
                 "type": "radio",
+                "label": "Will you be driving yourself to the event and leaving your car in the garage all day? We will validate parking for participants parking at the event.",
                 "options": [
-                    "Yes, I'll be there!",
-                    "Sorry, I can't make it"
+                    "Yes",
+                    "No"
                 ],
-                "hasOther": false,
                 "required": true
-            },
-            {
-                "name": "required-items",
-                "label": "Please confirm the following:",
-                "type": "checkbox",
-                "options": [
-                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
-                    "I agree to the terms of the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/blob/master/prize-terms-and-conditions/contest-terms.md)",
-                    "I agree to the terms of the [MLH Privacy Policy](https://mlh.io/privacy)",
-                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/0B2pRUVzz8hWeUE9oaGxXNUxRTjg/view?usp=sharing)"
-                ],
-                "hasOther": false,
-                "required": true
-            },
-            {
-                "name": "optional-items",
-                "label": "Please confirm the following (optional):",
-                "type": "checkbox",
-                "options": [
-                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/0B2pRUVzz8hWebXQ1WllYSmI5TGc/view?usp=sharing)"
-                ],
-                "hasOther": false,
-                "required": false
             }
         ]
     }

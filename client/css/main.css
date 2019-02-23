@@ -108,3 +108,11 @@ section.main {
     border-radius: 4px;
     box-sizing: border-box;
 }
+
+section.status {
+    padding: 40px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}

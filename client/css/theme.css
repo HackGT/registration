@@ -1,0 +1,202 @@
+/* latin-ext */
+@font-face {
+    font-family: 'Raleway';
+    font-style: italic;
+    font-weight: 800;
+    src: local('Raleway ExtraBold Italic'), local('Raleway-ExtraBoldItalic'), url(https://fonts.gstatic.com/s/raleway/v12/1Ptpg8zYS_SKggPNyCgw6qd_DNCb71ka4ZiO.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Raleway';
+    font-style: italic;
+    font-weight: 800;
+    src: local('Raleway ExtraBold Italic'), local('Raleway-ExtraBoldItalic'), url(https://fonts.gstatic.com/s/raleway/v12/1Ptpg8zYS_SKggPNyCgw6qd_AtCb71ka4Q.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  /* latin-ext */
+  @font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Raleway'), local('Raleway-Regular'), url(https://fonts.gstatic.com/s/raleway/v12/1Ptug8zYS_SKggPNyCMIT4ttDfCmxA.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Raleway'), local('Raleway-Regular'), url(https://fonts.gstatic.com/s/raleway/v12/1Ptug8zYS_SKggPNyC0IT4ttDfA.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  /* latin-ext */
+  @font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Raleway ExtraBold'), local('Raleway-ExtraBold'), url(https://fonts.gstatic.com/s/raleway/v12/1Ptrg8zYS_SKggPNwIouWqhPANqczVsq4A.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Raleway ExtraBold'), local('Raleway-ExtraBold'), url(https://fonts.gstatic.com/s/raleway/v12/1Ptrg8zYS_SKggPNwIouWqZPANqczVs.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  
+/* CSS variables for colors */
+:root {
+    --bg-color: #1a1a1a;
+    --input-color:#e6e6e6 ;
+    --text-color: #e6e6e6;
+    --dark-blue: #999999;
+    --light-blue: #e6e6e6;
+    --blur: rgba(255, 255, 255, 0.6);
+}
+
+/* Set backgrounds */
+html::before {
+    background-color: var(--bg-color);
+    /* opacity: 0.8; */
+
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+#sidebar-nav {
+    background: none;
+}
+/* section.main {
+    background-color: var(--blur);
+} */
+
+html, body, #sidebar-nav, section.main {
+    color: var(--text-color);
+    font-family: "Raleway", sans-serif;
+}
+
+/* Hide text and use image instead in the header */
+/* #sidebar > h1, .container > h1:first-child {
+    display: block;
+    background-image: url("https://build.hack.gt/assets/logo.svg");
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
+    height: 75px;
+
+    color: rgba(0, 0, 0, 0);
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+} */
+#sidebar > h1 {
+    margin-bottom: -10px;
+}
+
+#sidebar-nav > a, #sidebar, .editor-toolbar > a {
+    color: var(--text-color);
+    border: none;
+    text-decoration: initial;
+    font-family: "Raleway";
+    font-weight: 800;
+    font-style: italic;
+}
+.editor-toolbar > a {
+    color: var(--text-color) !important;
+}
+
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
+}
+#sidebar-nav > span.divider, section.main, table thead {
+    border-color: var(--light-blue);
+}
+a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
+}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--text-color);
+}
+
+#email-rendered {
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
+}
+
+/* Buttons */
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: var(--dark-blue);
+}
+.editor-toolbar > button {
+    color: var(--light-blue);
+}
+
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Raleway", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+}
+
+code {
+    color: var(--text-color);
+}
+
+ul {
+    padding-left: 0;
+}
+
+section.main > div > p:first-of-type {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):not([type=text]):not([type=email]):not([type=password]):not([type=tel]), select, fieldset {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--light-blue);
+}
+input, label {
+    font-variant-ligatures: none;
+    font-family: "Raleway";
+}
+label {
+    font-weight: bold;
+}
+fieldset > div > label {
+    font-weight: normal;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: var(--dark-blue);
+}
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
+    color: var(--bg-color) !important;
+}
+::placeholder {
+    color: var(--bg-color);
+}
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled) textarea {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
