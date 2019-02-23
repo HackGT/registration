@@ -22,7 +22,7 @@
             {
                 "name": "name",
                 "type": "text",
-                "label": "Full name",
+                "label": "Student Full name",
                 "required": true
             },
             {
@@ -38,6 +38,16 @@
                 "options": [
                     "Mine",
                     "My parent's / guardian's"
+                ],
+                "required": true
+            },
+            {
+                "name": "age",
+                "type": "radio",
+                "label": "Will you be over 18 years old on April 13th, 2019?",
+                "options": [
+                    "No, I will be under 18",
+                    "Yes, I will be over 18"
                 ],
                 "required": true
             },
