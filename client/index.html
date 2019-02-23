@@ -122,9 +122,9 @@
 						{{#if applicationStatus.areOpen}}
 							<p>You still need to complete your registration!</p>
 							{{#ifCond allApplicationTimes.length 1}}
-								<p>If you do not complete your registration before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
+								<p>If you do not complete your registration before {{applicationClose}}, you will not be able to attend {{siteTitle}}!</p>
 							{{else}}
-								<p>If you do not complete your registration before the following times, you will not be considered for {{siteTitle}}:</p>
+								<p>If you do not complete your registration before the following times, you will not be able to attend {{siteTitle}}:</p>
 								<ul>
 									{{#each allApplicationTimes}}
 										<li><strong>{{this.name}}</strong>: {{this.close}}</li>
