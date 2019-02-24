@@ -196,7 +196,7 @@ input:disabled, textarea:disabled {
 ::placeholder {
     color: var(--bg-color);
 }
-input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled) textarea {
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
     background: var(--text-color);
     color: var(--bg-color);
 }
