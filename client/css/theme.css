@@ -59,7 +59,7 @@
 
 /* Set backgrounds */
 html::before {
-    background-color: var(--bg-color);
+    /* background-color: var(--bg-color); */
     /* opacity: 0.8; */
 
     content: "";
@@ -199,4 +199,37 @@ input:disabled, textarea:disabled {
 input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled) textarea {
     background: var(--text-color);
     color: var(--bg-color);
+}
+@media only screen and (max-width: 1000px) {
+    html::before {
+        background-color: var(--bg-color);
+    }
+}
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 1000px) {
+    html::before {
+        background: url(http://localhost:3000/css/marginLeft.png) top left -400px, url(http://localhost:3000/css/marginRight.png) top right -400px;
+        background-color: var(--bg-color);
+        background-repeat: repeat-y;
+        background-size: 500px;
+    }
+} 
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1350px) {
+    html::before {
+        background: url(http://localhost:3000/css/marginLeft.png) top left -300px, url(http://localhost:3000/css/marginRight.png) top right -300px;
+        background-color: var(--bg-color);
+        background-repeat: repeat-y;
+        background-size: 500px;
+    }
+}
+
+@media only screen and (min-width: 1600px) {
+    html::before {
+        background: url(http://localhost:3000/css/marginLeft.png) top left -200px, url(http://localhost:3000/css/marginRight.png) top right -200px;
+        background-color: var(--bg-color);
+        background-repeat: repeat-y;
+        background-size: 500px;
+    }
 }

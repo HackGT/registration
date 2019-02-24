@@ -16,6 +16,16 @@
                 "for": "name",
                 "type": "p",
                 "content": "<Info about release forms>"
+            },
+            {
+                "for": "preference",
+                "type": "p",
+                "content": "Don't worry if you are not sure! You won't officially select a track until the beginning of the event."
+            },
+            {
+                "for": "session",
+                "type": "p",
+                "content": "This year Catalyst will have two sessions. Students in both sessions will receive the same instructional curriculum, but morning and afternoon break-out activities will differ. Please note that students being picked up or dropped off together should register for the same session. More information can be found in the FAQ section of the Catalyst website <insert link>."
             }
         ],
         "questions": [
@@ -225,11 +235,11 @@
                 "label": "What is your T-shirt size?",
                 "type": "radio",
                 "options": [
-                    "Extra small",
-                    "Small",
-                    "Medium",
-                    "Large",
-                    "Extra large",
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
                     "2XL",
                     "3XL"
                 ],
@@ -249,12 +259,13 @@
             },
             {
                 "name": "session",
-                "label": "This year, Catalyst will have two sessions. Which session do you prefer?",
+                "label": "Which session do you prefer?",
                 "type": "radio",
                 "options": [
                     "Session A: 9 AM - 7 PM",
                     "Session B: 10 AM - 8 PM"
-                ]
+                ],
+                "required": true
             },
             {
                 "name": "other",
@@ -268,24 +279,29 @@
         "name": "Mentor",
         "text": [
             {
-                "for": "confirmation",
+                "for": "name",
+                "type": "h5",
+                "content": "Mentorship:"
+            },
+            {
+                "for": "name",
+                "type": "p",
+                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of ten to twelve students. The goal of these cohorts is to directly connect participants with each other and mentors."
+            },
+            {
+                "for": "name",
                 "type": "h5",
                 "content": "A note about background checks:"
             },
             {
-                "for": "confirmation",
+                "for": "name",
                 "type": "p",
-                "content": "Due to [Georgia Tech Youth Programs policy](http://www.policylibrary.gatech.edu/youth-programs-policy), all volunteers who will have direct contact with minors at this event must have a completed criminal background check on file with with the Georgia Tech Office of Human Resources (OHR)."
+                "content": "Due to policy specified by Georgia Tech Youth Programs, all volunteers who will have direct contact with minors at this event must have a completed criminal background check on file with the Georgia Tech Office of Human Resources (OHR)."
             },
             {
-                "for": "confirmation",
+                "for": "name",
                 "type": "p",
-                "content": "Upon completion of this registration form, we will submit a request to initiate a background check on your behalf. Within the next few days, you will receive an email asking you to complete your background screening information. THIS MUST BE FILLED OUT WHEN YOU RECEIVE THIS EMAIL. If this is not completed by the deadline, your background check will not clear in time for Catalyst. If OHR already has a background check completed for you from the past 4 years, we will get those results and a new background check will not be initiated."
-            },
-            {
-                "for": "confirmation",
-                "type": "p",
-                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of ten to twelve students. The goal of these cohorts is to directly connect participants with each other and mentors."
+                "content": "Upon completion of this registration form, we will submit a request to initiate a background check on your behalf. Within the next few days, you will receive an email asking you to complete your background screening information. THIS MUST BE FILLED OUT WHEN YOU RECEIVE THIS EMAIL. If this is not completed by the deadline, your background check will not clear in time for Catalyst. *If OHR already has a background check completed for you from the past 4 years, we will get those results and a new background check will not be initiated.*"
             }
         ],
         "questions": [
@@ -350,11 +366,11 @@
                 "label": "What is your T-shirt size?",
                 "type": "radio",
                 "options": [
-                    "Extra small",
-                    "Small",
-                    "Medium",
-                    "Large",
-                    "Extra large",
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
                     "2XL",
                     "3XL"
                 ],
@@ -379,8 +395,8 @@
                 "label": "We need you to confirm a few things",
                 "type": "checkbox",
                 "options": [
-                    "I'm OK with a (free) background check",
-                    "I can attend a 1.5 hour training session (several sessions will be offered)",
+                    "I consent to a background check (cost covered by HackGT)",
+                    "I can attend a 1.5 hour training session (several sessions will be offered with a variety of dates and times)",
                     "I can stay for all / most of the event and work closely with students to help and inspire"
                 ],
                 "required": true
