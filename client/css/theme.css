@@ -208,7 +208,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 1000px) {
     html::before {
-        background: url(/css/marginLeft.png) top left -400px, url(/css/marginRight.png) top right -400px;
+        background: url(/css/marginLeft.svg) top left -400px, url(/css/marginRight.svg) top right -400px;
         background-color: var(--bg-color);
         background-repeat: repeat-y;
         background-size: 500px;
@@ -218,7 +218,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1350px) {
     html::before {
-        background: url(/css/marginLeft.png) top left -300px, url(/css/marginRight.png) top right -300px;
+        background: url(/css/marginLeft.svg) top left -300px, url(/css/marginRight.svg) top right -300px;
         background-color: var(--bg-color);
         background-repeat: repeat-y;
         background-size: 500px;
@@ -227,7 +227,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 
 @media only screen and (min-width: 1600px) {
     html::before {
-        background: url(/css/marginLeft.png) top left -200px, url(/css/marginRight.png) top right -200px;
+        background: url(/css/marginLeft.svg) top left -200px, url(/css/marginRight.svg) top right -200px;
         background-color: var(--bg-color);
         background-repeat: repeat-y;
         background-size: 500px;
