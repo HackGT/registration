@@ -32,23 +32,25 @@
             {
                 "name": "name",
                 "type": "text",
-                "label": "Student Full name",
+                "label": "Student Full Name",
+                "required": true
+            },
+            {
+                "name": "parent-name",
+                "type": "text",
+                "label": "Parent/Emergency Contact Full Name",
+                "required": true
+            },
+            {
+                "name": "parent-email",
+                "type": "email",
+                "label": "Parent/Emergency Contact Email",
                 "required": true
             },
             {
                 "name": "phone",
                 "type": "tel",
-                "label": "Phone number",
-                "required": true
-            },
-            {
-                "name": "phone-ownership",
-                "label": "Whose phone number is that?",
-                "type": "radio",
-                "options": [
-                    "Mine",
-                    "My parent's / guardian's"
-                ],
+                "label": "Parent/Emergency Contact Phone Number",
                 "required": true
             },
             {
@@ -196,7 +198,7 @@
             },
             {
                 "name": "race",
-                "label": "Race / ethnicity",
+                "label": "Race / Ethnicity",
                 "type": "checkbox",
                 "options": [
                     "White",
@@ -308,13 +310,13 @@
             {
                 "name": "name",
                 "type": "text",
-                "label": "Full name",
+                "label": "Full Name",
                 "required": true
             },
             {
                 "name": "phone",
                 "type": "tel",
-                "label": "Phone number",
+                "label": "Phone Number",
                 "required": true
             },
             {
@@ -340,8 +342,26 @@
                 "required": true
             },
             {
+                "name": "essay",
+                "type": "textarea",
+                "label": "Describe (briefly) a time when you taught someone something new.",
+                "required": true
+            },
+            {
+                "name": "preference",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Which track would you most like to mentor for?",
+                "type": "radio",
+                "options": [
+                    "Design",
+                    "Gaming",
+                    "Hardware",
+                    "Software"
+                ],
+                "required": true
+            },
+            {
                 "name": "race",
-                "label": "Race / ethnicity",
+                "label": "Race / Ethnicity",
                 "type": "checkbox",
                 "options": [
                     "White",
