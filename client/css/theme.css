@@ -212,6 +212,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
         background-color: var(--bg-color);
         background-repeat: repeat-y;
         background-size: 500px;
+        will-change: transform;
     }
 } 
 
@@ -222,6 +223,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
         background-color: var(--bg-color);
         background-repeat: repeat-y;
         background-size: 500px;
+        will-change: transform;
     }
 }
 
@@ -231,5 +233,6 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
         background-color: var(--bg-color);
         background-repeat: repeat-y;
         background-size: 500px;
+        will-change: transform;
     }
 }
