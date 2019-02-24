@@ -64,6 +64,7 @@
                                         "text",
                                         "tel",
                                         "date",
+                                        "email",
                                         "url",
                                         "file",
                                         "textarea"

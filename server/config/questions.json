@@ -349,13 +349,14 @@
             },
             {
                 "name": "preference",
-                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Which track would you most like to mentor for?",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Do you have a preference for mentoring a certain track?",
                 "type": "radio",
                 "options": [
                     "Design",
                     "Gaming",
                     "Hardware",
-                    "Software"
+                    "Software",
+                    "No prference"
                 ],
                 "required": true
             },
