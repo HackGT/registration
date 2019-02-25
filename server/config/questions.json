@@ -43,19 +43,19 @@
             {
                 "name": "parent-name",
                 "type": "text",
-                "label": "Parent/Emergency Contact Full Name",
+                "label": "Parent/Guardian Contact Full Name",
                 "required": true
             },
             {
                 "name": "parent-email",
                 "type": "email",
-                "label": "Parent/Emergency Contact Email",
+                "label": "Parent/Guardian Contact Email",
                 "required": true
             },
             {
                 "name": "phone",
                 "type": "tel",
-                "label": "Parent/Emergency Contact Phone Number",
+                "label": "Parent/Guardian Contact Phone Number",
                 "required": true
             },
             {
