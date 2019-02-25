@@ -293,7 +293,22 @@
             {
                 "for": "name",
                 "type": "p",
-                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of ten to twelve students. The goal of these cohorts is to directly connect participants with each other and mentors."
+                "content": "Catalyst is a FREE day of STEAM for Metro Atlanta high school students with an opportunity to explore Computer Science."
+            },
+            {
+                "for": "name",
+                "type": "p",
+                "content": "We will be offering four tracks to high school students:\n\n* Design\n\n* Gaming\n\n* Hardware\n\n* Software"
+            },
+            {
+                "for": "name",
+                "type": "p",
+                "content": "In addition to facilitating learning in these tracks, mentor responsibilities also include:\n\n* Co-leading a student cohort of up to 12 students\n\n* Encouraging mentees to network within cohorts\n\n* Encouraging mentees to learn throughout the day\n\n* Encouraging mentees to learn after Catalyst is over\n\n* Arriving on-time and staying throughout the entire duration of the event"
+            },
+            {
+                "for": "name",
+                "type": "p",
+                "content": "All mentors are required to attend a 1.5 hour training session. Sveral sessions will be offered with a variety of dates and times."
             },
             {
                 "for": "name",
@@ -347,7 +362,7 @@
                 "required": true
             },
             {
-                "name": "essay",
+                "name": "essay-2",
                 "type": "textarea",
                 "label": "Describe (briefly) a time when you taught someone something new.",
                 "required": true
