@@ -264,8 +264,8 @@
                 "label": "Which session do you prefer?",
                 "type": "radio",
                 "options": [
-                    "Session A: 9 AM - 7 PM",
-                    "Session B: 10 AM - 8 PM"
+                    "Session A: 9 AM - 8 PM",
+                    "Session B: 10 AM - 9 PM"
                 ],
                 "required": true
             },
