@@ -327,7 +327,9 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 });
 
 async function updateUserStatus(user: IUserMongoose, status: string): Promise<void> {
-	if (status === "no-decision") {
+	if (status === user.confirmationBranch) {
+		throw new Error(`User status is already ${status}!`);
+	} else if (status === "no-decision") {
 		// Clear all confirmation data
 		user.confirmationBranch = undefined;
 		user.confirmationData = [];
