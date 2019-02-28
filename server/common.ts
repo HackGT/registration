@@ -300,7 +300,7 @@ async function setDefaultSettings() {
 	const DEFAULTS: any = {
 		"teamsEnabled": true,
 		"qrEnabled": true,
-		"loginMethods": ["local", "github", "google", "facebook"]
+		"loginMethods": ["local"]
 	};
 
 	for (let setting in DEFAULTS) {
