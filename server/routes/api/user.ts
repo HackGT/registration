@@ -321,13 +321,16 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	catch (err) {
 		console.error(err);
 		response.status(500).json({
-			"error": "An error occurred while changing user status"
+			// This endpoint is admin-only so directly communicating error messages is fine
+			"error": `Error occurred while changing user status: ${err.message}`
 		});
 	}
 });
 
 async function updateUserStatus(user: IUserMongoose, status: string): Promise<void> {
-	if (status === "no-decision") {
+	if (status === user.confirmationBranch) {
+		throw new Error(`User status is already ${status}!`);
+	} else if (status === "no-decision") {
 		// Clear all confirmation data
 		user.confirmationBranch = undefined;
 		user.confirmationData = [];
