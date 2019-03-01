@@ -40,8 +40,9 @@ html::before {
     background-repeat: no-repeat;
     overflow: hidden;
     object-fit: fill;
+    position: fixed;
     object-position: bottom;
-    opacity: 0.8;
+    opacity: 0.3;
 
     content: "";
     position: fixed;
@@ -70,6 +71,7 @@ html, body, #sidebar-nav, section.main {
     background-size: contain;
     background-position: top center;
     background-repeat: no-repeat;
+    margin-top: 15%;
     height: 75px;
 
     color: rgba(0, 0, 0, 0);

@@ -41,28 +41,103 @@
                 "required": false
             },
             {
+                "name": "major",
+                "type": "text",
+                "label": "Major",
+                "required": true
+            },
+            {
+                "name": "year",
+                "type": "text",
+                "label": "Year",
+                "required": true
+            },
+            {
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
+                "type": "radio",
+                "options": [
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true
+            },
+            {
+                "name": "dietary-restrictions",
+                "label": "Do you have any dietary restrictions?",
+                "type": "checkbox",
+                "options": [
+                    "Vegetarian",
+                    "Vegan",
+                    "No beef",
+                    "No pork",
+                    "Gluten-free"
+                ],
+                "hasOther": true,
+                "required": false
+             },
+            {
+                "name": "hackgtedu-week-poll",
+                "label": "Would you be interested in a HackGTEdu week for Horizons?",
+                "type": "radio",
+                "options": ["Yes", "No"],
+                "hasOther": false,
+                "required": true
+            },
+            {
+                "name": "track",
+                "label": "What track are you interested in?",
+                "type": "checkbox",
+                "options": ["Physical", "Digital"],
+                "hasOther": false,
+                "required": true
+            },
+            {
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
                 "required": true
             },
             {
+                "name": "portfolio",
+                "type": "text",
+                "label": "Upload a link to your portfolio",
+                "required": false
+            },
+            {
                 "name": "first-hackathon",
-                "label": "Will HackGT be your first hackathon?",
+                "label": "Will Horizons be your first hackathon?",
                 "type": "radio",
                 "options": [
                     "Yes",
-                    "No, I've attended HackGT before",
                     "No, I've attended other hackathons before"
                 ],
                 "required": true
             },
             {
                 "name": "hope-to-learn",
-                "label": "What do you hope to learn at HackGT?",
+                "label": "What do you hope to learn at Horizons?",
                 "type": "textarea",
                 "required": true
+            },
+            {
+                "name": "color",
+                "type": "text",
+                "label": "What's your favorite color?",
+                "required": true
+            },
+            {
+                "name": "other",
+                "label": "Anything else you'd like us to know?",
+                "type": "textarea",
+                "required": false
             }
+            
         ]
     },
     {
