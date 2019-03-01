@@ -321,7 +321,8 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	catch (err) {
 		console.error(err);
 		response.status(500).json({
-			"error": "An error occurred while changing user status"
+			// This endpoint is admin-only so directly communicating error messages is fine
+			"error": `Error occurred while changing user status: ${err.message}`
 		});
 	}
 });
