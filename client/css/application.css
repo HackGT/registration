@@ -13,7 +13,7 @@ label {
     line-height: 1.5;
     letter-spacing: 0;
     font-weight: 300;
-    font-family: "Quicksand";
+    font-family: nobel, sans-serif;
 }
 .required::after {
     content: " *";
@@ -33,7 +33,7 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     -webkit-transition: 0.5s;
     transition: 0.5s;
     outline: none;
-    font-family: "Open Sans";
+    font-family: nobel, sans-serif;
 }
 form > h1,
 form > h2,
@@ -44,13 +44,13 @@ form > h6 {
     text-align: center;
 }
 form > p {
-    font-family: "Quicksand";
+    font-family: nobel, sans-serif;
 }
 form > p.file {
     text-align: center;
     margin: 0;
     font-size: 90%;
-    font-family: "Open Sans";
+    font-family: nobel, sans-serif;
 }
 fieldset {
 	padding: 8px 20px;

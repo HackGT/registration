@@ -1,0 +1,178 @@
+@font-face {
+    font-family: "Gotham";
+    src: url("https://storage.googleapis.com/hackgt/fonts/Gotham-Medium.otf") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Gotham Book";
+    src: url("https://storage.googleapis.com/hackgt/fonts/Gotham-Book.otf") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Space Mono";
+    src: url("https://storage.googleapis.com/hackgt/fonts/SpaceMono-Regular.ttf") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Space Mono";
+    src: url("https://storage.googleapis.com/hackgt/fonts/SpaceMono-Bold.ttf") format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* CSS variables for colors */
+:root {
+    --bg-color: #FFFFFE;
+    --text-color: #43616d;
+    --salmon: #f9ac8e;
+    --green-blue: #c2e3d3;
+    --blur: rgba(255, 255, 255, 0.6);
+}
+
+/* Set backgrounds */
+html::before {
+    background-image: url("https://horizons.hack.gt/assets/Blobs.svg");
+    background-size: 100% 100%;
+/*    background-position: top center;*/
+    background-repeat: no-repeat;
+    overflow: hidden;
+    object-fit: fill;
+    object-position: bottom;
+    opacity: 0.8;
+
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+#sidebar-nav {
+    background: none;
+}
+section.main {
+    background-color: var(--blur);
+}
+
+html, body, #sidebar-nav, section.main {
+    color: var(--text-color);
+    font-family: nobel, sans-serif;
+}
+
+/* Hide text and use image instead in the header */
+#sidebar > h1, .container > h1:first-child {
+    display: block;
+    background-image: url("https://horizons.hack.gt/assets/horizons-logo.png");
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
+    height: 75px;
+
+    color: rgba(0, 0, 0, 0);
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+#sidebar > h1 {
+    margin-bottom: -10px;
+}
+
+#sidebar-nav > a, #sidebar, .editor-toolbar > a {
+    color: var(--text-color);
+    border: none;
+    text-decoration: initial;
+    font-family: nobel, sans-serif;
+    font-weight: bold;
+}
+.editor-toolbar > a {
+    color: var(--text-color) !important;
+}
+
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
+}
+#sidebar-nav > span.divider, section.main, table thead {
+    border-color: var(--green-blue);
+}
+a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
+}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--text-color);
+}
+
+#email-rendered {
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
+}
+
+/* Buttons */
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: var(--salmon);
+     /* border: 2px solid #03565c;  */
+    color: var(--bg-color);
+}
+.editor-toolbar > button {
+    color: var(--salmon);
+}
+
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: nobel, sans-serif;
+}
+
+code {
+    color: var(--text-color);
+}
+
+ul {
+    padding-left: 0;
+}
+
+section.main > div > p:first-of-type {
+    font-weight: bold;
+    font-size: 125%;
+}
+
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
+    background-color: var(--blur);
+    color: var(--text-color);
+    border-color: var(--salmon);
+}
+input, label {
+    font-variant-ligatures: none;
+    font-family: nobel, sans-serif!important;
+}
+label {
+    font-weight: bold;
+}
+fieldset > div > label {
+    font-weight: normal;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: var(--green-blue);
+}
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, var(--green-blue), var(--green-blue) 10px, var(--salmon) 10px, var(--salmon) 20px );
+    color: var(--bg-color) !important;
+}
+input:disabled::placeholder {
+    color: var(--bg-color);
+}
