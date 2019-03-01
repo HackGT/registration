@@ -110,16 +110,6 @@
                 "required": false
             },
             {
-                "name": "first-hackathon",
-                "label": "Will Horizons be your first hackathon?",
-                "type": "radio",
-                "options": [
-                    "Yes",
-                    "No, I've attended other hackathons before"
-                ],
-                "required": true
-            },
-            {
                 "name": "hope-to-learn",
                 "label": "What do you hope to learn at Horizons?",
                 "type": "textarea",
