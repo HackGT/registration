@@ -79,7 +79,7 @@
                     "Gluten-free"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true
              },
             {
                 "name": "hackgtedu-week-poll",
