@@ -42,14 +42,54 @@
             },
             {
                 "name": "major",
-                "type": "text",
                 "label": "Major",
+                "type": "select",
+                "options": [
+                    "Aerospace Engineering",
+                    "Applied Language and Intercultural Studies",
+                    "Applied Physics",
+                    "Architecture",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business Administration",
+                    "Chemical and Biomolecular Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computer Engineering",
+                    "Computational Media",
+                    "Computer Science",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Economics and International Affairs",
+                    "Electrical Engineering",
+                    "Environmental Engineering",
+                    "Global Economics and Modern Languages",
+                    "History, Technology, and Society",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs",
+                    "International Affairs and Modern Language",
+                    "Literature, Media, and Communication",
+                    "Literature, Media, and Communication & Digital Media",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Physics",
+                    "Psychology",
+                    "Public Policy"],
+                "hasOther": true,
                 "required": true
             },
             {
                 "name": "year",
-                "type": "text",
                 "label": "Year",
+                "type": "radio",
+                "options": ["Freshman", "Sophomore", "Junior", "Senior"],
+                "hasOther": true,
                 "required": true
             },
             {
@@ -79,23 +119,15 @@
                     "Gluten-free"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": false
              },
-            {
-                "name": "hackgtedu-week-poll",
-                "label": "Would you be interested in a HackGTEdu week for Horizons?",
-                "type": "radio",
-                "options": ["Yes", "No"],
-                "hasOther": false,
-                "required": true
-            },
             {
                 "name": "track",
                 "label": "What track are you interested in?",
                 "type": "checkbox",
-                "options": ["Physical", "Digital"],
+                "options": ["Physical: encompasses creations that provide a tangible sensory experience for viewers", "Digital: consists of projects that exist solely within some form of digital display"],
                 "hasOther": false,
-                "required": true
+                "required": false
             },
             {
                 "name": "resume",
@@ -106,7 +138,7 @@
             {
                 "name": "portfolio",
                 "type": "text",
-                "label": "Upload a link to your portfolio",
+                "label": "If you have any external links (i.e. Github, Portfolio, etc.)",
                 "required": false
             },
             {

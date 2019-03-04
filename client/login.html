@@ -19,7 +19,7 @@
 			<section id="success">{{success}}</section>
 			<main>
 				{{#ifIn "local" loginMethods}}
-					<div class="active border text-center" id="login">
+					<div class="border text-center" id="login">
 						<h3>Log In</h3>
 						<a href="/login/forgot">Forgot your password?</a>
 						<form action="/auth/login" method="POST">
@@ -33,7 +33,7 @@
 							<a href="#" id="signup-link">Sign up</a>.
 						</p>
 					</div>
-					<div class="border text-center" id="signup">
+					<div class="active border text-center" id="signup">
 						<h3>Sign Up</h3>
 						<form action="/auth/signup" method="POST">
 							<input type="text" name="name" placeholder="Name" required />
