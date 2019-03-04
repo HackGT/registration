@@ -127,6 +127,7 @@ a:hover {
     background-color: var(--salmon);
      /* border: 2px solid #03565c;  */
     color: var(--bg-color);
+    border-radius: 75px;
 }
 .editor-toolbar > button {
     color: var(--salmon);
