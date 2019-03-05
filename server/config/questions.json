@@ -41,6 +41,21 @@
                 "required": false
             },
             {
+                 "name": "university",
+                 "type": "select",
+                 "label": "What university do you go to?",
+                 "options": [
+                     "Georgia Institute of Technology",
+                     "Georgia State University",
+                     "Emory University",
+                     "University of Georgia",
+                     "Clark Atlanta University",
+                     "Kennesaw State University"
+                 ],
+                 "hasOther": true,
+                 "required": true
+            },
+            {
                 "name": "major",
                 "label": "Major",
                 "type": "select",
@@ -222,6 +237,21 @@
                     "No"
                 ],
                 "required": true
+            },
+            {
+                 "name": "university",
+                 "type": "select",
+                 "label": "What university do you go to?",
+                 "options": [
+                     "Georgia Institute of Technology",
+                     "Georgia State University",
+                     "Emory University",
+                     "University of Georgia",
+                     "Clark Atlanta University",
+                     "Kennesaw State University"
+                 ],
+                 "hasOther": true,
+                 "required": true
             },
             {
                 "name": "major",
