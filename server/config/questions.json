@@ -138,7 +138,7 @@
             {
                 "name": "portfolio",
                 "type": "text",
-                "label": "If you have any external links (i.e. Github, Portfolio, etc.)",
+                "label": "External Links (i.e. GitHub, Portfolio, etc.)",
                 "required": false
             },
             {

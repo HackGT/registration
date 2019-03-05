@@ -85,12 +85,10 @@ main > .active {
 	main > * {
 		width: 50%;
 	}
-/*
 	main > .active.border {
 		border-right: 1px solid #43616d;
 		padding-right: 15px;
 	}
-*/
 	main > .active:last-of-type {
 		padding-left: 10px;
 	}

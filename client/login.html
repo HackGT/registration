@@ -19,7 +19,7 @@
 			<section id="success">{{success}}</section>
 			<main>
 				{{#ifIn "local" loginMethods}}
-					<div class="border text-center" id="login">
+					<div class="active border text-center" id="login">
 						<h3>Log In</h3>
 						<a href="/login/forgot">Forgot your password?</a>
 						<form action="/auth/login" method="POST">
@@ -30,10 +30,10 @@
 						<p>
 							Don't have an account?
 							<br />
-							<a href="#" id="signup-link">Sign up</a>.
+							Connect with an external service or <a href="#" id="signup-link">sign up</a>.
 						</p>
 					</div>
-					<div class="active border text-center" id="signup">
+					<div class="border text-center" id="signup">
 						<h3>Sign Up</h3>
 						<form action="/auth/signup" method="POST">
 							<input type="text" name="name" placeholder="Name" required />
@@ -46,14 +46,12 @@
 						</p>
 					</div>
 				{{/ifIn}}
-<!--
 				<div class="active simple-methods text-center">
 					{{#ifIn "local" loginMethods}}{{else}}
 						<h3>Log In</h3>
 					{{/ifIn}}
 					{{> login-methods}}
 				</div>
--->
 			</main>
 		</div>
 	</body>
