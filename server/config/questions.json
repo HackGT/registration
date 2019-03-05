@@ -173,6 +173,14 @@
                 "required": true
             },
             {
+                "name": "age",
+                "type": "radio",
+                "label": "Are you 18+?",
+                "options": ["Yes", "No"],
+                "hasOther": false,
+                "required": true
+            },
+            {
                 "name": "gender",
                 "label": "Gender",
                 "type": "radio",
@@ -206,6 +214,50 @@
                     "No"
                 ],
                 "required": true
+            },
+            {
+                "name": "major",
+                "label": "If yes, what is your major?",
+                "type": "select",
+                "options": [
+                    "Aerospace Engineering",
+                    "Applied Language and Intercultural Studies",
+                    "Applied Physics",
+                    "Architecture",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business Administration",
+                    "Chemical and Biomolecular Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computer Engineering",
+                    "Computational Media",
+                    "Computer Science",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Economics and International Affairs",
+                    "Electrical Engineering",
+                    "Environmental Engineering",
+                    "Global Economics and Modern Languages",
+                    "History, Technology, and Society",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs",
+                    "International Affairs and Modern Language",
+                    "Literature, Media, and Communication",
+                    "Literature, Media, and Communication & Digital Media",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Physics",
+                    "Psychology",
+                    "Public Policy"],
+                "hasOther": true,
+                "required": false
             },
             {
                 "name": "job-if-not-student",
@@ -244,30 +296,8 @@
                 "required": false
             },
             {
-                "name": "can-hold-workshop",
-                "label": "Would you be willing to hold a workshop?",
-                "type": "radio",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            },
-            {
-                "name": "workshop-if-willing",
-                "label": "If so, about what?",
-                "type": "text",
-                "required": false
-            },
-            {
-                "name": "teaching-experience",
-                "label": "Describe your previous experiences with teaching",
-                "type": "textarea",
-                "required": true
-            },
-            {
                 "name": "why-mentor",
-                "label": "Why do you want to be a mentor at HackGT?",
+                "label": "Why do you want to be a mentor at Horizons?",
                 "type": "textarea",
                 "required": true
             },
@@ -293,6 +323,8 @@
                 "options": [
                     "Vegetarian",
                     "Vegan",
+                    "No beef",
+                    "No pork",
                     "Gluten-free"
                 ],
                 "hasOther": true,
