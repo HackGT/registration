@@ -164,7 +164,13 @@
     },
     {
         "name": "Mentor",
-        "text": [],
+        "text": [
+            {
+				"for": "18-and-gt-student",
+				"type": "p",
+				"content": "Due to Institute policy, minors (under 18) that are not students at Georgia Tech may not attend Horizons."
+			}
+        ],
         "questions": [
             {
                 "name": "name",
@@ -173,12 +179,14 @@
                 "required": true
             },
             {
-                "name": "age",
-                "type": "radio",
-                "label": "Are you 18+?",
-                "options": ["Yes", "No"],
-                "hasOther": false,
-                "required": true
+				"name": "18-and-gt-student",
+				"label": "Are you over 18 or a student at Georgia Tech?",
+				"type": "radio",
+				"options": [
+					"I am 18 or older.",
+					"I am under 18 and a Georgia Tech student."
+				],
+				"required": true
             },
             {
                 "name": "gender",
@@ -378,7 +386,7 @@
         "questions": [
             {
                 "name": "confirmation",
-                "label": "Will you be attending HackGT this year on October 13th to 15th?",
+                "label": "Will you be attending Horizons this year on April 5th to 6th?",
                 "type": "radio",
                 "options": [
                     "Yes, I'll be there!",
