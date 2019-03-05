@@ -6,7 +6,12 @@
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
-            }
+            },
+            {
+				"for": "18-and-gt-student",
+				"type": "p",
+				"content": "Due to Institute policy, minors (under 18) that are not students at Georgia Tech may not attend BuildGT."
+			}
         ],
         "questions": [
             {
@@ -15,6 +20,16 @@
                 "label": "Full name",
                 "required": true
             },
+            {
+				"name": "18-and-gt-student",
+				"label": "Are you over 18 or a student at Georgia Tech?",
+				"type": "radio",
+				"options": [
+					"I am 18 or older.",
+					"I am under 18 and a Georgia Tech student."
+				],
+				"required": true
+			},
             {
                 "name": "gender",
                 "label": "Gender",
@@ -167,6 +182,18 @@
                 "type": "text",
                 "label": "What's your favorite color?",
                 "required": true
+            },
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)"
+                ],
+                "required": true,
+                "hasOther": false
             },
             {
                 "name": "other",
@@ -369,6 +396,18 @@
                 "required": false
             },
             {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)"
+                ],
+                "required": true,
+                "hasOther": false
+            },
+            {
                 "name": "other",
                 "label": "Anything else you want us to know?",
                 "type": "textarea",
@@ -424,29 +463,6 @@
                 ],
                 "hasOther": false,
                 "required": true
-            },
-            {
-                "name": "required-items",
-                "label": "Please confirm the following:",
-                "type": "checkbox",
-                "options": [
-                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
-                    "I agree to the terms of the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/blob/master/prize-terms-and-conditions/contest-terms.md)",
-                    "I agree to the terms of the [MLH Privacy Policy](https://mlh.io/privacy)",
-                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/0B2pRUVzz8hWeUE9oaGxXNUxRTjg/view?usp=sharing)"
-                ],
-                "hasOther": false,
-                "required": true
-            },
-            {
-                "name": "optional-items",
-                "label": "Please confirm the following (optional):",
-                "type": "checkbox",
-                "options": [
-                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/0B2pRUVzz8hWebXQ1WllYSmI5TGc/view?usp=sharing)"
-                ],
-                "hasOther": false,
-                "required": false
             }
         ]
     }
