@@ -132,7 +132,7 @@ Handlebars.registerHelper("removeSpaces", (input: string): string => {
 Handlebars.registerHelper("join", <T>(arr: T[]): string  => {
 	return arr.join(", ");
 });
-for (let name of ["sidebar", "login-methods"]) {
+for (let name of ["sidebar", "login-methods", "form"]) {
 	Handlebars.registerPartial(name, fs.readFileSync(path.resolve(STATIC_ROOT, "partials", `${name}.html`), "utf8"));
 }
 
@@ -322,11 +322,13 @@ templateRoutes.route("/login").get(async (request, response) => {
 	if (request.session && request.query.r && request.query.r.startsWith('/')) {
 		request.session.returnTo = request.query.r;
 	}
+	let loginMethods = await getSetting<string[]>("loginMethods");
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
 		error: request.flash("error"),
 		success: request.flash("success"),
-		loginMethods: await getSetting<string[]>("loginMethods")
+		loginMethods,
+		localOnly: loginMethods && loginMethods.length === 1 && loginMethods[0] === "local"
 	};
 	response.send(loginTemplate(templateData));
 });
@@ -555,13 +557,14 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 						}
 					}
 				}
+				question["hasResponse"] = savedValue && savedValue.value; // Used to determine whether "Please select" is selected in dropdown lists
 			}
 			else {
 				question["multi"] = false;
 			}
 			if (savedValue && question.type === "file" && savedValue.value) {
 				savedValue = {
-				...savedValue,
+					...savedValue,
 					value: (savedValue.value as Express.Multer.File).originalname
 				};
 			}
