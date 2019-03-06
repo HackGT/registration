@@ -322,11 +322,13 @@ templateRoutes.route("/login").get(async (request, response) => {
 	if (request.session && request.query.r && request.query.r.startsWith('/')) {
 		request.session.returnTo = request.query.r;
 	}
+	let loginMethods = await getSetting<string[]>("loginMethods");
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
 		error: request.flash("error"),
 		success: request.flash("success"),
-		loginMethods: await getSetting<string[]>("loginMethods")
+		loginMethods,
+		localOnly: loginMethods && loginMethods.length === 1 && loginMethods[0] === "local"
 	};
 	response.send(loginTemplate(templateData));
 });
