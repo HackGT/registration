@@ -69,7 +69,6 @@
                 "label": "School",
                 "type": "select",
                 "options": [
-                    "Please select",
                     "Allatoona High School",
                     "Alpharetta High School",
                     "Arabia Mountain High School - Academy of Engineering, Medicine and Environment",
@@ -484,7 +483,6 @@
                 "label": "What school are you chaperoning?",
                 "type": "select",
                 "options": [
-                    "Please select",
                     "Allatoona High School",
                     "Alpharetta High School",
                     "Arabia Mountain High School - Academy of Engineering, Medicine and Environment",
