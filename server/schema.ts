@@ -312,6 +312,7 @@ export interface ILoginTemplate {
 	error?: string;
 	success?: string;
 	loginMethods?: string[];
+	localOnly?: boolean;
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];

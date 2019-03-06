@@ -101,6 +101,32 @@
                 "required": false
             },
             {
+                "name": "school",
+                "label": "School?",
+                "type": "select",
+                "options": [
+                    "Georgia Tech",
+                    "North Avenue Trade School",
+                    "Georgia Institute of Technology",
+                    "Georgia Tech University"
+                ],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "school-2",
+                "label": "School (not required)?",
+                "type": "select",
+                "options": [
+                    "Georgia Tech",
+                    "North Avenue Trade School",
+                    "Georgia Institute of Technology",
+                    "Georgia Tech University"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
                 "name": "is-student",
                 "label": "Are you currently a student?",
                 "type": "radio",
