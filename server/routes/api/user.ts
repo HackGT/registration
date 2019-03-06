@@ -120,7 +120,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 				else {
 					errored = true;
 					response.status(400).json({
-						"error": `'${question.label}' is a required field`
+						"error": `"${question.label}" is a required field`
 					});
 					return null;
 				}
