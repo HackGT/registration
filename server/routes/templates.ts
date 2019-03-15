@@ -804,6 +804,43 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 
 			return questionIndexA - questionIndexB;
 		}
+	}).map(question => {
+		// Sort question responses into order
+		let branchIndex = Branches.Branches.indexOf(question.branch);
+		if (branchIndex === -1) {
+			// Branch not found; return unchanged
+			return question;
+		}
+		let branch = Branches.QuestionsConfig[branchIndex];
+
+		let branchQuestion = branch.questions.find(q => q.name === question.questionName);
+		if (!branchQuestion) {
+			// Question not found; return unchanged
+			return question;
+		}
+
+		if (branchQuestion.type === "checkbox" || branchQuestion.type === "radio" || branchQuestion.type === "select") {
+			let options = branchQuestion.options;
+			question.responses = question.responses.sort((a, b) => {
+				let optionIndexA = options.indexOf(a.response);
+				let optionIndexB = options.indexOf(b.response);
+				// Sort unknown options at the end (happens for "other" responses)
+				if (optionIndexA === -1) optionIndexA = Infinity;
+				if (optionIndexB === -1) optionIndexB = Infinity;
+
+				// If both are unknown, sort alphabetically
+				if (optionIndexA === Infinity && optionIndexB === Infinity) {
+					let responseA = a.response.toLowerCase();
+					let responseB = b.response.toLowerCase();
+					if (responseA < responseB) return -1;
+					if (responseA > responseB) return  1;
+					return 0;
+				}
+				return optionIndexA - optionIndexB;
+			});
+		}
+
+		return question;
 	});
 
 	response.send(adminTemplate(templateData));
