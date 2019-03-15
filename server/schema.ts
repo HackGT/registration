@@ -324,13 +324,14 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	unauthenticated: boolean;
 }
 export interface ResponseCount {
-	"response": string;
-	"count": number;
+	response: string;
+	count: number;
 }
 export interface StatisticEntry {
-	"questionName": string;
-	"branch": string;
-	"responses": ResponseCount[];
+	questionName: string;
+	questionLabel: string;
+	branch: string;
+	responses: ResponseCount[];
 }
 export interface IAdminTemplate extends ICommonTemplate {
 	applicationStatistics: {
