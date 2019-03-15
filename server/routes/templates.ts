@@ -8,7 +8,7 @@ import * as uuid from "uuid/v4";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
-	config, getSetting, renderMarkdown
+	config, getSetting, renderMarkdown, removeTags
 } from "../common";
 import {
 	authenticateWithRedirect, isAdmin,
@@ -751,14 +751,15 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					if (!rawQuestion) {
 						continue;
 					}
-					let rawQuestionLabel = rawQuestion.label;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestionLabel && entry.branch === appliedBranch.name);
+					let questionName = rawQuestion.name;
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === questionName && entry.branch === appliedBranch.name);
 
 					if (!statisticEntry) {
 						statisticEntry = {
-							"questionName": rawQuestionLabel,
-							"branch": statisticUser.applicationBranch,
-							"responses": []
+							questionName,
+							questionLabel: removeTags(rawQuestion.label),
+							branch: statisticUser.applicationBranch,
+							responses: []
 						};
 						templateData.generalStatistics.push(statisticEntry);
 					}
@@ -769,8 +770,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					}
 					else {
 						statisticEntry.responses.push({
-							"response": checkboxValue,
-							"count": 1
+							response: removeTags(checkboxValue),
+							count: 1
 						});
 					}
 				}

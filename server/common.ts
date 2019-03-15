@@ -410,6 +410,9 @@ export function sanitize(input?: string): string {
 	}
 	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+export function removeTags(input: string): string {
+	return striptags(input);
+}
 
 let renderer = new marked.Renderer();
 let singleLineRenderer = new marked.Renderer();
@@ -515,7 +518,7 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 	});
 	html = $.html();
 
-	let text: string = striptags(html);
+	let text = removeTags(html);
 	// Reverse sanitization
 	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 }
