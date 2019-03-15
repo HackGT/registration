@@ -212,7 +212,7 @@
                 "type": "textarea",
                 "required": false
             }
-            
+
         ]
     },
     {
@@ -267,32 +267,6 @@
                 "required": false
             },
             {
-                "name": "school",
-                "label": "School?",
-                "type": "select",
-                "options": [
-                    "Georgia Tech",
-                    "North Avenue Trade School",
-                    "Georgia Institute of Technology",
-                    "Georgia Tech University"
-                ],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "school-2",
-                "label": "School (not required)?",
-                "type": "select",
-                "options": [
-                    "Georgia Tech",
-                    "North Avenue Trade School",
-                    "Georgia Institute of Technology",
-                    "Georgia Tech University"
-                ],
-                "hasOther": true,
-                "required": false
-            },
-            {
                 "name": "is-student",
                 "label": "Are you currently a student?",
                 "type": "radio",
@@ -312,7 +286,8 @@
                      "Emory University",
                      "University of Georgia",
                      "Clark Atlanta University",
-                     "Kennesaw State University"
+                     "Kennesaw State University",
+                     "I'm not currently a student"
                  ],
                  "hasOther": true,
                  "required": true
