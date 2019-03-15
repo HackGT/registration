@@ -842,6 +842,7 @@ for (let i = 0; i < data.length; i++) {
 		continue;
 	}
 
+	const MAX_SIZE = 50;
 	new Chart(context, {
 		"type": "bar",
 		"data": {
@@ -874,12 +875,34 @@ for (let i = 0; i < data.length; i++) {
 						"stepSize": 1,
 						"autoSkip": false,
 						"minRotation": 0,
-						"maxRotation": 60
+						"maxRotation": 60,
+						"callback": (value: string, index: number, values: string[]) => {
+							if (value.length > MAX_SIZE) {
+								value = value.substr(0, MAX_SIZE) + "...";
+							}
+							return value;
+						}
 					},
 					"gridLines": {
 						"zeroLineColor": color
 					}
 				}]
+			},
+			"tooltips": {
+				"callbacks": {
+					"title": (tooltipItem: any, graphData: any) => {
+						let title: string = graphData.labels[tooltipItem[0].index];
+						let titleWithLineBreaks = "";
+						while (title.length > 0) {
+							titleWithLineBreaks += title.substring(0, MAX_SIZE);
+							if (title.length > MAX_SIZE) {
+								titleWithLineBreaks += "\n";
+							}
+							title = title.substring(MAX_SIZE);
+						}
+						return titleWithLineBreaks;
+					}
+				}
 			}
 		}
 	});
