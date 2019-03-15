@@ -776,69 +776,35 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					}
 				}
 			}
-			/*else if (question.type === "date") {
-				// Categorize by date
-				let years = moment().diff(moment(question.value as string), "years", true);
-
-				let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
-				let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
-				let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
-				if (index !== -1) {
-					templateData.generalStatistics[index].value += years;
-					templateData.generalStatistics[index].count = 1;
-				}
-				else {
-					templateData.generalStatistics.push({
-						"title": title,
-						"value": years,
-						"count": 1
-					});
-				}
-			}*/
 		});
 	});
 	// Order general statistics as they appear in questions.json
-	templateData.generalStatistics = await Promise.all(templateData.generalStatistics.sort((a, b) => {
-		if (a.branch.toLowerCase() < b.branch.toLowerCase()) {
-			return -1;
-		}
-		if (a.branch.toLowerCase() > b.branch.toLowerCase()) {
-			return 1;
-		}
-		return 0;
-	}).map(async statistic => {
-		let questions = (await Branches.BranchConfig.loadBranchFromDB(statistic.branch)).questions;
-		let question = questions.find(q => q.label === statistic.questionName)!;
+	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
+		if (a.branch !== b.branch) {
+			// Sort the branches into order
+			let branchIndexA = Branches.Branches.indexOf(a.branch);
+			let branchIndexB = Branches.Branches.indexOf(b.branch);
+			// Sort unknown branches at the end (shouldn't usually happen)
+			if (branchIndexA === -1) branchIndexA = Infinity;
+			if (branchIndexB === -1) branchIndexB = Infinity;
 
-		statistic.responses = statistic.responses.sort((a, b) => {
-			let aIndex: number = question.options.indexOf(a.response);
-			let bIndex: number = question.options.indexOf(b.response);
-			if (!a || !b || !a.response || !b.response) {
+			return branchIndexA - branchIndexB;
+		}
+		else {
+			if (!Branches.Tags[a.branch] || !Branches.Tags[b.branch]) {
+				// If the user applied to a branch that doesn't exist anymore
 				return 0;
 			}
-			if (aIndex !== -1 && bIndex === -1) {
-				return -1;
-			}
-			if (aIndex === -1 && bIndex !== -1) {
-				return 1;
-			}
-			if (aIndex === -1 && bIndex === -1) {
-				if (a.response.trim() === "") {
-					return 1;
-				}
-				if (a.response.toLowerCase() < b.response.toLowerCase()) {
-					return -1;
-				}
-				if (a.response.toLowerCase() > b.response.toLowerCase()) {
-					return 1;
-				}
-				return 0;
-			}
-			return aIndex - bIndex;
-		});
+			// Sort the questions into order
+			let questionIndexA = Branches.Tags[a.branch].indexOf(a.questionName);
+			let questionIndexB = Branches.Tags[b.branch].indexOf(b.questionName);
+			// Sort unknown questions at the end (shouldn't usually happen)
+			if (questionIndexA === -1) questionIndexA = Infinity;
+			if (questionIndexB === -1) questionIndexB = Infinity;
 
-		return statistic;
-	}));
+			return questionIndexA - questionIndexB;
+		}
+	});
 
 	response.send(adminTemplate(templateData));
 });
