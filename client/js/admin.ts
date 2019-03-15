@@ -842,12 +842,13 @@ for (let i = 0; i < data.length; i++) {
 		continue;
 	}
 
+	const MAX_SIZE = 50;
 	new Chart(context, {
 		"type": "bar",
 		"data": {
 			"labels": data[i].responses.map(response => response.response),
 			"datasets": [{
-				"label": data[i].questionName,
+				"label": "Count",
 				"data": data[i].responses.map(response => response.count),
 				"backgroundColor": Array(data[i].responses.length).fill(color)
 			}]
@@ -861,7 +862,7 @@ for (let i = 0; i < data.length; i++) {
 					"ticks": {
 						"fontColor": color,
 						"beginAtZero": true,
-						"callback": (value: number) => value % 1 === 0 ? value : undefined // Only integers
+						"precision": 0 // Only integers
 					},
 					"gridLines": {
 						"zeroLineColor": color
@@ -872,12 +873,36 @@ for (let i = 0; i < data.length; i++) {
 					"ticks": {
 						"fontColor": color,
 						"stepSize": 1,
-						"autoSkip": false
+						"autoSkip": false,
+						"minRotation": 0,
+						"maxRotation": 60,
+						"callback": (value: string, index: number, values: string[]) => {
+							if (value.length > MAX_SIZE) {
+								value = value.substr(0, MAX_SIZE) + "...";
+							}
+							return value;
+						}
 					},
 					"gridLines": {
 						"zeroLineColor": color
 					}
 				}]
+			},
+			"tooltips": {
+				"callbacks": {
+					"title": (tooltipItem: any, graphData: any) => {
+						let title: string = graphData.labels[tooltipItem[0].index];
+						let titleWithLineBreaks = "";
+						while (title.length > 0) {
+							titleWithLineBreaks += title.substring(0, MAX_SIZE);
+							if (title.length > MAX_SIZE) {
+								titleWithLineBreaks += "\n";
+							}
+							title = title.substring(MAX_SIZE);
+						}
+						return titleWithLineBreaks;
+					}
+				}
 			}
 		}
 	});
