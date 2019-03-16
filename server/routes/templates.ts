@@ -764,13 +764,14 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						templateData.generalStatistics.push(statisticEntry);
 					}
 
+					checkboxValue = removeTags(checkboxValue);
 					let responsesIndex = statisticEntry.responses.findIndex(resp => resp.response === checkboxValue);
 					if (responsesIndex !== -1) {
 						statisticEntry.responses[responsesIndex].count++;
 					}
 					else {
 						statisticEntry.responses.push({
-							response: removeTags(checkboxValue),
+							response: checkboxValue,
 							count: 1
 						});
 					}
