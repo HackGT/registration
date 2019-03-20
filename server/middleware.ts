@@ -76,7 +76,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 	const auth = request.headers.authorization;
 
 	if (auth && typeof auth === "string" && auth.indexOf(" ") > -1) {
-		const key = new Buffer(auth.split(" ")[1], "base64").toString();
+		const key = Buffer.from(auth.split(" ")[1], "base64").toString();
 		if (key === config.secrets.adminKey) {
 			next();
 		}

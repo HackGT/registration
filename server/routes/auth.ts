@@ -71,7 +71,7 @@ authRoutes.get("/login", validateAndCacheHostName, (request, response, next) => 
 });
 authRoutes.get("/login/callback", validateAndCacheHostName, (request, response, next) => {
 	let callbackURL = createLink(request, "auth/login/callback");
-	passport.authenticate("oauth2", { callbackURL } as AuthenticateOptions, (err: Error | null, user?: IUser) {
+	passport.authenticate("oauth2", { callbackURL } as AuthenticateOptions, (err: Error | null, user?: IUser) => {
 		if (err) {
 			console.error(err);
 			next(err);

@@ -34,7 +34,7 @@ class Config implements IConfig.Main {
 		workflowReleaseSummary: null,
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
-		mongoURL: "mongodb://localhost/",
+		mongoURL: "mongodb://localhost/registration",
 		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
 		defaultTimezone: "America/New_York"
 	};
@@ -120,9 +120,6 @@ class Config implements IConfig.Main {
 		// Secrets
 		if (process.env.ADMIN_KEY_SECRET) {
 			this.secrets.adminKey = process.env.ADMIN_KEY_SECRET;
-		}
-		else {
-			console.warn("Setting random admin key! Cannot use the service-to-service APIs.");
 		}
 		if (process.env.SESSION_SECRET) {
 			this.secrets.session = process.env.SESSION_SECRET;
