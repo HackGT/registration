@@ -12,11 +12,10 @@ export namespace IConfig {
 	export interface Secrets {
 		adminKey: string;
 		session: string;
-		oauth: {
-			[Service in OAuthServices]: {
-				id: string;
-				secret: string;
-			}
+		groundTruth: {
+			url: string;
+			id: string;
+			secret: string;
 		};
 	}
 	export interface Email {
@@ -45,7 +44,6 @@ export namespace IConfig {
 		email: Email;
 		server: Server;
 		style: Style;
-		admins: string[];
 		eventName: string;
 		questionsLocation: string;
 		storageEngine: {
@@ -63,60 +61,47 @@ export interface IFormItem {
 	"value": string | string[] | Express.Multer.File | null;
 }
 
-export interface ITeam {
+// For stricter type checking of new object creation
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+interface RootDocument {
 	_id: mongoose.Types.ObjectId;
+}
+export function createNew<T extends RootDocument>(model: mongoose.Model<T & mongoose.Document, {}>, doc: Omit<T, "_id">) {
+	return new model(doc);
+}
+export type Model<T extends RootDocument> = T & mongoose.Document;
+
+export interface ITeam extends RootDocument {
 	teamLeader: mongoose.Types.ObjectId;
 	members: mongoose.Types.ObjectId[];
 	teamName: string;
 }
 
-export type ITeamMongoose = ITeam & mongoose.Document;
-
-export const Team = mongoose.model<ITeamMongoose>("Team", new mongoose.Schema({
+export const Team = mongoose.model<Model<ITeam>>("Team", new mongoose.Schema({
 	teamLeader: {
 		type: mongoose.Schema.Types.ObjectId
 	},
 	members: [{
 		type: mongoose.Schema.Types.ObjectId
 	}],
-	teamName: {
-		type: mongoose.Schema.Types.String
-	}
+	teamName: String
 }));
 
-export interface IUser {
-	_id: mongoose.Types.ObjectId;
+export interface IUser extends RootDocument {
 	uuid: string;
 	email: string;
 	name: string;
-	verifiedEmail: boolean;
-	accountConfirmed: boolean;
 
-	local?: Partial<{
-		hash: string;
-		salt: string;
-		verificationCode: string;
-		resetRequested: boolean;
-		resetCode: string;
-		resetRequestedTime: Date;
-	}>;
-	services: {
-		[Service in Exclude<IConfig.Services, "local">]?: {
-			id: string;
-			// OAuth account email can be different than registration account email
-			email: string;
-			username?: string;
-			profileUrl?: string;
-		};
-	};
+	teamId?: mongoose.Types.ObjectId;
+	admin: boolean;
 
 	applied: boolean;
 	accepted: boolean;
 	preConfirmEmailSent: boolean;
 	confirmed: boolean;
-	applicationBranch: string;
+	applicationBranch?: string;
 	reimbursementAmount?: string;
-	applicationData: IFormItem[];
+	applicationData?: IFormItem[];
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
 
@@ -127,18 +112,14 @@ export interface IUser {
 	};
 
 	confirmationBranch?: string;
-	confirmationData: IFormItem[];
+	confirmationData?: IFormItem[];
 	confirmationStartTime?: Date;
 	confirmationSubmitTime?: Date;
 
-	admin?: boolean;
-
-	teamId?: mongoose.Types.ObjectId;
 }
-export type IUserMongoose = IUser & mongoose.Document;
 
 // This is basically a type definition that exists at runtime and is derived manually from the IUser definition above
-export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
+export const User = mongoose.model<Model<IUser>>("User", new mongoose.Schema({
 	uuid: {
 		type: String,
 		required: true,
@@ -155,22 +136,12 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 		type: String,
 		index: true
 	},
-	verifiedEmail: Boolean,
-	accountConfirmed: Boolean,
-
-	local: {
-		hash: String,
-		salt: String,
-		verificationCode: String,
-		resetRequested: Boolean,
-		resetCode: String,
-		resetRequestedTime: Date
-	},
-	services: mongoose.Schema.Types.Mixed,
 
 	teamId: {
 		type: mongoose.Schema.Types.ObjectId
 	},
+
+	admin: Boolean,
 
 	applied: Boolean,
 	accepted: Boolean,
@@ -191,22 +162,18 @@ export const User = mongoose.model<IUserMongoose>("User", new mongoose.Schema({
 	confirmationBranch: String,
 	confirmationData: [mongoose.Schema.Types.Mixed],
 	confirmationStartTime: Date,
-	confirmationSubmitTime: Date,
-
-	admin: Boolean
+	confirmationSubmitTime: Date
 }).index({
 	email: "text",
 	name: "text"
 }));
 
-export interface ISetting {
-	_id: mongoose.Types.ObjectId;
+export interface ISetting extends RootDocument {
 	name: string;
 	value: any;
 }
-export type ISettingMongoose = ISetting & mongoose.Document;
 
-export const Setting = mongoose.model<ISettingMongoose>("Setting", new mongoose.Schema({
+export const Setting = mongoose.model<Model<ISetting>>("Setting", new mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
@@ -228,16 +195,14 @@ export interface QuestionBranchSettings {
 	isAcceptance?: boolean; // Used by confirmation branch
 	autoConfirm?: boolean; // Used by confirmation branch
 }
-export interface IQuestionBranchConfig {
-	_id: mongoose.Types.ObjectId;
+export interface IQuestionBranchConfig extends RootDocument {
 	name: string;
 	type: QuestionBranchType;
 	settings: QuestionBranchSettings;
 	location: string;
 }
-export type IQuestionBranchConfigMongoose = IQuestionBranchConfig & mongoose.Document;
 
-export const QuestionBranchConfig = mongoose.model<IQuestionBranchConfigMongoose>("QuestionBranchConfig", new mongoose.Schema({
+export const QuestionBranchConfig = mongoose.model<Model<IQuestionBranchConfig>>("QuestionBranchConfig", new mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
@@ -302,17 +267,10 @@ export interface IIndexTemplate extends ICommonTemplate {
 	}[];
 }
 export interface ITeamTemplate extends ICommonTemplate {
-	team?: ITeamMongoose | null;
-	membersAsUsers?: IUserMongoose[] | null;
-	teamLeaderAsUser?: IUserMongoose | null;
+	team?: ITeam | null;
+	membersAsUsers?: IUser[] | null;
+	teamLeaderAsUser?: IUser | null;
 	isCurrentUserTeamLeader: boolean;
-}
-export interface ILoginTemplate {
-	siteTitle: string;
-	error?: string;
-	success?: string;
-	loginMethods?: string[];
-	localOnly?: boolean;
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];
@@ -371,12 +329,7 @@ export interface IAdminTemplate extends ICommonTemplate {
 				close: string;
 			}[];
 		};
-		loginMethodsInfo: {
-			name: string;
-			raw: string;
-			enabled: boolean;
-		}[];
-		adminEmails: IUserMongoose[];
+		adminEmails: IUser[];
 		apiKey: string;
 	};
 	config: {

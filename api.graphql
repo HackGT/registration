@@ -47,10 +47,6 @@ type User {
   name: String!
   # User's email
   email: String!
-  # If the user's email is a verified email
-  email_verified: Boolean!
-  # Login method(s) this user uses (merged by email address)
-  login_methods: [String!]!
 
   # If the user has admin privileges
   admin: Boolean!
@@ -156,4 +152,3 @@ type File {
   # The formatted size of the file in human-readable units
   size_formatted: String!
 }
-

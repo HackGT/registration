@@ -106,7 +106,6 @@
 						<th>Name</th>
 						<th>Email</th>
 						<th>Status</th>
-						<th>Log in method</th>
 					</thead>
 					<tbody></tbody>
 				</table>
@@ -122,14 +121,10 @@
 						<!-- Email -->
 						<td class="email">
 							<span></span>
-							<i class="fa fa-check" title="Verified email" aria-hidden="true"></i>
-							<i class="fa fa-exclamation-triangle" title="Unverified email" aria-hidden="true"></i>
 							<i class="fa fa-asterisk" title="Admin" aria-hidden="true"></i>
 						</td>
 						<!-- Status -->
 						<td class="status"></td>
-						<!-- Login method(s) -->
-						<td class="login-method"></td>
 					</tr>
 				</template>
 			</section>
@@ -183,8 +178,6 @@
 						<!-- Email -->
 						<td class="email">
 							<span></span>
-							<i class="fa fa-check" title="Verified email" aria-hidden="true"></i>
-							<i class="fa fa-exclamation-triangle" title="Unverified email" aria-hidden="true"></i>
 							<i class="fa fa-asterisk" title="Admin" aria-hidden="true"></i>
 						</td>
 						<!-- Application branch -->
@@ -349,22 +342,6 @@
 								<li><strong>\{{qrCode}}</strong>: Image with the user's check-in QR code containing their UUID.</li>
 							</ul>
 						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<h4>Change login methods</h4>
-						</div>
-					</div>
-					<div class="row row-flex">
-						{{#each settings.loginMethodsInfo}}
-							<div class="col-4 auth-method" data-raw-name="{{this.raw}}">
-								<h5>{{this.name}}</h5>
-								<select>
-									<option value="enabled" {{#if this.enabled}}selected{{/if}}>Enabled</option>
-									<option value="disabled" {{#unless this.enabled}}selected{{/unless}}>Disabled</option>
-								</select>
-							</div>
-						{{/each}}
 					</div>
 					<h4><code>config.json</code> options</h4>
 					<div class="row">
