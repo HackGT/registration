@@ -131,10 +131,6 @@ a:hover {
     border-bottom-style: solid;
 }
 
-::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color: var(--text-color);
-}
-
 #email-rendered {
     background-color: var(--bg-color);
     border: 1px solid var(--bg-color);
@@ -192,6 +188,9 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
 input:disabled, textarea:disabled {
     background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
     color: var(--bg-color) !important;
+}
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--bg-color);
 }
 ::placeholder {
     color: var(--bg-color);
