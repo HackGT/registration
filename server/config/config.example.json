@@ -1,19 +1,10 @@
 {
 	"secrets": {
 		"session": "<a random string>",
-		"oauth": {
-			"github": {
-				"id": "",
-				"secret": ""
-			},
-			"google": {
-				"id": "",
-				"secret": ""
-			},
-			"facebook": {
-				"id": "",
-				"secret": ""
-			}
+		"groundTruth": {
+			"url": "",
+			"id": "",
+			"secret": ""
 		}
 	},
 	"email": {
@@ -30,7 +21,6 @@
 		"passwordResetExpiration": 3600000,
 		"mongoURL": "mongodb://localhost/registration"
 	},
-	"admins": ["example@example.com"],
 	"eventName": "My Hackathon",
 	"storageEngine": {
 		"name": "disk | s3",

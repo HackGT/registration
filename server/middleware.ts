@@ -5,7 +5,7 @@ import * as os from "os";
 
 import { config, isBranchOpen } from "./common";
 import { BranchConfig, ApplicationBranch, ConfirmationBranch } from "./branch";
-import { User, IUser, DataLog, HackGTMetrics } from "./schema";
+import { IUser, User, DataLog, HackGTMetrics } from "./schema";
 
 //
 // Express middleware
@@ -60,7 +60,7 @@ export function isUserOrAdmin(request: express.Request, response: express.Respon
 			"error": "You must log in to access this endpoint"
 		});
 	}
-	else if ((user.uuid !== request.params.uuid && !user.admin) || !user.verifiedEmail || !user.accountConfirmed) {
+	else if (user.uuid !== request.params.uuid && !user.admin) {
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"
 		});
@@ -91,7 +91,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 			"error": "You must log in to access this endpoint"
 		});
 	}
-	else if (!user.admin || !user.verifiedEmail || !user.accountConfirmed) {
+	else if (!user.admin) {
 		response.status(403).json({
 			"error": "You are not permitted to access this endpoint"
 		});
@@ -104,7 +104,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 // For API endpoints
 export function authenticateWithReject(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "no-cache");
-	if (!request.isAuthenticated() || !request.user || !request.user.verifiedEmail || !request.user.accountConfirmed) {
+	if (!request.isAuthenticated() || !request.user) {
 		response.status(401).json({
 			"error": "You must log in to access this endpoint"
 		});
@@ -117,7 +117,7 @@ export function authenticateWithReject(request: express.Request, response: expre
 // For directly user facing endpoints
 export function authenticateWithRedirect(request: express.Request, response: express.Response, next: express.NextFunction) {
 	response.setHeader("Cache-Control", "private");
-	if (!request.isAuthenticated() || !request.user || !request.user.verifiedEmail || !request.user.accountConfirmed) {
+	if (!request.isAuthenticated() || !request.user) {
 		if (request.session) {
 			request.session.returnTo = request.originalUrl;
 		}
@@ -171,7 +171,7 @@ export async function canUserModify(request: express.Request, response: express.
 			});
 			return;
 		}
-		if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
+		if (user.applied && branchName.toLowerCase() !== user.applicationBranch!.toLowerCase()) {
 			response.status(400).json({
 				"error": "You can only edit the application branch that you originally submitted"
 			});
@@ -233,8 +233,8 @@ export function branchRedirector(requestType: ApplicationType): (request: expres
 
 			if (requestType === ApplicationType.Application) {
 				// Redirect directly to branch if there is an existing application or confirmation
-				if (user.applied && branchName.toLowerCase() !== user.applicationBranch.toLowerCase()) {
-					response.redirect(`/apply/${encodeURIComponent(user.applicationBranch.toLowerCase())}`);
+				if (user.applied && branchName.toLowerCase() !== user.applicationBranch!.toLowerCase()) {
+					response.redirect(`/apply/${encodeURIComponent(user.applicationBranch!.toLowerCase())}`);
 					return;
 				}
 			}
