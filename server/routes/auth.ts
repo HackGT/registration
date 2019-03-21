@@ -1,3 +1,6 @@
+import * as http from "http";
+import * as https from "https";
+import { URL } from "url";
 import * as crypto from "crypto";
 import * as express from "express";
 import * as session from "express-session";
@@ -54,7 +57,19 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 });
 
 authRoutes.all("/logout", (request, response) => {
-	request.logout();
+	let user = request.user as IUser | undefined;
+	if (user) {
+		let groundTruthURL = new URL(config.secrets.groundTruth.url);
+		let requester = groundTruthURL.protocol === "http:" ? http : https;
+		requester.request(new URL("/api/user/logout", config.secrets.groundTruth.url), {
+			method: "POST",
+			headers: {
+				"Authorization": `Bearer ${user.token}`
+			}
+		}).end();
+
+		request.logout();
+	}
 	if (request.session) {
 		request.session.loginAction = "render";
 	}

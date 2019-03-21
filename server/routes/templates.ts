@@ -31,7 +31,7 @@ export let templateRoutes = express.Router();
 export class Template<T> {
 	private template: Handlebars.TemplateDelegate<T> | null = null;
 
-	constructor(private file: string) {
+	constructor(private readonly file: string) {
 		this.loadTemplate();
 	}
 
@@ -328,7 +328,7 @@ templateRoutes.route("/login").get(async (request, response) => {
 		let templateData = {
 			siteTitle: config.eventName,
 			isLogOut: true,
-			groundTruthLogOut: new URL("/logout", config.secrets.groundTruth.url)
+			groundTruthLogOut: new URL("/logout", config.secrets.groundTruth.url).toString()
 		};
 		response.send(LoginTemplate.render(templateData));
 	}

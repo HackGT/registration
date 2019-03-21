@@ -85,7 +85,8 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 				...GroundTruthStrategy.defaultUserProperties,
 				uuid: uuid(),
 				name,
-				email
+				email,
+				token: null
 			});
 		} else {
 			let existingUser = await User.findOne({ uuid: request.params.uuid });

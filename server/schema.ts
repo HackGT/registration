@@ -91,6 +91,7 @@ export interface IUser extends RootDocument {
 	uuid: string;
 	email: string;
 	name: string;
+	token: string | null;
 
 	teamId?: mongoose.Types.ObjectId;
 	admin: boolean;
@@ -136,6 +137,7 @@ export const User = mongoose.model<Model<IUser>>("User", new mongoose.Schema({
 		type: String,
 		index: true
 	},
+	token: String,
 
 	teamId: {
 		type: mongoose.Schema.Types.ObjectId
