@@ -25,6 +25,7 @@ interface IProfile {
 	uuid: string;
 	name: string;
 	email: string;
+	token: string;
 }
 
 // Because the passport typedefs don't include this for some reason
@@ -72,7 +73,10 @@ export class GroundTruthStrategy extends OAuthStrategy {
 				return;
 			}
 			try {
-				let profile: IProfile = JSON.parse(data);
+				let profile: IProfile = {
+					...JSON.parse(data),
+					token: accessToken
+				};
 				done(null, profile);
 			}
 			catch (err) {
@@ -88,12 +92,14 @@ export class GroundTruthStrategy extends OAuthStrategy {
 				...GroundTruthStrategy.defaultUserProperties,
 				...profile
 			});
-			await user.save();
+		}
+		else {
+			user.token = accessToken;
 		}
 		if (config.admins.includes(profile.email) && !user.admin) {
 			user.admin = true;
-			await user.save();
 		}
+		await user.save();
 		done(null, user);
 	}
 }
