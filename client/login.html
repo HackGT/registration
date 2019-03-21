@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Login - {{siteTitle}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
+		<style>
+			#error {
+				text-align: center;
+				margin-top: 1em;
+				font-size: 2rem;
+				margin-bottom: 1em;
+				color: white;
+				padding: 10px;
+				border-radius: 5px;
+				background-color: rgba(255, 65, 54, 0.85);
+			}
+			.btn {
+				display: block;
+				width: 100px;
+				margin: 0 auto;
+			}
+		</style>
+		<link rel="stylesheet" href="/css/theme.css" />
+	</head>
+	<body>
+		<div class="container">
+			<h1 class="center">{{siteTitle}}</h1>
+
+			{{#if isLogOut}}
+				<h3 class="center">Logout successful</h3>
+				<a class="btn" href="/auth/login">Log in</a>
+			{{else}}
+				<h3 class="center">Login Error</h3>
+				<section id="error">{{error}}</section>
+				<a class="btn" href="/auth/login">Try again</a>
+			{{/if}}
+		</div>
+	</body>
+</html>

@@ -342,6 +342,13 @@ export interface IAdminTemplate extends ICommonTemplate {
 	};
 }
 
+export interface ILoginTemplate {
+	siteTitle: string;
+	isLogOut: boolean;
+	error?: string;
+	groundTruthLogOut?: string;
+}
+
 export interface DataLog {
 	action: string;
 	url: string;
