@@ -55,6 +55,9 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 
 authRoutes.all("/logout", (request, response) => {
 	request.logout();
+	if (request.session) {
+		request.session.loginAction = "render";
+	}
 	response.redirect("/login");
 });
 
@@ -71,23 +74,15 @@ authRoutes.get("/login", validateAndCacheHostName, (request, response, next) => 
 });
 authRoutes.get("/login/callback", validateAndCacheHostName, (request, response, next) => {
 	let callbackURL = createLink(request, "auth/login/callback");
-	passport.authenticate("oauth2", { callbackURL } as AuthenticateOptions, (err: Error | null, user?: IUser) => {
-		if (err) {
-			console.error(err);
-			next(err);
-			return;
-		}
-		if (!user) {
-			response.redirect("/login");
-			return;
-		}
-		request.login(user, err2 => {
-			if (err) {
-				console.error(err2);
-				next(err);
-				return;
-			}
-			response.redirect("/");
-		});
-	})(request, response, next);
+
+	if (request.query.error === "access_denied") {
+		request.flash("error", "Authentication request was denied");
+		response.redirect("/login");
+		return;
+	}
+	passport.authenticate("oauth2", {
+		failureRedirect: "/login",
+		successReturnToOrRedirect: "/",
+		callbackURL
+	} as AuthenticateOptions)(request, response, next);
 });

@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { URL } from "url";
 import * as express from "express";
 import * as Handlebars from "handlebars";
 import * as moment from "moment-timezone";
@@ -20,35 +21,42 @@ import {
 	ITeam, Team,
 	IIndexTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
-	IFormItem
+	IFormItem,
+	ILoginTemplate
 } from "../schema";
 import * as Branches from "../branch";
 
 export let templateRoutes = express.Router();
 
-// Load and compile Handlebars templates
-let [
-	indexTemplate,
-	preregisterTemplate,
-	preconfirmTemplate,
-	registerTemplate,
-	confirmTemplate,
-	adminTemplate,
-	unsupportedTemplate,
-	teamTemplate
-] = [
-	"index.html",
-	"preapplication.html",
-	"preconfirmation.html",
-	"application.html",
-	"confirmation.html",
-	"admin.html",
-	"unsupported.html",
-	"team.html"
-].map(file => {
-	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
-	return Handlebars.compile(data);
-});
+export class Template<T> {
+	private template: Handlebars.TemplateDelegate<T> | null = null;
+
+	constructor(private file: string) {
+		this.loadTemplate();
+	}
+
+	private loadTemplate(): void {
+		let data = fs.readFileSync(path.resolve(STATIC_ROOT, this.file), "utf8");
+		this.template = Handlebars.compile(data);
+	}
+
+	public render(input: T): string {
+		if (!config.server.isProduction) {
+			this.loadTemplate();
+		}
+		return this.template!(input);
+	}
+}
+
+const IndexTemplate = new Template<IIndexTemplate>("index.html");
+const PreRegisterTemplate = new Template<IRegisterBranchChoiceTemplate>("preapplication.html");
+const PreConfirmTemplate = new Template<IRegisterBranchChoiceTemplate>("preconfirmation.html");
+const RegisterTemplate = new Template<IRegisterTemplate>("application.html");
+const ConfirmTemplate = new Template<IRegisterTemplate>("confirmation.html");
+const AdminTemplate = new Template<IAdminTemplate>("admin.html");
+const UnsupportedTemplate = new Template<{ siteTitle: string }>("unsupported.html");
+const TeamTemplate = new Template<ITeamTemplate>("team.html");
+const LoginTemplate = new Template<ILoginTemplate>("login.html");
 
 // Block IE
 templateRoutes.use(async (request, response, next) => {
@@ -67,7 +75,7 @@ templateRoutes.use(async (request, response, next) => {
 		let templateData = {
 			siteTitle: config.eventName
 		};
-		response.send(unsupportedTemplate(templateData));
+		response.send(UnsupportedTemplate.render(templateData));
 	}
 	else {
 		next();
@@ -305,7 +313,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		templateData.timeline.teamFormation = "complete";
 	}
 
-	response.send(indexTemplate(templateData));
+	response.send(IndexTemplate.render(templateData));
 });
 
 templateRoutes.route("/login").get(async (request, response) => {
@@ -313,7 +321,28 @@ templateRoutes.route("/login").get(async (request, response) => {
 	if (request.session && request.query.r && request.query.r.startsWith('/')) {
 		request.session.returnTo = request.query.r;
 	}
-	response.redirect("/auth/login");
+
+	let errorMessage = request.flash("error") as string[];
+	if (request.session && request.session.loginAction === "render") {
+		request.session.loginAction = "redirect";
+		let templateData = {
+			siteTitle: config.eventName,
+			isLogOut: true,
+			groundTruthLogOut: new URL("/logout", config.secrets.groundTruth.url)
+		};
+		response.send(LoginTemplate.render(templateData));
+	}
+	else if (errorMessage.length > 0) {
+		let templateData = {
+			siteTitle: config.eventName,
+			error: errorMessage.join(" "),
+			isLogOut: false
+		};
+		response.send(LoginTemplate.render(templateData));
+	}
+	else {
+		response.redirect("/auth/login");
+	}
 });
 
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
@@ -347,7 +376,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 			qrEnabled: await getSetting<boolean>("qrEnabled")
 		}
 	};
-	response.send(teamTemplate(templateData));
+	response.send(TeamTemplate.render(templateData));
 });
 
 templateRoutes.route("/apply").get(
@@ -398,10 +427,10 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 		};
 
 		if (requestType === ApplicationType.Application) {
-			response.send(preregisterTemplate(templateData));
+			response.send(PreRegisterTemplate.render(templateData));
 		}
 		else {
-			response.send(preconfirmTemplate(templateData));
+			response.send(PreConfirmTemplate.render(templateData));
 		}
 	};
 }
@@ -535,9 +564,9 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		};
 
 		if (requestType === ApplicationType.Application) {
-			response.send(registerTemplate(templateData));
+			response.send(RegisterTemplate.render(templateData));
 		} else if (requestType === ApplicationType.Confirmation) {
-			response.send(confirmTemplate(templateData));
+			response.send(ConfirmTemplate.render(templateData));
 		}
 	};
 }
@@ -754,5 +783,5 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		return question;
 	});
 
-	response.send(adminTemplate(templateData));
+	response.send(AdminTemplate.render(templateData));
 });
