@@ -44,6 +44,10 @@ export namespace IConfig {
 		email: Email;
 		server: Server;
 		style: Style;
+		admins: {
+			domains: string[];
+			emails: string[];
+		};
 		eventName: string;
 		questionsLocation: string;
 		storageEngine: {

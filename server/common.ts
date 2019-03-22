@@ -38,7 +38,10 @@ class Config implements IConfig.Main {
 		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
 		defaultTimezone: "America/New_York"
 	};
-	public admins: string[] = [];
+	public admins = {
+		domains: ["hack.gt"],
+		emails: [] as string[]
+	};
 	public eventName: string = "Untitled Event";
 	public storageEngine = {
 		"name": "disk",
@@ -66,7 +69,7 @@ class Config implements IConfig.Main {
 	}
 	protected loadFromJSON(fileName: string): void {
 		// tslint:disable-next-line:no-shadowed-variable
-		let config: IConfig.Main | null = null;
+		let config: Partial<IConfig.Main> | null = null;
 		try {
 			config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config", fileName), "utf8"));
 		}
@@ -91,6 +94,14 @@ class Config implements IConfig.Main {
 		if (config.server) {
 			for (let key of Object.keys(config.server) as (keyof IConfig.Server)[]) {
 				this.server[key] = config.server[key];
+			}
+		}
+		if (config.admins) {
+			if (config.admins.domains) {
+				this.admins.domains = config.admins.domains;
+			}
+			if (config.admins.emails) {
+				this.admins.emails = config.admins.emails;
 			}
 		}
 		if (config.eventName) {
@@ -189,7 +200,10 @@ class Config implements IConfig.Main {
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
-			this.admins = JSON.parse(process.env.ADMIN_EMAILS!);
+			this.admins.emails = JSON.parse(process.env.ADMIN_EMAILS!);
+		}
+		if (process.env.ADMIN_DOMAINS) {
+			this.admins.domains = JSON.parse(process.env.ADMIN_DOMAINS);
 		}
 		// Event name
 		if (process.env.EVENT_NAME) {
