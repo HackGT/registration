@@ -96,7 +96,12 @@ export class GroundTruthStrategy extends OAuthStrategy {
 		else {
 			user.token = accessToken;
 		}
-		if (config.admins.includes(profile.email) && !user.admin) {
+
+		let domain = user.email.split("@").pop();
+		if (domain && config.admins.domains.includes(domain)) {
+			user.admin = true;
+		}
+		if (config.admins.emails.includes(profile.email)) {
 			user.admin = true;
 		}
 		await user.save();

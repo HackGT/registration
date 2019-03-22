@@ -593,6 +593,8 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		teamIDNameMap[team._id.toString()] = team.teamName;
 	});
 
+	let preconfiguredAdmins = config.admins.emails.concat(config.admins.domains.map(domain => `*@${domain}`));
+
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user,
@@ -650,7 +652,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 			apiKey: config.secrets.adminKey
 		},
 		config: {
-			admins: config.admins.join(", "),
+			admins: preconfiguredAdmins.join(", "),
 			eventName: config.eventName,
 			storageEngine: config.storageEngine.name,
 			uploadDirectoryRaw: config.storageEngine.options.uploadDirectory,
