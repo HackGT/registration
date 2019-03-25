@@ -214,7 +214,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		status = "Incomplete";
 	}
 	else if (user.applied && !user.confirmationBranch) {
-		status = "Pending Decision";
+		status = "Submitted";
 	}
 	else if (user.applied && user.confirmationBranch) {
 		// After confirmation - they either confirmed in time, did not, or branch did not require confirmation

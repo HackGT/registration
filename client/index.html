@@ -73,7 +73,7 @@
 							<p>Application type: <b>{{user.applicationBranch}}</b></p>
 							<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
 							{{#ifCond allConfirmationTimes.length 1}}
-								<p>You must confirm your decision by {{confirmationClose}}.</p>
+								<p>You must confirm your attendance by {{confirmationClose}}.</p>
 							{{else}}
 								<p>If you do not RSVP before the deadline for your confirmation type, you will not be able to attend {{siteTitle}}!</p>
 								<ul>
@@ -111,7 +111,7 @@
 							{{/if}}
 						{{/if}}
 					{{else if user.applied}}
-						<p>You've applied and are all set for now!</p>
+						<p>You've submitted your registration and are all set for now!</p>
 						<p>Registration type: <b>{{user.applicationBranch}}</b></p>
 						{{#if applicationStatus.areOpen}}
 							<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
