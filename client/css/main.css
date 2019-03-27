@@ -54,7 +54,7 @@ main {
 	height: 28px;
 	margin: 0 20px;
 }
-#sidebar a, #sidebar {
+#sidebar a :not(#title), #sidebar {
 	text-align: center;
 	font-family: "Quicksand";
 	letter-spacing: 2px;
