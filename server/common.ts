@@ -35,7 +35,6 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/registration",
-		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
 		defaultTimezone: "America/New_York"
 	};
 	public admins = {
@@ -191,12 +190,6 @@ class Config implements IConfig.Main {
 		}
 		if (process.env.DEFAULT_TIMEZONE) {
 			this.server.defaultTimezone = process.env.DEFAULT_TIMEZONE;
-		}
-		if (process.env.PASSWORD_RESET_EXPIRATION) {
-			let expirationTime = parseInt(process.env.PASSWORD_RESET_EXPIRATION, 10);
-			if (!isNaN(expirationTime) && expirationTime > 0) {
-				this.server.passwordResetExpiration = expirationTime;
-			}
 		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {

@@ -31,7 +31,6 @@ export namespace IConfig {
 		cookieMaxAge: number;
 		cookieSecureOnly: boolean;
 		mongoURL: string;
-		passwordResetExpiration: number;
 		defaultTimezone: string;
 	}
 	export interface Style {
