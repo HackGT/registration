@@ -274,7 +274,7 @@
                 "label": "Please confirm the following:",
                 "type": "checkbox",
                 "options": [
-                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)",
+                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)"
                 ],
                 "required": true,
                 "hasOther": false
