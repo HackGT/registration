@@ -216,6 +216,72 @@
         ]
     },
     {
+        "name": "Participant Confirmation",
+        "text": [],
+        "questions": [
+          {
+              "name": "confirmation",
+              "label": "Will you be attending Horizons this year on Apirl 5-6th?",
+              "type": "radio",
+              "options": [
+                "Yes, I'll be there!",
+                "Sorry, I can't make it"
+              ],
+              "hasOther": false,
+              "required": true
+            },
+            {
+                "name": "first-time-hacker",
+                "label": "Is this your first time participating in a hackathon?",
+                "type": "radio",
+                "options": [
+                  "Yes",
+                  "No"
+                ],
+                "hasOther": false,
+                "required": true
+            },
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)",
+                    "I agree to the terms set forth in the [HackGT Hardware Checkout TOS](https://drive.google.com/open?id=117jB4uIyd7_aiB8_CsRL9fhXyJ0ONSEB)."
+                ],
+                "required": true,
+                "hasOther": false
+            }
+        ]
+    },
+    {
+        "name": "Mentor Confirmation",
+        "text": [],
+        "questions": [
+          {
+              "name": "confirmation",
+              "label": "Will you be attending Horizons this year on Apirl 5-6th?",
+              "type": "radio",
+              "options": [
+                "Yes, I'll be there!",
+                "Sorry, I can't make it"
+              ],
+              "hasOther": false,
+              "required": true
+            },
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)",
+                ],
+                "required": true,
+                "hasOther": false
+            }
+        ]
+    },
+    {
         "name": "Mentor",
         "text": [
             {
