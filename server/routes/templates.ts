@@ -8,7 +8,7 @@ import * as uuid from "uuid/v4";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
-	config, getSetting, renderMarkdown
+	config, getSetting, renderMarkdown, removeTags
 } from "../common";
 import {
 	authenticateWithRedirect, isAdmin,
@@ -132,7 +132,7 @@ Handlebars.registerHelper("removeSpaces", (input: string): string => {
 Handlebars.registerHelper("join", <T>(arr: T[]): string  => {
 	return arr.join(", ");
 });
-for (let name of ["sidebar", "login-methods"]) {
+for (let name of ["sidebar", "login-methods", "form"]) {
 	Handlebars.registerPartial(name, fs.readFileSync(path.resolve(STATIC_ROOT, "partials", `${name}.html`), "utf8"));
 }
 
@@ -322,11 +322,13 @@ templateRoutes.route("/login").get(async (request, response) => {
 	if (request.session && request.query.r && request.query.r.startsWith('/')) {
 		request.session.returnTo = request.query.r;
 	}
+	let loginMethods = await getSetting<string[]>("loginMethods");
 	let templateData: ILoginTemplate = {
 		siteTitle: config.eventName,
 		error: request.flash("error"),
 		success: request.flash("success"),
-		loginMethods: await getSetting<string[]>("loginMethods")
+		loginMethods,
+		localOnly: loginMethods && loginMethods.length === 1 && loginMethods[0] === "local"
 	};
 	response.send(loginTemplate(templateData));
 });
@@ -555,13 +557,14 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 						}
 					}
 				}
+				question["hasResponse"] = savedValue && savedValue.value; // Used to determine whether "Please select" is selected in dropdown lists
 			}
 			else {
 				question["multi"] = false;
 			}
 			if (savedValue && question.type === "file" && savedValue.value) {
 				savedValue = {
-				...savedValue,
+					...savedValue,
 					value: (savedValue.value as Express.Multer.File).originalname
 				};
 			}
@@ -748,93 +751,98 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					if (!rawQuestion) {
 						continue;
 					}
-					let rawQuestionLabel = rawQuestion.label;
-					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === rawQuestionLabel && entry.branch === appliedBranch.name);
+					let questionName = rawQuestion.name;
+					let statisticEntry: StatisticEntry | undefined = templateData.generalStatistics.find(entry => entry.questionName === questionName && entry.branch === appliedBranch.name);
 
 					if (!statisticEntry) {
 						statisticEntry = {
-							"questionName": rawQuestionLabel,
-							"branch": statisticUser.applicationBranch,
-							"responses": []
+							questionName,
+							questionLabel: removeTags(rawQuestion.label),
+							branch: statisticUser.applicationBranch,
+							responses: []
 						};
 						templateData.generalStatistics.push(statisticEntry);
 					}
 
+					checkboxValue = removeTags(checkboxValue);
 					let responsesIndex = statisticEntry.responses.findIndex(resp => resp.response === checkboxValue);
 					if (responsesIndex !== -1) {
 						statisticEntry.responses[responsesIndex].count++;
 					}
 					else {
 						statisticEntry.responses.push({
-							"response": checkboxValue,
-							"count": 1
+							response: checkboxValue,
+							count: 1
 						});
 					}
 				}
 			}
-			/*else if (question.type === "date") {
-				// Categorize by date
-				let years = moment().diff(moment(question.value as string), "years", true);
-
-				let rawQuestion = rawQuestions.find(branch => branch.name === user.applicationBranch)!.questions.find(q => q.name === question.name);
-				let title = `${user.applicationBranch} → ${rawQuestion ? rawQuestion.label : question.name} (average)`;
-				let index = templateData.generalStatistics.findIndex(stat => stat.title === title);
-				if (index !== -1) {
-					templateData.generalStatistics[index].value += years;
-					templateData.generalStatistics[index].count = 1;
-				}
-				else {
-					templateData.generalStatistics.push({
-						"title": title,
-						"value": years,
-						"count": 1
-					});
-				}
-			}*/
 		});
 	});
 	// Order general statistics as they appear in questions.json
-	templateData.generalStatistics = await Promise.all(templateData.generalStatistics.sort((a, b) => {
-		if (a.branch.toLowerCase() < b.branch.toLowerCase()) {
-			return -1;
-		}
-		if (a.branch.toLowerCase() > b.branch.toLowerCase()) {
-			return 1;
-		}
-		return 0;
-	}).map(async statistic => {
-		let questions = (await Branches.BranchConfig.loadBranchFromDB(statistic.branch)).questions;
-		let question = questions.find(q => q.label === statistic.questionName)!;
+	templateData.generalStatistics = templateData.generalStatistics.sort((a, b) => {
+		if (a.branch !== b.branch) {
+			// Sort the branches into order
+			let branchIndexA = Branches.Branches.indexOf(a.branch);
+			let branchIndexB = Branches.Branches.indexOf(b.branch);
+			// Sort unknown branches at the end (shouldn't usually happen)
+			if (branchIndexA === -1) branchIndexA = Infinity;
+			if (branchIndexB === -1) branchIndexB = Infinity;
 
-		statistic.responses = statistic.responses.sort((a, b) => {
-			let aIndex: number = question.options.indexOf(a.response);
-			let bIndex: number = question.options.indexOf(b.response);
-			if (!a || !b || !a.response || !b.response) {
+			return branchIndexA - branchIndexB;
+		}
+		else {
+			if (!Branches.Tags[a.branch] || !Branches.Tags[b.branch]) {
+				// If the user applied to a branch that doesn't exist anymore
 				return 0;
 			}
-			if (aIndex !== -1 && bIndex === -1) {
-				return -1;
-			}
-			if (aIndex === -1 && bIndex !== -1) {
-				return 1;
-			}
-			if (aIndex === -1 && bIndex === -1) {
-				if (a.response.trim() === "") {
-					return 1;
-				}
-				if (a.response.toLowerCase() < b.response.toLowerCase()) {
-					return -1;
-				}
-				if (a.response.toLowerCase() > b.response.toLowerCase()) {
-					return 1;
-				}
-				return 0;
-			}
-			return aIndex - bIndex;
-		});
+			// Sort the questions into order
+			let questionIndexA = Branches.Tags[a.branch].indexOf(a.questionName);
+			let questionIndexB = Branches.Tags[b.branch].indexOf(b.questionName);
+			// Sort unknown questions at the end (shouldn't usually happen)
+			if (questionIndexA === -1) questionIndexA = Infinity;
+			if (questionIndexB === -1) questionIndexB = Infinity;
 
-		return statistic;
-	}));
+			return questionIndexA - questionIndexB;
+		}
+	}).map(question => {
+		// Sort question responses into order
+		let branchIndex = Branches.Branches.indexOf(question.branch);
+		if (branchIndex === -1) {
+			// Branch not found; return unchanged
+			return question;
+		}
+		let branch = Branches.QuestionsConfig[branchIndex];
+
+		let branchQuestion = branch.questions.find(q => q.name === question.questionName);
+		if (!branchQuestion) {
+			// Question not found; return unchanged
+			return question;
+		}
+
+		if (branchQuestion.type === "checkbox" || branchQuestion.type === "radio" || branchQuestion.type === "select") {
+			let options = branchQuestion.options;
+			question.responses = question.responses.sort((a, b) => {
+				let optionIndexA = options.indexOf(a.response);
+				let optionIndexB = options.indexOf(b.response);
+				// Sort unknown options at the end (happens for "other" responses)
+				if (optionIndexA === -1) optionIndexA = Infinity;
+				if (optionIndexB === -1) optionIndexB = Infinity;
+
+				// If both are unknown, sort alphabetically
+				if (optionIndexA === Infinity && optionIndexB === Infinity) {
+					let responseA = a.response.toLowerCase();
+					let responseB = b.response.toLowerCase();
+					if (responseA < responseB) return -1;
+					if (responseA > responseB) return  1;
+					return 0;
+				}
+				return optionIndexA - optionIndexB;
+			});
+		}
+
+		return question;
+	});
 
 	response.send(adminTemplate(templateData));
 });

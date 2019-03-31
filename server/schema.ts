@@ -312,6 +312,7 @@ export interface ILoginTemplate {
 	error?: string;
 	success?: string;
 	loginMethods?: string[];
+	localOnly?: boolean;
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];
@@ -323,13 +324,14 @@ export interface IRegisterTemplate extends ICommonTemplate {
 	unauthenticated: boolean;
 }
 export interface ResponseCount {
-	"response": string;
-	"count": number;
+	response: string;
+	count: number;
 }
 export interface StatisticEntry {
-	"questionName": string;
-	"branch": string;
-	"responses": ResponseCount[];
+	questionName: string;
+	questionLabel: string;
+	branch: string;
+	responses: ResponseCount[];
 }
 export interface IAdminTemplate extends ICommonTemplate {
 	applicationStatistics: {

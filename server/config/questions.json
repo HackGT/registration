@@ -212,7 +212,7 @@
                 "type": "textarea",
                 "required": false
             }
-            
+
         ]
     },
     {
@@ -352,7 +352,8 @@
                      "Emory University",
                      "University of Georgia",
                      "Clark Atlanta University",
-                     "Kennesaw State University"
+                     "Kennesaw State University",
+                     "I'm not currently a student"
                  ],
                  "hasOther": true,
                  "required": true

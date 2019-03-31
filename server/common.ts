@@ -410,6 +410,11 @@ export function sanitize(input?: string): string {
 	}
 	return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+export function removeTags(input: string): string {
+	let text = striptags(input);
+	text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+	return text;
+}
 
 let renderer = new marked.Renderer();
 let singleLineRenderer = new marked.Renderer();
@@ -515,9 +520,7 @@ export async function renderEmailText(markdown: string, user: IUser, markdownRen
 	});
 	html = $.html();
 
-	let text: string = striptags(html);
-	// Reverse sanitization
-	return text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+	return removeTags(html);
 }
 
 // Verify and load questions

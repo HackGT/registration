@@ -25,66 +25,16 @@
 				Running event.preventDefault() in the submit button's click handler also disables validation for some reason
 			-->
 			{{#unless unauthenticated}}
-				<form method="post" data-action="/api/user/{{user.uuid}}/application/{{slug branch}}">
+			<form method="post" data-action="/api/user/{{user.uuid}}/application/{{slug branch}}">
 			{{else}}
-				<form method="post" data-action="/api/registration/{{slug branch}}">
-					<label for="anonymous-registration-email" class="required">Email</label>
-					<input type="email" name="anonymous-registration-email" id="anonymous-registration-email" required />
-					<label for="anonymous-registration-name" class="required">Name</label>
-					<input type="text" name="anonymous-registration-name" id="anonymous-registration-name" required />
+			<form method="post" data-action="/api/registration/{{slug branch}}">
+				<label for="anonymous-registration-email" class="required">Email</label>
+				<input type="email" name="anonymous-registration-email" id="anonymous-registration-email" required />
+				<label for="anonymous-registration-name" class="required">Name</label>
+				<input type="text" name="anonymous-registration-name" id="anonymous-registration-name" required />
 			{{/unless}}
 
-				{{#each questionData}}
-					{{#if this.textContent}}
-						{{{this.textContent}}}
-					{{/if}}
-					{{#if this.multi}}
-						{{#ifCond this.type "select"}}
-							<label for="form-{{this.name}}" class="{{required this.required}}">{{{this.label}}}</label>
-							<select id="form-{{this.name}}" name="{{this.name}}" data-hasother-select="{{this.hasOther}}">
-								{{#each this.options}}
-									<option {{selected ../this.selected @index}}>{{this}}</option>
-								{{/each}}
-							</select>
-							{{#if this.hasOther}}
-								<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
-							{{/if}}
-						{{else}}
-							<label class="{{required this.required}}">{{{this.label}}}</label>
-							<fieldset data-hasother-fieldset="{{this.hasOther}}">
-								{{#each this.options}}
-									<div>
-										<input type="{{../this.type}}" name="{{../this.name}}" id="form-{{@index}}-{{../this.name}}" value="{{this}}" {{required ../this.required}} {{checked ../this.selected @index}} />
-										<label for="form-{{@index}}-{{../this.name}}">{{{this}}}</label>
-									</div>
-								{{/each}}
-								{{#if this.hasOther}}
-									<div>
-										<input type="text" name="{{this.name}}" placeholder="Other" {{enabled this.otherSelected}} {{required this.required}} value="{{this.otherValue}}" />
-									</div>
-								{{/if}}
-							</fieldset>
-						{{/ifCond}}
-					{{else}}
-						<label for="form-{{this.name}}" class="{{required this.required}}">{{{this.label}}}</label>
-						{{#ifCond this.type "textarea"}}
-							<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}>{{this.value}}</textarea>
-						{{else}}
-							{{#ifCond this.type "file"}}
-								{{#if this.value}}
-									<input type="file" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" />
-									<p class="file">Previously uploaded: <code>{{this.value}}</code></p>
-								{{else}}
-									<input type="file" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />
-								{{/if}}
-							{{else}}
-								<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} value="{{this.value}}" />
-							{{/ifCond}}
-						{{/ifCond}}
-					{{/if}}
-					<br />
-				{{/each}}
-				{{{endText}}}
+				{{> form}}
 				<div class="center">
 					{{#unless unauthenticated}}
 					{{#if user.applied}}
@@ -96,7 +46,6 @@
 					{{else}}
 						<input type="submit" value="Submit" />
 					{{/unless}}
-
 				</div>
 			</form>
 		{{/sidebar}}
