@@ -554,5 +554,220 @@
                 "required": true
             }
         ]
+    },
+    {
+        "name": "Participant Walk-Up",
+        "text": [
+            {
+                "for": "end",
+                "type": "p",
+                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+				"for": "18-and-gt-student",
+				"type": "p",
+				"content": "Due to Institute policy, minors (under 18) that are not students at Georgia Tech may not attend Horizons."
+			}
+        ],
+        "questions": [
+            {
+				"name": "18-and-gt-student",
+				"label": "Are you over 18 or a student at Georgia Tech?",
+				"type": "radio",
+				"options": [
+					"I am 18 or older.",
+					"I am under 18 and a Georgia Tech student."
+				],
+				"required": true
+			},
+            {
+                "name": "gender",
+                "label": "Gender",
+                "type": "radio",
+                "options": ["Male", "Female", "Prefer not to answer"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "race",
+                "label": "Race / ethnicity",
+                "type": "checkbox",
+                "options": [
+                    "Non-Hispanic White",
+                    "Black or African American",
+                    "Latino, Latina, or Hispanic American",
+                    "South Asian or Indian American",
+                    "East Asian or Asian American",
+                    "Middle Eastern or Arab American",
+                    "Native American or Alaskan Native",
+                    "Hawaiian or Pacific Islander"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                 "name": "university",
+                 "type": "select",
+                 "label": "What university do you go to?",
+                 "options": [
+                     "Georgia Institute of Technology",
+                     "Georgia State University",
+                     "Emory University",
+                     "University of Georgia",
+                     "Clark Atlanta University",
+                     "Kennesaw State University"
+                 ],
+                 "hasOther": true,
+                 "required": true
+            },
+            {
+                "name": "major",
+                "label": "Major",
+                "type": "select",
+                "options": [
+                    "Aerospace Engineering",
+                    "Applied Language and Intercultural Studies",
+                    "Applied Physics",
+                    "Architecture",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business Administration",
+                    "Chemical and Biomolecular Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computer Engineering",
+                    "Computational Media",
+                    "Computer Science",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Economics and International Affairs",
+                    "Electrical Engineering",
+                    "Environmental Engineering",
+                    "Global Economics and Modern Languages",
+                    "History, Technology, and Society",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs",
+                    "International Affairs and Modern Language",
+                    "Literature, Media, and Communication",
+                    "Literature, Media, and Communication & Digital Media",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Physics",
+                    "Psychology",
+                    "Public Policy"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "year",
+                "label": "Year",
+                "type": "radio",
+                "options": ["Freshman", "Sophomore", "Junior", "Senior"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
+                "type": "radio",
+                "options": [
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true
+            },
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)",
+                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)",
+                    "I agree to the terms set forth in the [HackGT Hardware Checkout TOS](https://drive.google.com/open?id=117jB4uIyd7_aiB8_CsRL9fhXyJ0ONSEB)."
+                ],
+                "required": true,
+                "hasOther": false
+            }
+        ]
+    },
+    {
+        "name": "Mentor Walk-Up",
+        "text": [
+            {
+                "for": "end",
+                "type": "p",
+                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+				"for": "18-and-gt-student",
+				"type": "p",
+				"content": "Due to Institute policy, minors (under 18) that are not students at Georgia Tech may not attend Horizons."
+			}
+        ],
+        "questions": [
+            {
+				"name": "18-and-gt-student",
+				"label": "Are you over 18 or a student at Georgia Tech?",
+				"type": "radio",
+				"options": [
+					"I am 18 or older.",
+					"I am under 18 and a Georgia Tech student."
+				],
+				"required": true
+			},
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)",
+                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)",
+                    "I agree to the terms set forth in the [HackGT Hardware Checkout TOS](https://drive.google.com/open?id=117jB4uIyd7_aiB8_CsRL9fhXyJ0ONSEB)."
+                ],
+                "required": true,
+                "hasOther": false
+            }
+        ]
+    },
+    {
+        "name": "Performer Walk-Up",
+        "text": [
+            {
+                "for": "end",
+                "type": "p",
+                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            }
+        ],
+        "questions": [
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)",
+                    "I agree to [The Hive Liability and Photo Waiver](https://drive.google.com/open?id=1vC2SzpVnEa-UwX67tUbJP6cge5qG9djp)",
+                    "I agree to the terms set forth in the [HackGT Hardware Checkout TOS](https://drive.google.com/open?id=117jB4uIyd7_aiB8_CsRL9fhXyJ0ONSEB)."
+                ],
+                "required": true,
+                "hasOther": false
+            }
+        ]
     }
 ]
