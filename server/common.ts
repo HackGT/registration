@@ -392,6 +392,7 @@ export const defaultEmailSubjects = {
 };
 export interface IMailObject {
 	to: string;
+	cc?: string;
 	from: string;
 	subject: string;
 	html: string;

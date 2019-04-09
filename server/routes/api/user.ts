@@ -404,15 +404,25 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 
 			let html = await renderEmailHTML(emailMarkdown, user);
 			let text = await renderEmailText(html, user, true);
-
-			emails.push({
-				from: config.email.from,
-				to: user.email,
-				subject: emailSubject || defaultEmailSubjects.preConfirm,
-				html,
-				text
-			});
-
+			if (user.applicationBranch === 'Participant') {
+				let question = user.applicationData.find(data => data.name === "parent-email")!;
+				emails.push({
+					from: config.email.from,
+					to: user.email,
+					cc: question.value! as string,
+					subject: emailSubject || defaultEmailSubjects.preConfirm,
+					html,
+					text
+				});
+			} else {
+				emails.push({
+					from: config.email.from,
+					to: user.email,
+					subject: emailSubject || defaultEmailSubjects.preConfirm,
+					html,
+					text
+				});
+			}
 			user.preConfirmEmailSent = true;
 			await user.save();
 		}
