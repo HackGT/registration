@@ -306,14 +306,25 @@ settingsRoutes.route("/send_batch_email")
 		for (let user of users) {
 			let html: string = await renderEmailHTML(markdownContent, user);
 			let text: string = await renderEmailText(html, user, true);
-
-			emails.push({
-				from: config.email.from,
-				to: user.email,
-				subject,
-				html,
-				text
-			});
+			let question = user.applicationData.find(data => data.name === "parent-email");
+			if (user.applicationBranch === 'Participant' && question && question.value && question.value !== user.email) {
+				emails.push({
+					from: config.email.from,
+					to: user.email,
+					cc: question.value as string,
+					subject,
+					html,
+					text
+				});
+			} else {
+				emails.push({
+					from: config.email.from,
+					to: user.email,
+					subject,
+					html,
+					text
+				});
+			}
 		}
 
 		let admins = await User.find({ admin: true });
