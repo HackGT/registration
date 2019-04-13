@@ -824,5 +824,10 @@
         "name": "Walk-up Auto-confirm",
         "text": [],
         "questions": []
+    },
+    {
+        "name": "Staff Auto-confirm",
+        "text": [],
+        "questions": []
     }
 ]
