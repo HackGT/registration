@@ -66,7 +66,7 @@ PRODUCTION | Set to `true` to enable reverse proxy trusting (default: `false`)
 PORT | The port the check in system should run on (default: `3000`)
 MONGO_URL | The URL to the MongoDB server (default: `mongodb://localhost/registration`)
 VERSION_HASH | The Git short hash used to identify the current commit (default: parsed automatically from the `.git` folder, if it exists)
-ADMIN_KEY_SECRET | A API key used to authenticate as admin an access the GraphQL api (default: random key that changes every server restart)
+ADMIN_KEY_SECRET | An API key used to authenticate as admin an access the GraphQL api (default: random key that changes every server restart)
 COOKIE_MAX_AGE | The `maxAge` of cookies set in milliseconds (default: 6 months) **NOTE: this is different from the session TTL**
 COOKIE_SECURE_ONLY | Whether session cookies should sent exclusively over secure connections (default: `false`)
 PASSWORD_RESET_EXPIRATION | The time that password reset links sent via email should be valid for in milliseconds (default: 1 hour)
@@ -75,14 +75,14 @@ GROUND_TRUTH_URL | Base URL of [Ground Truth](https://github.com/HackGT/ground-t
 GROUND_TRUTH_ID | OAuth client ID from Ground Truth *required*
 GROUND_TRUTH_SECRET | OAuth client secret from Ground Truth *required*
 EMAIL_FROM | The `From` header for sent emails (default: `HackGT Team <hello@hackgt.com>`)
-EMAIL_KEY | The SendGrid API key for sending emails (default: *none*)
+EMAIL_KEY | The SendGrid API key for sending emails (default: *none*) *required*
 ADMIN_EMAILS | A JSON array of the emails of the users that you want promoted to admin status when they create their account (default: none)
 EVENT_NAME | The current event's name which affects rendered templates and sent emails (default: `Untitled Event`)
 STORAGE_ENGINE | The name of the storage engine that handles file uploads as defined in [storage.ts](server/storage.ts) (default: `disk`)
 STORAGE_ENGINE_OPTIONS | JSON-encoded object containing options to be passed to the storage engine. Must at least contain a value for the `uploadDirectory` key. For the default `disk` storage engine, this directory is relative to the app's root, can be absolute, and will be created if it doesn't exist. (default: `{ "uploadDirectory": "uploads" }`)
 DEFAULT_TIMEZONE | Timezone used for dates and times (default: `America/New_York`)
 MAX_TEAM_SIZE | The maximum number of users allowed per team (default: `4`)
-QUESTIONS_FILE | Specify a path for the `questions.json` file.
+QUESTIONS_FILE | Specify a path for the `questions.json` file. (default: ./server/config/questions.json)
 THEME_FILE | Specify a path for the `theme.css` file, which will be loaded last at every page.
 FAVICON_FILE | Path to the favicon file (default is no favicon).
 FAVICON_FILE_BASE64 | Same as `FAVICON_FILE_BASE64` but the file is base64 encoded.
@@ -92,7 +92,7 @@ FAVICON_FILE_BASE64 | Same as `FAVICON_FILE_BASE64` but the file is base64 encod
 
 If you happen to find a bug or have a feature you'd like to see implemented, please [file an issue](https://github.com/HackGT/registration/issues).
 
-If you have some time and want to help us out with development, thank you! You can get started by taking a look at the open issues, particularly the ones marked [help wanted](https://github.com/HackGT/registration/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) or [help wanted - beginner](https://github.com/HackGT/registration/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted+-+beginner%22). Feel free to ask questions to clarify things, determine the best way to implement a new feature or bug fix, or anything else!
+If you have some time and want to help us out with development, thank you! You can get started by taking a look at the open issues, particularly the ones marked [help wanted](https://github.com/HackGT/registration/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) or [good first issue](https://github.com/HackGT/registration/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). Feel free to ask questions to clarify things, determine the best way to implement a new feature or bug fix, or anything else!
 
 ### Tips
 
