@@ -160,15 +160,17 @@ async function findQuestions(
 
 	let items: types.FormItem<Ctx>[] = [];
 	if (user.applied) {
-		items = items.concat(await Promise.all(user.applicationData!
-			.reduce(questionFilter, [])
-			.map(item => recordToFormItem(item, user.applicationBranch!))
+		items = items.concat(await Promise.all(
+			user.applicationData!
+				.reduce(questionFilter, [])
+				.map(item => recordToFormItem(item, user.applicationBranch!))
 		));
 	}
 	if (user.confirmed) {
-		items = items.concat(await Promise.all(user.confirmationData!
-			.reduce(questionFilter, [])
-			.map(item => recordToFormItem(item, user.confirmationBranch!))
+		items = items.concat(await Promise.all(
+			user.confirmationData!
+				.reduce(questionFilter, [])
+				.map(item => recordToFormItem(item, user.confirmationBranch!))
 		));
 	}
 	return items;
