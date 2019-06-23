@@ -7,6 +7,10 @@
 			"secret": ""
 		}
 	},
+	"admins": {
+		"domains": ["gatech.edu", "hack.gt"],
+		"emails": ["george.p@burdell.com", "buzz@gatech.edu"]
+	},
 	"email": {
 		"from": "HackGT Team <hello@hackgt.com>",
 		"host": "smtp.sendgrid.net",
