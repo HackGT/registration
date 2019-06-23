@@ -38,7 +38,7 @@ class Config implements IConfig.Main {
 		defaultTimezone: "America/New_York"
 	};
 	public admins = {
-		domains: ["hack.gt"],
+		domains: [] as string[],
 		emails: [] as string[]
 	};
 	public eventName: string = "Untitled Event";
