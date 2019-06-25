@@ -10,7 +10,6 @@ import { User, IUser, Team, IFormItem, QuestionBranchConfig } from "../../schema
 import { Branches, Tags, AllTags, BranchConfig, ApplicationBranch, ConfirmationBranch, NoopBranch } from "../../branch";
 import { schema as types } from "./api.graphql.types";
 import { formatSize } from "../../common";
-import { prettyNames as strategyNames } from "../strategies";
 
 const typeDefs = fs.readFileSync(path.resolve(__dirname, "../../../api.graphql"), "utf8");
 
@@ -161,15 +160,17 @@ async function findQuestions(
 
 	let items: types.FormItem<Ctx>[] = [];
 	if (user.applied) {
-		items = items.concat(await Promise.all(user.applicationData
-			.reduce(questionFilter, [])
-			.map(item => recordToFormItem(item, user.applicationBranch))
+		items = items.concat(await Promise.all(
+			user.applicationData!
+				.reduce(questionFilter, [])
+				.map(item => recordToFormItem(item, user.applicationBranch!))
 		));
 	}
 	if (user.confirmed) {
-		items = items.concat(await Promise.all(user.confirmationData
-			.reduce(questionFilter, [])
-			.map(item => recordToFormItem(item, user.confirmationBranch!))
+		items = items.concat(await Promise.all(
+			user.confirmationData!
+				.reduce(questionFilter, [])
+				.map(item => recordToFormItem(item, user.confirmationBranch!))
 		));
 	}
 	return items;
@@ -283,8 +284,8 @@ async function recordToFormItem(item: IFormItem, branchName: string): Promise<ty
 
 async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 	const application: types.Branch<Ctx> | undefined = user.applied ? {
-			type: user.applicationBranch,
-			data: await Promise.all(user.applicationData.map(item => recordToFormItem(item, user.applicationBranch))),
+			type: user.applicationBranch!,
+			data: await Promise.all(user.applicationData!.map(item => recordToFormItem(item, user.applicationBranch!))),
 			start_time: user.applicationStartTime &&
 				user.applicationStartTime.toDateString(),
 			submit_time: user.applicationSubmitTime &&
@@ -293,20 +294,12 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 
 	const confirmation: types.Branch<Ctx> | undefined = user.confirmed ? {
 		type: user.confirmationBranch!,
-		data: await Promise.all(user.confirmationData.map(item => recordToFormItem(item, user.confirmationBranch!))),
+		data: await Promise.all(user.confirmationData!.map(item => recordToFormItem(item, user.confirmationBranch!))),
 		start_time: user.confirmationStartTime &&
 			user.confirmationStartTime.toDateString(),
 		submit_time: user.confirmationSubmitTime &&
 			user.confirmationSubmitTime.toDateString()
 	} : undefined;
-
-	let loginMethods: string[] = [];
-	if (user.local && user.local!.hash) {
-		loginMethods.push("Local");
-	}
-	for (let service of Object.keys(user.services || {}) as (keyof typeof user.services)[]) {
-		loginMethods.push(strategyNames[service]);
-	}
 
 	let team = user.teamId ? await Team.findById(user.teamId) : null;
 
@@ -315,9 +308,7 @@ async function userRecordToGraphql(user: IUser): Promise<types.User<Ctx>> {
 
 		name: user.name || "",
 		email: user.email,
-		email_verified: !!user.verifiedEmail,
 		admin: !!user.admin,
-		login_methods: loginMethods,
 
 		applied: !!user.applied,
 		accepted: !!user.accepted,

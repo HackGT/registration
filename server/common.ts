@@ -16,19 +16,10 @@ class Config implements IConfig.Main {
 	public secrets: IConfig.Secrets = {
 		adminKey: crypto.randomBytes(32).toString("hex"),
 		session: crypto.randomBytes(32).toString("hex"),
-		oauth: {
-			github: {
-				id: "",
-				secret: ""
-			},
-			google: {
-				id: "",
-				secret: ""
-			},
-			facebook: {
-				id: "",
-				secret: ""
-			}
+		groundTruth: {
+			url: "",
+			id: "",
+			secret: ""
 		}
 	};
 	public email: IConfig.Email = {
@@ -43,11 +34,13 @@ class Config implements IConfig.Main {
 		workflowReleaseSummary: null,
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
-		mongoURL: "mongodb://localhost/",
-		passwordResetExpiration: 1000 * 60 * 60, // 1 hour
+		mongoURL: "mongodb://localhost/registration",
 		defaultTimezone: "America/New_York"
 	};
-	public admins: string[] = [];
+	public admins = {
+		domains: [] as string[],
+		emails: [] as string[]
+	};
 	public eventName: string = "Untitled Event";
 	public storageEngine = {
 		"name": "disk",
@@ -75,7 +68,7 @@ class Config implements IConfig.Main {
 	}
 	protected loadFromJSON(fileName: string): void {
 		// tslint:disable-next-line:no-shadowed-variable
-		let config: IConfig.Main | null = null;
+		let config: Partial<IConfig.Main> | null = null;
 		try {
 			config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config", fileName), "utf8"));
 		}
@@ -103,7 +96,12 @@ class Config implements IConfig.Main {
 			}
 		}
 		if (config.admins) {
-			this.admins = config.admins;
+			if (config.admins.domains) {
+				this.admins.domains = config.admins.domains;
+			}
+			if (config.admins.emails) {
+				this.admins.emails = config.admins.emails;
+			}
 		}
 		if (config.eventName) {
 			this.eventName = config.eventName;
@@ -131,42 +129,30 @@ class Config implements IConfig.Main {
 	protected loadFromEnv(): void {
 		// Secrets
 		if (process.env.ADMIN_KEY_SECRET) {
-			this.secrets.adminKey = process.env.ADMIN_KEY_SECRET!;
-		}
-		else {
-			console.warn("Setting random admin key! Cannot use the service-to-service APIs.");
+			this.secrets.adminKey = process.env.ADMIN_KEY_SECRET;
 		}
 		if (process.env.SESSION_SECRET) {
-			this.secrets.session = process.env.SESSION_SECRET!;
+			this.secrets.session = process.env.SESSION_SECRET;
 			this.sessionSecretSet = true;
 		}
-		if (process.env.GITHUB_CLIENT_ID) {
-			this.secrets.oauth.github.id = process.env.GITHUB_CLIENT_ID!;
+		if (process.env.GROUND_TRUTH_URL) {
+			this.secrets.groundTruth.url = process.env.GROUND_TRUTH_URL;
 		}
-		if (process.env.GITHUB_CLIENT_SECRET) {
-			this.secrets.oauth.github.secret = process.env.GITHUB_CLIENT_SECRET!;
+		if (process.env.GROUND_TRUTH_ID) {
+			this.secrets.groundTruth.id = process.env.GROUND_TRUTH_ID;
 		}
-		if (process.env.GOOGLE_CLIENT_ID) {
-			this.secrets.oauth.google.id = process.env.GOOGLE_CLIENT_ID!;
-		}
-		if (process.env.GOOGLE_CLIENT_SECRET) {
-			this.secrets.oauth.google.secret = process.env.GOOGLE_CLIENT_SECRET!;
-		}
-		if (process.env.FACEBOOK_CLIENT_ID) {
-			this.secrets.oauth.facebook.id = process.env.FACEBOOK_CLIENT_ID!;
-		}
-		if (process.env.FACEBOOK_CLIENT_SECRET) {
-			this.secrets.oauth.facebook.secret = process.env.FACEBOOK_CLIENT_SECRET!;
+		if (process.env.GROUND_TRUTH_SECRET) {
+			this.secrets.groundTruth.secret = process.env.GROUND_TRUTH_SECRET;
 		}
 		// Email
 		if (process.env.EMAIL_FROM) {
-			this.email.from = process.env.EMAIL_FROM!;
+			this.email.from = process.env.EMAIL_FROM;
 		}
 		if (process.env.EMAIL_KEY) {
-			this.email.key = process.env.EMAIL_KEY!;
+			this.email.key = process.env.EMAIL_KEY;
 		}
 		// Server
-		if (process.env.PRODUCTION && process.env.PRODUCTION!.toLowerCase() === "true") {
+		if (process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true") {
 			this.server.isProduction = true;
 		}
 		if (process.env.PORT) {
@@ -176,68 +162,65 @@ class Config implements IConfig.Main {
 			}
 		}
 		if (process.env.VERSION_HASH) {
-			this.server.versionHash = process.env.VERSION_HASH!;
+			this.server.versionHash = process.env.VERSION_HASH;
 		}
 		if (process.env.SOURCE_REV) {
-			this.server.versionHash = process.env.SOURCE_REV!;
+			this.server.versionHash = process.env.SOURCE_REV;
 		}
 		if (process.env.SOURCE_VERSION) {
-			this.server.versionHash = process.env.SOURCE_VERSION!;
+			this.server.versionHash = process.env.SOURCE_VERSION;
 		}
 		if (process.env.WORKFLOW_RELEASE_CREATED_AT) {
-			this.server.workflowReleaseCreatedAt = process.env.WORKFLOW_RELEASE_CREATED_AT!;
+			this.server.workflowReleaseCreatedAt = process.env.WORKFLOW_RELEASE_CREATED_AT;
 		}
 		if (process.env.WORKFLOW_RELEASE_SUMMARY) {
-			this.server.workflowReleaseSummary = process.env.WORKFLOW_RELEASE_SUMMARY!;
+			this.server.workflowReleaseSummary = process.env.WORKFLOW_RELEASE_SUMMARY;
 		}
 		if (process.env.COOKIE_MAX_AGE) {
-			let maxAge = parseInt(process.env.COOKIE_MAX_AGE!, 10);
+			let maxAge = parseInt(process.env.COOKIE_MAX_AGE, 10);
 			if (!isNaN(maxAge) && maxAge > 0) {
 				this.server.cookieMaxAge = maxAge;
 			}
 		}
-		if (process.env.COOKIE_SECURE_ONLY && process.env.COOKIE_SECURE_ONLY!.toLowerCase() === "true") {
+		if (process.env.COOKIE_SECURE_ONLY && process.env.COOKIE_SECURE_ONLY.toLowerCase() === "true") {
 			this.server.cookieSecureOnly = true;
 		}
 		if (process.env.MONGO_URL) {
-			this.server.mongoURL = process.env.MONGO_URL!;
+			this.server.mongoURL = process.env.MONGO_URL;
 		}
 		if (process.env.DEFAULT_TIMEZONE) {
 			this.server.defaultTimezone = process.env.DEFAULT_TIMEZONE;
 		}
-		if (process.env.PASSWORD_RESET_EXPIRATION) {
-			let expirationTime = parseInt(process.env.PASSWORD_RESET_EXPIRATION!, 10);
-			if (!isNaN(expirationTime) && expirationTime > 0) {
-				this.server.passwordResetExpiration = expirationTime;
-			}
-		}
 		// Admins
 		if (process.env.ADMIN_EMAILS) {
-			this.admins = JSON.parse(process.env.ADMIN_EMAILS!);
+			this.admins.emails = JSON.parse(process.env.ADMIN_EMAILS!);
+		}
+		if (process.env.ADMIN_DOMAINS) {
+			this.admins.domains = JSON.parse(process.env.ADMIN_DOMAINS);
 		}
 		// Event name
 		if (process.env.EVENT_NAME) {
-			this.eventName = process.env.EVENT_NAME!;
+			this.eventName = process.env.EVENT_NAME;
 		}
 		// Questions
 		if (process.env.QUESTIONS_FILE) {
-			this.questionsLocation = process.env.QUESTIONS_FILE!;
+			this.questionsLocation = process.env.QUESTIONS_FILE;
 		}
 		// Style
 		if (process.env.THEME_FILE) {
-			this.style.theme = process.env.THEME_FILE!;
+			this.style.theme = process.env.THEME_FILE;
 		}
 		if (process.env.FAVICON_FILE) {
-			this.style.favicon = process.env.FAVICON_FILE!;
+			this.style.favicon = process.env.FAVICON_FILE;
 		}
 		else if (process.env.FAVICON_FILE_BASE64) {
-			this.style.favicon = unbase64File(process.env.FAVICON_FILE_BASE64!);
+			this.style.favicon = unbase64File(process.env.FAVICON_FILE_BASE64);
 		}
 		// Storage engine
 		if (process.env.STORAGE_ENGINE) {
-			this.storageEngine.name = process.env.STORAGE_ENGINE!;
+			this.storageEngine.name = process.env.STORAGE_ENGINE;
 			if (process.env.STORAGE_ENGINE_OPTIONS) {
-				this.storageEngine.options = JSON.parse(process.env.STORAGE_ENGINE_OPTIONS!);
+				this.storageEngine.options = JSON.parse(process.env.STORAGE_ENGINE_OPTIONS);
 			}
 			else {
 				console.warn("Custom storage engine defined but no storage engine options passed");
@@ -248,7 +231,7 @@ class Config implements IConfig.Main {
 		}
 		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
-			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE!, 10);
+			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE, 10);
 		}
 	}
 }
@@ -285,7 +268,7 @@ export function formatSize(size: number, binary: boolean = true): string {
 // Database connection
 //
 import * as mongoose from "mongoose";
-mongoose.connect(config.server.mongoURL).catch(err => {
+mongoose.connect(config.server.mongoURL, { useNewUrlParser: true }).catch(err => {
 	throw err;
 });
 export { mongoose };
@@ -299,8 +282,7 @@ async function setDefaultSettings() {
 
 	const DEFAULTS: any = {
 		"teamsEnabled": true,
-		"qrEnabled": true,
-		"loginMethods": ["local"]
+		"qrEnabled": true
 	};
 
 	for (let setting in DEFAULTS) {
@@ -490,11 +472,11 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 	markdown = markdown.replace(/{{applicationBranch}}/g, sanitize(user.applicationBranch));
 	markdown = markdown.replace(/{{confirmationBranch}}/g, sanitize(user.confirmationBranch));
 	markdown = markdown.replace(/{{application\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
-		let question = user.applicationData.find(data => data.name === name);
+		let question = (user.applicationData || []).find(data => data.name === name);
 		return formatFormItem(question);
 	});
 	markdown = markdown.replace(/{{confirmation\.([a-zA-Z0-9\- ]+)}}/g, (match, name: string) => {
-		let question = user.confirmationData.find(data => data.name === name);
+		let question = (user.confirmationData || []).find(data => data.name === name);
 		return formatFormItem(question);
 	});
 

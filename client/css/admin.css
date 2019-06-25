@@ -46,12 +46,6 @@ table td:last-child {
 td.email > i.fa {
     display: none;
 }
-td.email.verified > i.fa-check {
-    display: inline;
-}
-td.email.notverified > i.fa-exclamation-triangle {
-    display: inline;
-}
 td.email.admin > i.fa-asterisk {
     display: inline;
 }

@@ -111,9 +111,7 @@ class UserEntries {
 					id,
 					name,
 					email,
-					email_verified,
 					admin,
-					login_methods,
 
 					application {
 						type
@@ -162,13 +160,7 @@ class UserEntries {
 					node.style.display = "table-row";
 					node.querySelector("td.name")!.textContent = user.name;
 					node.querySelector("td.email > span")!.textContent = user.email;
-					node.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
-					if (user.email_verified) {
-						node.querySelector("td.email")!.classList.add("verified");
-					}
-					else {
-						node.querySelector("td.email")!.classList.add("notverified");
-					}
+					node.querySelector("td.email")!.classList.remove("admin");
 					if (user.admin) {
 						node.querySelector("td.email")!.classList.add("admin");
 					}
@@ -187,7 +179,6 @@ class UserEntries {
 						userStatus = `Accepted (${user.application.type}) / Confirmed (${user.confirmation.type})`;
 					}
 					node.querySelector("td.status")!.textContent = userStatus;
-					node.querySelector("td.login-method")!.textContent = user.login_methods.join(", ");
 				}
 				else {
 					node.style.display = "none";
@@ -316,7 +307,6 @@ class ApplicantEntries {
 					id,
 					name,
 					email,
-					email_verified,
 					admin,
 					team {
 						id,
@@ -459,13 +449,7 @@ class ApplicantEntries {
 						generalNode.querySelector("td.team")!.textContent = "No Team";
 					}
 					generalNode.querySelector("td.email > span")!.textContent = user.email;
-					generalNode.querySelector("td.email")!.classList.remove("verified", "notverified", "admin");
-					if (user.email_verified) {
-						generalNode.querySelector("td.email")!.classList.add("verified");
-					}
-					else {
-						generalNode.querySelector("td.email")!.classList.add("notverified");
-					}
+					generalNode.querySelector("td.email")!.classList.remove("admin");
 					if (user.admin) {
 						generalNode.querySelector("td.email")!.classList.add("admin");
 					}
@@ -709,16 +693,6 @@ function settingsUpdate(e: MouseEvent) {
 	adminEmailData.append("adminString", (document.getElementById("admin-emails") as HTMLInputElement).value);
 	adminEmailData.append("addAdmins", (document.getElementById("add-admins") as HTMLInputElement).checked ? "true" : "false");
 
-	let loginMethodsData = new FormData();
-	let loginMethods = document.querySelectorAll("div.auth-method") as NodeListOf<HTMLDivElement>;
-	let enabledMethods: string[] = [];
-	for (let i = 0; i < loginMethods.length; i++) {
-		if (loginMethods[i].querySelector("select")!.value === "enabled") {
-			enabledMethods.push(loginMethods[i].dataset.rawName!);
-		}
-	}
-	loginMethodsData.append("enabledMethods", JSON.stringify(enabledMethods));
-
 	let branchRoleData = new FormData();
 	let branchRoles = document.querySelectorAll("div.branch-role") as NodeListOf<HTMLDivElement>;
 	for (let i = 0; i < branchRoles.length; i++) {
@@ -787,11 +761,6 @@ function settingsUpdate(e: MouseEvent) {
 		return fetch("/api/settings/admin_emails", {
 			...defaultOptions,
 			body: adminEmailData
-		});
-	}).then(checkStatus).then(parseJSON).then(() => {
-		return fetch("/api/settings/login_methods", {
-			...defaultOptions,
-			body: loginMethodsData
 		});
 	}).then(checkStatus).then(parseJSON).then(() => {
 		return fetch("/api/settings/branch_roles", {
