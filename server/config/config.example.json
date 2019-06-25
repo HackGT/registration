@@ -1,20 +1,15 @@
 {
 	"secrets": {
 		"session": "<a random string>",
-		"oauth": {
-			"github": {
-				"id": "",
-				"secret": ""
-			},
-			"google": {
-				"id": "",
-				"secret": ""
-			},
-			"facebook": {
-				"id": "",
-				"secret": ""
-			}
+		"groundTruth": {
+			"url": "",
+			"id": "",
+			"secret": ""
 		}
+	},
+	"admins": {
+		"domains": ["gatech.edu", "hack.gt"],
+		"emails": ["george.p@burdell.com", "buzz@gatech.edu"]
 	},
 	"email": {
 		"from": "HackGT Team <hello@hackgt.com>",
@@ -27,10 +22,8 @@
 		"port": 3000,
 		"cookieMaxAge": 15552000000,
 		"cookieSecureOnly": true,
-		"passwordResetExpiration": 3600000,
 		"mongoURL": "mongodb://localhost/registration"
 	},
-	"admins": ["example@example.com"],
 	"eventName": "My Hackathon",
 	"storageEngine": {
 		"name": "disk | s3",
