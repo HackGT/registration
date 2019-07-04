@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css?family=Milonga&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro&display=swap');
+
+  
+/* CSS variables for colors */
+:root {
+    --bg-color: #131429;
+    --input-color:#e6e6e6 ;
+    --text-color: #e6e6e6;
+    --dark-blue: #999999;
+    --light-blue: #e6e6e6;
+    --blur: rgba(255, 255, 255, 0.6);
+}
+
+/* Set backgrounds */
+html::before {
+    /* background-color: var(--bg-color); */
+    /* opacity: 0.8; */
+
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+#sidebar-nav {
+    background: none;
+}
+
+section.main {
+    border-top: 1px var(--light-blue) solid;
+}
+
+#sidebar-nav {
+    color: var(--text-color);
+    font-family: "Milonga", serif;
+}
+html, body, section.main {
+    color: var(--text-color);
+    font-family: 'Source Serif Pro', serif;
+}
+
+/* Hide text and use image instead in the header */
+/* #sidebar > h1, .container > h1:first-child {
+    display: block;
+    background-image: url("https://build.hack.gt/assets/logo.svg");
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
+    height: 75px;
+
+    color: rgba(0, 0, 0, 0);
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+} */
+#sidebar > #site-title {
+    font-size: 40px;
+    line-height: 75px;
+    font-family: 'Milonga', serif;
+}
+#sidebar > #site-user {
+    font-size: 15px;
+
+}
+#title {
+    font-size: 40px;
+
+}
+#sidebar > h1 {
+    margin-bottom: -10px;
+}
+#mainRow {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+#sidebar-nav > a, #sidebar, .editor-toolbar > a {
+    color: var(--text-color);
+    font-family: 'Milonga', serif;
+    font-size: 15px;
+    line-height: 30px;
+    text-decoration: initial;
+    border: none;
+}
+#status {
+    font-size: 2.25rem;
+}
+.editor-toolbar > a {
+    color: var(--text-color) !important;
+}
+
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
+}
+#sidebar-nav > span.divider, section.main, table thead {
+    border-color: var(--light-blue);
+}
+a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
+}
+
+#email-rendered {
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
+}
+
+/* Buttons */
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: var(--dark-blue);
+}
+.editor-toolbar > button {
+    color: var(--light-blue);
+}
+
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Source Serif Pro', serif;
+}
+
+code {
+    color: var(--text-color);
+}
+
+ul {
+    padding-left: 0;
+}
+
+section.main > div > p:first-of-type {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):not([type=text]):not([type=email]):not([type=password]):not([type=tel]):not([type=date]), select, fieldset {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--light-blue);
+}
+input, label {
+    font-variant-ligatures: none;
+    font-family: 'Source Serif Pro', serif;
+}
+label {
+    font-weight: bold;
+}
+fieldset > div > label {
+    font-weight: normal;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: var(--dark-blue);
+}
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
+    color: var(--bg-color) !important;
+}
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--bg-color);
+}
+::placeholder {
+    color: var(--bg-color);
+}
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+@media only screen and (max-width: 1000px) {
+    html::before {
+        background-color: var(--bg-color);
+    }
+}
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 1000px) {
+    html::before {
+        background: url(/css/marginLeft.svg) top left 0px, url(/css/marginRight.svg) top right 0px;
+        background-color: var(--bg-color);
+        background-repeat: repeat-y;
+        background-size: 200px;
+        will-change: transform;
+    }
+}

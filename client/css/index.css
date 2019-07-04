@@ -12,9 +12,6 @@ h1 {
 .row:first-of-type > .col-6:last-child {
 	text-transform: uppercase;
 }
-p:first-of-type {
-	text-align: center;
-}
 p {
 	font-size: 1.6rem;
 }

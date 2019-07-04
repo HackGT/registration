@@ -5,6 +5,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+		<link rel="icon" href="/favicon.ico" type="image/x-icon" />
 		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
 		<link rel="stylesheet" href="/css/main.css" />
 		<link rel="stylesheet" href="/css/index.css" />
@@ -19,16 +20,15 @@
 	</head>
 	<body>
 		{{#> sidebar}}
-			<h1 class="center">Dashboard</h1>
-
+			<!-- <h1 id="title" class="center">Dashboard</h1> -->
 			<section class="main">
-				<ul class="timeline">
+				<!-- <ul hidden="true" class="timeline" >
 					<li class="{{timeline.application}}" data-pending="Not completed" data-complete="Done!" data-warning="Applications closed" data-rejected="Not completed">
 						<div class="status">
-							<h4>Application Submission</h4>
+							<h4>Registration Submission</h4>
 						</div>
 					</li>
-					<li class="{{timeline.decision}}" data-pending="Pending" data-complete="Accepted!" data-rejected="Not accepted">
+					<li  class="{{timeline.decision}}" data-pending="Pending" data-complete="Accepted!" data-rejected="Not accepted">
 						<div class="status">
 							<h4>Application Decision</h4>
 						</div>
@@ -38,134 +38,134 @@
 							<h4>Confirmation Submission</h4>
 						</div>
 					</li>
-					<li class="{{timeline.teamFormation}}" data-pending="Not completed" data-complete="Done!">
+					<li hidden="true" class="{{timeline.teamFormation}}" data-pending="Not completed" data-complete="Done!">
 						<div class="status">
 							<h4>Team Formation <small>(optional)</small></h4>
 						</div>
 					</li>
-				</ul>
+				</ul> -->
 
-				<div class="row">
-					<div class="col-6">
-						<h2>Your status:</h2>
+				
+				<div class="row" id="mainRow">
+					<div class="col-4 center">
+						<img height="300px" src="/css/bunnyBear.svg">
 					</div>
-					<div class="col-6">
-						{{status}}
+					<div class="col-8">
+							<h4 style="padding-top: 10px;"><b>Welcome back, {{user.name}}!</b></h4><br>
+							<h4 id="status"><b>Status: {{status}}</b></h4>
+							{{#if user.confirmed}}
+								<p>Application type: <b>{{user.applicationBranch}}</b></p>
+								<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
+								{{#unless autoConfirm}}
+									{{#if confirmationStatus.areOpen}}
+										<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
+										<a class="btn" href="/confirm">Edit your confirmation</a>
+									{{else}}
+										<p>RSVPing closed on {{confirmationClose}}.</p>
+									{{/if}}
+								{{/unless}}
+		
+								{{#if settings.qrEnabled}}
+									{{#if user.accepted}}
+										<p>Show your QR code to check in when you get here.</p>
+										<div id="qrCode" data-encoded="user:{{user.uuid}}"></div>
+									{{/if}}
+								{{/if}}
+							{{else if user.confirmationBranch}}
+								{{#if confirmationStatus.areOpen}}
+									<p>Please confirm your application decision.</p>
+									<p>Application type: <b>{{user.applicationBranch}}</b></p>
+									<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
+									{{#ifCond allConfirmationTimes.length 1}}
+										<p>You must confirm your attendance by {{confirmationClose}}.</p>
+									{{else}}
+										<p>If you do not RSVP before the deadline for your confirmation type, you will not be able to attend {{siteTitle}}!</p>
+										<ul>
+											{{#each allConfirmationTimes}}
+												<li><strong>{{this.name}}</strong>: {{this.open}} until {{this.close}}</li>
+											{{/each}}
+										</ul>
+									{{/ifCond}}
+									<a class="btn" href="/confirm">Confirm your attendance</a>
+								{{else}}
+									<p>Application type: <b>{{user.applicationBranch}}</b></p>
+									{{#if confirmationStatus.beforeOpen}}
+										{{#ifCond allConfirmationTimes.length 1}}
+											<p>RSVPing will open on {{confirmationOpen}}.</p>
+										{{else}}
+											<p>RSVPing will be open during the following times:</p>
+											<ul>
+												{{#each allConfirmationTimes}}
+													<li><strong>{{this.name}}</strong>: {{this.open}} until {{this.close}}</li>
+												{{/each}}
+											</ul>
+										{{/ifCond}}
+									{{/if}}
+									{{#if confirmationStatus.afterClose}}
+										{{#ifCond allConfirmationTimes.length 1}}
+											<p>RSVPs closed on {{confirmationClose}}. If you have any questions, please email hello@hack.gt./p>
+										{{else}}
+											<p>RSVPs closed at the following times. If you have any questions, please email hello@hack.gt.</p>
+											<ul>
+												{{#each allConfirmationTimes}}
+													<li><strong>{{this.name}}</strong>: {{this.close}}</li>
+												{{/each}}
+											</ul>
+										{{/ifCond}}
+									{{/if}}
+								{{/if}}
+							{{else if user.applied}}
+								<p>You've submitted your registration and are all set for now!</p>
+								<p>Registration type: <b>{{user.applicationBranch}}</b></p>
+								{{#if applicationStatus.areOpen}}
+									<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
+									<a class="btn" href="/apply">Edit your registration</a>
+								{{else}}
+									<p>Registration closed on {{applicationClose}}.</p>
+								{{/if}}
+							{{else}}
+								{{#if applicationStatus.areOpen}}
+									<p>You still need to complete your registration!</p>
+									{{#ifCond allApplicationTimes.length 1}}
+										<p>If you do not complete your registration before {{applicationClose}}, you will not be able to attend {{siteTitle}}!</p>
+									{{else}}
+										<p>If you do not complete your registration before the following times, you will not be able to attend {{siteTitle}}:</p>
+										<ul>
+											{{#each allApplicationTimes}}
+												<li><strong>{{this.name}}</strong>: {{this.close}}</li>
+											{{/each}}
+										</ul>
+									{{/ifCond}}
+									<a class="btn" href="/apply">Complete your registration</a>
+								{{else}}
+									{{#if applicationStatus.beforeOpen}}
+										{{#ifCond allApplicationTimes.length 1}}
+											<p>Registration is currently closed and will open on {{applicationOpen}}.</p>
+										{{else}}
+											<p>Registration is currently closed and will open at the following times:</p>
+											<ul>
+												{{#each allApplicationTimes}}
+													<li><strong>{{this.name}}</strong>: {{this.open}}</li>
+												{{/each}}
+											</ul>
+										{{/ifCond}}
+									{{/if}}
+									{{#if applicationStatus.afterClose}}
+										{{#ifCond allApplicationTimes.length 1}}
+											<p>Registration closed on {{applicationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
+										{{else}}
+											<p>Registration closed at the following times. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
+											<ul>
+												{{#each allApplicationTimes}}
+													<li><strong>{{this.name}}</strong>: {{this.close}}</li>
+												{{/each}}
+											</ul>
+										{{/ifCond}}
+									{{/if}}
+								{{/if}}
+							{{/if}}
+						<p>Mentor and volunteer applications will open in September.</p>
 					</div>
-				</div>
-				<div class="row">
-					<p>Welcome back, {{user.name}}!</p>
-					{{#if user.confirmed}}
-						<p>Application type: <b>{{user.applicationBranch}}</b></p>
-						<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
-						{{#unless autoConfirm}}
-							{{#if confirmationStatus.areOpen}}
-								<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
-								<a class="btn" href="/confirm">Edit your confirmation</a>
-							{{else}}
-								<p>RSVPing closed on {{confirmationClose}}.</p>
-							{{/if}}
-						{{/unless}}
-
-						{{#if settings.qrEnabled}}
-							{{#if user.accepted}}
-								<p>Show your QR code to check in when you get here.</p>
-								<div id="qrCode" data-encoded="user:{{user.uuid}}"></div>
-							{{/if}}
-						{{/if}}
-					{{else if user.confirmationBranch}}
-						{{#if confirmationStatus.areOpen}}
-							<p>Please confirm your application decision.</p>
-							<p>Application type: <b>{{user.applicationBranch}}</b></p>
-							<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
-							{{#ifCond allConfirmationTimes.length 1}}
-								<p>You must confirm your decision by {{confirmationClose}}.</p>
-							{{else}}
-								<p>If you do not RSVP before the deadline for your confirmation type, you will not be able to attend {{siteTitle}}!</p>
-								<ul>
-									{{#each allConfirmationTimes}}
-										<li><strong>{{this.name}}</strong>: {{this.open}} until {{this.close}}</li>
-									{{/each}}
-								</ul>
-							{{/ifCond}}
-							<a class="btn" href="/confirm">Confirm your attendance</a>
-						{{else}}
-							<p>Application type: <b>{{user.applicationBranch}}</b></p>
-							{{#if confirmationStatus.beforeOpen}}
-								{{#ifCond allConfirmationTimes.length 1}}
-									<p>RSVPing will open on {{confirmationOpen}}.</p>
-								{{else}}
-									<p>RSVPing will be open during the following times:</p>
-									<ul>
-										{{#each allConfirmationTimes}}
-											<li><strong>{{this.name}}</strong>: {{this.open}} until {{this.close}}</li>
-										{{/each}}
-									</ul>
-								{{/ifCond}}
-							{{/if}}
-							{{#if confirmationStatus.afterClose}}
-								{{#ifCond allConfirmationTimes.length 1}}
-									<p>RSVPs closed on {{confirmationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
-								{{else}}
-									<p>RSVPs closed at the following times. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
-									<ul>
-										{{#each allConfirmationTimes}}
-											<li><strong>{{this.name}}</strong>: {{this.close}}</li>
-										{{/each}}
-									</ul>
-								{{/ifCond}}
-							{{/if}}
-						{{/if}}
-					{{else if user.applied}}
-						<p>You've applied and are all set for now!</p>
-						<p>Application type: <b>{{user.applicationBranch}}</b></p>
-						{{#if applicationStatus.areOpen}}
-							<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
-							<a class="btn" href="/apply">Edit your application</a>
-						{{else}}
-							<p>Applications closed on {{applicationClose}}.</p>
-						{{/if}}
-					{{else}}
-						{{#if applicationStatus.areOpen}}
-							<p>You still need to complete your application!</p>
-							{{#ifCond allApplicationTimes.length 1}}
-								<p>If you do not complete your application before {{applicationClose}}, you will not be considered for {{siteTitle}}!</p>
-							{{else}}
-								<p>If you do not complete your application before the following times, you will not be considered for {{siteTitle}}:</p>
-								<ul>
-									{{#each allApplicationTimes}}
-										<li><strong>{{this.name}}</strong>: {{this.close}}</li>
-									{{/each}}
-								</ul>
-							{{/ifCond}}
-							<a class="btn" href="/apply">Complete your application</a>
-						{{else}}
-							{{#if applicationStatus.beforeOpen}}
-								{{#ifCond allApplicationTimes.length 1}}
-									<p>Applications are currently closed and will open on {{applicationOpen}}.</p>
-								{{else}}
-									<p>Applications are currently closed and will open at the following times:</p>
-									<ul>
-										{{#each allApplicationTimes}}
-											<li><strong>{{this.name}}</strong>: {{this.open}}</li>
-										{{/each}}
-									</ul>
-								{{/ifCond}}
-							{{/if}}
-							{{#if applicationStatus.afterClose}}
-								{{#ifCond allApplicationTimes.length 1}}
-									<p>Applications closed on {{applicationClose}}. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
-								{{else}}
-									<p>Applications closed at the following times. Thanks for your interest in {{siteTitle}} &mdash; we hope to see you next time!</p>
-									<ul>
-										{{#each allApplicationTimes}}
-											<li><strong>{{this.name}}</strong>: {{this.close}}</li>
-										{{/each}}
-									</ul>
-								{{/ifCond}}
-							{{/if}}
-						{{/if}}
-					{{/if}}
 				</div>
 			</section>
 		{{/sidebar}}
