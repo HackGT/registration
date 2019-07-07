@@ -7,8 +7,8 @@
     --bg-color: #131429;
     --input-color:#e6e6e6 ;
     --text-color: #e6e6e6;
-    --dark-blue: #999999;
-    --light-blue: #e6e6e6;
+    --dark-grey: #999999;
+    --light-grey: #e6e6e6;
     --blur: rgba(255, 255, 255, 0.6);
 }
 
@@ -30,7 +30,7 @@ html::before {
 }
 
 section.main {
-    border-top: 1px var(--light-blue) solid;
+    border-top: 1px var(--light-grey) solid;
 }
 
 #sidebar-nav {
@@ -102,7 +102,7 @@ html, body, section.main {
     outline: none;
 }
 #sidebar-nav > span.divider, section.main, table thead {
-    border-color: var(--light-blue);
+    border-color: var(--light-grey);
 }
 a {
     color: var(--text-color);
@@ -121,10 +121,10 @@ a:hover {
 
 /* Buttons */
 .btn, [type=submit], button, .accepted-btn-false {
-    background-color: var(--dark-blue);
+    background-color: var(--dark-grey);
 }
 .editor-toolbar > button {
-    color: var(--light-blue);
+    color: var(--light-grey);
 }
 
 fieldset > div > label {
@@ -148,10 +148,10 @@ section.main > div > p:first-of-type {
 }
 
 /* Form elements */
-input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):not([type=text]):not([type=email]):not([type=password]):not([type=tel]):not([type=date]), select, fieldset {
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
     background-color: var(--bg-color);
     color: var(--text-color);
-    border-color: var(--light-blue);
+    border-color: var(--light-grey);
 }
 input, label {
     font-variant-ligatures: none;
@@ -164,10 +164,10 @@ fieldset > div > label {
     font-weight: normal;
 }
 input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
-    border-color: var(--dark-blue);
+    border-color: var(--dark-grey);
 }
 input:disabled, textarea:disabled {
-    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
+    background: repeating-linear-gradient(45deg, var(--dark-grey), var(--dark-grey) 10px, var(--light-grey) 10px, var(--light-grey) 20px );
     color: var(--bg-color) !important;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -176,17 +176,17 @@ input:disabled, textarea:disabled {
 ::placeholder {
     color: var(--bg-color);
 }
-input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled) {
     background: var(--text-color);
     color: var(--bg-color);
 }
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1200px) {
     html::before {
         background-color: var(--bg-color);
     }
 }
 /* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 1000px) {
+@media only screen and (min-width: 1200px) {
     html::before {
         background: url(/css/marginLeft.svg) top left 0px, url(/css/marginRight.svg) top right 0px;
         background-color: var(--bg-color);

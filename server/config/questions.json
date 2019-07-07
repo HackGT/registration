@@ -1,6 +1,6 @@
 [
     {
-        "name": "Participant",
+        "name": "Participant - Travel Reimbursement",
         "text": [
             {
                 "for": "end",
@@ -15,17 +15,17 @@
             {
                 "for": "essay-1",
                 "type": "h2",
-                "content": "Free Response (TODO Better name)"
-            },
+                "content": "Free Response"
+			},
             {
                 "for": "resume",
                 "type": "h2",
-                "content": "Sponsorship TODO Better name"
+                "content": "Other Information"
             },
             {
                 "for": "18-and-gt-student",
                 "type": "h2",
-                "content": "Legal TODO Better name"
+                "content": "Final Stretch"
             },
             {
 				"for": "18-and-gt-student",
@@ -45,7 +45,6 @@
 				"label": "What college or university do you currently attend?",
 				"type": "select",
 				"options": [
-					"",
 					"Georgia Institute of Technology",
 					"Abraham Baldwin Agricultural College",
 					"Albany Medical College",
@@ -314,7 +313,6 @@
 				"label": "What is your major?",
 				"type": "select",
 				"options": [
-					"",
 					"Accounting",
 					"Aerospace Engineering",
 					"Applied Physics",
@@ -428,33 +426,23 @@
                 "required": false
             },
             {
-                "name": "light",
-                "label": "(TODO is this good wording)Do you have a sensitivity to flashing or strobing lights?",
-                "type": "select",
-                "options": [
-                    "No",
-                    "Yes"
-                ],
-                "required": true
-            },
-            {
 				"name": "referrer",
-				"label": "How did you hear about HackGT 6? (TODO Still WIP)",
+				"label": "How did you hear about HackGT 6?",
 				"type": "select",
 				"options": [
-					"",
-					"MLH",
-					"Friend",
 					"Facebook",
-					"Twitter",
-					"HackGT Website"
+					"Friend",
+					"HackGT Website",
+					"MLH",
+					"Student Organization",
+					"Twitter"
 				],
 				"hasOther": true,
 				"required": true
             },
             {
                 "name": "essay-1",
-                "label": "(TODO, reword) Describe a current or past project that you are proud of. It can be one that you worked on in any setting (class, personal project, etc.). Max 150 words.",
+                "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it? Max 150 words.",
                 "type": "textarea",
                 "required": true
             },
@@ -466,15 +454,9 @@
             },
             {
                 "name": "essay-3",
-                "label": "TODO - Experience - Max 150 words",
+                "label": "What are your current interests and aspirations? TODO",
                 "type": "textarea",
                 "required": true
-            },
-            {
-                "name": "other",
-                "label": "Anything else you want us to know?",
-                "type": "text",
-                "required": false
             },
             {
 				"name": "resume",
@@ -496,7 +478,7 @@
             },
             {
 				"name": "employment",
-				"label": "Are you interested in any of the following positions:",
+				"label": "Are you interested in any of the following positions?",
 				"type": "checkbox",
 				"options": [
 					"Spring 2020 Co-Op",
@@ -513,24 +495,6 @@
                 "label": "If you responded to the above question, what kinds of opportunities are you looking for?",
                 "type": "textarea",
                 "required": false
-            },
-            {
-                "name": "skils",
-                "label": "TODO - skills",
-                "type": "text",
-                "required": true
-            },
-            {
-                "name": "skils",
-                "label": "TODO - Ice breaker 1 ",
-                "type": "text",
-                "required": true
-            },
-            {
-                "name": "skils",
-                "label": "TODO - Ice breaker 2",
-                "type": "text",
-                "required": true
             },
             {
 				"name": "18-and-gt-student",
@@ -551,11 +515,16 @@
                     "I authorize HackGT to share my application and registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy).",
                     "I agree to the terms of the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions).",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1M_nYaxMDA12JdFzpZAnoWH9M5nD9AyQI/view).",
-                    "I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp).",
-                    "Microsoft legal"
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp)."
 				],
 				"required": true
-			}
+			},
+            {
+                "name": "other",
+                "label": "Anything else you want us to know?",
+                "type": "text",
+                "required": false
+            }
         ]
     }
 ]
