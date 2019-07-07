@@ -1,6 +1,6 @@
 [
     {
-        "name": "Participant - Travel Reimbursement",
+        "name": "Participant",
         "text": [
             {
                 "for": "end",
@@ -31,7 +31,17 @@
 				"for": "18-and-gt-student",
 				"type": "p",
 				"content": "Due to institute policy, minors (under 18) that are not students at Georgia Tech may not attend HackGT."
-            }
+			},
+			{
+				"for": "require-travel",
+				"type": "h2",
+				"content": "Travel Details"
+			},
+			{
+				"for": "require-travel",
+				"type": "p",
+				"content": "HackGT will offer travel reimbursement for accepted hackers. To qualify for reimbursment, you must live greater than 30 miles from Atlanta. At our discretion, we may offer you travel in the form of:\n* A bus to the event that stops near your campus.\n* Reimbursement for a purchased flight ticket.\n* Reimbursement for gas per mile driven.\n\nIf you have any questions, please email us at hello@hack.gt!"
+			}
         ],
         "questions": [
 			{
@@ -45,7 +55,6 @@
 				"label": "What college or university do you currently attend?",
 				"type": "select",
 				"options": [
-					"Georgia Institute of Technology",
 					"Abraham Baldwin Agricultural College",
 					"Albany Medical College",
 					"Albany State University",
@@ -99,6 +108,7 @@
 					"Georgia College & State University",
 					"Georgia Gwinnett College",
 					"Georgia Highlands College",
+					"Georgia Institute of Technology",
 					"Georgia Southern University",
 					"Georgia Southwestern State University",
 					"Georgia State University",
@@ -439,7 +449,23 @@
 				],
 				"hasOther": true,
 				"required": true
-            },
+			},
+			{
+				"name": "city",
+				"label": "What city will you be traveling from?",
+				"type": "text",
+				"required": true
+			},
+			{
+				"name": "require-travel",
+				"label": "Do you require travel reimbursement to attend HackGT: Into the Rabbit Hole?",
+				"type": "select",
+				"options": [
+					"No",
+					"Yes"
+				],
+				"required": true
+			},
             {
                 "name": "essay-1",
                 "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it? Max 150 words.",
