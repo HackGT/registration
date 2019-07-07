@@ -40,7 +40,7 @@
 			{
 				"for": "city",
 				"type": "p",
-				"content": "HackGT will offer travel reimbursement for accepted hackers. To qualify for reimbursment, you must live greater than 30 miles from Atlanta. At our discretion, we may offer you travel in the form of:\n* Reimbursement for a purchased flight ticket.\n* Reimbursement for gas per mile driven.\n\nWe will be sending busses to campuses throughout the southeast. Based on the school and city you indicate, we may offer you a position on a nearby bus instead of offering travel reimbursement. If you have any questions, please email us at hello@hack.gt!"
+				"content": "Travel reimbursement is available for eligible hackers. To qualify for reimbursment, you must live greater than 30 miles from Atlanta. At our discretion, we may offer you travel reimbursement in the form of:\n* Reimbursement for a purchased flight ticket.\n* Reimbursement for gas per mile driven.\n\nWe will be sending busses to campuses throughout the southeast. Based on the school and city you indicate, we may offer you a position on a nearby bus instead of offering travel reimbursement. If you have any questions, please email us at hello@hack.gt!"
 			}
         ],
         "questions": [
@@ -537,9 +537,6 @@
 				"label": "Please confirm the following",
 				"type": "checkbox",
 				"options": [
-                    "I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf).",
-                    "I authorize HackGT to share my application and registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy).",
-                    "I agree to the terms of the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions).",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1M_nYaxMDA12JdFzpZAnoWH9M5nD9AyQI/view).",
                     "I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp)."
 				],
