@@ -205,7 +205,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			}
 
 			let emailHTML = await renderEmailHTML(emailMarkdown, user);
-			let emailText = await renderEmailText(emailHTML, user, true);
+			let emailText = await renderEmailText(emailMarkdown, user);
 
 			if (questionBranch instanceof Branches.ApplicationBranch) {
 				if (!user.applied) {
@@ -423,7 +423,7 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 			}
 
 			let html = await renderEmailHTML(emailMarkdown, user);
-			let text = await renderEmailText(html, user, true);
+			let text = await renderEmailText(emailMarkdown, user);
 
 			emails.push({
 				from: config.email.from,
