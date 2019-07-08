@@ -33,9 +33,23 @@
 			</fieldset>
 		{{/ifCond}}
 	{{else}}
-		<label for="form-{{this.name}}" class="{{required this.required}}">{{{this.label}}}</label>
+		<label for="form-{{this.name}}" class="{{required this.required}}">
+			{{{this.label}}}
+			{{#if this.minWordCount}}
+				<small>(At least {{this.minWordCount}} words)&nbsp;</small>
+			{{/if}}
+			{{#if this.maxWordCount}}
+				<small>(Max {{this.maxWordCount}} words)&nbsp;</small>
+			{{/if}}
+			{{#if this.minCharacterCount}}
+				<small>(At least {{this.minCharacterCount}} characters)&nbsp;</small>
+			{{/if}}
+			{{#if this.maxCharacterCount}}
+				<small>(Max {{this.maxCharacterCount}} characters)&nbsp;</small>
+			{{/if}}
+		</label>
 		{{#ifCond this.type "textarea"}}
-			<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}}>{{this.value}}</textarea>
+			<textarea name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} minlength="{{this.minCharacterCount}}" maxlength="{{this.maxCharacterCount}}">{{this.value}}</textarea>
 		{{else}}
 			{{#ifCond this.type "file"}}
 				{{#if this.value}}
@@ -45,7 +59,7 @@
 					<input type="file" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} />
 				{{/if}}
 			{{else}}
-				<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} value="{{this.value}}" />
+				<input type="{{this.type}}" name="{{this.name}}" id="form-{{this.name}}" placeholder="{{this.placeholder}}" {{required this.required}} minlength="{{this.minCharacterCount}}" maxlength="{{this.maxCharacterCount}}" value="{{this.value}}" />
 			{{/ifCond}}
 		{{/ifCond}}
 	{{/if}}
