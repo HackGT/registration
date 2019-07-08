@@ -158,22 +158,25 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 					return reportError(`"${question.label}" is a required field`);
 				}
 			}
-			if (question.minCharacterCount && getQuestion("").length < question.minCharacterCount) {
-				return reportError(`Your response to "${question.label}" must have at least ${question.minCharacterCount} characters`);
-			}
-			if (question.maxCharacterCount && getQuestion("").length > question.maxCharacterCount) {
-				return reportError(`Your response to "${question.label}" cannot exceed ${question.maxCharacterCount} characters`);
-			}
-			let wordCount = getQuestion("").trim().split(/\s+/).length;
-			if (getQuestion("").trim().length === 0) {
-				wordCount = 0;
-			}
-			const wordCountPlural = wordCount === 1 ? "" : "s";
-			if (question.minWordCount && wordCount < question.minWordCount) {
-				return reportError(`Your response to "${question.label}" must contain at least ${question.minWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
-			}
-			if (question.maxWordCount && wordCount > question.maxWordCount) {
-				return reportError(`Your response to "${question.label}" cannot exceed ${question.maxWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+			if (question.type !== "file" && (question.minCharacterCount || question.maxCharacterCount || question.minWordCount || question.maxWordCount)) {
+				let questionValue = getQuestion<string>("");
+				if (question.minCharacterCount && questionValue.length < question.minCharacterCount) {
+					return reportError(`Your response to "${question.label}" must have at least ${question.minCharacterCount} characters`);
+				}
+				if (question.maxCharacterCount && questionValue.length > question.maxCharacterCount) {
+					return reportError(`Your response to "${question.label}" cannot exceed ${question.maxCharacterCount} characters`);
+				}
+				let wordCount = questionValue.trim().split(/\s+/).length;
+				if (questionValue.trim().length === 0) {
+					wordCount = 0;
+				}
+				const wordCountPlural = wordCount === 1 ? "" : "s";
+				if (question.minWordCount && wordCount < question.minWordCount) {
+					return reportError(`Your response to "${question.label}" must contain at least ${question.minWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+				}
+				if (question.maxWordCount && wordCount > question.maxWordCount) {
+					return reportError(`Your response to "${question.label}" cannot exceed ${question.maxWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+				}
 			}
 
 			if ((question.type === "select" || question.type === "radio") && Array.isArray(getQuestion<unknown>(question.name)) && question.hasOther) {
