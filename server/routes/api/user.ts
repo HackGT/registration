@@ -38,37 +38,45 @@ let postApplicationBranchErrorHandler: express.ErrorRequestHandler = (err, reque
 };
 
 // We don't use canUserModify here, instead check for admin
-registrationRoutes.route("/:branch").post(
-	isAdmin,
-	postParser,
-	uploadHandler.any(),
-	postApplicationBranchErrorHandler,
-	postApplicationBranchHandler(true)
-);
+registrationRoutes.route("/:branch")
+	.post(
+		isAdmin,
+		postParser,
+		uploadHandler.any(),
+		postApplicationBranchErrorHandler,
+		postApplicationBranchHandler(true)
+	);
 
-userRoutes.route("/application/:branch").post(
-	isUserOrAdmin,
-	canUserModify,
-	postParser,
-	uploadHandler.any(),
-	postApplicationBranchErrorHandler,
-	postApplicationBranchHandler(false)
-).delete(
-	isUserOrAdmin,
-	canUserModify,
-	deleteApplicationBranchHandler);
-userRoutes.route("/confirmation/:branch").post(
-	isUserOrAdmin,
-	canUserModify,
-	postParser,
-	uploadHandler.any(),
-	postApplicationBranchErrorHandler,
-	postApplicationBranchHandler(false)
-).delete(
-	isUserOrAdmin,
-	canUserModify,
-	deleteApplicationBranchHandler
-);
+userRoutes.route("/application/:branch")
+	.post(
+		isUserOrAdmin,
+		canUserModify,
+		postParser,
+		uploadHandler.any(),
+		postApplicationBranchErrorHandler,
+		postApplicationBranchHandler(false)
+	)
+	.delete(
+		isUserOrAdmin,
+		canUserModify,
+		deleteApplicationBranchHandler
+	);
+
+userRoutes.route("/confirmation/:branch")
+	.post(
+		isUserOrAdmin,
+		canUserModify,
+		postParser,
+		uploadHandler.any(),
+		postApplicationBranchErrorHandler,
+		postApplicationBranchHandler(false)
+	)
+	.delete(
+		isUserOrAdmin,
+		canUserModify,
+		deleteApplicationBranchHandler
+	);
+
 function postApplicationBranchHandler(anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request, response) => {
 		let user: Model<IUser>;
@@ -111,6 +119,21 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 		let unchangedFiles: string[] = [];
 		let errored: boolean = false; // Used because .map() can't be broken out of
 		let rawData: (IFormItem | null)[] = questionBranch.questions.map(question => {
+			function reportError(message: string): null {
+				errored = true;
+				response.status(400).json({
+					"error": message
+				});
+				return null;
+			}
+			function getQuestion<T>(defaultValue?: T): T {
+				let value = request.body[question.name] as T;
+				if (defaultValue !== undefined) {
+					return value || defaultValue;
+				}
+				return value;
+			}
+
 			if (errored) {
 				return null;
 			}
@@ -120,7 +143,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 				&& user.applicationData != undefined
 				&& user.applicationData.some(entry => entry.name === question.name && !!entry.value);
 
-			if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
+			if (question.required && !getQuestion<unknown>() && !files.find(file => file.fieldname === question.name)) {
 				// Required field not filled in
 				if (preexistingFile) {
 					let previousValue = user.applicationData!.find(entry => entry.name === question.name && !!entry.value)!.value as Express.Multer.File;
@@ -132,31 +155,48 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 					};
 				}
 				else {
-					errored = true;
-					response.status(400).json({
-						"error": `"${question.label}" is a required field`
-					});
-					return null;
+					return reportError(`"${question.label}" is a required field`);
 				}
 			}
-			if ((question.type === "select" || question.type === "radio") && Array.isArray(request.body[question.name]) && question.hasOther) {
+			if (question.type !== "file" && (question.minCharacterCount || question.maxCharacterCount || question.minWordCount || question.maxWordCount)) {
+				let questionValue = getQuestion<string>("");
+				if (question.minCharacterCount && questionValue.length < question.minCharacterCount) {
+					return reportError(`Your response to "${question.label}" must have at least ${question.minCharacterCount} characters`);
+				}
+				if (question.maxCharacterCount && questionValue.length > question.maxCharacterCount) {
+					return reportError(`Your response to "${question.label}" cannot exceed ${question.maxCharacterCount} characters`);
+				}
+				let wordCount = questionValue.trim().split(/\s+/).length;
+				if (questionValue.trim().length === 0) {
+					wordCount = 0;
+				}
+				const wordCountPlural = wordCount === 1 ? "" : "s";
+				if (question.minWordCount && wordCount < question.minWordCount) {
+					return reportError(`Your response to "${question.label}" must contain at least ${question.minWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+				}
+				if (question.maxWordCount && wordCount > question.maxWordCount) {
+					return reportError(`Your response to "${question.label}" cannot exceed ${question.maxWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+				}
+			}
+
+			if ((question.type === "select" || question.type === "radio") && Array.isArray(getQuestion<unknown>(question.name)) && question.hasOther) {
 				// "Other" option selected
-				request.body[question.name] = request.body[question.name].pop();
+				request.body[question.name] = getQuestion<unknown[]>().pop();
 			}
 			else if (question.type === "checkbox" && question.hasOther) {
-				if (!request.body[question.name]) {
+				if (!getQuestion<unknown>(question.name)) {
 					request.body[question.name] = [];
 				}
-				if (!Array.isArray(request.body[question.name])) {
-					request.body[question.name] = [request.body[question.name]];
+				if (!Array.isArray(getQuestion<unknown>(question.name))) {
+					request.body[question.name] = [getQuestion<unknown>()];
 				}
 				// Filter out "other" option
-				request.body[question.name] = (request.body[question.name] as string[]).filter(value => value !== "Other");
+				request.body[question.name] = getQuestion<string[]>().filter(value => value !== "Other");
 			}
 			return {
 				"name": question.name,
 				"type": question.type,
-				"value": request.body[question.name] || files.find(file => file.fieldname === question.name)
+				"value": getQuestion<any>(files.find(file => file.fieldname === question.name))
 			};
 		});
 		if (errored) {
