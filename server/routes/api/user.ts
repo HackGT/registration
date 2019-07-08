@@ -128,7 +128,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			}
 			function getQuestion<T>(defaultValue?: T): T {
 				let value = request.body[question.name] as T;
-				if (defaultValue) {
+				if (defaultValue !== undefined) {
 					return value || defaultValue;
 				}
 				return value;
