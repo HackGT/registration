@@ -126,3 +126,21 @@ for (let i = 0; i < inputsWithOther.length; i++) {
 		}
 	});
 }
+
+let wordCountInputs = document.querySelectorAll("[data-max-word-count], [data-min-word-count]") as NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
+for (let i = 0; i < wordCountInputs.length; i++) {
+	wordCountInputs[i].addEventListener("input", e => {
+		let target = e.target as HTMLInputElement | HTMLTextAreaElement;
+		let correspondingLabel = document.querySelector(`label[for="${target.id}"] > .current-count`);
+		if (!correspondingLabel) return;
+
+		let { maxWordCount, minWordCount } = target.dataset;
+		if (!maxWordCount && !minWordCount) return;
+
+		let wordCount = target.value.trim().split(/\s+/).length;
+		if (target.value.trim().length === 0) {
+			wordCount = 0;
+		}
+		correspondingLabel.textContent = `(${wordCount.toLocaleString()} word${wordCount === 1 ? "" : "s"})`;
+	});
+}

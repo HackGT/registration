@@ -164,7 +164,10 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			if (question.maxCharacterCount && getQuestion("").length > question.maxCharacterCount) {
 				return reportError(`Your response to "${question.label}" cannot exceed ${question.maxCharacterCount} characters`);
 			}
-			let wordCount = getQuestion("").split(/\s+/).length;
+			let wordCount = getQuestion("").trim().split(/\s+/).length;
+			if (getQuestion("").trim().length === 0) {
+				wordCount = 0;
+			}
 			let wordCountPlural = wordCount === 1 ? "" : "s";
 			if (question.minWordCount && wordCount < question.minWordCount) {
 				return reportError(`Your response to "${question.label}" must contain at least ${question.minWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
