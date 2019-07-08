@@ -168,7 +168,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			if (getQuestion("").trim().length === 0) {
 				wordCount = 0;
 			}
-			let wordCountPlural = wordCount === 1 ? "" : "s";
+			const wordCountPlural = wordCount === 1 ? "" : "s";
 			if (question.minWordCount && wordCount < question.minWordCount) {
 				return reportError(`Your response to "${question.label}" must contain at least ${question.minWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
 			}
