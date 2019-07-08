@@ -453,7 +453,7 @@
 			{
 				"name": "require-travel",
 				"label": "Do you require travel reimbursement to attend HackGT: Into the Rabbit Hole?",
-				"type": "select",
+				"type": "radio",
 				"options": [
 					"No",
 					"Yes"
