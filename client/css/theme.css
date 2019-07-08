@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Milonga&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro&display=swap');
 
-  
+
 /* CSS variables for colors */
 :root {
     --bg-color: #131429;
@@ -37,7 +37,7 @@ section.main {
     color: var(--text-color);
     font-family: "Milonga", serif;
 }
-html, body, section.main {
+html, body, section.main, form > p {
     color: var(--text-color);
     font-family: 'Source Serif Pro', serif;
 }
