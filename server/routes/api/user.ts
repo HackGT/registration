@@ -164,6 +164,14 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			if (question.maxCharacterCount && getQuestion("").length > question.maxCharacterCount) {
 				return reportError(`Your response to "${question.label}" cannot exceed ${question.maxCharacterCount} characters`);
 			}
+			let wordCount = getQuestion("").split(/\s+/).length;
+			let wordCountPlural = wordCount === 1 ? "" : "s";
+			if (question.minWordCount && wordCount < question.minWordCount) {
+				return reportError(`Your response to "${question.label}" must contain at least ${question.minWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+			}
+			if (question.maxWordCount && wordCount > question.maxWordCount) {
+				return reportError(`Your response to "${question.label}" cannot exceed ${question.maxWordCount} words (currently has ${wordCount} word${wordCountPlural})`);
+			}
 
 			if ((question.type === "select" || question.type === "radio") && Array.isArray(getQuestion<unknown>(question.name)) && question.hasOther) {
 				// "Other" option selected
