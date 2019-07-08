@@ -231,7 +231,7 @@ settingsRoutes.route("/email_content/:type/rendered")
 		try {
 			let markdown: string = request.body.content;
 			let html: string = await renderEmailHTML(markdown, request.user as IUser);
-			let text: string = await renderEmailText(html, request.user as IUser, true);
+			let text: string = await renderEmailText(markdown, request.user as IUser);
 
 			response.json({ html, text });
 		}
@@ -266,7 +266,7 @@ settingsRoutes.route("/send_batch_email")
 		let emails: IMailObject[] = [];
 		for (let user of users) {
 			let html: string = await renderEmailHTML(markdownContent, user);
-			let text: string = await renderEmailText(html, user, true);
+			let text: string = await renderEmailText(markdownContent, user);
 
 			emails.push({
 				from: config.email.from,
@@ -281,7 +281,7 @@ settingsRoutes.route("/send_batch_email")
 		subject = `[Admin FYI] ${subject}`;
 		for (let user of admins) {
 			let html: string = await renderEmailHTML(markdownContent, user);
-			let text: string = await renderEmailText(html, user, true);
+			let text: string = await renderEmailText(markdownContent, user);
 			html = `${JSON.stringify(filter)}<br>${html}`;
 			text = `${JSON.stringify(filter)}\n${text}`;
 			emails.push({

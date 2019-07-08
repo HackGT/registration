@@ -14,6 +14,7 @@ RUN npm run build
 # Set Timezone to EST
 RUN apk add tzdata
 ENV TZ="/usr/share/zoneinfo/America/New_York"
+ENV NODE_ENV="production"
 
 # Deis wants EXPOSE and CMD
 EXPOSE 3000
