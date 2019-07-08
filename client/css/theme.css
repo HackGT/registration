@@ -8,7 +8,7 @@
     --input-color:#e6e6e6 ;
     --text-color: #e6e6e6;
     --dark-grey: #999999;
-    --light-grey: #e6e6e6;
+    --purple: #979bcd;
     --blur: rgba(255, 255, 255, 0.6);
 }
 
@@ -30,7 +30,7 @@ html::before {
 }
 
 section.main {
-    border-top: 1px var(--light-grey) solid;
+    border-top: 1px var(--purple) solid;
 }
 
 #sidebar-nav {
@@ -102,7 +102,7 @@ html, body, section.main, form > p {
     outline: none;
 }
 #sidebar-nav > span.divider, section.main, table thead {
-    border-color: var(--light-grey);
+    border-color: var(--purple);
 }
 a {
     color: var(--text-color);
@@ -121,10 +121,10 @@ a:hover {
 
 /* Buttons */
 .btn, [type=submit], button, .accepted-btn-false {
-    background-color: var(--dark-grey);
+    background-color: var(--purple);
 }
 .editor-toolbar > button {
-    color: var(--light-grey);
+    color: var(--purple);
 }
 
 fieldset > div > label {
@@ -151,7 +151,7 @@ section.main > div > p:first-of-type {
 input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
     background-color: var(--bg-color);
     color: var(--text-color);
-    border-color: var(--light-grey);
+    border-color: var(--purple);
 }
 input, label {
     font-variant-ligatures: none;
@@ -167,7 +167,7 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     border-color: var(--dark-grey);
 }
 input:disabled, textarea:disabled {
-    background: repeating-linear-gradient(45deg, var(--dark-grey), var(--dark-grey) 10px, var(--light-grey) 10px, var(--light-grey) 20px );
+    background: repeating-linear-gradient(45deg, var(--dark-grey), var(--dark-grey) 10px, var(--purple) 10px, var(--purple) 20px );
     color: var(--bg-color) !important;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
