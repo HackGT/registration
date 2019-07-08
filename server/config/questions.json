@@ -55,6 +55,7 @@
 				"label": "What college or university do you currently attend?",
 				"type": "select",
 				"options": [
+                    "Georgia Institute of Technology",
 					"Abraham Baldwin Agricultural College",
 					"Albany Medical College",
 					"Albany State University",
@@ -108,7 +109,6 @@
 					"Georgia College & State University",
 					"Georgia Gwinnett College",
 					"Georgia Highlands College",
-					"Georgia Institute of Technology",
 					"Georgia Southern University",
 					"Georgia Southwestern State University",
 					"Georgia State University",
