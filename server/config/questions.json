@@ -468,21 +468,24 @@
 			},
             {
                 "name": "essay-1",
-                "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it? Max 150 words.",
+                "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it?",
                 "type": "textarea",
-                "required": true
+                "required": true,
+                "maxWordCount": 150
             },
             {
                 "name": "essay-2",
-                "label": "What motivated you to apply to HackGT and what are your goals for the event? Max 150 words.",
+                "label": "What motivated you to apply to HackGT and what are your goals for the event?",
                 "type": "textarea",
-                "required": true
+                "required": true,
+                "maxWordCount": 150
             },
             {
                 "name": "essay-3",
                 "label": "What are your current interests and aspirations? TODO",
                 "type": "textarea",
-                "required": true
+                "required": true,
+                "maxWordCount": 150
             },
             {
 				"name": "resume",
