@@ -14,7 +14,7 @@ import {
 import {
 	authenticateWithRedirect, isAdmin,
 	onlyAllowAnonymousBranch, branchRedirector, ApplicationType,
-	postParser,
+	postParser
 } from "../middleware";
 import {
 	Model,
