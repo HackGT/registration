@@ -602,7 +602,18 @@ const markdownEditor = new EasyMDE({ element: document.getElementById("email-con
 let contentChanged = false;
 let lastSelected = emailTypeSelect.value;
 
-markdownEditor.codemirror.on("change", async () => {
+const debounceTimeout = 500; // Milliseconds to wait before content is rendered to avoid hitting the server for every keystroke
+function debounce(func: () => void): () => void {
+	let timer: number | null = null;
+	return () => {
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(func, debounceTimeout);
+	};
+}
+
+markdownEditor.codemirror.on("change", debounce(async () => {
 	contentChanged = true;
 	try {
 		let content = new FormData();
@@ -626,7 +637,7 @@ markdownEditor.codemirror.on("change", async () => {
 	catch {
 		emailRenderedArea.textContent = "Couldn't retrieve email content";
 	}
-});
+}));
 
 async function emailTypeChange(): Promise<void> {
 	if (contentChanged) {
