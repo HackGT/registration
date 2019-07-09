@@ -587,72 +587,166 @@ sendAcceptancesButton.addEventListener("click", async e => {
 });
 
 //
-// Email content
+// Markdown content
 //
 declare const EasyMDE: typeof import("easymde");
 
 const emailTypeSelect = document.getElementById("email-type") as HTMLSelectElement;
 const emailSubject = document.getElementById("email-subject") as HTMLInputElement;
+
+const interstitialTypeSelect = document.getElementById("interstitial-type") as HTMLSelectElement;
+
 let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
+let interstitialRenderedArea: HTMLElement | ShadowRoot = document.getElementById("interstitial-rendered") as HTMLElement;
 if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
 	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
+	interstitialRenderedArea = interstitialRenderedArea.attachShadow({ mode: "open" });
 }
-const markdownEditor = new EasyMDE({ element: document.getElementById("email-content")! });
-let contentChanged = false;
-let lastSelected = emailTypeSelect.value;
 
-markdownEditor.codemirror.on("change", async () => {
-	contentChanged = true;
-	try {
-		let content = new FormData();
-		content.append("content", markdownEditor.value());
+const debounceTimeout = 500; // Milliseconds to wait before content is rendered to avoid hitting the server for every keystroke
+function debounce(func: (...args: unknown[]) => void): (...args: unknown[]) => void {
+	let timer: number | null = null;
+	return () => {
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(func, debounceTimeout);
+	};
+}
 
-		let { html, text }: { html: string; text: string } = (
-			await fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}/rendered`, {
-				credentials: "same-origin",
-				method: "POST",
-				body: content
-			}).then(checkStatus).then(parseJSON)
-		);
-		emailRenderedArea.innerHTML = html;
-		let hr = document.createElement("hr");
-		hr.style.border = "1px solid #737373";
-		emailRenderedArea.appendChild(hr);
-		let textContainer = document.createElement("pre");
-		textContainer.textContent = text;
-		emailRenderedArea.appendChild(textContainer);
+abstract class Editor {
+	private readonly editor: EasyMDE;
+	protected contentChanged: boolean = false;
+	protected lastSelected: string;
+
+	constructor(editorElementID: string, protected typeSelector: HTMLSelectElement) {
+		let element = document.getElementById(editorElementID);
+		if (!element) {
+			throw new Error(`Cannot create Markdown editor from non-existent <textarea> with ID ${editorElementID}`);
+		}
+		this.editor = new EasyMDE({ element });
+		const onChange = debounce(this.onChange.bind(this));
+		this.editor.codemirror.on("change", () => {
+			this.contentChanged = true;
+			onChange();
+		});
+
+		const onTypeChange = this.onTypeChange.bind(this);
+		this.lastSelected = typeSelector.value;
+		typeSelector.addEventListener("change", () => {
+			onTypeChange();
+			this.lastSelected = typeSelector.value;
+		});
+		// Load initial content
+		this.loadContent().catch(err => {
+			console.error(err);
+		});
 	}
-	catch {
-		emailRenderedArea.textContent = "Couldn't retrieve email content";
+	public get value(): string {
+		return this.editor.value();
 	}
-});
+	public set value(value: string) {
+		this.editor.value(value);
+	}
 
-async function emailTypeChange(): Promise<void> {
-	if (contentChanged) {
-		let shouldProceed = confirm("Heads up! You've edited the content of this email but haven't saved it. Click cancel to stay and save.");
-		if (!shouldProceed) {
-			emailTypeSelect.value = lastSelected;
-			return;
+	protected abstract onChange(): Promise<void>;
+	protected abstract onTypeChange(): Promise<void>;
+	protected abstract loadContent(): Promise<void>;
+}
+class EmailEditor extends Editor {
+	protected async onChange(): Promise<void> {
+		try {
+			let content = new FormData();
+			content.append("content", this.value);
+
+			let { html, text }: { html: string; text: string } = (
+				await fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}/rendered`, {
+					credentials: "same-origin",
+					method: "POST",
+					body: content
+				}).then(checkStatus).then(parseJSON)
+			);
+			emailRenderedArea.innerHTML = html;
+			let hr = document.createElement("hr");
+			hr.style.border = "1px solid #737373";
+			emailRenderedArea.appendChild(hr);
+			let textContainer = document.createElement("pre");
+			textContainer.textContent = text;
+			emailRenderedArea.appendChild(textContainer);
+		}
+		catch {
+			emailRenderedArea.textContent = "Couldn't retrieve email content";
 		}
 	}
-
-	// Load editor content via AJAX
-	try {
-		let emailSettings: { subject: string; content: string } = await fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON);
-		emailSubject.value = emailSettings.subject;
-		markdownEditor.value(emailSettings.content);
+	protected async onTypeChange(ignoreChanged?: boolean): Promise<void> {
+		if (this.contentChanged) {
+			let shouldProceed = confirm("Heads up! You've edited the content of this email but haven't saved it. Click cancel to stay and save.");
+			if (!shouldProceed) {
+				this.typeSelector.value = this.lastSelected;
+				return;
+			}
+		}
+		return this.loadContent();
 	}
-	catch {
-		markdownEditor.value("Couldn't retrieve email content");
+	protected async loadContent(): Promise<void> {
+		try {
+			let emailSettings: { subject: string; content: string } = await fetch(`/api/settings/email_content/${encodeURIComponent(emailTypeSelect.value)}`, { credentials: "same-origin" }).then(checkStatus).then(parseJSON);
+			emailSubject.value = emailSettings.subject;
+			this.value = emailSettings.content;
+		}
+		catch {
+			this.value = "Couldn't retrieve email content";
+		}
+		this.contentChanged = false;
 	}
-	contentChanged = false;
-	lastSelected = emailTypeSelect.value;
 }
-emailTypeSelect.addEventListener("change", emailTypeChange);
-emailTypeChange().catch(err => {
-	console.error(err);
-});
+class InterstitialEditor extends Editor {
+	protected async onChange(): Promise<void> {
+		try {
+			let content = new FormData();
+			content.append("content", this.value);
+
+			let { html }: { html: string } = (
+				await fetch(`/api/settings/interstitial/${encodeURIComponent(interstitialTypeSelect.value)}/rendered`, {
+					credentials: "same-origin",
+					method: "POST",
+					body: content
+				}).then(checkStatus).then(parseJSON)
+			);
+			interstitialRenderedArea.innerHTML = html;
+		}
+		catch {
+			interstitialRenderedArea.textContent = "Couldn't retrieve email content";
+		}
+	}
+	protected async onTypeChange(): Promise<void> {
+		if (this.contentChanged) {
+			let shouldProceed = confirm("Heads up! You've edited the content of this interstitial but haven't saved it. Click cancel to stay and save.");
+			if (!shouldProceed) {
+				this.typeSelector.value = this.lastSelected;
+				return;
+			}
+		}
+		return this.loadContent();
+	}
+	protected async loadContent(): Promise<void> {
+		try {
+			let interstitialSettings: { content: string } = await fetch(
+				`/api/settings/interstitial/${encodeURIComponent(interstitialTypeSelect.value)}`,
+				{ credentials: "same-origin" }
+			).then(checkStatus).then(parseJSON);
+			this.value = interstitialSettings.content;
+		}
+		catch {
+			this.value = "Couldn't retrieve interstitial content";
+		}
+		this.contentChanged = false;
+	}
+}
+
+let emailEditor = new EmailEditor("email-content", emailTypeSelect);
+let interstitialEditor = new InterstitialEditor("interstitial-content", interstitialTypeSelect);
 
 //
 // Settings
@@ -743,7 +837,10 @@ function settingsUpdate(e: MouseEvent) {
 
 	let emailContentData = new FormData();
 	emailContentData.append("subject", emailSubject.value);
-	emailContentData.append("content", markdownEditor.value());
+	emailContentData.append("content", emailEditor.value);
+
+	let interstitialContentData = new FormData();
+	interstitialContentData.append("content", interstitialEditor.value);
 
 	const defaultOptions: RequestInit = {
 		credentials: "same-origin",
@@ -778,9 +875,20 @@ function settingsUpdate(e: MouseEvent) {
 			return Promise.resolve();
 		}
 	}).then(async () => {
+		if (interstitialTypeSelect.value) {
+			return fetch(`/api/settings/interstitial/${encodeURIComponent(interstitialTypeSelect.value)}`, {
+				...defaultOptions,
+				body: interstitialContentData
+			}).then(checkStatus).then(parseJSON);
+		}
+		else {
+			return Promise.resolve();
+		}
+	}).then(async () => {
 		await sweetAlert("Awesome!", "Settings successfully updated.", "success");
 		window.location.reload();
 	}).catch(async (err: Error) => {
+		console.error(err);
 		await sweetAlert("Oh no!", err.message, "error");
 		settingsUpdateButtonDisabled(false);
 	});
