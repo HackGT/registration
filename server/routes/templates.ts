@@ -9,20 +9,20 @@ import * as uuid from "uuid/v4";
 
 import {
 	STATIC_ROOT, STORAGE_ENGINE,
-	config, getSetting, renderMarkdown, removeTags
+	config, getSetting, renderMarkdown, removeTags, renderPageHTML
 } from "../common";
 import {
 	authenticateWithRedirect, isAdmin,
-	onlyAllowAnonymousBranch, branchRedirector, ApplicationType
+	onlyAllowAnonymousBranch, branchRedirector, ApplicationType,
+	postParser
 } from "../middleware";
 import {
 	Model,
 	IUser, User,
 	ITeam, Team,
-	IIndexTemplate, IAdminTemplate, ITeamTemplate,
-	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
-	IFormItem,
-	ILoginTemplate
+	ILoginTemplate, IIndexTemplate, IAdminTemplate, ITeamTemplate,
+	IRegisterBranchChoiceTemplate, IInterstitialTemplate, IRegisterTemplate, StatisticEntry,
+	IFormItem
 } from "../schema";
 import * as Branches from "../branch";
 
@@ -51,6 +51,7 @@ export class Template<T> {
 const IndexTemplate = new Template<IIndexTemplate>("index.html");
 const PreRegisterTemplate = new Template<IRegisterBranchChoiceTemplate>("preapplication.html");
 const PreConfirmTemplate = new Template<IRegisterBranchChoiceTemplate>("preconfirmation.html");
+const InterstitialTemplate = new Template<IInterstitialTemplate>("interstitial.html");
 const RegisterTemplate = new Template<IRegisterTemplate>("application.html");
 const ConfirmTemplate = new Template<IRegisterTemplate>("confirmation.html");
 const AdminTemplate = new Template<IAdminTemplate>("admin.html");
@@ -441,17 +442,31 @@ templateRoutes.route("/register/:branch").get(
 	applicationBranchHandler(ApplicationType.Application, true)
 );
 
-templateRoutes.route("/apply/:branch").get(
-	authenticateWithRedirect,
-	branchRedirector(ApplicationType.Application),
-	applicationBranchHandler(ApplicationType.Application, false)
-);
-templateRoutes.route("/confirm/:branch").get(
-	authenticateWithRedirect,
-	branchRedirector(ApplicationType.Confirmation),
-	applicationBranchHandler(ApplicationType.Confirmation, false)
-);
+templateRoutes.route("/apply/:branch")
+	.get(
+		authenticateWithRedirect,
+		branchRedirector(ApplicationType.Application),
+		applicationBranchHandler(ApplicationType.Application, false)
+	)
+	.post(postParser, interstitialPostHandler);
+templateRoutes.route("/confirm/:branch")
+	.get(
+		authenticateWithRedirect,
+		branchRedirector(ApplicationType.Confirmation),
+		applicationBranchHandler(ApplicationType.Confirmation, false)
+	)
+	.post(postParser, interstitialPostHandler);
 
+function interstitialPostHandler(request: express.Request, response: express.Response) {
+	if (request.body["interstitial-action"] === "Back") {
+		response.redirect("/apply");
+		return;
+	}
+	if (request.session) {
+		request.session.interstitialShown = true;
+	}
+	response.redirect(request.url); // Redirect to a GET of this page
+}
 function applicationBranchHandler(requestType: ApplicationType, anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request, response) => {
 		let user: IUser;
@@ -465,9 +480,46 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		}
 
 		let branchName = request.params.branch as string;
-
 		let questionBranches = await Branches.BranchConfig.loadAllBranches();
 		let questionBranch = questionBranches.find(branch => branch.name.toLowerCase() === branchName.toLowerCase())!;
+
+		let interstitialMarkdown: string = "";
+		try {
+			interstitialMarkdown = await getSetting<string>(`${questionBranch.name}-interstitial`, false);
+		}
+		// tslint:disable-next-line:no-empty
+		catch {} // Setting retrieval will throw if the setting is unset
+
+		// Show user interstitial for this branch if:
+		// 1. The interstitial content is not blank
+		// 2. User has not already been shown interstitial for this branch (and clicked Continue)
+		// 3. User is applying to this branch for the first time (i.e. is not editing their existing application)
+		let interstitialShown = false;
+		if (request.session && request.session.interstitialShown) {
+			interstitialShown = true;
+		}
+		let isUserEditing = false;
+		if (requestType === ApplicationType.Application && user.applicationBranch) {
+			isUserEditing = true;
+		}
+		if (requestType === ApplicationType.Confirmation && user.confirmationBranch) {
+			isUserEditing = true;
+		}
+		if (interstitialMarkdown.trim() && !interstitialShown && !isUserEditing) {
+			response.send(InterstitialTemplate.render({
+				siteTitle: config.eventName,
+				user,
+				settings: {
+					teamsEnabled: await getSetting<boolean>("teamsEnabled"),
+					qrEnabled: await getSetting<boolean>("qrEnabled")
+				},
+				html: await renderPageHTML(interstitialMarkdown, user)
+			}));
+			return;
+		}
+		if (request.session) {
+			request.session.interstitialShown = false;
+		}
 
 		// tslint:disable:no-string-literal
 		let questionData = await Promise.all(questionBranch.questions.map(async question => {

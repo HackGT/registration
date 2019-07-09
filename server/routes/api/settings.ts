@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, renderEmailHTML, renderEmailText, defaultEmailSubjects, sendBatchMailAsync, config, IMailObject
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, renderPageHTML, defaultEmailSubjects, sendBatchMailAsync, config, IMailObject
 } from "../../common";
 import {
 	isAdmin, uploadHandler
@@ -239,6 +239,50 @@ settingsRoutes.route("/email_content/:type/rendered")
 			console.error(err);
 			response.status(500).json({
 				"error": "An error occurred while rendering the email content"
+			});
+		}
+	});
+
+settingsRoutes.route("/interstitial/:type")
+	.get(isAdmin, async (request, response) => {
+		let content: string;
+		try {
+			content = await getSetting<string>(`${request.params.type}-interstitial`, false);
+		}
+		catch {
+			// Content not set yet
+			content = "";
+		}
+		response.json({ content });
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let content: string = request.body.content;
+		try {
+			await updateSetting<string>(`${request.params.type}-interstitial`, content);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting interstitial content"
+			});
+		}
+	});
+
+settingsRoutes.route("/interstitial/:type/rendered")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		try {
+			let markdown: string = request.body.content;
+			let html = await renderPageHTML(markdown, request.user as IUser);
+
+			response.json({ html });
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while rendering the interstitial content"
 			});
 		}
 	});

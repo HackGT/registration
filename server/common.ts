@@ -513,9 +513,8 @@ async function templateMarkdown(markdown: string, user: IUser): Promise<string> 
 	return markdown;
 }
 export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
-	markdown = await templateMarkdown(markdown, user);
-
-	let renderedMarkdown = await renderMarkdown(markdown);
+	let templatedMarkdown = await templateMarkdown(markdown, user);
+	let renderedMarkdown = await renderMarkdown(templatedMarkdown);
 	return email.render("email-template/html", {
 		emailHeaderImage: config.email.headerImage,
 		twitterHandle: config.email.twitterHandle,
@@ -529,6 +528,10 @@ export async function renderEmailText(markdown: string, user: IUser): Promise<st
 	let templatedMarkdown = await templateMarkdown(markdown, user);
 	let renderedHtml = await renderMarkdown(templatedMarkdown);
 	return htmlToText.fromString(renderedHtml);
+}
+export async function renderPageHTML(markdown: string, user: IUser): Promise<string> {
+	let templatedMarkdown = await templateMarkdown(markdown, user);
+	return renderMarkdown(templatedMarkdown);
 }
 
 // Verify and load questions

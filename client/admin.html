@@ -343,6 +343,28 @@
 							</ul>
 						</div>
 					</div>
+					<div class="row">
+						<div class="col-12">
+							<h4>Configure interstitial pages</h4>
+							<p>These are pages that will be shown to users after they click on an application branch and before they are shown the form itself. It will not be shown to users who are editing an application that they already submitted.</p>
+							<p>Interstitial page content is written in <a href="https://daringfireball.net/projects/markdown/" target="_blank">Markdown</a>. Valid HTML is also valid Markdown and can be useful for more complex layouts or styles. The same variables as email templating are supported (see above).</p>
+							<select id="interstitial-type">
+								<optgroup label="Application branches">
+									{{#each settings.branches.application}}
+									<option value="{{this.name}}">{{this.name}}</option>
+									{{/each}}
+								</optgroup>
+								<optgroup label="Confirmation branches">
+									{{#each settings.branches.confirmation}}
+									<option value="{{this.name}}">{{this.name}}</option>
+									{{/each}}
+								</optgroup>
+							</select>
+							<textarea id="interstitial-content"></textarea>
+							<h5>Rendered HTML:</h5>
+							<section id="interstitial-rendered"></section>
+						</div>
+					</div>
 					<h4><code>config.json</code> options</h4>
 					<div class="row">
 						<div class="col-4">
