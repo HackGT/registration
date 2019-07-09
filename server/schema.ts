@@ -284,6 +284,9 @@ export interface ITeamTemplate extends ICommonTemplate {
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];
 }
+export interface IInterstitialTemplate extends ICommonTemplate {
+	html: string;
+}
 export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;
 	questionData: Questions;
