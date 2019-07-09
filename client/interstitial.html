@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>{{siteTitle}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
+		<link rel="stylesheet" href="/css/main.css" />
+		<style>
+			main {
+				text-align: center;
+			}
+		</style>
+		<link rel="stylesheet" href="/css/theme.css" />
+	</head>
+	<body>
+		{{#> sidebar}}
+			{{{html}}}
+			<br />
+			<form method="POST">
+				<input class="btn" type="submit" name="interstitial-action" value="Back" />
+				<input class="btn" type="submit" name="interstitial-action" value="Continue" />
+			</form>
+		{{/sidebar}}
+	</body>
+</html>
