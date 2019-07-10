@@ -443,7 +443,9 @@
 					"Facebook",
 					"Friend",
 					"HackGT Website",
+					"Instagram",
 					"MLH",
+					"Reddit",
 					"Student Organization",
 					"Twitter"
 				],
@@ -476,13 +478,6 @@
             {
                 "name": "essay-2",
                 "label": "What motivated you to apply to HackGT and what are your goals for the event?",
-                "type": "textarea",
-                "required": true,
-                "maxWordCount": 150
-            },
-            {
-                "name": "essay-3",
-                "label": "What are your current interests and aspirations? TODO",
                 "type": "textarea",
                 "required": true,
                 "maxWordCount": 150
