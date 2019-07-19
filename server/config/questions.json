@@ -539,7 +539,19 @@
                     "I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp)."
 				],
 				"required": true
-			},
+	    },
+		
+            {
+                "name": "add-to-mailing-list",
+                "label": "Would you like to be added to our newsletter with information about future HackGT events? We promise we won't spam you!",
+                "type": "radio",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "hasOther": false,
+                "required": true
+            },
             {
                 "name": "other",
                 "label": "Anything else you want us to know?",
