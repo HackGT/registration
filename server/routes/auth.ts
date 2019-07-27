@@ -1,5 +1,3 @@
-import * as http from "http";
-import * as https from "https";
 import { URL } from "url";
 import * as crypto from "crypto";
 import * as express from "express";
@@ -56,25 +54,12 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 	response.send(crypto.createHmac("sha256", config.secrets.session).update(nonce).digest().toString("hex"));
 });
 
-authRoutes.all("/logout", (request, response) => {
+authRoutes.all("/logout", async (request, response) => {
 	let user = request.user as IUser | undefined;
 	if (user) {
 		let groundTruthURL = new URL(config.secrets.groundTruth.url);
-		let requester = groundTruthURL.protocol === "http:" ? http : https;
-		let req = requester.request({
-			host: groundTruthURL.hostname,
-			path: "/api/user/logout",
-			method: "POST",
-			headers: {
-				"Authorization": `Bearer ${user.token}`
-			}
-		});
-
-		req.on('error', (e) => {
-			console.error("Unable to logout: %s", e);
-		});
-
-		req.end();
+		// Invalidates token and logs user out of Ground Truth too
+		await GroundTruthStrategy.apiRequest("POST", new URL("/api/user/logout", groundTruthURL).toString(), user.token || "");
 		request.logout();
 	}
 	if (request.session) {
