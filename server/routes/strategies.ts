@@ -2,6 +2,7 @@ import * as crypto from "crypto";
 import * as http from "http";
 import * as https from "https";
 import { URL } from "url";
+import * as request from "request";
 import * as passport from "passport";
 import { Strategy as OAuthStrategy } from "passport-oauth2";
 
@@ -37,6 +38,25 @@ export type AuthenticateOptions = passport.AuthenticateOptions & {
 export class GroundTruthStrategy extends OAuthStrategy {
 	public readonly url: string;
 
+	public static async apiRequest(method: "GET" | "POST", url: string, token: string): Promise<string> {
+		return new Promise((resolve, reject) => {
+			request(url, {
+				method,
+				auth: {
+					sendImmediately: true,
+					bearer: token
+				}
+			}, (error, response, body) => {
+				if (error) {
+					reject(error);
+				}
+				else {
+					resolve(body as string);
+				}
+			});
+		});
+	}
+
 	public static get defaultUserProperties() {
 		return {
 			"admin": false,
@@ -67,22 +87,23 @@ export class GroundTruthStrategy extends OAuthStrategy {
 	}
 
 	public userProfile(accessToken: string, done: PassportProfileDone) {
-		(this._oauth2 as any)._request("GET", new URL("/api/user", this.url).toString(), null, null, accessToken, (err: Error | null, data: string) => {
-			if (err) {
+		GroundTruthStrategy
+			.apiRequest("GET", new URL("/api/user", this.url).toString(), accessToken)
+			.then(data => {
+				try {
+					let profile: IProfile = {
+						...JSON.parse(data),
+						token: accessToken
+					};
+					done(null, profile);
+				}
+				catch (err) {
+					return done(err);
+				}
+			})
+			.catch(err => {
 				done(err);
-				return;
-			}
-			try {
-				let profile: IProfile = {
-					...JSON.parse(data),
-					token: accessToken
-				};
-				done(null, profile);
-			}
-			catch (err) {
-				return done(err);
-			}
-		});
+			});
 	}
 
 	protected static async passportCallback(request: Request,  accessToken: string, refreshToken: string, profile: IProfile, done: PassportDone) {
