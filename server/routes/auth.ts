@@ -61,13 +61,20 @@ authRoutes.all("/logout", (request, response) => {
 	if (user) {
 		let groundTruthURL = new URL(config.secrets.groundTruth.url);
 		let requester = groundTruthURL.protocol === "http:" ? http : https;
-		requester.request(new URL("/api/user/logout", config.secrets.groundTruth.url), {
+		let req = requester.request({
+			host: groundTruthURL.hostname,
+			path: "/api/user/logout",
 			method: "POST",
 			headers: {
 				"Authorization": `Bearer ${user.token}`
 			}
-		}).end();
+		});
 
+		req.on('error', (e) => {
+			console.error("Unable to logout: %s", e);
+		});
+
+		req.end();
 		request.logout();
 	}
 	if (request.session) {
