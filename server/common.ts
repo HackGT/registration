@@ -577,7 +577,7 @@ export async function isBranchOpen(rawBranchName: string, user: IUser, requestTy
 import * as Agenda from "agenda";
 export const agenda = new Agenda({db: {address: config.server.mongoURL}});
 import { User } from "./schema";
-agenda.define("send_templated_email", {priority: 'high', concurrency: 20}, async (job, done) => {
+agenda.define("send_templated_email", async (job, done) => {
 	try {
 		let user = await User.findOne({uuid: job.attrs.data.id});
 		if (user) {
