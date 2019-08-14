@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import * as http from "http";
 import * as https from "https";
 import { URL } from "url";
-import * as request from "request";
+import * as requester from "request";
 import * as passport from "passport";
 import { Strategy as OAuthStrategy } from "passport-oauth2";
 
@@ -40,7 +40,7 @@ export class GroundTruthStrategy extends OAuthStrategy {
 
 	public static async apiRequest(method: "GET" | "POST", url: string, token: string): Promise<string> {
 		return new Promise((resolve, reject) => {
-			request(url, {
+			requester(url, {
 				method,
 				auth: {
 					sendImmediately: true,
