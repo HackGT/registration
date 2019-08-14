@@ -7,7 +7,7 @@ import * as uuid from "uuid/v4";
 import {
 	STORAGE_ENGINE,
 	formatSize,
-	config, getSetting, renderEmailHTML, renderEmailText, sendMailAsync, defaultEmailSubjects, IMailObject, sendBatchMailAsync
+	config, getSetting, defaultEmailSubjects, agenda
 } from "../../common";
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
@@ -244,17 +244,12 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 				emailMarkdown = "";
 			}
 
-			let emailHTML = await renderEmailHTML(emailMarkdown, user);
-			let emailText = await renderEmailText(emailMarkdown, user);
-
 			if (questionBranch instanceof Branches.ApplicationBranch) {
 				if (!user.applied) {
-					await sendMailAsync({
-						from: config.email.from,
-						to: user.email,
+					await agenda.now("send_templated_email", {
+						id: user.uuid,
 						subject: emailSubject || defaultEmailSubjects.apply,
-						html: emailHTML,
-						text: emailText
+						markdown: emailMarkdown
 					});
 				}
 				user.applied = true;
@@ -280,12 +275,10 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 
 			} else if (questionBranch instanceof Branches.ConfirmationBranch) {
 				if (!user.confirmed) {
-					await sendMailAsync({
-						from: config.email.from,
-						to: user.email,
+					await agenda.now("send_templated_email", {
+						id: user.uuid,
 						subject: emailSubject || defaultEmailSubjects.attend,
-						html: emailHTML,
-						text: emailText
+						markdown: emailMarkdown
 					});
 				}
 				user.confirmed = true;
@@ -443,7 +436,6 @@ async function updateUserStatus(user: Model<IUser>, status: string): Promise<voi
 userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let users = await User.find({ "confirmationBranch": {$exists: true}, "preConfirmEmailSent": { $ne: true } });
-		let emails: IMailObject[] = [];
 		for (let user of users) {
 			// Email the applicant about their acceptance
 			let emailSubject: string | null;
@@ -462,25 +454,18 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 				emailMarkdown = "";
 			}
 
-			let html = await renderEmailHTML(emailMarkdown, user);
-			let text = await renderEmailText(emailMarkdown, user);
-
-			emails.push({
-				from: config.email.from,
-				to: user.email,
-				subject: emailSubject || defaultEmailSubjects.preConfirm,
-				html,
-				text
-			});
-
 			user.preConfirmEmailSent = true;
+			await agenda.now("send_templated_email", {
+				id: user.uuid,
+				subject: emailSubject || defaultEmailSubjects.preConfirm,
+				markdown: emailMarkdown
+			});
 			await user.save();
 		}
 
-		await sendBatchMailAsync(emails);
 		response.json({
 			"success": true,
-			"count": emails.length
+			"count": users.length
 		});
 	}
 	catch (err) {
