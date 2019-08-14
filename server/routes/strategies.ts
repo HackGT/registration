@@ -2,6 +2,7 @@ import * as crypto from "crypto";
 import * as http from "http";
 import * as https from "https";
 import { URL } from "url";
+import * as requester from "request";
 import * as passport from "passport";
 import { Strategy as OAuthStrategy } from "passport-oauth2";
 
@@ -37,6 +38,29 @@ export type AuthenticateOptions = passport.AuthenticateOptions & {
 export class GroundTruthStrategy extends OAuthStrategy {
 	public readonly url: string;
 
+	public static async apiRequest<T = unknown>(method: "GET" | "POST", url: string, token: string): Promise<T> {
+		return new Promise((resolve, reject) => {
+			requester(url, {
+				method,
+				auth: {
+					sendImmediately: true,
+					bearer: token
+				}
+			}, (error, response, body) => {
+				if (error) {
+					reject(error);
+					return;
+				}
+				try {
+					resolve(JSON.parse(body));
+				}
+				catch {
+					reject(new Error(`Invalid JSON: ${body}`));
+				}
+			});
+		});
+	}
+
 	public static get defaultUserProperties() {
 		return {
 			"admin": false,
@@ -67,22 +91,23 @@ export class GroundTruthStrategy extends OAuthStrategy {
 	}
 
 	public userProfile(accessToken: string, done: PassportProfileDone) {
-		(this._oauth2 as any)._request("GET", new URL("/api/user", this.url).toString(), null, null, accessToken, (err: Error | null, data: string) => {
-			if (err) {
+		GroundTruthStrategy
+			.apiRequest<IProfile>("GET", new URL("/api/user", this.url).toString(), accessToken)
+			.then(data => {
+				try {
+					let profile: IProfile = {
+						...data,
+						token: accessToken
+					};
+					done(null, profile);
+				}
+				catch (err) {
+					return done(err);
+				}
+			})
+			.catch(err => {
 				done(err);
-				return;
-			}
-			try {
-				let profile: IProfile = {
-					...JSON.parse(data),
-					token: accessToken
-				};
-				done(null, profile);
-			}
-			catch (err) {
-				return done(err);
-			}
-		});
+			});
 	}
 
 	protected static async passportCallback(request: Request,  accessToken: string, refreshToken: string, profile: IProfile, done: PassportDone) {
