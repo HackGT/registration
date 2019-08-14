@@ -246,9 +246,9 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 
 			if (questionBranch instanceof Branches.ApplicationBranch) {
 				if (!user.applied) {
-					await agenda.now('send_templated_email', {
+					await agenda.now("send_templated_email", {
 						id: user.uuid,
-						subject: emailSubject || defaultEmailSubjects.preConfirm,
+						subject: emailSubject || defaultEmailSubjects.apply,
 						markdown: emailMarkdown
 					});
 				}
@@ -275,9 +275,9 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 
 			} else if (questionBranch instanceof Branches.ConfirmationBranch) {
 				if (!user.confirmed) {
-					await agenda.now('send_templated_email', {
+					await agenda.now("send_templated_email", {
 						id: user.uuid,
-						subject: emailSubject || defaultEmailSubjects.preConfirm,
+						subject: emailSubject || defaultEmailSubjects.attend,
 						markdown: emailMarkdown
 					});
 				}
@@ -455,7 +455,7 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 			}
 
 			user.preConfirmEmailSent = true;
-			await agenda.now('send_templated_email', {
+			await agenda.now("send_templated_email", {
 				id: user.uuid,
 				subject: emailSubject || defaultEmailSubjects.preConfirm,
 				markdown: emailMarkdown

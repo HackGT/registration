@@ -308,7 +308,7 @@ settingsRoutes.route("/send_batch_email")
 
 		let users = await User.find(filter);
 		for (let user of users) {
-			await agenda.now('send_templated_email', {
+			await agenda.now("send_templated_email", {
 				id: user.uuid,
 				subject,
 				markdown: markdownContent
@@ -318,7 +318,7 @@ settingsRoutes.route("/send_batch_email")
 		let admins = await User.find({ admin: true });
 		subject = `[Admin FYI] ${subject}`;
 		for (let user of admins) {
-			await agenda.now('send_templated_email', {
+			await agenda.now("send_templated_email", {
 				id: user.uuid,
 				subject: subject + JSON.stringify(filter),
 				markdown: markdownContent
