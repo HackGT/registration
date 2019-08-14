@@ -410,13 +410,6 @@ export interface IMailObject {
 	html: string;
 	text: string;
 }
-// Union types don't work well with overloaded method resolution in Typescript so we split into two methods
-export async function sendMailAsync(mail: IMailObject)  {
-	return sendgrid.send(mail);
-}
-export async function sendBatchMailAsync(mail: IMailObject[]) {
-	return sendgrid.send(mail);
-}
 export function sanitize(input?: string): string {
 	if (!input || typeof input !== "string") {
 		return "";
@@ -577,3 +570,38 @@ export async function isBranchOpen(rawBranchName: string, user: IUser, requestTy
 
 	return false;
 }
+
+//
+// Agenda Async Queue
+//
+import * as Agenda from "agenda";
+export const agenda = new Agenda({db: {address: config.server.mongoURL}});
+import { User } from "./schema";
+agenda.define("send_templated_email", {priority: 'high', concurrency: 20}, async (job, done) => {
+	try {
+		let user = await User.findOne({uuid: job.attrs.data.id});
+		if (user) {
+			let emailHTML = await renderEmailHTML(job.attrs.data.markdown, user);
+			let emailText = await renderEmailText(job.attrs.data.markdown, user);
+			let emailDetails = {
+				from: config.email.from,
+				to: user.email,
+				subject: job.attrs.data.subject,
+				html: emailHTML,
+				text: emailText
+			};
+			await sendgrid.send(emailDetails);
+			await done();
+		} else {
+			await done(new Error("No such user"));
+		}
+	}
+	catch(err) {
+		console.error(err);
+		await done(err);
+	}
+});
+
+agenda.start().catch((err) => {
+	console.error("Unable to start agenda worker: ", err);
+});

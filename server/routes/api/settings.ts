@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, renderEmailHTML, renderEmailText, renderPageHTML, defaultEmailSubjects, sendBatchMailAsync, config, IMailObject
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, renderPageHTML, defaultEmailSubjects, agenda
 } from "../../common";
 import {
 	isAdmin, uploadHandler
@@ -307,46 +307,26 @@ settingsRoutes.route("/send_batch_email")
 		}
 
 		let users = await User.find(filter);
-		let emails: IMailObject[] = [];
 		for (let user of users) {
-			let html: string = await renderEmailHTML(markdownContent, user);
-			let text: string = await renderEmailText(markdownContent, user);
-
-			emails.push({
-				from: config.email.from,
-				to: user.email,
+			await agenda.now('send_templated_email', {
+				id: user.uuid,
 				subject,
-				html,
-				text
+				markdown: markdownContent
 			});
 		}
 
 		let admins = await User.find({ admin: true });
 		subject = `[Admin FYI] ${subject}`;
 		for (let user of admins) {
-			let html: string = await renderEmailHTML(markdownContent, user);
-			let text: string = await renderEmailText(markdownContent, user);
-			html = `${JSON.stringify(filter)}<br>${html}`;
-			text = `${JSON.stringify(filter)}\n${text}`;
-			emails.push({
-				from: config.email.from,
-				to: user.email,
-				subject,
-				html,
-				text
+			await agenda.now('send_templated_email', {
+				id: user.uuid,
+				subject: subject + JSON.stringify(filter),
+				markdown: markdownContent
 			});
 		}
-		try {
-			await sendBatchMailAsync(emails);
-		} catch (e) {
-			console.error(e);
-			return response.status(500).json({
-				"error": "Error sending email!"
-			});
-		}
-		console.log(`Sent ${emails.length} batch emails requested by ${(request.user as IUser).email}`);
+		console.log(`Sent ${users.length} batch emails requested by ${(request.user as IUser).email}`);
 		return response.json({
 			"success": true,
-			"count": emails.length
+			"count": users.length
 		});
 	});
