@@ -38,7 +38,7 @@ export type AuthenticateOptions = passport.AuthenticateOptions & {
 export class GroundTruthStrategy extends OAuthStrategy {
 	public readonly url: string;
 
-	public static async apiRequest(method: "GET" | "POST", url: string, token: string): Promise<string> {
+	public static async apiRequest<T = unknown>(method: "GET" | "POST", url: string, token: string): Promise<T> {
 		return new Promise((resolve, reject) => {
 			requester(url, {
 				method,
@@ -49,9 +49,13 @@ export class GroundTruthStrategy extends OAuthStrategy {
 			}, (error, response, body) => {
 				if (error) {
 					reject(error);
+					return;
 				}
-				else {
-					resolve(body as string);
+				try {
+					resolve(JSON.parse(body));
+				}
+				catch {
+					reject(new Error(`Invalid JSON: ${body}`));
 				}
 			});
 		});
@@ -88,11 +92,11 @@ export class GroundTruthStrategy extends OAuthStrategy {
 
 	public userProfile(accessToken: string, done: PassportProfileDone) {
 		GroundTruthStrategy
-			.apiRequest("GET", new URL("/api/user", this.url).toString(), accessToken)
+			.apiRequest<IProfile>("GET", new URL("/api/user", this.url).toString(), accessToken)
 			.then(data => {
 				try {
 					let profile: IProfile = {
-						...JSON.parse(data),
+						...data,
 						token: accessToken
 					};
 					done(null, profile);
