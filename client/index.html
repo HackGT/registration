@@ -115,14 +115,16 @@
 									{{/if}}
 								{{/if}}
 							{{else if user.applied}}
-								<p>You've submitted your application and are all set for now!</p>
+								<p>You've submitted your application! We are currently reviewing your application and will get back to you in late August.</p>
 								<p>Application type: <b>{{user.applicationBranch}}</b></p>
 								{{#ifCond user.applicationBranch "Participant"}}
-									<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
-									<ul>
-										<li><strong>Travel Reimbursement Deadline</strong>: Wendesday, August 14th 2019 at 11:59 pm EDT</li>
-										<li><strong>Non-Travel Deadline</strong>: Friday, September 20th 2019 at 11:59 pm EDT</li>
-									</ul>
+									{{#if applicationStatus.areOpen}}
+										<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
+										<ul>
+											<li><strong>Travel Reimbursement Deadline (Closed)</strong>: <strike>Wendesday, August 14th 2019 at 11:59 pm EDT</strike></li>
+											<li><strong>Non-Travel Deadline</strong>: Friday, September 20th 2019 at 11:59 pm EDT</li>
+										</ul>
+									{{/if}}
 								{{/ifCond}}
 								{{#if applicationStatus.areOpen}}
 									{{#ifCond user.applicationBranch "Participant"}}
@@ -132,14 +134,14 @@
 									{{/ifCond}}
 									<a class="btn" href="/apply">Edit your application</a>
 								{{else}}
-									<p>Applications closed on {{applicationClose}}.</p>
+									<p>Applications for Travel Reimbursement closed on {{applicationClose}}.</p>
 								{{/if}}
 							{{else}}
 								{{#if applicationStatus.areOpen}}
 									<p>You still need to complete your application!</p>
 									<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
 									<ul>
-										<li><strong>Travel Reimbursement Application Deadline</strong>: Wendesday, August 14th 2019 at 11:59 pm EDT</li>
+										<li><strong>Travel Reimbursement Deadline (Closed)</strong>: <strike>Wendesday, August 14th 2019 at 11:59 pm EDT</strike></li>
 										<li><strong>Non-Travel Application Deadline</strong>: Friday, September 20th 2019 at 11:59 pm EDT</li>
 									</ul>
 									<p>Mentor and volunteer applications will open in September.</p>
