@@ -113,6 +113,12 @@ export interface IUser extends RootDocument {
 	applicationStartTime?: Date;
 	applicationSubmitTime?: Date;
 
+	applicationDeadline?: {
+		name: string;
+		open: Date;
+		close: Date;
+	};
+
 	confirmationDeadline?: {
 		name: string;
 		open: Date;
@@ -161,6 +167,12 @@ export const User = mongoose.model<Model<IUser>>("User", new mongoose.Schema({
 	applicationData: [mongoose.Schema.Types.Mixed],
 	applicationStartTime: Date,
 	applicationSubmitTime: Date,
+
+	applicationDeadline: {
+		name: String,
+		open: Date,
+		close: Date
+	},
 
 	confirmationDeadline: {
 		name: String,
