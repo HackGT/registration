@@ -138,6 +138,15 @@ for (let name of ["sidebar", "login-methods", "form"]) {
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
+	interface IBranchOpenClose {
+		name: string;
+		open: Date;
+		close: Date;
+	}
+	interface IDeadlineMap {
+		[name: string]: IBranchOpenClose;
+	}
+
 	let user = request.user as IUser;
 
 	let applyBranches: Branches.ApplicationBranch[];
@@ -161,15 +170,6 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 
 	if (user.confirmationBranch) {
 		confirmBranches.push(await Branches.BranchConfig.loadBranchFromDB(user.confirmationBranch) as Branches.ConfirmationBranch);
-	}
-
-	interface IBranchOpenClose {
-		name: string;
-		open: Date;
-		close: Date;
-	}
-	interface IDeadlineMap {
-		[name: string]: IBranchOpenClose;
 	}
 
 	let confirmTimes = confirmBranches.reduce((map, branch) => {
