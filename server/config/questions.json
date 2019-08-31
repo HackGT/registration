@@ -655,7 +655,12 @@
 		"text": []
 	},
 	{
-		"name": "Pending Decision",
+		"name": "Pending Decision (Local)",
+		"questions":[],
+		"text": []
+	},
+	{
+		"name": "Pending Decision (Bus)",
 		"questions":[],
 		"text": []
 	}
