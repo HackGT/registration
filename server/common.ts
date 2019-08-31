@@ -552,6 +552,13 @@ export async function isBranchOpen(rawBranchName: string, user: IUser, requestTy
 
 	let openDate = branch.open;
 	let closeDate = branch.close;
+	if (requestType === ApplicationType.Application
+		&& user.applicationDeadline
+		&& user.applicationDeadline.name
+		&& user.applicationDeadline.name.toLowerCase() === branchName.toLowerCase()) {
+		openDate = user.applicationDeadline.open;
+		closeDate = user.applicationDeadline.close;
+	}
 	if (requestType === ApplicationType.Confirmation
 		&& user.confirmationDeadline
 		&& user.confirmationDeadline.name

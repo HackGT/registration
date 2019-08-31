@@ -13,11 +13,6 @@
                 "content": "Basic Information"
             },
             {
-                "for": "essay-1",
-                "type": "h2",
-                "content": "Free Response"
-			},
-            {
                 "for": "resume",
                 "type": "h2",
                 "content": "Other Information"
@@ -33,14 +28,19 @@
 				"content": "Due to institute policy, minors (under 18) that are not students at Georgia Tech may not attend HackGT."
 			},
 			{
-				"for": "require-travel",
+				"for": "essay-1",
 				"type": "h2",
 				"content": "Travel Details"
 			},
 			{
-				"for": "require-travel",
+				"for": "essay-1",
 				"type": "p",
-				"content": "Travel reimbursement is available for eligible hackers. To qualify for reimbursment, you must live greater than 30 miles from Atlanta. At our discretion, we may offer you travel reimbursement in the form of:\n* Reimbursement for a purchased flight ticket.\n* Reimbursement for gas per mile driven.\n\nWe will be sending busses to campuses throughout the southeast. Based on the school and city you indicate, we may offer you a seat on a nearby bus instead of offering travel reimbursement. If you have any questions, please email us at hello@hack.gt!"
+				"content": "Travel reimbursement applications closed on Wendesday, August 14th at 11:59 PM EDT."
+			},
+            {
+                "for": "essay-1",
+                "type": "h2",
+                "content": "Free Response"
 			}
         ],
         "questions": [
@@ -450,22 +450,6 @@
 					"Twitter"
 				],
 				"hasOther": true,
-				"required": true
-			},
-			{
-				"name": "require-travel",
-				"label": "Do you require travel reimbursement to attend HackGT: Into the Rabbit Hole?",
-				"type": "radio",
-				"options": [
-					"No",
-					"Yes"
-				],
-				"required": true
-			},
-			{
-				"name": "city",
-				"label": "What city will you be traveling from?",
-				"type": "text",
 				"required": true
 			},
             {

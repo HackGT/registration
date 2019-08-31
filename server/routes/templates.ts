@@ -138,6 +138,15 @@ for (let name of ["sidebar", "login-methods", "form"]) {
 
 templateRoutes.route("/dashboard").get((request, response) => response.redirect("/"));
 templateRoutes.route("/").get(authenticateWithRedirect, async (request, response) => {
+	interface IBranchOpenClose {
+		name: string;
+		open: Date;
+		close: Date;
+	}
+	interface IDeadlineMap {
+		[name: string]: IBranchOpenClose;
+	}
+
 	let user = request.user as IUser;
 
 	let applyBranches: Branches.ApplicationBranch[];
@@ -148,20 +157,19 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	else {
 		applyBranches = (await Branches.BranchConfig.loadAllBranches("Application") as Branches.ApplicationBranch[]);
 	}
+	let applyTimes = applyBranches.reduce((map, branch) => {
+		map[branch.name] = branch;
+		return map;
+	}, {} as IDeadlineMap);
+	if (user.applicationDeadline && user.applicationDeadline.name) {
+		applyTimes[user.applicationDeadline.name] = user.applicationDeadline;
+	}
+	let applyTimesArr: IBranchOpenClose[] = Object.keys(applyTimes).map(name => applyTimes[name]);
 
 	let confirmBranches: Branches.ConfirmationBranch[] = [];
 
 	if (user.confirmationBranch) {
 		confirmBranches.push(await Branches.BranchConfig.loadBranchFromDB(user.confirmationBranch) as Branches.ConfirmationBranch);
-	}
-
-	interface IBranchOpenClose {
-		name: string;
-		open: Date;
-		close: Date;
-	}
-	interface IDeadlineMap {
-		[name: string]: IBranchOpenClose;
 	}
 
 	let confirmTimes = confirmBranches.reduce((map, branch) => {
@@ -179,8 +187,8 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	let applicationOpenDate: moment.Moment | null = null;
 	let applicationCloseDate: moment.Moment | null = null;
 	if (applyBranches.length > 0) {
-		applicationOpenDate = moment(applyBranches.map(b => b.open).sort(dateComparator)[0]);
-		applicationCloseDate = moment(applyBranches.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
+		applicationOpenDate = moment(applyTimesArr.map(b => b.open).sort(dateComparator)[0]);
+		applicationCloseDate = moment(applyTimesArr.map(b => b.close).sort(dateComparator)[applyBranches.length - 1]);
 	}
 	let confirmationOpenDate: moment.Moment | null = null;
 	let confirmationCloseDate: moment.Moment | null = null;
@@ -272,7 +280,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 			beforeOpen: confirmationOpenDate ? moment().isBefore(confirmationOpenDate) : true,
 			afterClose: confirmationCloseDate ? moment().isAfter(confirmationCloseDate) : false
 		},
-		allApplicationTimes: applyBranches.map(branch => {
+		allApplicationTimes: applyTimesArr.map(branch => {
 			return {
 				name: branch.name,
 				...formatMoments(moment(branch.open), moment(branch.close))
