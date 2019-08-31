@@ -54,23 +54,33 @@
 							<h4 style="padding-top: 10px;"><b>Welcome back, {{user.name}}!</b></h4><br>
 							<h4 id="status"><b>Status: {{status}}</b></h4>
 							{{#if user.confirmed}}
-								<p>Application type: <b>{{user.applicationBranch}}</b></p>
-								<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
-								{{#unless autoConfirm}}
-									{{#if confirmationStatus.areOpen}}
-										<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
-										<a class="btn" href="/confirm">Edit your confirmation</a>
-									{{else}}
-										<p>RSVPing closed on {{confirmationClose}}.</p>
+								{{#ifCond user.confirmationBranch "Pending Decision"}}
+									<p>You've submitted your application! We are currently reviewing your application and will get back to you in late August.</p>
+									<p>Application type: <b>{{user.applicationBranch}}</b></p>
+									<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
+									<ul>
+										<li><strong>Travel Reimbursement Deadline (Closed)</strong>: <s>Wendesday, August 14th 2019 at 11:59 pm EDT</s></li>
+										<li><strong>Non-Travel Deadline</strong>: Friday, September 20th 2019 at 11:59 pm EDT</li>
+									</ul>
+								{{else}}
+									<p>Application type: <b>{{user.applicationBranch}}</b></p>
+									<p>Confirmation type: <b>{{user.confirmationBranch}}</b></p>
+									{{#unless autoConfirm}}
+										{{#if confirmationStatus.areOpen}}
+											<p>Feel free to edit your RSVP at any time. However, once RSVPing closes on {{confirmationClose}}, you will not be able to edit it anymore.</p>
+											<a class="btn" href="/confirm">Edit your confirmation</a>
+										{{else}}
+											<p>RSVPing closed on {{confirmationClose}}.</p>
+										{{/if}}
+									{{/unless}}
+			
+									{{#if settings.qrEnabled}}
+										{{#if user.accepted}}
+											<p>Show your QR code to check in when you get here.</p>
+											<div id="qrCode" data-encoded="user:{{user.uuid}}"></div>
+										{{/if}}
 									{{/if}}
-								{{/unless}}
-		
-								{{#if settings.qrEnabled}}
-									{{#if user.accepted}}
-										<p>Show your QR code to check in when you get here.</p>
-										<div id="qrCode" data-encoded="user:{{user.uuid}}"></div>
-									{{/if}}
-								{{/if}}
+								{{/ifCond}}
 							{{else if user.confirmationBranch}}
 								{{#if confirmationStatus.areOpen}}
 									<p>Please confirm your application decision.</p>
@@ -88,6 +98,13 @@
 									{{/ifCond}}
 									<a class="btn" href="/confirm">Confirm your attendance</a>
 								{{else}}
+									<p>You've submitted your application! We are currently reviewing your application and will get back to you in late August.</p>
+									<p>Application type: <b>{{user.applicationBranch}}</b></p>
+									<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
+									<ul>
+										<li><strong>Travel Reimbursement Deadline (Closed)</strong>: <s>Wendesday, August 14th 2019 at 11:59 pm EDT</s></li>
+										<li><strong>Non-Travel Deadline</strong>: Friday, September 20th 2019 at 11:59 pm EDT</li>
+									</ul>
 									<p>Application type: <b>{{user.applicationBranch}}</b></p>
 									{{#if confirmationStatus.beforeOpen}}
 										{{#ifCond allConfirmationTimes.length 1}}

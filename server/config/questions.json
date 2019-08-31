@@ -543,5 +543,120 @@
                 "required": false
             }
         ]
-    }
+	},
+	{
+		"name": "Accepted / Travel Reimbursement",
+		"text": [
+			{
+				"for": "receipt1",
+				"type": "p",
+				"content": "Congratulations on your acceptance to HackGT! We are incredibly excited to welcome you to Wonderland this October. As you fill out this form, please note that check-in will begin at approximately 5:30pm on Friday, October 25th and closing ceremonies will end at approximately 2:00pm on Sunday, October 27th."
+			},
+			{
+				"for": "receipt1",
+				"type": "h2",
+				"content": "Flight Receipt"
+			},
+			{
+				"for": "receipt1",
+				"type": "p",
+				"content": "Valid receipts must have a proof of payment and must be round trip tickets to Hartsfield-Jackson Atlanta International Airport."
+			},
+			{
+				"for": "receipt1",
+				"type": "p",
+				"content": "(**Note**: We will not accept receipts submitted after **Saturday, September 7th** at 11:59pm EDT)"
+			},
+			{
+				"for": "first-hackathon",
+				"type": "h2",
+				"content": "Other Information"
+			},
+			{
+				"for": "mlh",
+				"type": "h2",
+				"content": "Legal"
+			}
+		],
+		"questions": [
+			{
+				"name": "receipt1",
+				"label": "Flight receipt",
+				"type": "file",
+				"required": true
+			},
+			{
+				"name": "receipt-confirmation",
+				"label": "I understand that my travel reimbursement will only be awarded after HackGT has verified that I submitted and demoed a project at HackGT.",
+				"type": "checkbox",
+				"options": [
+					"Yes, I understand"
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "first-hackathon",
+				"label": "Will HackGT 6 be your first hackathon?",
+				"type": "radio",
+				"options": [
+					"Yes",
+					"No"
+				],
+				"required": true
+			},
+			{
+				"name": "fun", 
+				"type": "text",
+				"label": "What's your favorite book, movie, or TV show?",
+				"required": true
+			},
+			{
+				"name": "fun", 
+				"type": "text",
+				"label": "What's your ideal studying environment?",
+				"required": true
+			},
+			{
+
+				"name": "mlh",
+				"type": "checkbox",
+				"label": "Please confirm the following:",
+				"required": true,
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy)."
+				]
+			},
+			{
+
+				"name": "sponsor",
+				"type": "checkbox",
+				"label": "Sponsor Products and Services:",
+				"required": false,
+				"options": [
+					"I would like more information about HackGT and other sponsor-related products, services, and opportunities."
+				]
+			},
+			{
+				"name": "last",
+				"type": "textarea",
+				"label": "That's all! Anything else you would like us to know?"
+			}
+		]
+	},
+	{
+		"name": "Waitlisted / Travel Reimbursement",
+		"questions":[],
+		"text": []
+	},
+	{
+		"name": "No Admission / Travel Reimbursement",
+		"questions":[],
+		"text": []
+	},
+	{
+		"name": "Pending Decision",
+		"questions":[],
+		"text": []
+	}
 ]
