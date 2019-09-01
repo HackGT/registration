@@ -612,7 +612,7 @@
 				"required": true
 			},
 			{
-				"name": "fun", 
+				"name": "fun-2", 
 				"type": "text",
 				"label": "What's your ideal studying environment?",
 				"required": true
