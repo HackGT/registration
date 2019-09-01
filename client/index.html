@@ -54,7 +54,7 @@
 							<h4 style="padding-top: 10px;"><b>Welcome back, {{user.name}}!</b></h4><br>
 							<h4 id="status"><b>Status: {{status}}</b></h4>
 							{{#if user.confirmed}}
-								{{#ifCond user.confirmationBranch "Pending Decision Bus"}}
+								{{#ifCond user.confirmationBranch "Pending Decision (Bus)"}}
 									<p>You've submitted your application! We are currently reviewing your application and will get back to you in late September.</p>
 									<p>Application type: <b>{{user.applicationBranch}}</b></p>
 									<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
@@ -63,7 +63,7 @@
 										<li><strong>Non-Travel Deadline</strong>: Friday, September 20th 2019 at 11:59 pm EDT</li>
 									</ul>
 								{{else}}
-									{{#ifCond user.confirmationBranch "Pending Decision Local"}}
+									{{#ifCond user.confirmationBranch "Pending Decision (Local)"}}
 										<p>You've submitted your application! We are currently reviewing your application and will get back to you in late September.</p>
 										<p>Application type: <b>{{user.applicationBranch}}</b></p>
 										<p>For HackGT: Into The Rabbit Hole, participant applications will be considered in two rounds.</p>
