@@ -32,11 +32,6 @@
 				"type": "h2",
 				"content": "Travel Details"
 			},
-			{
-				"for": "essay-1",
-				"type": "p",
-				"content": "Travel reimbursement applications closed on Wendesday, August 14th at 11:59 PM EDT."
-			},
             {
                 "for": "essay-1",
                 "type": "h2",
@@ -452,6 +447,18 @@
 				"hasOther": true,
 				"required": true
 			},
+			{
+				"name": "bus",
+				"label": "HackGT will be offering several bus routes this year. If applicable, please select the bus route you would prefer.",
+				"type": "radio",
+				"options": [
+					"I will not be taking a bus",
+					"University of Florida Route",
+					"Florida International University → University of Central Florida Route",
+					"Duke University → North Carolina A&T Route"
+				],
+				"required": true
+			},
             {
                 "name": "essay-1",
                 "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it?",
@@ -583,6 +590,12 @@
 				"name": "receipt1",
 				"label": "Flight receipt",
 				"type": "file",
+				"required": true
+			},
+			{
+				"name": "amount",
+				"label": "What is the total cost of your travel to HackGT?",
+				"type": "text",
 				"required": true
 			},
 			{
