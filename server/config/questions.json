@@ -1184,10 +1184,12 @@
 				"type": "checkbox",
 				"options": [
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1M_nYaxMDA12JdFzpZAnoWH9M5nD9AyQI/view).",
-                    "I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp)."
+					"I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp).",
+					"I understand that if accepted as a mentor for HackGT 6, I will be required to mentor for at least 4 hours.",
+					"I understand that if accepted as a mentor for HackGT 6, I will be required to attend a mandatory mentor training session in the week leading up to HackGT 6."
 				],
 				"required": true
-	    	},
+			},
             {
                 "name": "add-to-mailing-list",
                 "label": "Would you like to be added to our newsletter with information about future HackGT events? We promise we won't spam you!",
