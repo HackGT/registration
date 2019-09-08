@@ -570,11 +570,6 @@
 				"content": "Valid receipts must have a proof of payment and must be round trip tickets to Hartsfield-Jackson Atlanta International Airport."
 			},
 			{
-				"for": "receipt1",
-				"type": "p",
-				"content": "(**Note**: We will not accept receipts submitted after **Saturday, September 7th** at 11:59pm EDT)"
-			},
-			{
 				"for": "first-hackathon",
 				"type": "h2",
 				"content": "Other Information"
