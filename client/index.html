@@ -22,7 +22,7 @@
 		{{#> sidebar}}
 			<!-- <h1 id="title" class="center">Dashboard</h1> -->
 			<section class="main">
-				<!-- <ul hidden="true" class="timeline" >
+				<ul class="timeline" >
 					<li class="{{timeline.application}}" data-pending="Not completed" data-complete="Done!" data-warning="Applications closed" data-rejected="Not completed">
 						<div class="status">
 							<h4>Registration Submission</h4>
@@ -38,14 +38,14 @@
 							<h4>Confirmation Submission</h4>
 						</div>
 					</li>
-					<li hidden="true" class="{{timeline.teamFormation}}" data-pending="Not completed" data-complete="Done!">
+					<li class="{{timeline.teamFormation}}" data-pending="Not completed" data-complete="Done!">
 						<div class="status">
 							<h4>Team Formation <small>(optional)</small></h4>
 						</div>
 					</li>
-				</ul> -->
+				</ul>
 
-				
+
 				<div class="row" id="mainRow">
 					<div class="col-4 center">
 						<img height="300px" src="/css/bunnyBear.svg">
@@ -82,7 +82,7 @@
 												<p>RSVPing closed on {{confirmationClose}}.</p>
 											{{/if}}
 										{{/unless}}
-				
+
 										{{#if settings.qrEnabled}}
 											{{#if user.accepted}}
 												<p>Show your QR code to check in when you get here.</p>
