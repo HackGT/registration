@@ -59,7 +59,14 @@ authRoutes.all("/logout", async (request, response) => {
 	if (user) {
 		let groundTruthURL = new URL(config.secrets.groundTruth.url);
 		// Invalidates token and logs user out of Ground Truth too
-		await GroundTruthStrategy.apiRequest("POST", new URL("/api/user/logout", groundTruthURL).toString(), user.token || "");
+		try {
+			await GroundTruthStrategy.apiRequest("POST", new URL("/api/user/logout", groundTruthURL).toString(), user.token || "");
+		}
+		catch (err) {
+			// User might already be logged out of Ground Truth
+			// Log them out of registration and continue
+			console.error(err);
+		}
 		request.logout();
 	}
 	if (request.session) {
