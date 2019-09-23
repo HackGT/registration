@@ -382,7 +382,8 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		isCurrentUserTeamLeader,
 		settings: {
 			teamsEnabled: await getSetting<boolean>("teamsEnabled"),
-			qrEnabled: await getSetting<boolean>("qrEnabled")
+			qrEnabled: await getSetting<boolean>("qrEnabled"),
+			maxTeamSize: config.maxTeamSize
 		}
 	};
 	response.send(TeamTemplate.render(templateData));
