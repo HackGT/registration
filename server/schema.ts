@@ -238,6 +238,7 @@ export interface ICommonTemplate {
 	settings: {
 		teamsEnabled: boolean;
 		qrEnabled: boolean;
+		maxTeamSize?: number;
 	};
 }
 type TimelineClass = "" | "complete" | "warning" | "rejected";
