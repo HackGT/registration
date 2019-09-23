@@ -8,7 +8,8 @@
     "build": "bash ./build.sh",
     "quickbuild": "./node_modules/typescript/bin/tsc -p server/ && ./node_modules/typescript/bin/tsc -p client/",
     "start": "node server/app.js",
-    "build-start": "npm run build && npm start"
+    "build-start": "npm run build && npm start",
+    "debug": "node --nolazy --inspect=9230 server/app.js"
   },
   "author": {
     "name": "Ryan Petschek",
