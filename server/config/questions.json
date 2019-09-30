@@ -1738,5 +1738,57 @@
 		"name": "Pending Decision (Bus)",
 		"questions":[],
 		"text": []
+	},
+	{
+		"name": "Accepted / Mentor",
+		"text": [
+			{
+				"for": "first-hackathon",
+				"type": "h2",
+				"content": "Other Information"
+			},
+			{
+				"for": "mlh",
+				"type": "h2",
+				"content": "Legal"
+			}
+		],
+		"questions": [
+            {
+				"name": "resume",
+				"label": "Please upload your resume.",
+				"type": "file",
+				"required": true
+			},
+            {
+				"name": "employment",
+				"label": "For student mentors, are you interested in any of the following positions?",
+				"type": "checkbox",
+				"options": [
+					"Spring 2020 Co-Op",
+					"Spring 2020 Internship",
+                    "Spring 2020 Full Time",
+                    "Summer 2020 Co-Op",
+                    "Summer 2020 Internship",
+                    "Summer/Fall 2020 Full Time"
+				],
+				"required": false
+            },
+			{
+
+				"name": "mlh",
+				"type": "checkbox",
+				"label": "Please confirm the following:",
+				"required": true,
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy)."
+				]
+			},
+			{
+				"name": "last",
+				"type": "textarea",
+				"label": "That's all! Anything else you would like us to know?"
+			}
+		]
 	}
 ]
