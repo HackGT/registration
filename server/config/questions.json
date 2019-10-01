@@ -1765,56 +1765,6 @@
 				"required": false
 			},
 			{
-				"name": "fun", 
-				"type": "text",
-				"label": "What are you proud of, but never had a reason to bring it up/tell people about?",
-				"required": true
-			},
-			{
-				"name": "languages",
-				"type": "checkbox",
-				"label": "Select the languages you are most comfortable/proficent in.",
-				"options": [
-					"Bash/Shell/PowerShell",
-					"C",
-					"C#",
-					"C++",
-					"Go",
-					"HTML/CSS",
-					"Java",
-					"JavaScript",
-					"PHP",
-					"Python",
-					"Ruby",
-					"Rust",
-					"Scala",
-					"Swift",
-					"TypeScript"
-				],
-				"required": false,
-				"hasOther": true
-			},
-			{
-				"name": "topics",
-				"type": "checkbox",
-				"label": "We will be hosting workshops on a variety of topics at HackGT 6. Which topics are you most interested in?",
-				"options": [
-					"Artificial Intelligence",
-					"Computer Security",
-					"Data Science",
-					"Electrical Engineering",
-					"Machine Learning",
-					"Mobile Development",
-					"Robotics",
-					"UX",
-					"Video Game Development",
-					"Visual Design",
-					"Web Development"
-				],
-				"required": false,
-				"hasOther": true
-			},
-			{
 
 				"name": "mlh",
 				"type": "checkbox",
@@ -1860,56 +1810,6 @@
 				"required": false
 			},
 			{
-				"name": "fun", 
-				"type": "text",
-				"label": "What are you proud of, but never had a reason to bring it up/tell people about?",
-				"required": true
-			},
-			{
-				"name": "languages",
-				"type": "checkbox",
-				"label": "Select the languages you are most comfortable/proficent in.",
-				"options": [
-					"Bash/Shell/PowerShell",
-					"C",
-					"C#",
-					"C++",
-					"Go",
-					"HTML/CSS",
-					"Java",
-					"JavaScript",
-					"PHP",
-					"Python",
-					"Ruby",
-					"Rust",
-					"Scala",
-					"Swift",
-					"TypeScript"
-				],
-				"required": false,
-				"hasOther": true
-			},
-			{
-				"name": "topics",
-				"type": "checkbox",
-				"label": "We will be hosting workshops on a variety of topics at HackGT 6. Which topics are you most interested in?",
-				"options": [
-					"Artificial Intelligence",
-					"Computer Security",
-					"Data Science",
-					"Electrical Engineering",
-					"Machine Learning",
-					"Mobile Development",
-					"Robotics",
-					"UX",
-					"Video Game Development",
-					"Visual Design",
-					"Web Development"
-				],
-				"required": false,
-				"hasOther": true
-			},
-			{
 
 				"name": "mlh",
 				"type": "checkbox",
@@ -1935,7 +1835,7 @@
 				"label": "Congratulations on your acceptance to HackGT 6! Check-in will begin at 5:30 PM on October 25th at the [Ferst Center For The Arts](https://goo.gl/maps/h1Vsqf987ajCNGBdA). Please confirm a few things for us:",
 				"type": "checkbox",
 				"options": [
-					"I will be attending HackGT 5 from Friday, October 25th to Sunday, October 27th",
+					"I will be attending HackGT 6 from Friday, October 25th to Sunday, October 27th",
 					"I acknowledge that I **must** check in between 5:30 PM and 7:30 PM on Friday, October 25th. I understand that if I do not check in between these times, I will forfeit my spot as a HackGT 6 participant and my spot will be given to someone else. Please email us at [hello@hack.gt](mailto:hello@hack.gt) if you will be unable to check-in during this window."
 				],
 				"hasOther": false,
@@ -1993,6 +1893,7 @@
 					"Electrical Engineering",
 					"Machine Learning",
 					"Mobile Development",
+					"Product Management",
 					"Robotics",
 					"UX",
 					"Video Game Development",
@@ -2040,6 +1941,11 @@
 				"for": "mlh",
 				"type": "h2",
 				"content": "Legal"
+			},
+			{
+				"for": "fun",
+				"type": "p",
+				"content": "All information collected will be to help gauge attendance and interest in different aspects of the event. In turn, this will then us provide you with the most relevant information on workshops, sponsors, and more. Additionally, we’ve asked you to answer a few fun questions about yourself which we will pass onto sponsors as a quick and spontaneous way to start a conversation."
 			}
 		]
 	},
@@ -2054,7 +1960,7 @@
 		"text": []
 	},
 	{
-		"name": "Accepted / Duke University and North Carolina A&T Route",
+		"name": "Accepted / Duke University and North Carolina A&T Bus",
 		"questions":[],
 		"text": []
 	},
