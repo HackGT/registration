@@ -1791,13 +1791,13 @@
 		"questions":[
 			{
 				"name": "resume",
-				"label": "For student volunteers, please upload your resume.",
+				"label": "Please upload your resume.",
 				"type": "file",
-				"required": false
+				"required": true
 			},
             {
 				"name": "employment",
-				"label": "For student volunteers, are you interested in any of the following positions?",
+				"label": "Are you interested in any of the following positions?",
 				"type": "checkbox",
 				"options": [
 					"Spring 2020 Co-Op",
@@ -1810,6 +1810,18 @@
 				"required": false
 			},
 			{
+				"name": "session",
+				"label": "Which session will you be attending?",
+				"type": "radio",
+				"options": [
+					"Wednesday, October 16th, 7:30 pm - 8:30 pm",
+					"Thursday, October 17th, 11 am - 12 pm",
+					"Monday, October 21st, 1 pm - 2 pm",
+					"Other - I will schedule by emailing hello@hack.gt"
+				],
+				"required": true
+			},
+			{
 
 				"name": "mlh",
 				"type": "checkbox",
@@ -1820,7 +1832,11 @@
 				]
 			}
 		],
-		"text": []
+		"text": [{
+			"for": "session",
+			"type": "p",
+			"content": "We will be holding three volunteer orientations, and **you must attend one of these sessions to volunteer at the event.**"
+		}]
 	},
 	{
 		"name": "Denied Admission / Volunteer",
@@ -1836,7 +1852,7 @@
 				"type": "checkbox",
 				"options": [
 					"I will be attending HackGT 6 from Friday, October 25th to Sunday, October 27th",
-					"I acknowledge that I **must** check in between 5:30 PM and 7:30 PM on Friday, October 25th. I understand that if I do not check in between these times, I will forfeit my spot as a HackGT 6 participant and my spot will be given to someone else. Please email us at [hello@hack.gt](mailto:hello@hack.gt) if you will be unable to check-in during this window."
+					"I acknowledge that I **must** check in between 5:30 PM and 6:30 pm on Friday, October 25th. I understand that if I do not check in between these times, I will forfeit my spot as a HackGT 6 participant and my spot will be given to someone else. Please email us at [hello@hack.gt](mailto:hello@hack.gt) if you will be unable to check-in during this window."
 				],
 				"hasOther": false,
 				"required": true
@@ -1906,7 +1922,7 @@
 			{
 				"name": "fun-2",
 				"type": "text",
-				"label": "What's the most useless talent you have?",
+				"label": "What's your favorite fun fact about yourself?",
 				"required": true
 			},
 			{
@@ -1962,18 +1978,402 @@
 	},
 	{
 		"name": "Accepted / University of Florida Bus",
-		"questions":[],
-		"text": []
+		"questions":[
+			{
+				"name": "attendance-confirmation",
+				"label": "Congratulations on your acceptance to HackGT 6! Check-in will begin at 5:30 PM on October 25th at the [Ferst Center For The Arts](https://goo.gl/maps/h1Vsqf987ajCNGBdA). Please confirm a few things for us:",
+				"type": "checkbox",
+				"options": [
+					"I will be attending HackGT 6 from Friday, October 25th to Sunday, October 27th",
+					"I acknowledge that I **must** check in between 5:30 PM and 6:30 pm on Friday, October 25th. I understand that if I do not check in between these times, I will forfeit my spot as a HackGT 6 participant and my spot will be given to someone else. Please email us at [hello@hack.gt](mailto:hello@hack.gt) if you will be unable to check-in during this window."
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "needs-team",
+				"label": "We are hosting a team formation session at the beginning of the event! Are you looking for a team or additional teammates?",
+				"type": "radio",
+				"options": [
+					"Yes",
+					"No"
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "languages",
+				"type": "checkbox",
+				"label": "Select the languages you are most comfortable/proficent in.",
+				"options": [
+					"Bash/Shell/PowerShell",
+					"C",
+					"C#",
+					"C++",
+					"Go",
+					"HTML/CSS",
+					"Java",
+					"JavaScript",
+					"PHP",
+					"Python",
+					"Ruby",
+					"Rust",
+					"Scala",
+					"Swift",
+					"TypeScript"
+				],
+				"required": false,
+				"hasOther": true
+			},
+			{
+				"name": "topics",
+				"type": "checkbox",
+				"label": "We will be hosting workshops on a variety of topics at HackGT 6. Which topics are you most interested in?",
+				"options": [
+					"Artificial Intelligence",
+					"Computer Security",
+					"Data Science",
+					"Electrical Engineering",
+					"Machine Learning",
+					"Mobile Development",
+					"Product Management",
+					"Robotics",
+					"UX",
+					"Video Game Development",
+					"Visual Design",
+					"Web Development"
+				],
+				"required": false,
+				"hasOther": true
+			},
+			{
+				"name": "fun", 
+				"type": "text",
+				"label": "What are you proud of, but never had a reason to bring it up/tell people about?",
+				"required": true
+			},
+			{
+				"name": "fun-2",
+				"type": "text",
+				"label": "What's your favorite fun fact about yourself?",
+				"required": true
+			},
+			{
+
+				"name": "mlh",
+				"type": "checkbox",
+				"label": "Please confirm the following:",
+				"required": true,
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy)."
+				]
+			},
+			{
+
+				"name": "sponsor",
+				"type": "checkbox",
+				"label": "Sponsor Products and Services:",
+				"required": false,
+				"options": [
+					"I would like more information about HackGT and other sponsor-related products, services, and opportunities."
+				]
+			},
+			{
+				"name": "last",
+				"type": "textarea",
+				"label": "That's all! Anything else you would like us to know?"
+			}
+			
+		],
+		"text": [
+
+			{
+				"for": "languages",
+				"type": "h2",
+				"content": "Other Information"
+			},
+			{
+				"for": "mlh",
+				"type": "h2",
+				"content": "Legal"
+			},
+			{
+				"for": "languages",
+				"type": "p",
+				"content": "All information collected will be to help gauge attendance and interest in different aspects of the event. In turn, this will then us provide you with the most relevant information on workshops, sponsors, and more."
+			},
+			{
+				"for": "fun",
+				"type": "p",
+				"content": "We’ve asked you to answer a few fun questions about yourself which we will pass onto sponsors as a quick and spontaneous way to start a conversation."
+			}
+		]
 	},
 	{
 		"name": "Accepted / Florida International University and University of Central Florida Bus",
-		"questions":[],
-		"text": []
+		"questions":[
+			{
+				"name": "attendance-confirmation",
+				"label": "Congratulations on your acceptance to HackGT 6! Check-in will begin at 5:30 PM on October 25th at the [Ferst Center For The Arts](https://goo.gl/maps/h1Vsqf987ajCNGBdA). Please confirm a few things for us:",
+				"type": "checkbox",
+				"options": [
+					"I will be attending HackGT 6 from Friday, October 25th to Sunday, October 27th",
+					"I acknowledge that I **must** check in between 5:30 PM and 6:30 pm on Friday, October 25th. I understand that if I do not check in between these times, I will forfeit my spot as a HackGT 6 participant and my spot will be given to someone else. Please email us at [hello@hack.gt](mailto:hello@hack.gt) if you will be unable to check-in during this window."
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "needs-team",
+				"label": "We are hosting a team formation session at the beginning of the event! Are you looking for a team or additional teammates?",
+				"type": "radio",
+				"options": [
+					"Yes",
+					"No"
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "languages",
+				"type": "checkbox",
+				"label": "Select the languages you are most comfortable/proficent in.",
+				"options": [
+					"Bash/Shell/PowerShell",
+					"C",
+					"C#",
+					"C++",
+					"Go",
+					"HTML/CSS",
+					"Java",
+					"JavaScript",
+					"PHP",
+					"Python",
+					"Ruby",
+					"Rust",
+					"Scala",
+					"Swift",
+					"TypeScript"
+				],
+				"required": false,
+				"hasOther": true
+			},
+			{
+				"name": "topics",
+				"type": "checkbox",
+				"label": "We will be hosting workshops on a variety of topics at HackGT 6. Which topics are you most interested in?",
+				"options": [
+					"Artificial Intelligence",
+					"Computer Security",
+					"Data Science",
+					"Electrical Engineering",
+					"Machine Learning",
+					"Mobile Development",
+					"Product Management",
+					"Robotics",
+					"UX",
+					"Video Game Development",
+					"Visual Design",
+					"Web Development"
+				],
+				"required": false,
+				"hasOther": true
+			},
+			{
+				"name": "fun", 
+				"type": "text",
+				"label": "What are you proud of, but never had a reason to bring it up/tell people about?",
+				"required": true
+			},
+			{
+				"name": "fun-2",
+				"type": "text",
+				"label": "What's your favorite fun fact about yourself?",
+				"required": true
+			},
+			{
+
+				"name": "mlh",
+				"type": "checkbox",
+				"label": "Please confirm the following:",
+				"required": true,
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy)."
+				]
+			},
+			{
+
+				"name": "sponsor",
+				"type": "checkbox",
+				"label": "Sponsor Products and Services:",
+				"required": false,
+				"options": [
+					"I would like more information about HackGT and other sponsor-related products, services, and opportunities."
+				]
+			},
+			{
+				"name": "last",
+				"type": "textarea",
+				"label": "That's all! Anything else you would like us to know?"
+			}
+			
+		],
+		"text": [
+
+			{
+				"for": "languages",
+				"type": "h2",
+				"content": "Other Information"
+			},
+			{
+				"for": "mlh",
+				"type": "h2",
+				"content": "Legal"
+			},
+			{
+				"for": "languages",
+				"type": "p",
+				"content": "All information collected will be to help gauge attendance and interest in different aspects of the event. In turn, this will then us provide you with the most relevant information on workshops, sponsors, and more."
+			},
+			{
+				"for": "fun",
+				"type": "p",
+				"content": "We’ve asked you to answer a few fun questions about yourself which we will pass onto sponsors as a quick and spontaneous way to start a conversation."
+			}
+		]
 	},
 	{
 		"name": "Accepted / Duke University and North Carolina A&T Bus",
-		"questions":[],
-		"text": []
+		"questions":[
+			{
+				"name": "attendance-confirmation",
+				"label": "Congratulations on your acceptance to HackGT 6! Check-in will begin at 5:30 PM on October 25th at the [Ferst Center For The Arts](https://goo.gl/maps/h1Vsqf987ajCNGBdA). Please confirm a few things for us:",
+				"type": "checkbox",
+				"options": [
+					"I will be attending HackGT 6 from Friday, October 25th to Sunday, October 27th",
+					"I acknowledge that I **must** check in between 5:30 PM and 6:30 pm on Friday, October 25th. I understand that if I do not check in between these times, I will forfeit my spot as a HackGT 6 participant and my spot will be given to someone else. Please email us at [hello@hack.gt](mailto:hello@hack.gt) if you will be unable to check-in during this window."
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "needs-team",
+				"label": "We are hosting a team formation session at the beginning of the event! Are you looking for a team or additional teammates?",
+				"type": "radio",
+				"options": [
+					"Yes",
+					"No"
+				],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "languages",
+				"type": "checkbox",
+				"label": "Select the languages you are most comfortable/proficent in.",
+				"options": [
+					"Bash/Shell/PowerShell",
+					"C",
+					"C#",
+					"C++",
+					"Go",
+					"HTML/CSS",
+					"Java",
+					"JavaScript",
+					"PHP",
+					"Python",
+					"Ruby",
+					"Rust",
+					"Scala",
+					"Swift",
+					"TypeScript"
+				],
+				"required": false,
+				"hasOther": true
+			},
+			{
+				"name": "topics",
+				"type": "checkbox",
+				"label": "We will be hosting workshops on a variety of topics at HackGT 6. Which topics are you most interested in?",
+				"options": [
+					"Artificial Intelligence",
+					"Computer Security",
+					"Data Science",
+					"Electrical Engineering",
+					"Machine Learning",
+					"Mobile Development",
+					"Product Management",
+					"Robotics",
+					"UX",
+					"Video Game Development",
+					"Visual Design",
+					"Web Development"
+				],
+				"required": false,
+				"hasOther": true
+			},
+			{
+				"name": "fun", 
+				"type": "text",
+				"label": "What are you proud of, but never had a reason to bring it up/tell people about?",
+				"required": true
+			},
+			{
+				"name": "fun-2",
+				"type": "text",
+				"label": "What's your favorite fun fact about yourself?",
+				"required": true
+			},
+			{
+
+				"name": "mlh",
+				"type": "checkbox",
+				"label": "Please confirm the following:",
+				"required": true,
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy)."
+				]
+			},
+			{
+
+				"name": "sponsor",
+				"type": "checkbox",
+				"label": "Sponsor Products and Services:",
+				"required": false,
+				"options": [
+					"I would like more information about HackGT and other sponsor-related products, services, and opportunities."
+				]
+			},
+			{
+				"name": "last",
+				"type": "textarea",
+				"label": "That's all! Anything else you would like us to know?"
+			}
+			
+		],
+		"text": [
+
+			{
+				"for": "languages",
+				"type": "h2",
+				"content": "Other Information"
+			},
+			{
+				"for": "mlh",
+				"type": "h2",
+				"content": "Legal"
+			},
+			{
+				"for": "languages",
+				"type": "p",
+				"content": "All information collected will be to help gauge attendance and interest in different aspects of the event. In turn, this will then us provide you with the most relevant information on workshops, sponsors, and more."
+			},
+			{
+				"for": "fun",
+				"type": "p",
+				"content": "We’ve asked you to answer a few fun questions about yourself which we will pass onto sponsors as a quick and spontaneous way to start a conversation."
+			}
+		]
 	},
 	{
 		"name": "Waitlisted / Non-Travel",
