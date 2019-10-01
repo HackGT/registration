@@ -1906,7 +1906,7 @@
 			{
 				"name": "fun-2",
 				"type": "text",
-				"label": "Whats the most useless talent you have?",
+				"label": "What's the most useless talent you have?",
 				"required": true
 			},
 			{
