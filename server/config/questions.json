@@ -1814,9 +1814,9 @@
 				"label": "Which session will you be attending?",
 				"type": "radio",
 				"options": [
-					"Wednesday, October 16th, 7:30 pm - 8:30 pm",
-					"Thursday, October 17th, 11 am - 12 pm",
-					"Monday, October 21st, 1 pm - 2 pm",
+					"Wednesday, October 16th, 7:30 pm - 8:30 pm in Skiles 246",
+					"Thursday, October 17th, 11 am - 12 pm in COC 053",
+					"Monday, October 21st, 1 pm - 2 pm in Skiles 269",
 					"Other - I will schedule by emailing hello@hack.gt"
 				],
 				"required": true
