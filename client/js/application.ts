@@ -26,8 +26,8 @@ submitButton.addEventListener("click", e => {
 			qr.make();
 
 			await sweetAlert({
-				type: 'success',
-				title: 'Awesome!',
+				type: "success",
+				title: "Awesome!",
 				html: `Scan this code to create badge: <br>${qr.createImgTag(8,4)}`
 			});
 		} else {
