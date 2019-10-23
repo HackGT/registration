@@ -20,11 +20,7 @@ submitButton.addEventListener("click", e => {
 		method: "POST",
 		body: new FormData(form)
 	}).then(checkStatus).then(parseJSON).then(async (json) => {
-		let successMessage: string = formType === FormType.Application ? "Your application has been saved." : "Your RSVP has been saved.";
-		if (!unauthenticated) {
-			successMessage += " Feel free to come back here and edit it at any time.";
-			await sweetAlert("Awesome!", successMessage, "success");
-		} else {
+		if (unauthenticated) {
 			let qr = qrcode(0, "H");
 			qr.addData(json.uuid);
 			qr.make();
@@ -34,6 +30,10 @@ submitButton.addEventListener("click", e => {
 				title: 'Awesome!',
 				html: `Scan this code to create badge: <br>${qr.createImgTag(8,4)}`
 			});
+		} else {
+			let successMessage: string = formType === FormType.Application ? "Your application has been saved." : "Your RSVP has been saved.";
+			successMessage += " Feel free to come back here and edit it at any time.";
+			await sweetAlert("Awesome!", successMessage, "success");
 		}
 
 		if (unauthenticated) {
