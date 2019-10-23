@@ -2389,5 +2389,85 @@
 		"name": "Denied Admission / Non-Travel Reimbursement",
 		"questions":[],
 		"text": []
+	},
+	{
+		"name": "General Confirmation",
+		"questions": [],
+		"text": []
+	},
+	{
+		"name": "Sponsor Day-of",
+		"questions": [
+			{
+				"name": "company",
+				"label": "What company are you representing?",
+				"type": "select",
+				"options": ["Accenture", "Amazon", "Anthem", "AT&T", "Best Pacific Textiles", "BlackRock", "BNY Mellon", "Bose", "Capital One", "Cardlytics", "Disney", "Equifax", "ESRI", "Facebook", "Google Cloud", "Lyft", "Microsoft", "MLH", "NCR", "NSA", "NSIN", "PDI", "State Farm", "Teleportal", "Wayfair", "MLH"],
+				"hasOther": false,
+				"required": true
+			},
+			{
+				"name": "required-items",
+				"label": "Please confirm the following:",
+				"type": "checkbox",
+				"options": [
+					"I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1M_nYaxMDA12JdFzpZAnoWH9M5nD9AyQI/view).",
+					"I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp).",
+				],
+				"hasOther": false,
+				"required": true
+			}
+		]
+	},
+	{
+		"name": "Organizer Day-Of",
+		"questions": []
+	},
+	{
+		"name": "Mentor Day-of",
+		"questions": [
+            {
+				"name": "resume",
+				"label": "(Optional) Upload your resume.",
+				"type": "file",
+				"required": false
+			},
+			{
+				"name": "required-items",
+				"label": "Please confirm the following:",
+				"type": "checkbox",
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1M_nYaxMDA12JdFzpZAnoWH9M5nD9AyQI/view).",
+					"I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp).",
+				],
+				"hasOther": false,
+				"required": true
+			}
+		]
+	},
+	{
+		"name": "Participant Day-of",
+		"questions": [
+            {
+				"name": "resume",
+				"label": "(Optional) Upload your resume.",
+				"type": "file",
+				"required": false
+			},
+			{
+				"name": "required-items",
+				"label": "Please confirm the following:",
+				"type": "checkbox",
+				"options": [
+					"I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I authorize you to share my application/registration information for event administration, ranking, MLH administration, pre- and post-event informational e-mails, and occasional messages about hackathons in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1M_nYaxMDA12JdFzpZAnoWH9M5nD9AyQI/view).",
+					"I agree to the [HackGT Photo Release](https://drive.google.com/open?id=1fGDudiTZ53ElU8gc2AnJ2bE1WCvHc5Tp).",
+				],
+				"hasOther": false,
+				"required": true
+			}
+		]
 	}
 ]
