@@ -606,7 +606,7 @@ if (document.head.attachShadow) {
 
 const debounceTimeout = 500; // Milliseconds to wait before content is rendered to avoid hitting the server for every keystroke
 function debounce(func: (...args: unknown[]) => void): (...args: unknown[]) => void {
-	let timer: number | null = null;
+	let timer: any = null;
 	return () => {
 		if (timer) {
 			clearTimeout(timer);
