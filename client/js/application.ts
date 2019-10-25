@@ -22,7 +22,7 @@ submitButton.addEventListener("click", e => {
 	}).then(checkStatus).then(parseJSON).then(async (json) => {
 		if (unauthenticated) {
 			let qr = qrcode(0, "H");
-			qr.addData(`uuid:${json.uuid}`);
+			qr.addData(`user:${json.uuid}`);
 			qr.make();
 
 			await sweetAlert({
