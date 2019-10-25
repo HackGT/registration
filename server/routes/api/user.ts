@@ -300,6 +300,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 
 			await user.save();
 			response.status(200).json({
+				"uuid": user.uuid,
 				"success": true
 			});
 		}
