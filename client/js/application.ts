@@ -22,13 +22,13 @@ submitButton.addEventListener("click", e => {
 	}).then(checkStatus).then(parseJSON).then(async (json) => {
 		if (unauthenticated) {
 			let qr = qrcode(0, "H");
-			qr.addData(json.uuid);
+			qr.addData(`uuid:${json.uuid}`);
 			qr.make();
 
 			await sweetAlert({
 				type: "success",
 				title: "Awesome!",
-				html: `Scan this code to create badge: <br>${qr.createImgTag(8,4)}`
+				html: `Scan this code to create badge: <br><br>${qr.createImgTag(8,4)}`
 			});
 		} else {
 			let successMessage: string = formType === FormType.Application ? "Your application has been saved." : "Your RSVP has been saved.";
