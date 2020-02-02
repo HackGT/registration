@@ -12,7 +12,7 @@
             {
                 "name": "name",
                 "type": "text",
-                "label": "Full name",
+                "label": "Full Name",
                 "required": true
             },
             {
