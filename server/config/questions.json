@@ -27,7 +27,7 @@
             {
                 "name": "name",
                 "type": "text",
-                "label": "Student Full Name",
+                "label": "Student Full name",
                 "required": true
             },
             {
