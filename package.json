@@ -1,6 +1,6 @@
 {
   "name": "registration",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "description": "Powerful and extensible registration system for hackathons and other large events",
   "main": "server/app.js",
   "scripts": {
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/HackGT/registration#readme",
   "private": true,
   "dependencies": {
+    "@google-cloud/storage": "^4.3.0",
     "@sendgrid/mail": "^6.2.1",
     "agenda": "^2.0.2",
     "ajv": "^5.5.2",
