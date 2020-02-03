@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
 import * as AWS from "aws-sdk";
-import {Storage} from "@google-cloud/storage";
+import { Storage } from "@google-cloud/storage";
 
 /**
  * All uploaded files are initially saved in the OS's temp directory in case the files uploaded aren't valid
@@ -123,8 +123,8 @@ class S3StorageEngine implements IStorageEngine {
 
 interface IGCSOptions extends ICommonOptions {
 	bucket: string;
-	client_email: string;
-	private_key: string;
+	clientEmail: string;
+	privateKey: string;
 }
 
 class GCSStorageEngine implements IStorageEngine {
@@ -140,8 +140,8 @@ class GCSStorageEngine implements IStorageEngine {
 		this.uploadRoot = this.options.uploadDirectory;
 		this.storage = new Storage({
 			credentials: {
-				client_email: this.options.client_email,
-				private_key: this.options.private_key
+				client_email: this.options.clientEmail,
+				private_key: this.options.privateKey
 			}
 		});
 	}
