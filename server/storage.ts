@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
 import * as AWS from "aws-sdk";
+import {Storage} from "@google-cloud/storage";
 
 /**
  * All uploaded files are initially saved in the OS's temp directory in case the files uploaded aren't valid
@@ -120,10 +121,46 @@ class S3StorageEngine implements IStorageEngine {
 	}
 }
 
+interface IGCSOptions extends ICommonOptions {
+	bucket: string;
+	client_email: string;
+	private_key: string;
+}
+
+class GCSStorageEngine implements IStorageEngine {
+	public readonly uploadRoot: string;
+	private readonly options: IGCSOptions;
+	private readonly storage: Storage;
+
+	constructor(options: IGCSOptions) {
+		// Values copied via spread operator instead of being passed by reference
+		this.options = {
+			...options
+		};
+		this.uploadRoot = this.options.uploadDirectory;
+		this.storage = new Storage({
+			credentials: {
+				client_email: this.options.client_email,
+				private_key: this.options.private_key
+			}
+		});
+	}
+
+	public async saveFile(currentPath: string, name: string): Promise<void> {
+		await this.storage.bucket(this.options.bucket).upload(currentPath, {
+			destination: name
+		});
+	}
+	public async readFile(name: string): Promise<Readable> {
+		return this.storage.bucket(this.options.bucket).file(name).createReadStream();
+	}
+}
+
 interface IStorageEngines {
 	[name: string]: new(options: ICommonOptions) => IStorageEngine;
 }
 export const storageEngines: IStorageEngines = {
 	"disk": DiskStorageEngine,
-	"s3": S3StorageEngine
+	"s3": S3StorageEngine,
+	"gcs": GCSStorageEngine
 };
