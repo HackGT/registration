@@ -3,6 +3,11 @@
         "name": "Participant",
         "text": [
             {
+                "for": "18-and-gt-student",
+                "type": "p",
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend Horizons."
+            },
+            {
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
@@ -10,9 +15,13 @@
         ],
         "questions": [
             {
-                "name": "name",
-                "type": "text",
-                "label": "Full Name",
+                "name": "18-and-gt-student",
+                "label": "Are you over 18 or a student at Georgia Tech?",
+                "type": "radio",
+                "options": [
+                    "I am 18 or older.",
+                    "I am under 18 and a Georgia Tech student."
+                ],
                 "required": true
             },
             {
@@ -41,163 +50,78 @@
                 "required": false
             },
             {
-                "name": "resume",
-                "label": "Please upload your resume or a skill sheet",
-                "type": "file",
-                "required": true
-            },
-            {
-                "name": "first-hackathon",
-                "label": "Will HackGT be your first hackathon?",
-                "type": "radio",
+                "name": "university",
+                "type": "select",
+                "label": "What university do you go to?",
                 "options": [
-                    "Yes",
-                    "No, I've attended HackGT before",
-                    "No, I've attended other hackathons before"
-                ],
-                "required": true
-            },
-            {
-                "name": "hope-to-learn",
-                "label": "What do you hope to learn at HackGT?",
-                "type": "textarea",
-                "required": true
-            }
-        ]
-    },
-    {
-        "name": "Mentor",
-        "text": [],
-        "questions": [
-            {
-                "name": "name",
-                "type": "text",
-                "label": "Full name",
-                "required": true
-            },
-            {
-                "name": "gender",
-                "label": "Gender",
-                "type": "radio",
-                "options": ["Male", "Female", "Prefer not to answer"],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "race",
-                "label": "Race / ethnicity",
-                "type": "checkbox",
-                "options": [
-                    "Non-Hispanic White",
-                    "Black or African American",
-                    "Latino, Latina, or Hispanic American",
-                    "South Asian or Indian American",
-                    "East Asian or Asian American",
-                    "Middle Eastern or Arab American",
-                    "Native American or Alaskan Native",
-                    "Hawaiian or Pacific Islander"
+                    "Georgia Institute of Technology",
+                    "Georgia State University",
+                    "Emory University",
+                    "University of Georgia",
+                    "Clark Atlanta University",
+                    "Kennesaw State University"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true
             },
             {
-                "name": "school",
-                "label": "School?",
+                "name": "major",
+                "label": "Major",
                 "type": "select",
                 "options": [
-                    "Georgia Tech",
-                    "North Avenue Trade School",
-                    "Georgia Institute of Technology",
-                    "Georgia Tech University"
+                    "Aerospace Engineering",
+                    "Applied Language and Intercultural Studies",
+                    "Applied Physics",
+                    "Architecture",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business Administration",
+                    "Chemical and Biomolecular Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computer Engineering",
+                    "Computational Media",
+                    "Computer Science",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Economics and International Affairs",
+                    "Electrical Engineering",
+                    "Environmental Engineering",
+                    "Global Economics and Modern Languages",
+                    "History, Technology, and Society",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs",
+                    "International Affairs and Modern Language",
+                    "Literature, Media, and Communication",
+                    "Literature, Media, and Communication & Digital Media",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Physics",
+                    "Psychology",
+                    "Public Policy"
                 ],
                 "hasOther": true,
                 "required": true
             },
             {
-                "name": "school-2",
-                "label": "School (not required)?",
-                "type": "select",
+                "name": "year",
+                "label": "Year",
+                "type": "radio",
                 "options": [
-                    "Georgia Tech",
-                    "North Avenue Trade School",
-                    "Georgia Institute of Technology",
-                    "Georgia Tech University"
+                    "1st year",
+                    "2nd year",
+                    "3rd year",
+                    "4th year",
+                    "5th year+",
+                    "Graduate Student"
                 ],
                 "hasOther": true,
-                "required": false
-            },
-            {
-                "name": "is-student",
-                "label": "Are you currently a student?",
-                "type": "radio",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            },
-            {
-                "name": "job-if-not-student",
-                "label": "If not, what do you do?",
-                "type": "text",
-                "required": false
-            },
-            {
-                "name": "resume",
-                "label": "Please upload your resume or a skill sheet",
-                "type": "file",
-                "required": true
-            },
-            {
-                "name": "what-can-mentor",
-                "label": "What topics are you comfortable mentoring in? Please list most proficient first.",
-                "type": "textarea",
-                "required": true
-            },
-            {
-                "name": "github",
-                "label": "GitHub profile",
-                "type": "url",
-                "required": false
-            },
-            {
-                "name": "website",
-                "label": "Personal website",
-                "type": "url",
-                "required": false
-            },
-            {
-                "name": "other-links",
-                "label": "Other relevant links (e.g. LinkedIn)",
-                "type": "url",
-                "required": false
-            },
-            {
-                "name": "can-hold-workshop",
-                "label": "Would you be willing to hold a workshop?",
-                "type": "radio",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            },
-            {
-                "name": "workshop-if-willing",
-                "label": "If so, about what?",
-                "type": "text",
-                "required": false
-            },
-            {
-                "name": "teaching-experience",
-                "label": "Describe your previous experiences with teaching",
-                "type": "textarea",
-                "required": true
-            },
-            {
-                "name": "why-mentor",
-                "label": "Why do you want to be a mentor at HackGT?",
-                "type": "textarea",
                 "required": true
             },
             {
@@ -205,11 +129,11 @@
                 "label": "What is your T-shirt size?",
                 "type": "radio",
                 "options": [
-                    "Extra small",
-                    "Small",
-                    "Medium",
-                    "Large",
-                    "Extra large",
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
                     "2XL",
                     "3XL"
                 ],
@@ -222,34 +146,56 @@
                 "options": [
                     "Vegetarian",
                     "Vegan",
+                    "No beef",
+                    "No pork",
                     "Gluten-free"
                 ],
                 "hasOther": true,
                 "required": false
             },
             {
+                "name": "portfolio",
+                "type": "text",
+                "label": "Any cool links? (e.g. GitHub, portfolio, etc.)",
+                "required": false
+            },
+            {
+                "name": "resume",
+                "label": "Please upload your resume or a skill sheet",
+                "type": "file",
+                "required": true
+            },
+            {
+                "name": "creative-outlets",
+                "type": "textarea",
+                "label": "How can Georgia Tech prioritize creative outlets?",
+                "required": true,
+                "maxWordCount": 150
+            },
+            {
+                "name": "tweet",
+                "type": "textarea",
+                "label": "Compose a tweet about your newest invention! (this can be anything—a quirky new idea, a solution to a problem, whatever!)",
+                "required": true,
+                "maxCharacterCount": 140
+            },
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)"
+                ],
+                "required": true,
+                "hasOther": false
+            },
+            {
                 "name": "other",
-                "label": "Anything else you want us to know?",
+                "label": "What materials/supplies would you like to use/have at the event? Anything else you'd like us to know?",
                 "type": "textarea",
                 "required": false
-            }
-        ]
-    },
-    {
-        "name": "Waitlist",
-        "text": [
-            {
-                "for": "confirmation",
-                "type": "h5",
-                "content": "We will notify you by 9 PM on the day the event starts"
-            }
-        ],
-        "questions": [
-            {
-                "name": "phone",
-                "label": "Please give your phone number to confirm spot on the waitlist.",
-                "type": "text",
-                "required": true
             }
         ]
     },
@@ -259,7 +205,7 @@
         "questions": []
     },
     {
-        "name": "General Confirmation",
+        "name": "General Confirmation (requires edit)",
         "text": [
             {
                 "for": "confirmation",
