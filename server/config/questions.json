@@ -185,8 +185,8 @@
                 "type": "checkbox",
                 "options": [
                     "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
-                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1MEtM9bhnxoTbQIL-OdAMt8EdfSM_aNlK/view)",
-                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1ES-iF_RWmfx1WuhO8F0RORjax-fRXqgP/view)"
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ANN4waxYj2jl3PxHpONcJr250a2Ektvq/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1swEJBCMoASk7w3BbbOj9coatPQL8P_64/view)"
                 ],
                 "required": true,
                 "hasOther": false
