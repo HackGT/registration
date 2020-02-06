@@ -195,12 +195,15 @@
                 "label": "Race / Ethnicity",
                 "type": "checkbox",
                 "options": [
-                    "White",
-                    "Black or African American",
-                    "Hispanic / Latino / Latina",
-                    "Asian",
-                    "Native American / American Indian / Alaskan Native",
-                    "Hawaiian or Pacific Islander"
+                    "African-American/Black", 
+                    "Hispanic/Latino", 
+                    "Caucasian", 
+                    "Middle Eastern", 
+                    "East Asian", 
+                    "South Asian", 
+                    "Southeast Asian", 
+                    "Pacific Islander", 
+                    "Native American"
                 ],
                 "hasOther": true
             },
@@ -228,7 +231,7 @@
             },
             {
                 "name": "tshirt-size",
-                "label": "What is your T-shirt size?",
+                "label": "What is your T-shirt size? (In adult sizes)",
                 "type": "radio",
                 "options": [
                     "XS",
@@ -246,10 +249,10 @@
                 "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Which track do you prefer?",
                 "type": "radio",
                 "options": [
-                    "Design",
+                    "Info Security",
                     "Gaming",
-                    "Hardware",
-                    "Software"
+                    "Robotics",
+                    "Music Technology"
                 ],
                 "required": true
             },
@@ -258,8 +261,27 @@
                 "label": "Which session do you prefer?",
                 "type": "radio",
                 "options": [
-                    "Session A: 9 AM - 8 PM",
-                    "Session B: 10 AM - 9 PM"
+                    "Session A: 9 AM - 7 PM",
+                    "Session B: 10 AM - 8 PM"
+                ],
+                "required": true
+            },
+            {
+                "name": "transportation",
+                "label": "If there was a bus to Catalyst from your local high school would that be something you are interested in? Disclaimer: As of now this is just something that is being considered. If it becomes available then you will be notified. ",
+                "type": "radio",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            },
+            {
+                "name": "agreement",
+                "label": "In order to participate at Catalyst, there are a few forms (such as Liability and Photo Release forms) that will be sent out after decisions have been made. Please check this box to indicate you understand you have to complete forms in order to attend Catalyst or you will not be allowed to enter the event.",
+                "type": "checkbox",
+                "options": [
+                    "Yes, I agree."
                 ],
                 "required": true
             },
@@ -287,7 +309,7 @@
             {
                 "for": "name",
                 "type": "p",
-                "content": "We will be offering four tracks to high school students:\n\n* Design\n\n* Gaming\n\n* Hardware\n\n* Software"
+                "content": "We will be offering four tracks to high school students:\n\n* Info Security\n\n* Gaming\n\n* Robotics\n\n* Music Technology"
             },
             {
                 "for": "name",
@@ -297,7 +319,7 @@
             {
                 "for": "name",
                 "type": "p",
-                "content": "All mentors are required to attend a 1.5 hour training session. Several sessions will be offered with a variety of dates and times."
+                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of eight to ten students. The goal of these cohorts is to directly connect participants with each other and mentors. All mentors are required to attend a 1.5 hour training session. Several sessions will be offered with a variety of dates and times."
             },
             {
                 "for": "name",
@@ -329,12 +351,18 @@
                 "required": true
             },
             {
+                "name": "email",
+                "type": "email",
+                "label": "Email",
+                "required": true
+            },
+            {
                 "name": "occupation",
                 "type": "radio",
                 "label": "I am a...",
                 "options": [
                     "Georgia Tech student",
-                    "Georgia Tech faculty",
+                    "Georgia Tech faculty member",
                     "Teacher",
                     "School Administrator",
                     "School Counselor",
@@ -361,10 +389,10 @@
                 "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Do you have a preference for mentoring a certain track?",
                 "type": "radio",
                 "options": [
-                    "Design",
+                    "Info Security",
                     "Gaming",
-                    "Hardware",
-                    "Software",
+                    "Robotics",
+                    "Music Technology",
                     "No preference"
                 ],
                 "required": true
@@ -374,12 +402,15 @@
                 "label": "Race / Ethnicity",
                 "type": "checkbox",
                 "options": [
-                    "White",
-                    "Black or African American",
-                    "Hispanic / Latino / Latina",
-                    "Asian",
-                    "Native American / American Indian / Alaskan Native",
-                    "Hawaiian or Pacific Islander"
+                    "African-American/Black", 
+                    "Hispanic/Latino", 
+                    "Caucasian", 
+                    "Middle Eastern", 
+                    "East Asian", 
+                    "South Asian", 
+                    "Southeast Asian", 
+                    "Pacific Islander", 
+                    "Native American"
                 ],
                 "hasOther": true
             },
@@ -393,7 +424,7 @@
             },
             {
                 "name": "tshirt-size",
-                "label": "What is your T-shirt size?",
+                "label": "What is your T-shirt size? (In adult sizes)",
                 "type": "radio",
                 "options": [
                     "XS",
@@ -427,7 +458,7 @@
                 "options": [
                     "I consent to a background check (cost covered by HackGT)",
                     "I can attend a 1.5 hour training session (several sessions will be offered with a variety of dates and times)",
-                    "I can stay for all / most of the event and work closely with students to help and inspire"
+                    "I can stay for all or most of the event from 9 am to 8 pm on March, 28th (to assist students with their projects throughout the day and give advice about future aspirations)"
                 ],
                 "required": true
             },
@@ -585,7 +616,7 @@
             {
                 "for": "parking",
                 "type": "p",
-                "content": "Thank your confirming your attendance to Catalyst 2018!"
+                "content": "Thank your confirming your attendance to Catalyst 2020!"
             }
         ],
         "questions": [
