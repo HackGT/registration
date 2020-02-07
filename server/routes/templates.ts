@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { URL } from "url";
 import * as express from "express";
 import * as Handlebars from "handlebars";
 import * as moment from "moment-timezone";
@@ -15,49 +16,47 @@ import {
 	onlyAllowAnonymousBranch, branchRedirector, ApplicationType
 } from "../middleware";
 import {
-	IUser, IUserMongoose, User,
-	ITeamMongoose, Team,
-	IIndexTemplate, ILoginTemplate, IAdminTemplate, ITeamTemplate,
+	Model,
+	IUser, User,
+	ITeam, Team,
+	IIndexTemplate, IAdminTemplate, ITeamTemplate,
 	IRegisterBranchChoiceTemplate, IRegisterTemplate, StatisticEntry,
 	IFormItem,
-	IConfig
+	ILoginTemplate
 } from "../schema";
 import * as Branches from "../branch";
-import { strategies, prettyNames } from "../routes/strategies";
 
 export let templateRoutes = express.Router();
 
-// Load and compile Handlebars templates
-let [
-	indexTemplate,
-	loginTemplate,
-	postLoginTemplate,
-	forgotPasswordTemplate,
-	resetPasswordTemplate,
-	preregisterTemplate,
-	preconfirmTemplate,
-	registerTemplate,
-	confirmTemplate,
-	adminTemplate,
-	unsupportedTemplate,
-	teamTemplate
-] = [
-	"index.html",
-	"login.html",
-	"postlogin.html",
-	"forgotpassword.html",
-	"resetpassword.html",
-	"preapplication.html",
-	"preconfirmation.html",
-	"application.html",
-	"confirmation.html",
-	"admin.html",
-	"unsupported.html",
-	"team.html"
-].map(file => {
-	let data = fs.readFileSync(path.resolve(STATIC_ROOT, file), "utf8");
-	return Handlebars.compile(data);
-});
+export class Template<T> {
+	private template: Handlebars.TemplateDelegate<T> | null = null;
+
+	constructor(private readonly file: string) {
+		this.loadTemplate();
+	}
+
+	private loadTemplate(): void {
+		let data = fs.readFileSync(path.resolve(STATIC_ROOT, this.file), "utf8");
+		this.template = Handlebars.compile(data);
+	}
+
+	public render(input: T): string {
+		if (!config.server.isProduction) {
+			this.loadTemplate();
+		}
+		return this.template!(input);
+	}
+}
+
+const IndexTemplate = new Template<IIndexTemplate>("index.html");
+const PreRegisterTemplate = new Template<IRegisterBranchChoiceTemplate>("preapplication.html");
+const PreConfirmTemplate = new Template<IRegisterBranchChoiceTemplate>("preconfirmation.html");
+const RegisterTemplate = new Template<IRegisterTemplate>("application.html");
+const ConfirmTemplate = new Template<IRegisterTemplate>("confirmation.html");
+const AdminTemplate = new Template<IAdminTemplate>("admin.html");
+const UnsupportedTemplate = new Template<{ siteTitle: string }>("unsupported.html");
+const TeamTemplate = new Template<ITeamTemplate>("team.html");
+const LoginTemplate = new Template<ILoginTemplate>("login.html");
 
 // Block IE
 templateRoutes.use(async (request, response, next) => {
@@ -76,7 +75,7 @@ templateRoutes.use(async (request, response, next) => {
 		let templateData = {
 			siteTitle: config.eventName
 		};
-		response.send(unsupportedTemplate(templateData));
+		response.send(UnsupportedTemplate.render(templateData));
 	}
 	else {
 		next();
@@ -314,7 +313,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		templateData.timeline.teamFormation = "complete";
 	}
 
-	response.send(indexTemplate(templateData));
+	response.send(IndexTemplate.render(templateData));
 });
 
 templateRoutes.route("/login").get(async (request, response) => {
@@ -322,96 +321,47 @@ templateRoutes.route("/login").get(async (request, response) => {
 	if (request.session && request.query.r && request.query.r.startsWith('/')) {
 		request.session.returnTo = request.query.r;
 	}
-	let loginMethods = await getSetting<string[]>("loginMethods");
-	let templateData: ILoginTemplate = {
-		siteTitle: config.eventName,
-		error: request.flash("error"),
-		success: request.flash("success"),
-		loginMethods,
-		localOnly: loginMethods && loginMethods.length === 1 && loginMethods[0] === "local"
-	};
-	response.send(loginTemplate(templateData));
-});
-templateRoutes.route("/login/confirm").get(async (request, response) => {
-	let user = request.user as IUser;
-	if (!user) {
-		response.redirect("/login");
-		return;
-	}
-	if (user.accountConfirmed) {
-		response.redirect("/");
-		return;
-	}
 
-	let usedLoginMethods: string[] = [];
-	if (user.local && user.local!.hash) {
-		usedLoginMethods.push("Local");
+	let errorMessage = request.flash("error") as string[];
+	if (request.session && request.session.loginAction === "render") {
+		request.session.loginAction = "redirect";
+		let templateData = {
+			siteTitle: config.eventName,
+			isLogOut: true,
+			groundTruthLogOut: new URL("/logout", config.secrets.groundTruth.url).toString()
+		};
+		response.send(LoginTemplate.render(templateData));
 	}
-	let services = Object.keys(user.services || {}) as (keyof typeof user.services)[];
-	for (let service of services) {
-		usedLoginMethods.push(prettyNames[service]);
+	else if (errorMessage.length > 0) {
+		let templateData = {
+			siteTitle: config.eventName,
+			error: errorMessage.join(" "),
+			isLogOut: false
+		};
+		response.send(LoginTemplate.render(templateData));
 	}
-	let loginMethods = (await getSetting<IConfig.Services[]>("loginMethods")).filter(method => method !== "local" && !services.includes(method));
-
-	response.send(postLoginTemplate({
-		siteTitle: config.eventName,
-		error: request.flash("error"),
-		success: request.flash("success"),
-
-		name: user.name || "",
-		email: user.email || "",
-		verifiedEmail: user.verifiedEmail || false,
-		usedLoginMethods,
-		loginMethods,
-		canAddLogins: loginMethods.length !== 0
-	}));
-});
-templateRoutes.route("/login/forgot").get((request, response) => {
-	let templateData: ILoginTemplate = {
-		siteTitle: config.eventName,
-		error: request.flash("error"),
-		success: request.flash("success")
-	};
-	response.send(forgotPasswordTemplate(templateData));
-});
-templateRoutes.route("/auth/forgot/:code").get(async (request, response) => {
-	let user = await User.findOne({ "local.resetCode": request.params.code });
-	if (!user) {
-		request.flash("error", "Invalid password reset code");
-		response.redirect("/login");
-		return;
+	else {
+		response.redirect("/auth/login");
 	}
-	else if (!user.local!.resetRequested || Date.now() - user.local!.resetRequestedTime!.valueOf() > 1000 * 60 * 60) {
-		request.flash("error", "Your password reset link has expired. Please request a new one.");
-		user.local!.resetCode = "";
-		user.local!.resetRequested = false;
-		await user.save();
-		response.redirect("/login");
-		return;
-	}
-	let templateData: ILoginTemplate = {
-		siteTitle: config.eventName,
-		error: request.flash("error"),
-		success: request.flash("success")
-	};
-	response.send(resetPasswordTemplate(templateData));
 });
 
 templateRoutes.route("/team").get(authenticateWithRedirect, async (request, response) => {
-	let team: ITeamMongoose | null = null;
-	let membersAsUsers: IUserMongoose[] | null = null;
-	let teamLeaderAsUser: IUserMongoose | null = null;
+	let team: ITeam | null = null;
+	let membersAsUsers: IUser[] | null = null;
+	let teamLeaderAsUser: IUser | null = null;
 	let isCurrentUserTeamLeader = false;
 
 	if (request.user && request.user.teamId) {
-		team = await Team.findById(request.user.teamId) as ITeamMongoose;
-		membersAsUsers = await User.find({
-			_id: {
-				$in: team.members
-			}
-		});
-		teamLeaderAsUser = await User.findById(team.teamLeader) as IUserMongoose;
-		isCurrentUserTeamLeader = teamLeaderAsUser._id.toString() === request.user._id.toString();
+		team = await Team.findById(request.user.teamId);
+		if (team) {
+			membersAsUsers = await User.find({
+				_id: {
+					$in: team.members
+				}
+			});
+			teamLeaderAsUser = await User.findById(team.teamLeader);
+			isCurrentUserTeamLeader = teamLeaderAsUser != null && teamLeaderAsUser._id.toString() === request.user._id.toString();
+		}
 	}
 
 	let templateData: ITeamTemplate = {
@@ -426,7 +376,7 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 			qrEnabled: await getSetting<boolean>("qrEnabled")
 		}
 	};
-	response.send(teamTemplate(templateData));
+	response.send(TeamTemplate.render(templateData));
 });
 
 templateRoutes.route("/apply").get(
@@ -450,7 +400,7 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 		// NOTE: this assumes the user is still able to apply as this type at this point
 		if (requestType === ApplicationType.Application) {
 			if (user.applied) {
-				questionBranches = [user.applicationBranch.toLowerCase()];
+				questionBranches = [user.applicationBranch!.toLowerCase()];
 			}
 			else {
 				const branches = await Branches.BranchConfig.getOpenBranches<Branches.ApplicationBranch>("Application");
@@ -477,10 +427,10 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 		};
 
 		if (requestType === ApplicationType.Application) {
-			response.send(preregisterTemplate(templateData));
+			response.send(PreRegisterTemplate.render(templateData));
 		}
 		else {
-			response.send(preconfirmTemplate(templateData));
+			response.send(PreConfirmTemplate.render(templateData));
 		}
 	};
 }
@@ -523,7 +473,7 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		let questionData = await Promise.all(questionBranch.questions.map(async question => {
 			let savedValue: IFormItem | undefined;
 			if (user) {
-				savedValue = user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"].find(item => item.name === question.name);
+				savedValue = (user[requestType === ApplicationType.Application ? "applicationData" : "confirmationData"] || []).find(item => item.name === question.name);
 			}
 
 			if (question.type === "checkbox" || question.type === "radio" || question.type === "select") {
@@ -589,7 +539,7 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		}
 
 		if (!anonymous) {
-			let thisUser = await User.findById(user._id) as IUserMongoose;
+			let thisUser = await User.findById(user._id) as Model<IUser>;
 			// TODO this is a bug - dates are wrong
 			if (requestType === ApplicationType.Application && !thisUser.applicationStartTime) {
 				thisUser.applicationStartTime = new Date();
@@ -614,9 +564,9 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 		};
 
 		if (requestType === ApplicationType.Application) {
-			response.send(registerTemplate(templateData));
+			response.send(RegisterTemplate.render(templateData));
 		} else if (requestType === ApplicationType.Confirmation) {
-			response.send(confirmTemplate(templateData));
+			response.send(ConfirmTemplate.render(templateData));
 		}
 	};
 }
@@ -630,16 +580,6 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let teamsEnabled = await getSetting<boolean>("teamsEnabled");
 	let qrEnabled = await getSetting<boolean>("qrEnabled");
 
-	type StrategyNames = keyof typeof strategies;
-	let enabledMethods = await getSetting<StrategyNames[]>("loginMethods");
-	let loginMethodsInfo = Object.keys(strategies).map((name: StrategyNames) => {
-		return {
-			name: prettyNames[name],
-			raw: name,
-			enabled: enabledMethods.includes(name)
-		};
-	});
-
 	let adminEmails = await User.find({ admin: true }).select("email");
 
 	let noopBranches = (await Branches.BranchConfig.loadAllBranches("Noop")) as Branches.NoopBranch[];
@@ -649,9 +589,11 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let teamIDNameMap: {
 		[id: string]: string;
 	} = {};
-	(await Team.find()).forEach((team: ITeamMongoose) => {
+	(await Team.find()).forEach(team => {
 		teamIDNameMap[team._id.toString()] = team.teamName;
 	});
+
+	let preconfiguredAdmins = config.admins.emails.concat(config.admins.domains.map(domain => `*@${domain}`));
 
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
@@ -706,12 +648,11 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 					};
 				})
 			},
-			loginMethodsInfo,
 			adminEmails,
 			apiKey: config.secrets.adminKey
 		},
 		config: {
-			admins: config.admins.join(", "),
+			admins: preconfiguredAdmins.join(", "),
 			eventName: config.eventName,
 			storageEngine: config.storageEngine.name,
 			uploadDirectoryRaw: config.storageEngine.options.uploadDirectory,
@@ -730,11 +671,11 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 
 	// Generate general statistics
 	(await User.find({ "applied": true })).forEach(async statisticUser => {
-		let appliedBranch = applicationBranchMap[statisticUser.applicationBranch];
+		let appliedBranch = applicationBranchMap[statisticUser.applicationBranch!];
 		if (!appliedBranch) {
 			return;
 		}
-		statisticUser.applicationData.forEach(question => {
+		statisticUser.applicationData!.forEach(question => {
 			if (question.value === null) {
 				return;
 			}
@@ -758,7 +699,7 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 						statisticEntry = {
 							questionName,
 							questionLabel: removeTags(rawQuestion.label),
-							branch: statisticUser.applicationBranch,
+							branch: statisticUser.applicationBranch!,
 							responses: []
 						};
 						templateData.generalStatistics.push(statisticEntry);
@@ -844,5 +785,5 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 		return question;
 	});
 
-	response.send(adminTemplate(templateData));
+	response.send(AdminTemplate.render(templateData));
 });

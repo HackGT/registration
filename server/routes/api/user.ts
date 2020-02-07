@@ -15,11 +15,13 @@ import {
 	trackEvent, canUserModify
 } from "../../middleware";
 import {
+	Model, createNew,
 	IFormItem,
-	IUserMongoose, User,
-	ITeamMongoose, Team
+	IUser, User,
+	Team
 } from "../../schema";
 import * as Branches from "../../branch";
+import { GroundTruthStrategy } from "../strategies";
 
 export let userRoutes = express.Router({ "mergeParams": true });
 export let registrationRoutes = express.Router({ "mergeParams": true });
@@ -69,23 +71,32 @@ userRoutes.route("/confirmation/:branch").post(
 );
 function postApplicationBranchHandler(anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request, response) => {
-		let user: IUserMongoose;
+		let user: Model<IUser>;
 		if (anonymous) {
 			let email = request.body["anonymous-registration-email"] as string;
 			let name = request.body["anonymous-registration-name"] as string;
-			if (await User.findOne({email})) {
+			if (await User.findOne({ email })) {
 				response.status(400).json({
 					"error": `User with email "${email}" already exists`
 				});
 				return;
 			}
-			user = new User({
+			user = createNew<IUser>(User, {
+				...GroundTruthStrategy.defaultUserProperties,
 				uuid: uuid(),
 				name,
-				email
-			}) as IUserMongoose;
+				email,
+				token: null
+			});
 		} else {
-			user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+			let existingUser = await User.findOne({ uuid: request.params.uuid });
+			if (!existingUser) {
+				response.status(400).json({
+					"error": "Invalid user id"
+				});
+				return;
+			}
+			user = existingUser;
 		}
 
 		let branchName = await Branches.BranchConfig.getCanonicalName(request.params.branch);
@@ -104,12 +115,15 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 				return null;
 			}
 			let files = request.files as Express.Multer.File[];
-			let preexistingFile: boolean = question.type === "file" && user.applicationData && user.applicationData.some(entry => entry.name === question.name && !!entry.value);
+			let preexistingFile: boolean =
+				question.type === "file"
+				&& user.applicationData != undefined
+				&& user.applicationData.some(entry => entry.name === question.name && !!entry.value);
 
 			if (question.required && !request.body[question.name] && !files.find(file => file.fieldname === question.name)) {
 				// Required field not filled in
 				if (preexistingFile) {
-					let previousValue = user.applicationData.find(entry => entry.name === question.name && !!entry.value)!.value as Express.Multer.File;
+					let previousValue = user.applicationData!.find(entry => entry.name === question.name && !!entry.value)!.value as Express.Multer.File;
 					unchangedFiles.push(previousValue.filename);
 					return {
 						"name": question.name,
@@ -267,7 +281,13 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 async function deleteApplicationBranchHandler(request: express.Request, response: express.Response) {
 	let requestType: ApplicationType = request.url.match(/\/application\//) ? ApplicationType.Application : ApplicationType.Confirmation;
 
-	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+	let user = await User.findOne({ uuid: request.params.uuid });
+	if (!user) {
+		response.status(400).json({
+			"error": "Invalid user id"
+		});
+		return;
+	}
 	if (requestType === ApplicationType.Application) {
 		user.applied = false;
 		user.accepted = false;
@@ -327,7 +347,7 @@ userRoutes.route("/status").post(isAdmin, uploadHandler.any(), async (request, r
 	}
 });
 
-async function updateUserStatus(user: IUserMongoose, status: string): Promise<void> {
+async function updateUserStatus(user: Model<IUser>, status: string): Promise<void> {
 	if (status === user.confirmationBranch) {
 		throw new Error(`User status is already ${status}!`);
 	} else if (status === "no-decision") {
@@ -453,14 +473,14 @@ userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void
 		for (let branchName of await Branches.BranchConfig.getNames()) {
 			// TODO: THIS IS A PRELIMINARY VERSION FOR HACKGT CATALYST
 			// TODO: Change this to { "accepted": true }
-			let attendingUsers: IUserMongoose[] = await User.find({ "applied": true, "applicationBranch": branchName });
+			let attendingUsers = await User.find({ "applied": true, "applicationBranch": branchName });
 			if (attendingUsers.length === 0) {
 				continue;
 			}
 
 			let csvData = attendingUsers.map(user => {
 				// TODO: Replace with more robust schema-agnostic version
-				let nameFormItem = user.applicationData.find(item => item.name === "name");
+				let nameFormItem = (user.applicationData || []).find(item => item.name === "name");
 				return {
 					"name": nameFormItem && typeof nameFormItem.value === "string" ? nameFormItem.value : user.name,
 					"email": user.email
@@ -478,12 +498,12 @@ userRoutes.route("/export").get(isAdmin, async (request, response): Promise<void
 	}
 });
 
-async function removeUserFromAllTeams(user: IUserMongoose): Promise<boolean> {
+async function removeUserFromAllTeams(user: IUser): Promise<boolean> {
 	if (!user.teamId) {
 		return true;
 	}
 
-	let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
+	let currentUserTeam = await Team.findById(user.teamId);
 	if (!currentUserTeam) {
 		return false;
 	}
@@ -529,13 +549,18 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		Else if the user's in a team, take them out of it
 		Else make them a new team
 	 */
-	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+	let user = await User.findOne({ uuid: request.params.uuid });
+	if (!user) {
+		response.status(400).json({
+			"error": "Invalid user id"
+		});
+		return;
+	}
 	let decodedTeamName = decodeURI(request.params.teamName);
 
-	let existingTeam = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
+	let existingTeam = await Team.findOne({ teamName: decodedTeamName });
 
 	if (existingTeam) {
-
 		// Someone else has a team with this name
 		response.status(400).json({
 			"error": `Someone else has a team called ${decodedTeamName}. Please pick a different name.`
@@ -545,18 +570,20 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 
 	// If the user is in a team, remove them from their current team unless they're the team leader
 	if (user.teamId) {
-		let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
+		let currentUserTeam = await Team.findById(user.teamId);
 
-		if (currentUserTeam.teamLeader === user._id) {
-			// The user is in the team they made already
-			// Ideally this will never happen if we do some validation client side
-			response.status(400).json({
-				"error": "You're already the leader of this team"
-			});
-			return;
+		if (currentUserTeam) {
+			if (currentUserTeam.teamLeader === user._id) {
+				// The user is in the team they made already
+				// Ideally this will never happen if we do some validation client side
+				response.status(400).json({
+					"error": "You're already the leader of this team"
+				});
+				return;
+			}
+
+			await removeUserFromAllTeams(user);
 		}
-
-		await removeUserFromAllTeams(user);
 	}
 
 	let query = {
@@ -573,9 +600,11 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 		setDefaultsOnInsert: true
 	};
 
-	let team = await Team.findOneAndUpdate(query, {}, options) as ITeamMongoose;
+	let team = await Team.findOneAndUpdate(query, {}, options);
 
-	user.teamId = team._id;
+	if (team) {
+		user.teamId = team._id;
+	}
 	await user.save();
 
 	response.json({
@@ -584,7 +613,14 @@ userRoutes.route("/team/create/:teamName").post(isUserOrAdmin, async (request, r
 });
 
 userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+	let user = await User.findOne({ uuid: request.params.uuid });
+	if (!user) {
+		response.status(400).json({
+			"error": "Invalid user id"
+		});
+		return;
+	}
+
 	let decodedTeamName = decodeURI(request.params.teamName);
 
 	if (user.teamId) {
@@ -600,7 +636,7 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 		return;
 	}
 
-	let teamToJoin = await Team.findOne({ teamName: decodedTeamName }) as ITeamMongoose;
+	let teamToJoin = await Team.findOne({ teamName: decodedTeamName });
 
 	if (!teamToJoin) {
 		// If the team they tried to join isn't real...
@@ -637,7 +673,13 @@ userRoutes.route("/team/join/:teamName").post(isUserOrAdmin, async (request, res
 });
 
 userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
+	let user = await User.findOne({ uuid: request.params.uuid });
+	if (!user) {
+		response.status(400).json({
+			"error": "Invalid user id"
+		});
+		return;
+	}
 	await removeUserFromAllTeams(user);
 
 	response.status(200).json({
@@ -646,8 +688,13 @@ userRoutes.route("/team/leave").post(isUserOrAdmin, async (request, response): P
 });
 
 userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request, response): Promise<void> => {
-	let user = await User.findOne({uuid: request.params.uuid}) as IUserMongoose;
-
+	let user = await User.findOne({ uuid: request.params.uuid });
+	if (!user) {
+		response.status(400).json({
+			"error": "Invalid user id"
+		});
+		return;
+	}
 	if (!user.teamId) {
 		response.status(400).json({
 			"error": "You're not in a team"
@@ -655,8 +702,7 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 		return;
 	}
 
-	let currentUserTeam = await Team.findById(user.teamId) as ITeamMongoose;
-
+	let currentUserTeam = await Team.findById(user.teamId);
 	if (!currentUserTeam) {
 		// User tried to change their team name even though they don't have a team
 		response.status(400).json({
@@ -693,18 +739,26 @@ userRoutes.route("/team/rename/:newTeamName").post(isUserOrAdmin, async (request
 	});
 });
 
-userRoutes.get('/', async (request, response) => {
+userRoutes.get("/", async (request, response) => {
 	if (request.user) {
-		let user = await User.findOne({uuid: request.user!.uuid}) as IUserMongoose;
+		let user = await User.findOne({ uuid: request.user.uuid });
+		if (!user) {
+			response.status(400).json({
+				"error": "Invalid user id"
+			});
+			return;
+		}
+
 		response.json({
 			uuid: user.uuid,
 			name: user.name,
 			email: user.email,
 			admin: user.admin || false
 		});
-	} else {
+	}
+	else {
 		response.json({
-			error: 1
+			"error": "Not logged in"
 		});
 	}
 });

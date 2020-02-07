@@ -121,9 +121,7 @@ class S3StorageEngine implements IStorageEngine {
 }
 
 interface IStorageEngines {
-	[name: string]: {
-		new(options: ICommonOptions): IStorageEngine;
-	};
+	[name: string]: new(options: ICommonOptions) => IStorageEngine;
 }
 export const storageEngines: IStorageEngines = {
 	"disk": DiskStorageEngine,

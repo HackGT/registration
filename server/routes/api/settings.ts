@@ -108,43 +108,6 @@ settingsRoutes.route("/admin_emails")
 		});
 	});
 
-settingsRoutes.route("/login_methods")
-	.get(async (request, response) => {
-		let methods = await getSetting<string[]>("loginMethods");
-		response.json({
-			methods
-		});
-	})
-	.put(isAdmin, uploadHandler.any(), async (request, response) => {
-		let { enabledMethods } = request.body;
-		if (!enabledMethods) {
-			response.status(400).json({
-				"error": "Missing value for enabled methods"
-			});
-			return;
-		}
-		try {
-			let methods = JSON.parse(enabledMethods);
-			if (!Array.isArray(methods)) {
-				response.status(400).json({
-					"error": "Invalid value for enabled methods"
-				});
-				return;
-			}
-			await updateSetting<string[]>("loginMethods", methods);
-			await (await import("../auth")).reloadAuthentication();
-			response.json({
-				"success": true
-			});
-		}
-		catch (err) {
-			console.error(err);
-			response.status(500).json({
-				"error": "An error occurred while changing available login methods"
-			});
-		}
-	});
-
 settingsRoutes.route("/branch_roles")
 	.get(isAdmin, async (request, response) => {
 		response.json({
@@ -283,8 +246,6 @@ settingsRoutes.route("/email_content/:type/rendered")
 settingsRoutes.route("/send_batch_email")
 	.post(isAdmin, uploadHandler.any(), async (request, response) => {
 		let filter = JSON.parse(request.body.filter);
-		filter.verifiedEmail = true;
-		filter.accountConfirmed = true;
 		let subject = request.body.subject as string;
 		let markdownContent = request.body.markdownContent;
 		if (typeof filter !== "object") {

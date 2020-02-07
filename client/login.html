@@ -5,65 +5,22 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<link rel="icon" href="/favicon.ico" type="image/x-icon" />
 		<link rel="stylesheet" href="/css/wing-0.1.9.min.css" />
 		<link rel="stylesheet" href="/css/login.css" />
 		<link rel="stylesheet" href="/css/theme.css" />
-		<script src="https://use.fontawesome.com/efaca8fe24.js"></script>
-		<script src="/js/login.js"></script>
 	</head>
 	<body>
 		<div class="container">
 			<h1 class="center">{{siteTitle}}</h1>
 
-			<section id="error">{{error}}</section>
-			<section id="success">{{success}}</section>
-			<main>
-				{{#ifIn "local" loginMethods}}
-					{{#if localOnly}}
-					<div class="active text-center" id="login">
-					{{else}}
-					<div class="active border text-center" id="login">
-					{{/if}}
-						<h3>Log In</h3>
-						<a href="/login/forgot">Forgot your password?</a>
-						<form action="/auth/login" method="POST">
-							<input type="email" name="email" placeholder="Email" required />
-							<input type="password" name="password" placeholder="Password" required />
-							<input type="submit" value="Log in" />
-						</form>
-						<p>
-							Don't have an account?
-							<br />
-							Connect with an external service or <a href="#" id="signup-link">sign up</a>.
-						</p>
-					</div>
-					{{#if localOnly}}
-					<div class="text-center" id="signup">
-					{{else}}
-					<div class="border text-center" id="signup">
-					{{/if}}
-						<h3>Sign Up</h3>
-						<form action="/auth/signup" method="POST">
-							<input type="text" name="name" placeholder="Name" required />
-							<input type="email" name="email" placeholder="Email" required />
-							<input type="password" name="password" placeholder="Password" required />
-							<input type="submit" value="Sign up" />
-						</form>
-						<p>
-							Already have a local account? <a href="#" id="login-link">Log in</a>.
-						</p>
-					</div>
-				{{/ifIn}}
-				{{#unless localOnly}}
-					<div class="active simple-methods text-center">
-						{{#ifIn "local" loginMethods}}{{else}}
-							<h3>Log In</h3>
-						{{/ifIn}}
-						{{> login-methods}}
-					</div>
-				{{/unless}}
-			</main>
+			{{#if isLogOut}}
+				<h3 class="center">Logout successful</h3>
+				<a class="btn" href="/auth/login">Log in</a>
+			{{else}}
+				<h3 class="center">Login Error</h3>
+				<section id="error">{{error}}</section>
+				<a class="btn" href="/auth/login">Try again</a>
+			{{/if}}
 		</div>
 	</body>
 </html>
