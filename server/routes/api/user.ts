@@ -424,26 +424,15 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 
 			let html = await renderEmailHTML(emailMarkdown, user);
 			let text = await renderEmailText(html, user, true);
-			let question = user.applicationData.find(data => data.name === "parent-email");
-			if (user.applicationBranch === 'Participant' && question && question.value && question.value !== user.email) {
-				console.log(user);
-				emails.push({
-					from: config.email.from,
-					to: user.email,
-					cc: question.value as string,
-					subject: emailSubject || defaultEmailSubjects.preConfirm,
-					html,
-					text
-				});
-			} else {
-				emails.push({
-					from: config.email.from,
-					to: user.email,
-					subject: emailSubject || defaultEmailSubjects.preConfirm,
-					html,
-					text
-				});
-			}
+
+			emails.push({
+				from: config.email.from,
+				to: user.email,
+				subject: emailSubject || defaultEmailSubjects.preConfirm,
+				html,
+				text
+			});
+
 			user.preConfirmEmailSent = true;
 			await user.save();
 		}
@@ -455,7 +444,7 @@ userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): P
 		});
 	}
 	catch (err) {
-		console.error(JSON.stringify(err));
+		console.error(err);
 		response.status(500).json({
 			"error": "An error occurred while sending out acceptance emails"
 		});
