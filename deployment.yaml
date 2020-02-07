@@ -21,7 +21,8 @@ env:
   EMAIL_FROM: "HackGT Team <hello@hackgt.com>"
   PRODUCTION: true
   ADMIN_EMAILS:
-    - ehsan@hack.gt
-    - ryan@hack.gt
-    - julian@hack.gt
+    - stephanie@hack.gt
+    - evan@hack.gt
+    - claudia@hack.gt
+    - catalyst@hack.gt
 
