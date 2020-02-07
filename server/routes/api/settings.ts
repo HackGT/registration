@@ -306,4 +306,3 @@ settingsRoutes.route("/send_batch_email")
 			"count": emails.length
 		});
 	});
-	
