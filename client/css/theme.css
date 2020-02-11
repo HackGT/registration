@@ -215,18 +215,23 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
     background: var(--text-color);
     color: var(--bg-color);
 }
+
 @media only screen and (max-width: 1000px) {
     html::before {
+        background: url(/css/spaceBackground.svg);
         background-color: var(--bg-color);
+        background-repeat: no-repeat;
+        background-size: cover;
     }
 }
+
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 1000px) {
     html::before {
-        background: url(/css/stars.svg) top left -400px, url(/css/stars.svg) top right -400px;
+        background: url(/css/spaceBackground.svg);
         background-color: var(--bg-color);
-        background-repeat: repeat-y;
-        background-size: 500px;
+        background-repeat: no-repeat;
+        background-size: cover;
         will-change: transform;
     }
 } 
@@ -234,20 +239,20 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1350px) {
     html::before {
-        background: url(/css/stars.svg) top left -300px, url(/css/stars.svg) top right -300px;
+        background: url(/css/spaceBackground.svg);
         background-color: var(--bg-color);
-        background-repeat: repeat-y;
-        background-size: 500px;
+        background-repeat: no-repeat;
+        background-size: cover;
         will-change: transform;
     }
 }
 
 @media only screen and (min-width: 1600px) {
     html::before {
-        background: url(/css/stars.svg) top left -200px, url(/css/stars.svg) top right -200px;
+        background: url(/css/spaceBackground.svg);
         background-color: var(--bg-color);
-        background-repeat: repeat-y;
-        background-size: 500px;
+        background-repeat: no-repeat;
+        background-size: cover;
         will-change: transform;
     }
 }
