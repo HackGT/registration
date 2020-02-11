@@ -26,7 +26,7 @@
 	},
 	"eventName": "My Hackathon",
 	"storageEngine": {
-		"name": "disk | s3",
+		"name": "disk | s3 | gcs",
 		"options": {
 			"uploadDirectory": "uploads"
 		}

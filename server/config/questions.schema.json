@@ -78,6 +78,18 @@
                                 },
                                 "required": {
                                     "type": "boolean"
+                                },
+                                "maxWordCount": {
+                                    "type": "number"
+                                },
+                                "minWordCount": {
+                                    "type": "number"
+                                },
+                                "maxCharacterCount": {
+                                    "type": "number"
+                                },
+                                "minCharacterCount": {
+                                    "type": "number"
                                 }
                             },
                             "required": [

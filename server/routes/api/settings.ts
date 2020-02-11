@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, renderEmailHTML, renderEmailText, defaultEmailSubjects, sendBatchMailAsync, config, IMailObject
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, renderPageHTML, defaultEmailSubjects, agenda
 } from "../../common";
 import {
 	isAdmin, uploadHandler
@@ -231,7 +231,7 @@ settingsRoutes.route("/email_content/:type/rendered")
 		try {
 			let markdown: string = request.body.content;
 			let html: string = await renderEmailHTML(markdown, request.user as IUser);
-			let text: string = await renderEmailText(html, request.user as IUser, true);
+			let text: string = await renderEmailText(markdown, request.user as IUser);
 
 			response.json({ html, text });
 		}
@@ -239,6 +239,50 @@ settingsRoutes.route("/email_content/:type/rendered")
 			console.error(err);
 			response.status(500).json({
 				"error": "An error occurred while rendering the email content"
+			});
+		}
+	});
+
+settingsRoutes.route("/interstitial/:type")
+	.get(isAdmin, async (request, response) => {
+		let content: string;
+		try {
+			content = await getSetting<string>(`${request.params.type}-interstitial`, false);
+		}
+		catch {
+			// Content not set yet
+			content = "";
+		}
+		response.json({ content });
+	})
+	.put(isAdmin, uploadHandler.any(), async (request, response) => {
+		let content: string = request.body.content;
+		try {
+			await updateSetting<string>(`${request.params.type}-interstitial`, content);
+			response.json({
+				"success": true
+			});
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while setting interstitial content"
+			});
+		}
+	});
+
+settingsRoutes.route("/interstitial/:type/rendered")
+	.post(isAdmin, uploadHandler.any(), async (request, response) => {
+		try {
+			let markdown: string = request.body.content;
+			let html = await renderPageHTML(markdown, request.user as IUser);
+
+			response.json({ html });
+		}
+		catch (err) {
+			console.error(err);
+			response.status(500).json({
+				"error": "An error occurred while rendering the interstitial content"
 			});
 		}
 	});
@@ -263,46 +307,26 @@ settingsRoutes.route("/send_batch_email")
 		}
 
 		let users = await User.find(filter);
-		let emails: IMailObject[] = [];
 		for (let user of users) {
-			let html: string = await renderEmailHTML(markdownContent, user);
-			let text: string = await renderEmailText(html, user, true);
-
-			emails.push({
-				from: config.email.from,
-				to: user.email,
+			await agenda.now("send_templated_email", {
+				id: user.uuid,
 				subject,
-				html,
-				text
+				markdown: markdownContent
 			});
 		}
 
 		let admins = await User.find({ admin: true });
 		subject = `[Admin FYI] ${subject}`;
 		for (let user of admins) {
-			let html: string = await renderEmailHTML(markdownContent, user);
-			let text: string = await renderEmailText(html, user, true);
-			html = `${JSON.stringify(filter)}<br>${html}`;
-			text = `${JSON.stringify(filter)}\n${text}`;
-			emails.push({
-				from: config.email.from,
-				to: user.email,
-				subject,
-				html,
-				text
+			await agenda.now("send_templated_email", {
+				id: user.uuid,
+				subject: subject + JSON.stringify(filter),
+				markdown: markdownContent
 			});
 		}
-		try {
-			await sendBatchMailAsync(emails);
-		} catch (e) {
-			console.error(e);
-			return response.status(500).json({
-				"error": "Error sending email!"
-			});
-		}
-		console.log(`Sent ${emails.length} batch emails requested by ${(request.user as IUser).email}`);
+		console.log(`Sent ${users.length} batch emails requested by ${(request.user as IUser).email}`);
 		return response.json({
 			"success": true,
-			"count": emails.length
+			"count": users.length
 		});
 	});

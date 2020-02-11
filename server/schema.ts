@@ -21,6 +21,10 @@ export namespace IConfig {
 	export interface Email {
 		from: string;
 		key: string;
+		headerImage: string;
+		twitterHandle: string;
+		facebookHandle: string;
+		contactAddress: string;
 	}
 	export interface Server {
 		isProduction: boolean;
@@ -234,6 +238,7 @@ export interface ICommonTemplate {
 	settings: {
 		teamsEnabled: boolean;
 		qrEnabled: boolean;
+		maxTeamSize?: number;
 	};
 }
 type TimelineClass = "" | "complete" | "warning" | "rejected";
@@ -279,6 +284,9 @@ export interface ITeamTemplate extends ICommonTemplate {
 }
 export interface IRegisterBranchChoiceTemplate extends ICommonTemplate {
 	branches: string[];
+}
+export interface IInterstitialTemplate extends ICommonTemplate {
+	html: string;
 }
 export interface IRegisterTemplate extends ICommonTemplate {
 	branch: string;

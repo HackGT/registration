@@ -19,6 +19,9 @@
 				margin-top: 0;
 				text-align: center;
 			}
+			.align-center {
+				text-align: center;
+			}
 		</style>
 		<script src="/node_modules/whatwg-fetch/fetch.js"></script>
 		<script src="/node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
@@ -31,6 +34,7 @@
 			<section class="main">
 				{{#if user.teamId}}
 					<h3>Team <b class="teamName">{{team.teamName}}</b></h3>
+					<p class="align-center">Teams can have up to <strong>{{settings.maxTeamSize}}</strong> members.</p>
 					<ul>
 						<li><b>{{teamLeaderAsUser.name}}</b> ({{teamLeaderAsUser.email}}) &mdash; <strong>Team Leader</strong></li>
 						{{#each membersAsUsers}}
@@ -56,6 +60,7 @@
 					</div>
 				{{else}}
 					<h3>Let's get you in a team!</h3>
+					<p class="align-center">Teams can have up to <strong>{{settings.maxTeamSize}}</strong> members. If you don't currently have a team, you can form one at the event!</p>
 
 					<div class="row">
 						<div class="col">

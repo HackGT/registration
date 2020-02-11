@@ -24,7 +24,11 @@ class Config implements IConfig.Main {
 	};
 	public email: IConfig.Email = {
 		from: "HackGT Team <hello@hackgt.com>",
-		key: ""
+		key: "",
+		headerImage: "",
+		twitterHandle: "TheHackGT",
+		facebookHandle: "thehackgt",
+		contactAddress: "hello@hack.gt"
 	};
 	public server: IConfig.Server = {
 		isProduction: false,
@@ -82,7 +86,7 @@ class Config implements IConfig.Main {
 		}
 		if (config.secrets) {
 			for (let key of Object.keys(config.secrets) as (keyof IConfig.Secrets)[]) {
-				this.secrets[key] = config.secrets[key];
+				(this.secrets as any)[key] = config.secrets[key];
 			}
 		}
 		if (config.email) {
@@ -92,7 +96,7 @@ class Config implements IConfig.Main {
 		}
 		if (config.server) {
 			for (let key of Object.keys(config.server) as (keyof IConfig.Server)[]) {
-				this.server[key] = config.server[key];
+				(this.server as any)[key] = config.server[key];
 			}
 		}
 		if (config.admins) {
@@ -150,6 +154,18 @@ class Config implements IConfig.Main {
 		}
 		if (process.env.EMAIL_KEY) {
 			this.email.key = process.env.EMAIL_KEY;
+		}
+		if (process.env.EMAIL_HEADER_IMAGE) {
+			this.email.headerImage = process.env.EMAIL_HEADER_IMAGE;
+		}
+		if (process.env.EMAIL_TWITTER_HANDLE) {
+			this.email.twitterHandle = process.env.EMAIL_TWITTER_HANDLE;
+		}
+		if (process.env.EMAIL_FACEBOOK_HANDLE) {
+			this.email.facebookHandle = process.env.EMAIL_FACEBOOK_HANDLE;
+		}
+		if (process.env.EMAIL_CONTACT_ADDRESS) {
+			this.email.contactAddress = process.env.EMAIL_CONTACT_ADDRESS;
 		}
 		// Server
 		if (process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true") {
@@ -366,6 +382,21 @@ import * as marked from "marked";
 // tslint:disable-next-line:no-var-requires
 const striptags = require("striptags");
 import { IUser, Team, IFormItem } from "./schema";
+import * as htmlToText from "html-to-text";
+// tslint:disable-next-line:no-var-requires
+const Email = require("email-templates");
+const email = new Email({
+	views: {
+		root: path.resolve("server/emails/")
+	},
+	juice: true,
+	juiceResources: {
+		preserveImportant: true,
+		webResources: {
+			relativeTo: path.join(__dirname, "emails", "email-template")
+		}
+	}
+});
 
 export const defaultEmailSubjects = {
 	apply: `[${config.eventName}] - Thank you for applying!`,
@@ -374,18 +405,10 @@ export const defaultEmailSubjects = {
 };
 export interface IMailObject {
 	to: string;
-	cc?: string;
 	from: string;
 	subject: string;
 	html: string;
 	text: string;
-}
-// Union types don't work well with overloaded method resolution in Typescript so we split into two methods
-export async function sendMailAsync(mail: IMailObject)  {
-	return sendgrid.send(mail);
-}
-export async function sendBatchMailAsync(mail: IMailObject[]) {
-	return sendgrid.send(mail);
 }
 export function sanitize(input?: string): string {
 	if (!input || typeof input !== "string") {
@@ -415,7 +438,7 @@ export async function renderMarkdown(markdown: string, options?: MarkedOptions, 
 		});
 	});
 }
-export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
+async function templateMarkdown(markdown: string, user: IUser): Promise<string> {
 	let teamName: string;
 	if (await getSetting<boolean>("teamsEnabled")) {
 		teamName = "No team created or joined";
@@ -480,30 +503,28 @@ export async function renderEmailHTML(markdown: string, user: IUser): Promise<st
 		let question = (user.confirmationData || []).find(data => data.name === name);
 		return formatFormItem(question);
 	});
-
-	return renderMarkdown(markdown);
+	return markdown;
 }
-export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
-	let html: string;
-	if (!markdownRendered) {
-		html = await renderEmailHTML(markdown, user);
-	}
-	else {
-		html = markdown;
-	}
-	// Remove <style> and <script> block's content
-	html = html.replace(/<style>[\s\S]*?<\/style>/gi, "<style></style>").replace(/<script>[\s\S]*?<\/script>/gi, "<script></script>");
-
-	// Append href of links to their text
-	const cheerio = await import("cheerio");
-	let $ = cheerio.load(html, { decodeEntities: false });
-	$("a").each((i, el) => {
-		let element = $(el);
-		element.text(`${element.text()} (${element.attr("href")})`);
+export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
+	let templatedMarkdown = await templateMarkdown(markdown, user);
+	let renderedMarkdown = await renderMarkdown(templatedMarkdown);
+	return email.render("email-template/html", {
+		emailHeaderImage: config.email.headerImage,
+		twitterHandle: config.email.twitterHandle,
+		facebookHandle: config.email.facebookHandle,
+		emailAddress: config.email.contactAddress,
+		hackathonName: config.eventName,
+		body: renderedMarkdown
 	});
-	html = $.html();
-
-	return removeTags(html);
+}
+export async function renderEmailText(markdown: string, user: IUser): Promise<string> {
+	let templatedMarkdown = await templateMarkdown(markdown, user);
+	let renderedHtml = await renderMarkdown(templatedMarkdown);
+	return htmlToText.fromString(renderedHtml);
+}
+export async function renderPageHTML(markdown: string, user: IUser): Promise<string> {
+	let templatedMarkdown = await templateMarkdown(markdown, user);
+	return renderMarkdown(templatedMarkdown);
 }
 
 // Verify and load questions
@@ -549,3 +570,38 @@ export async function isBranchOpen(rawBranchName: string, user: IUser, requestTy
 
 	return false;
 }
+
+//
+// Agenda Async Queue
+//
+import * as Agenda from "agenda";
+export const agenda = new Agenda({db: {address: config.server.mongoURL}});
+import { User } from "./schema";
+agenda.define("send_templated_email", async (job, done) => {
+	try {
+		let user = await User.findOne({uuid: job.attrs.data.id});
+		if (user) {
+			let emailHTML = await renderEmailHTML(job.attrs.data.markdown, user);
+			let emailText = await renderEmailText(job.attrs.data.markdown, user);
+			let emailDetails = {
+				from: config.email.from,
+				to: user.email,
+				subject: job.attrs.data.subject,
+				html: emailHTML,
+				text: emailText
+			};
+			await sendgrid.send(emailDetails);
+			await done();
+		} else {
+			await done(new Error("No such user"));
+		}
+	}
+	catch(err) {
+		console.error(err);
+		await done(err);
+	}
+});
+
+agenda.start().catch((err) => {
+	console.error("Unable to start agenda worker: ", err);
+});
