@@ -410,6 +410,24 @@
     {
         "name": "General Confirmation",
         "text": [],
-        "questions": []
+        "questions": [
+            {
+                "name": "will-be-there",
+                "label": "Will you be attending HackGT Horizons taking place Feb 28 to Feb 29?",
+                "type": "radio",
+                "options": [
+                    "Yes, I'll be there!",
+                    "No, I can no longer make it"
+                ],
+                "required": true,
+                "hasOther": false
+            },
+            {
+                "name": "other",
+                "label": "Anything else you'd like us to know?",
+                "type": "textarea",
+                "required": false
+            }
+        ]
     }
 ]
