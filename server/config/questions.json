@@ -396,7 +396,7 @@
                 "type": "checkbox",
                 "label": "What tools do you feel comfortable mentoring in?",
                 "options": [
-                    "JAVA", 
+                    "Java", 
                     "Python", 
                     "JavaScript", 
                     "HTML/CSS",
