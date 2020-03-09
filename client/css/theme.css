@@ -4,11 +4,12 @@
 
 /* CSS variables for colors */
 :root {
-    --bg: url(/css/registration.png);
-	--primary: #4f73af;
+    --bg-img: url(/css/registration.png);
+    --bg: #27285E;
+	--primary: #A562A6;
 	--secondary-1: #bec9d9;
 	--secondary-2: #66C5C2;
-	--accent-1: #A562A6;
+	--accent-1: #DB3626;
 	--accent-2: #68B6E5;
 	--secondary: #242424;
 	--text-light-bg: #3b4241;
@@ -28,9 +29,15 @@
     color: var(--text-light-bg);
     font-family: var(--body-font);
 }
-html, body, section.main, form > p {
-    color: var(--text-light-bg);
-    background-color: var(--bg);
+html, body {
+    color: var(--text-dark-bg);
+    font-family: var(--body-font);
+    background-image: var(--bg-img);
+}
+
+section.main, form > p  {
+    background-color: var(--accent-2);
+    color: var(--text-dark-bg);
     font-family: var(--body-font);
 }
 
@@ -91,7 +98,7 @@ a:hover {
 }
 
 #email-rendered {
-    background-color: var(--bg);
+    background-image: var(--bg-img);
     border: 1px solid var(--bg);
 }
 
@@ -134,7 +141,7 @@ section.main > div > p:first-of-type {
 
 /* Form elements */
 input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
-    background-color: var(--bg);
+    background-color: var(--accent-2);
     color: var(--text-light-bg);
     border-color: var(--primary);
 }
