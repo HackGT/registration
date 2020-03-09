@@ -1,0 +1,170 @@
+@import url("https://use.typekit.net/lrr4iqb.css");
+@import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,800,800i&display=swap");
+
+
+/* CSS variables for colors */
+:root {
+    --bg: #faefe0;
+	--primary: #4f73af;
+	--secondary-1: #bec9d9;
+	--secondary-2: #e8c4c5;
+	--accent-1: #d33e4a;
+	--accent-2: #f6c059;
+	--secondary: #242424;
+	--text-light-bg: #3b4241;
+	--text-dark-bg: white;
+	--bg-dark: #242425;
+	--title-font: sauna-swash-new, sans-serif;
+	--body-font: Raleway, sans-serif;
+    --blur: rgba(255, 255, 255, 0.6);
+}
+
+/* Set backgrounds */
+#sidebar-nav {
+    background: none;
+}
+
+#sidebar-nav {
+    color: var(--text-light-bg);
+    font-family: var(--body-font);
+}
+html, body, section.main, form > p {
+    color: var(--text-light-bg);
+    background-color: var(--bg);
+    font-family: var(--body-font);
+}
+
+#sidebar > #site-title {
+    font-size: 40px;
+    line-height: 75px;
+    font-family: var(--title-font);
+}
+#sidebar > #site-user {
+    font-size: 15px;
+}
+#title {
+    font-size: 40px;
+}
+#sidebar > h1 {
+    margin-bottom: -10px;
+}
+#mainRow {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+#sidebar-nav > a, #sidebar, .editor-toolbar > a {
+    color: var(--text-light-bg);
+    font-family: var(--body-font);
+    font-size: 15px;
+    line-height: 30px;
+    text-decoration: initial;
+    border: none;
+}
+#status {
+    font-size: 2.25rem;
+}
+.editor-toolbar > a {
+    color: var(--text-light-bg) !important;
+}
+
+.editor-toolbar button.active, .editor-toolbar button:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
+    color: var(--text-light-bg);
+}
+#sidebar-nav > span.divider, section.main, table thead {
+    border-color: var(--text-light-bg);
+}
+a {
+    color: var(--text-light-bg);
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
+}
+
+#email-rendered {
+    background-color: var(--bg);
+    border: 1px solid var(--bg);
+}
+
+ul.timeline h4 {
+    font-family: var(--body-font);
+}
+
+/* Buttons */
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: var(--primary);
+    box-shadow: 0px 5px var(--secondary-1);
+    border-radius: 50px;
+    padding: 12px 20px 12px 20px;
+    font-weight: bold;
+}
+.editor-toolbar > button {
+    background-color: var(--primary);
+    color: var(--text-dark-bg);
+}
+
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--title-font);
+}
+
+code {
+    color: var(--accent-1);
+}
+
+ul {
+    padding-left: 0;
+}
+
+section.main > div > p:first-of-type {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
+    background-color: var(--bg);
+    color: var(--text-light-bg);
+    border-color: var(--primary);
+}
+input, label {
+    font-variant-ligatures: none;
+    font-family: var(--body-font);
+}
+label {
+    font-weight: bold;
+    font-style: italic;
+}
+fieldset > div > label {
+    font-weight: normal;
+    font-style: normal;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: var(--bg-dark);
+}
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, var(--bg), var(--bg) 10px, var(--secondary-1) 10px, var(--secondary-1) 20px );
+    color: var(--text-light-bg) !important;
+    display: none !important;
+}
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--text-light-bg);
+}
+::placeholder {
+    color: var(--text-light-bg);
+}
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled) {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
