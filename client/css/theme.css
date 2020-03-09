@@ -21,6 +21,14 @@ html::before {
     height: 100%;
     width: 100%;
     z-index: -1;
+    background: url(/css/registration.png);
+    background-color: var(--bg-color);
+    background-repeat: no-repeat;
+    background-size: cover;
+    will-change: transform;
+    filter: blur(12px);
+    -webkit-filter: blur(12px);
+    
 }
 #sidebar-nav {
     background: none;
@@ -187,6 +195,18 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 }
 
 @media only screen and (min-width: 1600px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-color: var(--bg-color);
+        background-repeat: no-repeat;
+        background-size: cover;
+        will-change: transform;
+        filter: blur(12px);
+        -webkit-filter: blur(12px);
+    }
+}
+
+@media only screen and (max-width: 350px) {
     html::before {
         background: url(/css/registration.png);
         background-color: var(--bg-color);
