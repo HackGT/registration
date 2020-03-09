@@ -4,18 +4,18 @@
 
 /* CSS variables for colors */
 :root {
-    --bg: #faefe0;
+    --bg: "registration.png";
 	--primary: #4f73af;
 	--secondary-1: #bec9d9;
-	--secondary-2: #e8c4c5;
-	--accent-1: #d33e4a;
-	--accent-2: #f6c059;
+	--secondary-2: #66C5C2;
+	--accent-1: #A562A6;
+	--accent-2: #68B6E5;
 	--secondary: #242424;
 	--text-light-bg: #3b4241;
 	--text-dark-bg: white;
-	--bg-dark: #242425;
-	--title-font: sauna-swash-new, sans-serif;
-	--body-font: Raleway, sans-serif;
+	--bg-dark: #27285E;
+	--title-font: droid-sans, sans-serif;
+	--body-font: Roboto, sans-serif;
     --blur: rgba(255, 255, 255, 0.6);
 }
 
