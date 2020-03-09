@@ -1,94 +1,144 @@
-@import url("https://use.typekit.net/lrr4iqb.css");
-@import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,800,800i&display=swap");
-
-
+/* latin-ext */
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Ubuntu Regular'), local('Ubuntu-Regular'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKcQ72nU6AF7xm.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Ubuntu Regular'), local('Ubuntu-Regular'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKfw72nU6AFw.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  /* latin-ext */
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Ubuntu Regular'), local('Ubuntu-Regular'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKcQ72nU6AF7xm.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Ubuntu Regular'), local('Ubuntu-Regular'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCs6KVjbNBYlgoKfw72nU6AFw.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  /* latin-ext */
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCv6KVjbNBYlgoCxCvjvmyNPYZvg7UI.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCv6KVjbNBYlgoCxCvjsGyNPYZvgw.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  /* latin-ext */
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCv6KVjbNBYlgoCxCvjvmyNPYZvg7UI.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(https://fonts.gstatic.com/s/ubuntu/v14/4iCv6KVjbNBYlgoCxCvjsGyNPYZvgw.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  
 /* CSS variables for colors */
 :root {
-    --bg-img: url(/css/registration.png);
-    --bg: #27285E;
-	--primary: #A562A6;
-	--secondary-1: #bec9d9;
-	--secondary-2: #66C5C2;
-	--accent-1: #DB3626;
-	--accent-2: #68B6E5;
-	--secondary: #242424;
-	--text-light-bg: #3b4241;
-	--text-dark-bg: white;
-	--bg-dark: #27285E;
-	--title-font: droid-sans, sans-serif;
-	--body-font: Roboto, sans-serif;
+    --bg-color: #10112E;
+    --input-color:#e6e6e6 ;
+    --text-color: #e6e6e6;
+    --dark-blue: #27285E;
+    --light-blue: #68B6E5;
     --blur: rgba(255, 255, 255, 0.6);
 }
 
 /* Set backgrounds */
+html::before {
+    /* background-color: var(--bg-color); */
+    /* opacity: 0.8; */
+
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
 #sidebar-nav {
     background: none;
 }
+/* section.main {
+    background-color: var(--blur);
+} */
 
-#sidebar-nav {
-    color: var(--text-light-bg);
-    font-family: var(--body-font);
-}
-html, body {
-    color: var(--text-dark-bg);
-    font-family: var(--body-font);
-    background-image: var(--bg-img);
+html, body, #sidebar-nav, section.main {
+    color: var(--text-color);
+    font-family: "Ubuntu", sans-serif;
 }
 
-section.main, form > p  {
-    background-color: var(--accent-2);
-    color: var(--text-dark-bg);
-    font-family: var(--body-font);
-}
+/* Hide text and use image instead in the header */
+/* #sidebar > h1, .container > h1:first-child {
+    display: block;
+    background-image: url("https://build.hack.gt/assets/logo.svg");
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
+    height: 75px;
 
-#sidebar > #site-title {
-    font-size: 40px;
-    line-height: 75px;
-    font-family: var(--title-font);
-}
-#sidebar > #site-user {
-    font-size: 15px;
-}
-#title {
-    font-size: 40px;
-}
+    color: rgba(0, 0, 0, 0);
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+} */
 #sidebar > h1 {
     margin-bottom: -10px;
 }
-#mainRow {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
 
 #sidebar-nav > a, #sidebar, .editor-toolbar > a {
-    color: var(--text-light-bg);
-    font-family: var(--body-font);
-    font-size: 15px;
-    line-height: 30px;
-    text-decoration: initial;
+    color: var(--text-color);
     border: none;
-}
-#status {
-    font-size: 2.25rem;
+    text-decoration: initial;
+    font-family: "Ubuntu";
+    font-weight: 800;
+    font-style: italic;
 }
 .editor-toolbar > a {
-    color: var(--text-light-bg) !important;
+    color: var(--text-color) !important;
 }
 
-.editor-toolbar button.active, .editor-toolbar button:hover {
+.editor-toolbar a.active, .editor-toolbar a:hover {
     border-color: #4C5D67;
     background-color: rgba(196, 251, 245, 0.2);
     outline: none;
-    color: var(--text-light-bg);
 }
 #sidebar-nav > span.divider, section.main, table thead {
-    border-color: var(--text-light-bg);
+    border-color: var(--light-blue);
 }
 a {
-    color: var(--text-light-bg);
+    color: var(--text-color);
     text-decoration: none;
     border-bottom: 1px dotted;
     cursor: pointer;
@@ -98,36 +148,29 @@ a:hover {
 }
 
 #email-rendered {
-    background-image: var(--bg-img);
-    border: 1px solid var(--bg);
-}
-
-ul.timeline h4 {
-    font-family: var(--body-font);
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
 }
 
 /* Buttons */
 .btn, [type=submit], button, .accepted-btn-false {
-    background-color: var(--primary);
-    box-shadow: 0px 5px var(--secondary-1);
-    border-radius: 50px;
-    padding: 12px 20px 12px 20px;
-    font-weight: bold;
+    background-color: var(--dark-blue);
 }
 .editor-toolbar > button {
-    background-color: var(--primary);
-    color: var(--text-dark-bg);
+    color: var(--light-blue);
 }
 
 fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--title-font);
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 800;
+    font-style: italic;
 }
 
 code {
-    color: var(--accent-1);
+    color: var(--text-color);
 }
 
 ul {
@@ -140,38 +183,76 @@ section.main > div > p:first-of-type {
 }
 
 /* Form elements */
-input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]), select, fieldset, textarea {
-    background-color: var(--accent-2);
-    color: var(--text-light-bg);
-    border-color: var(--primary);
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):not([type=text]):not([type=email]):not([type=password]):not([type=tel]):not([type=date]), select, fieldset {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--light-blue);
 }
 input, label {
     font-variant-ligatures: none;
-    font-family: var(--body-font);
+    font-family: "Ubuntu";
 }
 label {
     font-weight: bold;
-    font-style: italic;
 }
 fieldset > div > label {
     font-weight: normal;
-    font-style: normal;
 }
 input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
-    border-color: var(--bg-dark);
+    border-color: var(--dark-blue);
 }
 input:disabled, textarea:disabled {
-    background: repeating-linear-gradient(45deg, var(--bg), var(--bg) 10px, var(--secondary-1) 10px, var(--secondary-1) 20px );
-    color: var(--text-light-bg) !important;
-    display: none !important;
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
+    color: var(--bg-color) !important;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color: var(--text-light-bg);
+    color: var(--bg-color);
 }
 ::placeholder {
-    color: var(--text-light-bg);
+    color: var(--bg-color);
 }
-input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled) {
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
     background: var(--text-color);
     color: var(--bg-color);
+}
+
+@media only screen and (max-width: 1000px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-color: var(--bg-color);
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 1000px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-color: var(--bg-color);
+        background-repeat: no-repeat;
+        background-size: cover;
+        will-change: transform;
+    }
+} 
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1350px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-color: var(--bg-color);
+        background-repeat: no-repeat;
+        background-size: cover;
+        will-change: transform;
+    }
+}
+
+@media only screen and (min-width: 1600px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-color: var(--bg-color);
+        background-repeat: no-repeat;
+        background-size: cover;
+        will-change: transform;
+    }
 }
