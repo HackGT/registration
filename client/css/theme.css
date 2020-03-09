@@ -4,7 +4,7 @@
 
 /* CSS variables for colors */
 :root {
-    --bg: "registration.png";
+    --bg: url(/css/registration.png);
 	--primary: #4f73af;
 	--secondary-1: #bec9d9;
 	--secondary-2: #66C5C2;
