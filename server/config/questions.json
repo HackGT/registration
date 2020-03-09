@@ -53,9 +53,9 @@
             },
             {
                 "name": "job",
-                "label": "Do you have a job?",
+                "label": "If you are graduating in Spring or Fall 2020, are you already committed to a full time job?",
                 "type": "radio",
-                "options": ["Yes", "No"],
+                "options": ["Yes", "No", "Not Graduating"],
                 "required": true
             },
             {
@@ -181,14 +181,14 @@
             {
                 "name": "biggest-issue",
                 "type": "textarea",
-                "label": "What do you think the biggest issue facing healthcare is right now?  Please answer in 150 words or less.",
+                "label": "What area of healthcare are you most interested in learning more about?",
                 "required": true,
                 "maxWordCount": 150
             },
             {
                 "name": "impactful-org",
                 "type": "textarea",
-                "label": "Talk about an organization that you think is making a positive impact in the healthcare industry.  Please answer in 150 words or less.",
+                "label": "Talk about an organization that you think is making a positive impact in the healthcare industry.",
                 "required": true,
                 "maxWordCount": 150
             },
@@ -268,13 +268,6 @@
                 "name": "gradterm",
                 "label": "When do you plan on graduating?",
                 "type": "text",
-                "required": true
-            },
-            {
-                "name": "job",
-                "label": "Do you have a job?",
-                "type": "radio",
-                "options": ["Yes", "No"],
                 "required": true
             },
             {
@@ -391,12 +384,6 @@
                 "hasOther": true,
                 "required": false
             }, 
-            {
-                "name": "resume",
-                "label": "Please upload your resume or a skill sheet",
-                "type": "file",
-                "required": true
-            },
             {
                 "name": "why-mentor",
                 "type": "textarea",
@@ -678,5 +665,47 @@
                 "required": false
             }
         ]
-    }
+    },
+    {
+        "name": "Participant Confirmation",
+        "text": [
+              {
+                  "for": "parking",
+                  "type": "p",
+                  "content": "Thank your confirming your attendance to HealthTech 2020!"
+              }
+          ],
+          "questions": [
+              {
+                  "name": "parking",
+                  "type": "radio",
+                  "label": "Will you need parking validation for the event?",
+                  "options": [
+                      "Yes",
+                      "No"
+                  ],
+                  "required": true
+              }
+          ]
+      },
+      {
+        "name": "Mentor Confirmation",
+        "text": [],
+        "questions": []
+      },
+      {
+        "name": "Volunteer Confirmation",
+        "text": [],
+        "questions": []
+      },
+      {
+        "name": "Denied Admission / Mentor",
+        "questions":[],
+        "text": []
+      },
+      {
+        "name": "Denied Admission / Volunteer",
+        "questions":[],
+        "text": []
+      }
 ]
