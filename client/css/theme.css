@@ -1,4 +1,14 @@
 
+@font-face {
+    font-family: Bavro;
+    src: url("Bavro-Regular.ttf");
+}
+
+@font-face {
+    font-family: Quicksand;
+    src: url("Quicksand-VariableFont_wght.ttf");
+}
+
 /* CSS variables for colors */
 :root {
     --bg-color: #10112E;
@@ -22,12 +32,8 @@ html::before {
     width: 100%;
     z-index: -1;
     background: url(/css/registration.png);
-    background-color: var(--bg-color);
     background-repeat: no-repeat;
     background-size: cover;
-    will-change: transform;
-    filter: blur(12px);
-    -webkit-filter: blur(12px);
     
 }
 #sidebar-nav {
@@ -65,7 +71,7 @@ html, body, #sidebar-nav, section.main {
     color: var(--text-color);
     border: none;
     text-decoration: initial;
-    font-family: "Roboto";
+    font-family: "Quicksand";
     font-weight: 800;
 }
 .editor-toolbar > a {
@@ -107,7 +113,7 @@ fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Roboto", sans-serif;
+    font-family: "Bavro", sans-serif;
     font-weight: 800;
 }
 
@@ -132,7 +138,7 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
 }
 input, label {
     font-variant-ligatures: none;
-    font-family: "Roboto";
+    font-family: "Quicksand";
 }
 label {
     font-weight: bold;
