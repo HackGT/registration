@@ -10,12 +10,6 @@
         ],
         "questions": [
             {
-                "name": "name",
-                "label": "Name",
-                "type": "text",
-                "required": true
-            },
-            {
                 "name": "18-and-gt-student",
                 "label": "Are you over 18 or a student at Georgia Tech?",
                 "type": "radio",
@@ -375,6 +369,7 @@
                 "label": "What time zone will you be located in during HackGT(Oct 16th-18th)?",
                 "type": "select",
                 "options": [
+                    "Eastern Daylight Time",
                     "Greenwich Mean Time",
                     "Universal Coordinated Time",
                     "European Central Time",
@@ -400,7 +395,6 @@
                     "Phoenix Daylight Time",
                     "Mountain Daylight Time",
                     "Central Daylight Time",
-                    "Eastern Daylight Time",
                     "Indiana Eastern Daylight Time",
                     "Puerto Rico and US Virgin Islands Time",
                     "Canada Newfoundland Time",
@@ -459,7 +453,8 @@
                 "type": "checkbox",
                 "options": [
                     "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
-                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ANN4waxYj2jl3PxHpONcJr250a2Ektvq/view)"
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
+                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)"
                 ],
                 "required": true,
                 "hasOther": false
@@ -482,12 +477,6 @@
             }
         ],
         "questions": [
-            {
-                "name": "name",
-                "label": "Name",
-                "type": "text",
-                "required": true
-            },
             {
                 "name": "18-and-gt-student",
                 "label": "Are you over 18 or a student at Georgia Tech?",
@@ -848,6 +837,7 @@
                 "label": "What time zone will you be located in during HackGT(Oct 16th-18th)?",
                 "type": "select",
                 "options": [
+                    "Eastern Daylight Time",
                     "Greenwich Mean Time",
                     "Universal Coordinated Time",
                     "European Central Time",
@@ -873,7 +863,6 @@
                     "Phoenix Daylight Time",
                     "Mountain Daylight Time",
                     "Central Daylight Time",
-                    "Eastern Daylight Time",
                     "Indiana Eastern Daylight Time",
                     "Puerto Rico and US Virgin Islands Time",
                     "Canada Newfoundland Time",
@@ -925,7 +914,8 @@
                 "type": "checkbox",
                 "options": [
                     "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
-                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ANN4waxYj2jl3PxHpONcJr250a2Ektvq/view)"
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
+                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)"
                 ],
                 "required": true,
                 "hasOther": false
