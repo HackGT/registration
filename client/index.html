@@ -118,7 +118,7 @@
 							{{/if}}
 						{{/if}}
 					{{else if user.applied}}
-						<p>You've registered and are all set for now!</p>
+						<p>You've applied and are all set for now!</p>
 						<p>Application type: <b>{{user.applicationBranch}}</b></p>
 						{{#if applicationStatus.areOpen}}
 							<p>Feel free to edit your application at any time. However, once registration closes on {{applicationClose}}, you will not be able to edit it any further.</p>
@@ -128,18 +128,18 @@
 						{{/if}}
 					{{else}}
 						{{#if applicationStatus.areOpen}}
-							<p>You still need to register!</p>
+							<p>You still need to apply!</p>
 							{{#ifCond allApplicationTimes.length 1}}
-								<p>If you do not register before {{applicationClose}}, you won't be able to attend {{siteTitle}}!</p>
+								<p>If you do not apply before {{applicationClose}}, you won't be able to attend {{siteTitle}}!</p>
 							{{else}}
-								<p>If you do not register before the following times, you won't be able to attend {{siteTitle}}:</p>
+								<p>If you do not apply before the following times, you won't be able to attend {{siteTitle}}:</p>
 								<ul>
 									{{#each allApplicationTimes}}
 										<li><strong>{{this.name}}</strong>: {{this.close}}</li>
 									{{/each}}
 								</ul>
 							{{/ifCond}}
-							<a class="btn" href="/apply">Register now!</a>
+							<a class="btn" href="/apply">Apply now!</a>
 						{{else}}
 							{{#if applicationStatus.beforeOpen}}
 								{{#ifCond allApplicationTimes.length 1}}
