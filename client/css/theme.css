@@ -169,7 +169,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
     color: var(--text-color);
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (min-width: 1000px) {
     html::before {
         background: url(/css/registration.png);
         background-repeat: no-repeat;
@@ -177,13 +177,6 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
         
     }
 }
-
-@media only screen and (max-width: 1000px) {
-    html::before {
-        background-color: #BD4F6C;
-        background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
-    }
-} 
 
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1350px) {
@@ -195,7 +188,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
     }
 }
 
-@media only screen and (min-width: 1600px) {
+@media only screen and (max-width: 900px) {
     html::before {
         background-color: #BD4F6C;
         background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);

@@ -280,7 +280,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7?",
+                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -1010,7 +1010,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7?",
+                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -1744,7 +1744,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7?",
+                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
