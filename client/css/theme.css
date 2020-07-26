@@ -149,8 +149,8 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     border-color: var(--dark-blue);
 }
 input:disabled, textarea:disabled {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--bg-color) !important;
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, rgba(255, 255, 255, 0.35) 10px, rgba(255, 255, 255, 0.35) 20px );
+    color: white !important;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color: var(--bg-color);
@@ -194,6 +194,13 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
     html::before {
         background-color: #BD4F6C;
         background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
+    }
+}
+
+@media only screen and (max-width: 650px) {
+    html::before {
+        background-color: #BD4F6C;
+        background-image: linear-gradient(#D7816A 0%, #BD4F6C 74%);
     }
 }
 
