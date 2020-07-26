@@ -722,16 +722,6 @@
                 "hasOther": false
             },
             {
-                "name": "gdpr",
-                "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
-                "type": "checkbox",
-                "options": [
-                    "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
-                ],
-                "required": false,
-                "hasOther": false
-            },
-            {
                 "name": "other",
                 "label": "Anything else you'd like us to know?",
                 "type": "textarea",
