@@ -149,7 +149,7 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     border-color: var(--dark-blue);
 }
 input:disabled, textarea:disabled {
-    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
+    background: rgba(255, 255, 255, 0.15);
     color: var(--bg-color) !important;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -192,9 +192,8 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 
 @media only screen and (min-width: 1600px) {
     html::before {
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
+        background-color: #BD4F6C;
+        background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
     }
 }
 
