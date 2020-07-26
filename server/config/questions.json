@@ -546,7 +546,7 @@
                     "3rd year",
                     "4th year",
                     "5th year+",
-                    "Masters",
+                    "Master's",
                     "PhD"
                 ],
                 "hasOther": true,
@@ -1269,7 +1269,7 @@
             {
                 "name": "year",
                 "label": "What is your year in school?",
-                "type": "radio",
+                "type": "select",
                 "options": [
                     "1st year",
                     "2nd year",
@@ -1408,6 +1408,12 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "resume",
+                "label": "Please upload your resume or a skill sheet",
+                "type": "file",
                 "required": true
             },
             {
@@ -2089,7 +2095,7 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": false
             },
             {
                 "name": "attended-hackgt-participant",

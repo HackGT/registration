@@ -135,6 +135,11 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     color: var(--text-color);
     border-color: var(--light-blue);
 }
+
+option {
+    color: black;
+}
+
 input, label {
     font-variant-ligatures: none;
     font-family: "Quicksand";
