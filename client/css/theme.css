@@ -188,7 +188,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
     }
 }
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1000px) {
     html::before {
         background-color: #BD4F6C;
         background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
