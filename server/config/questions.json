@@ -712,7 +712,7 @@
                 "label": "Please confirm the following:",
                 "type": "checkbox",
                 "options": [
-                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
                     "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)",
                     "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
@@ -1445,7 +1445,7 @@
                 "label": "Please confirm the following:",
                 "type": "checkbox",
                 "options": [
-                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
                     "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)",
                     "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
