@@ -6,6 +6,11 @@
                 "for": "18-and-gt-student",
                 "type": "p",
                 "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+            },
+            {
+                "for": "gdpr",
+                "type": "h4",
+                "content": "Authorization to Share Data with Sponsors"
             }
         ],
         "questions": [
@@ -714,9 +719,21 @@
                 "options": [
                     "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
-                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)"
+                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)",
+                    "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
+                    "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails."
                 ],
                 "required": true,
+                "hasOther": false
+            },
+            {
+                "name": "gdpr",
+                "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+                "type": "checkbox",
+                "options": [
+                    "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+                ],
+                "required": false,
                 "hasOther": false
             },
             {
@@ -734,6 +751,11 @@
                 "for": "18-and-gt-student",
                 "type": "p",
                 "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+            },
+            {
+                "for": "gdpr",
+                "type": "h4",
+                "content": "Authorization to Share Data with Sponsors"
             }
         ],
         "questions": [
@@ -1435,9 +1457,21 @@
                 "options": [
                     "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
-                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)"
+                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)",
+                    "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
+                    "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails."
                 ],
                 "required": true,
+                "hasOther": false
+            },
+            {
+                "name": "gdpr",
+                "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+                "type": "checkbox",
+                "options": [
+                    "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+                ],
+                "required": false,
                 "hasOther": false
             },
             {
