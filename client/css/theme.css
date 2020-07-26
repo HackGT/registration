@@ -1,22 +1,21 @@
 
 @font-face {
     font-family: Bavro;
-    src: url("Bavro-Regular.ttf");
+    src: url(/css/Bavro-Regular.ttf);
 }
 
 @font-face {
     font-family: Quicksand;
-    src: url("Quicksand-VariableFont_wght.ttf");
+    src: url(/css/Quicksand-VariableFont_wght.ttf);
 }
 
 /* CSS variables for colors */
 :root {
     --bg-color: #10112E;
-    --input-color:#e6e6e6 ;
+    --input-color:rgba(255, 255, 255, 0.1);
     --text-color: #e6e6e6;
-    --dark-blue: #27285E;
-    --light-blue: #68B6E5;
-    --blur: rgba(255, 255, 255, 0.6);
+    --dark-blue: rgba(255, 255, 255, 0.3);
+    --light-blue: #658AAE;
 }
 
 /* Set backgrounds */
@@ -45,7 +44,7 @@ html::before {
 
 html, body, #sidebar-nav, section.main {
     color: var(--text-color);
-    font-family: "Roboto", sans-serif;
+    font-family: "Quicksand";
 }
 
 /* Hide text and use image instead in the header */
@@ -113,7 +112,7 @@ fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Bavro", sans-serif;
+    font-family: "Bavro";
     font-weight: 800;
 }
 
@@ -167,7 +166,6 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 @media only screen and (max-width: 1000px) {
     html::before {
         background: url(/css/registration.png);
-        background-color: var(--bg-color);
         background-repeat: no-repeat;
         background-size: cover;
         
@@ -177,13 +175,10 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 1000px) {
     html::before {
-        background: url(/css/registration.png);
-        background-color: var(--bg-color);
+        background: url(/css/mobile.png);
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
     }
 } 
 
@@ -191,35 +186,25 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 @media only screen and (min-width: 1350px) {
     html::before {
         background: url(/css/registration.png);
-        background-color: var(--bg-color);
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
     }
 }
 
 @media only screen and (min-width: 1600px) {
     html::before {
-        background: url(/css/registration.png);
-        background-color: var(--bg-color);
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
     }
 }
 
 @media only screen and (max-width: 350px) {
     html::before {
-        background: url(/css/registration.png);
-        background-color: var(--bg-color);
+        background: url(/css/mobile.png);
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
     }
 }
