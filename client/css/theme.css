@@ -11,7 +11,7 @@
 
 /* CSS variables for colors */
 :root {
-    --bg-color: #10112E;
+    --bg-color: rgba(255, 255, 255, 0.1);
     --input-color:rgba(255, 255, 255, 0.1);
     --text-color: #e6e6e6;
     --dark-blue: rgba(255, 255, 255, 0.3);
@@ -159,8 +159,8 @@ input:disabled, textarea:disabled {
     color: var(--bg-color);
 }
 input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
-    background: var(--text-color);
-    color: var(--bg-color);
+    background: rgba(255, 255, 255, 0.1);
+    color: black;
 }
 
 @media only screen and (max-width: 1000px) {
@@ -175,10 +175,8 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 1000px) {
     html::before {
-        background: url(/css/mobile.png);
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
+        background-color: #BD4F6C;
+        background-image: linear-gradient(326deg, #BD4F6C 0%, #D7816A 74%);
     }
 } 
 
@@ -202,9 +200,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 
 @media only screen and (max-width: 350px) {
     html::before {
-        background: url(/css/mobile.png);
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
+        background-color: #BD4F6C;
+        background-image: linear-gradient(326deg, #BD4F6C 0%, #D7816A 74%);
     }
 }
