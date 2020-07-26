@@ -6,11 +6,6 @@
                 "for": "18-and-gt-student",
                 "type": "p",
                 "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
-            },
-            {
-                "for": "gdpr",
-                "type": "h4",
-                "content": "Authorization to Share Data with Sponsors"
             }
         ],
         "questions": [
@@ -751,11 +746,6 @@
                 "for": "18-and-gt-student",
                 "type": "p",
                 "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
-            },
-            {
-                "for": "gdpr",
-                "type": "h4",
-                "content": "Authorization to Share Data with Sponsors"
             }
         ],
         "questions": [
@@ -1462,16 +1452,6 @@
                     "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails."
                 ],
                 "required": true,
-                "hasOther": false
-            },
-            {
-                "name": "gdpr",
-                "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
-                "type": "checkbox",
-                "options": [
-                    "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
-                ],
-                "required": false,
                 "hasOther": false
             },
             {
@@ -2231,14 +2211,29 @@
     {
         "name": "Emerging Participant Confirmation",
         "text": [
-              {
-                  "for": "additional-info",
-                  "type": "p",
-                  "content": "Thank your confirming your attendance to HackGT 7!"
-              }
+                {
+                    "for": "additional-info",
+                    "type": "p",
+                    "content": "Thank your confirming your attendance to HackGT 7!"
+                },
+                {
+                    "for": "gdpr",
+                    "type": "h4",
+                    "content": "Authorization to Share Data with Sponsors"
+                }
           ],
           "questions": [
-              {
+                {
+                    "name": "gdpr",
+                    "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+                    "type": "checkbox",
+                    "options": [
+                        "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+                    ],
+                    "required": false,
+                    "hasOther": false
+                },
+                {
                   "name": "additional-info",
                   "type": "textarea",
                   "label": "Is there anything you'd like us to know?",
@@ -2249,19 +2244,34 @@
       {
         "name": "General Participant Confirmation",
         "text": [
-              {
-                  "for": "additional-info",
-                  "type": "p",
-                  "content": "Thank your confirming your attendance to HackGT 7!"
-              }
+                {
+                    "for": "additional-info",
+                    "type": "p",
+                    "content": "Thank your confirming your attendance to HackGT 7!"
+                },
+                {
+                    "for": "gdpr",
+                    "type": "h4",
+                    "content": "Authorization to Share Data with Sponsors"
+                }
           ],
           "questions": [
-              {
-                  "name": "additional-info",
-                  "type": "textarea",
-                  "label": "Is there anything you'd like us to know?",
-                  "required": false
-              }
+                {
+                    "name": "gdpr",
+                    "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+                    "type": "checkbox",
+                    "options": [
+                        "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+                    ],
+                    "required": false,
+                    "hasOther": false
+                },  
+                {
+                    "name": "additional-info",
+                    "type": "textarea",
+                    "label": "Is there anything you'd like us to know?",
+                    "required": false
+                }
           ]
       },
       {
