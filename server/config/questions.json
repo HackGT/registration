@@ -678,7 +678,7 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": false
             },
             {
                 "name": "resume",
