@@ -18,11 +18,17 @@ p {
     flex-wrap: wrap;
 	justify-content: space-around;
 	margin-right: 20px;
+	max-width: 40%;
+    min-width: 25%;
 
 }
 
 @media only screen and (max-width: 768px) {
     .selection {
         display: block;
-    }
+	}
+	
+	#box {
+		max-width: 100%;
+	}
 }
