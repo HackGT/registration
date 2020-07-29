@@ -1,12 +1,21 @@
 
+@font-face {
+    font-family: Bavro;
+    src: url(/css/Bavro-Regular.ttf);
+}
+
+@font-face {
+    font-family: Quicksand;
+    src: url(/css/Quicksand-VariableFont_wght.ttf);
+}
+
 /* CSS variables for colors */
 :root {
-    --bg-color: #10112E;
-    --input-color:#e6e6e6 ;
+    --bg-color: rgba(255, 255, 255, 0.1);
+    --input-color:rgba(255, 255, 255, 0.1);
     --text-color: #e6e6e6;
-    --dark-blue: #27285E;
-    --light-blue: #68B6E5;
-    --blur: rgba(255, 255, 255, 0.6);
+    --dark-blue: rgba(255, 255, 255, 0.3);
+    --light-blue: white;
 }
 
 /* Set backgrounds */
@@ -22,12 +31,8 @@ html::before {
     width: 100%;
     z-index: -1;
     background: url(/css/registration.png);
-    background-color: var(--bg-color);
     background-repeat: no-repeat;
     background-size: cover;
-    will-change: transform;
-    filter: blur(12px);
-    -webkit-filter: blur(12px);
     
 }
 #sidebar-nav {
@@ -39,7 +44,7 @@ html::before {
 
 html, body, #sidebar-nav, section.main {
     color: var(--text-color);
-    font-family: "Roboto", sans-serif;
+    font-family: "Quicksand";
 }
 
 /* Hide text and use image instead in the header */
@@ -65,7 +70,7 @@ html, body, #sidebar-nav, section.main {
     color: var(--text-color);
     border: none;
     text-decoration: initial;
-    font-family: "Roboto";
+    font-family: "Quicksand";
     font-weight: 800;
 }
 .editor-toolbar > a {
@@ -107,7 +112,7 @@ fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Roboto", sans-serif;
+    font-family: "Bavro";
     font-weight: 800;
 }
 
@@ -130,9 +135,14 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     color: var(--text-color);
     border-color: var(--light-blue);
 }
+
+option {
+    color: black;
+}
+
 input, label {
     font-variant-ligatures: none;
-    font-family: "Roboto";
+    font-family: "Quicksand";
 }
 label {
     font-weight: bold;
@@ -144,8 +154,9 @@ input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]
     border-color: var(--dark-blue);
 }
 input:disabled, textarea:disabled {
-    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, var(--light-blue) 10px, var(--light-blue) 20px );
-    color: var(--bg-color) !important;
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, rgba(255, 255, 255, 0.35) 10px, rgba(255, 255, 255, 0.35) 20px );
+    color: white !important;
+    font-weight: 700;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color: var(--bg-color);
@@ -154,66 +165,32 @@ input:disabled, textarea:disabled {
     color: var(--bg-color);
 }
 input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
-    background: var(--text-color);
-    color: var(--bg-color);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (min-width: 1000px) {
     html::before {
         background: url(/css/registration.png);
-        background-color: var(--bg-color);
         background-repeat: no-repeat;
         background-size: cover;
         
     }
 }
 
-/* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 1000px) {
-    html::before {
-        background: url(/css/registration.png);
-        background-color: var(--bg-color);
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
-    }
-} 
-
 /* Extra large devices (large laptops and desktops, 1200px and up) */
-@media only screen and (min-width: 1350px) {
+@media only screen and (min-width: 1400px) {
     html::before {
         background: url(/css/registration.png);
-        background-color: var(--bg-color);
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
     }
 }
 
-@media only screen and (min-width: 1600px) {
+@media only screen and (max-width: 1400px) {
     html::before {
-        background: url(/css/registration.png);
-        background-color: var(--bg-color);
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
-    }
-}
-
-@media only screen and (max-width: 350px) {
-    html::before {
-        background: url(/css/registration.png);
-        background-color: var(--bg-color);
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
-        filter: blur(12px);
-        -webkit-filter: blur(12px);
+        background-color: #BD4F6C;
+        background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
     }
 }
