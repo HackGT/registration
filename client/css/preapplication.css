@@ -16,6 +16,12 @@ p {
     align-content: center;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+	justify-content: space-around;
 
+}
+
+@media only screen and (max-width: 768px) {
+    .selection {
+        display: block;
+    }
 }
