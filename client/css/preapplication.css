@@ -11,7 +11,7 @@ p {
 }
 
 #box {
-	border-color: white;
+	border: white;
 	border-radius: 15px;
 	border-width: 2px;
 }
