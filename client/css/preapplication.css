@@ -3,8 +3,6 @@ p {
 }
 .selection {
 	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-around;
 }
 .selection > a {
 	min-width: 25%;
@@ -14,4 +12,10 @@ p {
 	border: white;
 	border-radius: 15px;
 	border-width: 2px;
+    align-items: center;
+    align-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
 }
