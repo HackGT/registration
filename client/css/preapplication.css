@@ -6,21 +6,24 @@ p {
 }
 .selection > a {
 	min-width: 25%;
+	flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
 }
 
 #box {
-	border: white;
-	border-radius: 15px;
-	border-width: 2px;
+	border: white solid;
+    border-radius: 15px;
+    border-width: 2px;
     align-items: center;
     align-content: center;
     display: flex;
     flex-wrap: wrap;
-	justify-content: space-around;
-	margin-right: 20px;
-	max-width: 40%;
+    justify-content: space-around;
+    margin: 20px;
+    max-width: 40%;
     min-width: 25%;
-
+    padding: 5px 10px 15px 10px;
 }
 
 @media only screen and (max-width: 768px) {
