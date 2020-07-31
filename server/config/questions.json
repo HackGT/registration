@@ -1460,6 +1460,18 @@
     },
     {
         "name": "Mentor",
+        "text": [
+            {
+                "for": "18-and-gt-student",
+                "type": "p",
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+            },
+            {
+                "for": "help-hackers",
+                "type": "p",
+                "content": "Select which prompt you would like to answer, and provide your response in the text box below."
+            }
+        ],
         "questions": [
             {
                 "name": "18-and-gt-student",
@@ -1478,15 +1490,10 @@
 				"required": true
             },
             {
-                "name": "current-job",
-                "label": "What is your current occupation?",
-                "type": "text",
-                "required": true
-            },
-            {
-                "name": "affiliation",
-                "label": "Affiliation (e.g. college/university, company)",
-                "type": "text",
+                "name": "is-student",
+                "label": "Are you a student?",
+                "type": "radio",
+                "options": ["Yes", "No"],
                 "required": true
             },
             {
@@ -1738,6 +1745,145 @@
 					"Wright State University",
 					"Yale University",
 					"Yeshiva University"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "year",
+                "label": "If you are a student, what is your year in school?",
+                "type": "select",
+                "options": [
+                    "1st",
+                    "2nd",
+                    "3rd",
+                    "4th",
+                    "5th",
+                    "Master's",
+                    "PhD"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "major",
+                "label": "If you are a student, what is your major?",
+                "type": "select",
+                "options": [
+                    "Aerospace Engineering",
+                    "Applied Language and Intercultural Studies",
+                    "Applied Physics",
+                    "Architecture",
+                    "Biochemistry",
+                    "Biology",
+                    "Biomedical Engineering",
+                    "Business Administration",
+                    "Chemical and Biomolecular Engineering",
+                    "Chemistry",
+                    "Civil Engineering",
+                    "Computer Engineering",
+                    "Computational Media",
+                    "Computer Science",
+                    "Earth and Atmospheric Sciences",
+                    "Economics",
+                    "Economics and International Affairs",
+                    "Electrical Engineering",
+                    "Environmental Engineering",
+                    "Global Economics and Modern Languages",
+                    "History, Technology, and Society",
+                    "Industrial Design",
+                    "Industrial Engineering",
+                    "International Affairs",
+                    "International Affairs and Modern Language",
+                    "Literature, Media, and Communication",
+                    "Literature, Media, and Communication & Digital Media",
+                    "Materials Science and Engineering",
+                    "Mathematics",
+                    "Mechanical Engineering",
+                    "Music Technology",
+                    "Neuroscience",
+                    "Nuclear and Radiological Engineering",
+                    "Physics",
+                    "Psychology",
+                    "Public Policy"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "current-job",
+                "label": "If you are not a student, what is your current occupation? (eg. software engineer)",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "affiliation",
+                "label": "If you are not a student, what is your affiliation (e.g. company)",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "gender",
+                "label": "I identify as ...",
+                "type": "radio",
+                "options": ["Male", "Female", "Non-binary/third gender", "Prefer not to answer"],
+                "hasOther": true,
+                "required": true
+            },
+            {
+                "name": "race",
+                "label": "What is your race/ethnicity?",
+                "type": "checkbox",
+                "options": [
+                    "Non-Hispanic Caucasian",
+                    "Black or African American",
+                    "Latinx or Hispanic American",
+                    "South Asian or Indian American",
+                    "East Asian or Asian American",
+                    "Middle Eastern or Arab American",
+                    "Native American or Alaskan Native",
+                    "Hawaiian or Pacific Islander"
+                ],
+                "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "timezone",
+                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+                "type": "select",
+                "options": [
+                    "Eastern Daylight Time",
+                    "Greenwich Mean Time",
+                    "Universal Coordinated Time",
+                    "European Central Time",
+                    "Eastern European Time",
+                    "(Arabic) Egypt Daylight Time",
+                    "Eastern African Time",
+                    "Middle East Time",
+                    "Near East Time",
+                    "Pakistan Lahore Time",
+                    "India Daylight Time",
+                    "Bangladesh Daylight Time",
+                    "Vietnam Daylight Time",
+                    "China Taiwan Time",
+                    "Japan Daylight Time",
+                    "Australia Central Time",
+                    "Australia Eastern Time",
+                    "Solomon Daylight Time",
+                    "New Zealand Daylight Time",
+                    "Midway Islands Time",
+                    "Hawaii Daylight Time",
+                    "Alaska Daylight Time",
+                    "Pacific Daylight Time",
+                    "Phoenix Daylight Time",
+                    "Mountain Daylight Time",
+                    "Central Daylight Time",
+                    "Indiana Eastern Daylight Time",
+                    "Puerto Rico and US Virgin Islands Time",
+                    "Canada Newfoundland Time",
+                    "Argentina Daylight Time",
+                    "Brazil Eastern Time",
+                    "Central African Time"
                 ],
                 "hasOther": true,
                 "required": false
@@ -2001,72 +2147,6 @@
                 "required": true
             },
             {
-                "name": "gender",
-                "label": "I identify as ...",
-                "type": "radio",
-                "options": ["Male", "Female", "Non-binary/third gender", "Prefer not to answer"],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "race",
-                "label": "What is your race/ethnicity?",
-                "type": "checkbox",
-                "options": [
-                    "Non-Hispanic Caucasian",
-                    "Black or African American",
-                    "Latinx or Hispanic American",
-                    "South Asian or Indian American",
-                    "East Asian or Asian American",
-                    "Middle Eastern or Arab American",
-                    "Native American or Alaskan Native",
-                    "Hawaiian or Pacific Islander"
-                ],
-                "hasOther": true,
-                "required": false
-            },
-            {
-                "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
-                "type": "select",
-                "options": [
-                    "Eastern Daylight Time",
-                    "Greenwich Mean Time",
-                    "Universal Coordinated Time",
-                    "European Central Time",
-                    "Eastern European Time",
-                    "(Arabic) Egypt Daylight Time",
-                    "Eastern African Time",
-                    "Middle East Time",
-                    "Near East Time",
-                    "Pakistan Lahore Time",
-                    "India Daylight Time",
-                    "Bangladesh Daylight Time",
-                    "Vietnam Daylight Time",
-                    "China Taiwan Time",
-                    "Japan Daylight Time",
-                    "Australia Central Time",
-                    "Australia Eastern Time",
-                    "Solomon Daylight Time",
-                    "New Zealand Daylight Time",
-                    "Midway Islands Time",
-                    "Hawaii Daylight Time",
-                    "Alaska Daylight Time",
-                    "Pacific Daylight Time",
-                    "Phoenix Daylight Time",
-                    "Mountain Daylight Time",
-                    "Central Daylight Time",
-                    "Indiana Eastern Daylight Time",
-                    "Puerto Rico and US Virgin Islands Time",
-                    "Canada Newfoundland Time",
-                    "Argentina Daylight Time",
-                    "Brazil Eastern Time",
-                    "Central African Time"
-                ],
-                "hasOther": true,
-                "required": false
-            },
-            {
                 "name": "t-shirt",
                 "label": "What is your T-Shirt size?",
                 "type": "select",
@@ -2078,7 +2158,9 @@
                     "XL",
                     "2XL",
                     "3XL"
-                ]
+                ],
+                "hasOther": true,
+                "required": true
             },
             {
                 "name": "marketing",
@@ -2121,32 +2203,25 @@
             {
                 "name": "ta",
                 "label": "Have you ever worked as a tutor, teaching assistant or similar before? If so, what was your title, and how long did you have this position?",
-                "type": "textarea",
+                "type": "text",
                 "required": true
             },
             {
                 "name": "skills",
                 "label": "What skills and topics do you feel comfortable mentoring in?",
-                "type": "checkbox",
-                "options": [
-                    "JAVA",
-                    "Python",
-                    "JavaScript",
-                    "HTML/CSS",
-                    "React",
-                    "Flask",
-                    "iOS",
-                    "Android",
-                    "Raspberry Pi/Arduino"
-                ],
+                "type": "text",
                 "hasOther": true,
                 "required": true
             },
             {
                 "name": "who-mentor",
-                "label": "Who do you want to mentor?",
+                "label": "Would you like to be part of the Emerging Hacker Mentorship Program? (learn more at [2020.hack.gt/mentor.html](https://2020.hack.gt/mentor.html)",
                 "type": "radio",
-                "options": ["Emerging", "General", "Both"],
+                "options": [
+                    "Yes, I would also like to be part of the Emerging Hacker Mentorship Program",
+                    "No, I want to be an overall mentor",
+                    "I don't know yet"
+                ],
                 "required": true
             },
             {
@@ -2157,8 +2232,8 @@
                 "maxWordCount": 150
             },
             {
-                "name": "help-participants",
-                "label": "Many hackers stop hacking when they get stuck on problems they do not know how to solve. As a mentor, what is your approach to (1) guide hackers to a solution and (2) encourage them to keep hacking?",
+                "name": "help-hackers",
+                "label": "(1) Many hackers stop hacking when they get stuck on problems they do not know how to solve. As a mentor, what is your approach to (1) guide hackers to a solution and (2) encourage them to keep hacking?<br>(2) Describe a time you taught something technical to someone with no/very little experience with the topic (can be in informal setting).",
                 "type": "textarea",
                 "required": true,
                 "maxWordCount": 150
@@ -2171,27 +2246,15 @@
                 "maxWordCount": 150
             },
             {
-                "name": "availability",
-                "label": "When are you available to mentor during the event?",
-                "type": "checkbox",
-                "options": [
-                    "Early Morning",
-                    "Morning",
-                    "Afternoon",
-                    "Evening",
-                    "Night",
-                    "Late Night"
-                ],
-                "required": true
-            },
-            {
                 "name": "required-items",
                 "label": "Please confirm the following:",
                 "type": "checkbox",
                 "options": [
-                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
                     "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
-                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)"
+                    "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)",
+                    "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
+                    "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails."
                 ],
                 "required": true,
                 "hasOther": false

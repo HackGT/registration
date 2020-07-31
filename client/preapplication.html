@@ -14,11 +14,14 @@
 		{{#> sidebar}}
 			<h1 class="center">Apply</h1>
 			<p>Choose what you want to apply as:</p>
+			<strong>This year, you can participate in one of our two tracks or as a Mentor.</strong>
 			<p>
-				This year, we are introducing two tracks for participants with focused resources to target your 
-				specific those goals: <strong>the Emerging Track and the General Track</strong>.  
-				Apply to the branch that you think is most fitting for you—most people will fit into the General 
-				track.  You can also find more detailed descriptions in the Tracks section of 
+				We are introducing two tracks for participants with focused resources to target your specific 
+				those goals: the Emerging Track and the General Track. Apply to the branch that you think is most 
+				fitting for you—most people will fit into the General track.
+			</p>
+			<p>
+				You can also find more detailed descriptions of all the available options at 
 				<a href="https://2020.hack.gt">2020.hack.gt</a>.
 			</p>
 			<section class="selection">
@@ -38,6 +41,14 @@
 								General is the right place for you! The General Hacker Track is the conventional 
 								hacker experience, giving you full creative control and offering supplemental 
 								resources as necessary.
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "mentor"}}
+							<p>
+								Apply here if you want to mentor at HackGT 7! Mentors will help both emerging and general 
+								hackers, and can take part in a new program to match mentors with emerging hacker teams. 
+								Visit <a href="https://2020.hack.gt/mentor.html">2020.hack.gt/mentor.html</a> for more 
+								information about the program and eligibility.
 							</p>
 						{{/ifCond}}
 						<a href="/apply/{{slug this}}" class="btn">Apply!</a>
