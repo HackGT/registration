@@ -18,6 +18,7 @@ export let postParser = bodyParser.urlencoded({
 
 import * as multer from "multer";
 import {QuestionBranches} from "./config/questions.schema";
+import * as crypto from "crypto";
 
 export const MAX_FILE_SIZE = 50000000; // 50 MB
 export let uploadHandler = multer({
@@ -295,4 +296,44 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 		tags
 	};
 	console.log(JSON.stringify(metricsEvent));
+}
+
+export function isHelpscoutIntegrationEnabled(request: express.Request, response: express.Response, next: express.NextFunction) {
+	const enabled = config.helpscout.enabled;
+
+	if (enabled) {
+		response.status(403).json({
+			"error": "Helpscout integration functionality is currently disabled"
+		});
+		return;
+	}
+
+	next();
+}
+
+export function validateHelpscoutSignature(request: express.Request, response: express.Response, next: express.NextFunction) {
+	const secret = config.helpscout.secretKey;
+	const hsSignature = request.header('X-HelpScout-Signature');
+	console.log("hsSignature was:", hsSignature);
+	// TODO: test me
+	if (hsSignature) {
+		const hashSlingingSlasher = crypto.createHmac('sha1', secret);
+		const stringifiedBody = '{}';
+		hashSlingingSlasher.update(stringifiedBody);
+		const computedReqBodyHash = hashSlingingSlasher.digest('base64');
+		if (hsSignature === computedReqBodyHash) {
+			next();
+			return;
+		} else {
+			console.warn("Rejecting request for Helpscout integration due to incorrect signature (check that " +
+				"the secret key is correct in local config and in Helpscout app config)")
+		}
+	} else {
+		console.warn("Rejecting request for Helpscout integration - missing required X-HelpScout-Signature " +
+			"header")
+	}
+
+	response.status(400).json({
+		"error": "Request validation failed; check server logs for details"
+	});
 }

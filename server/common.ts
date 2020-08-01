@@ -61,6 +61,11 @@ class Config implements IConfig.Main {
 		favicon: path.resolve(__dirname, "../client/favicon.ico")
 	};
 
+	public helpscout: IConfig.Helpscout = {
+		enabled: false,
+		secretKey: ""
+	}
+
 	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
 
 	constructor(fileName: string = "config.json") {
@@ -128,6 +133,12 @@ class Config implements IConfig.Main {
 		}
 		if (config.style) {
 			this.style = config.style;
+		}
+		if (config.helpscout) {
+			if (config.helpscout.enabled) {
+				this.helpscout.enabled = config.helpscout.enabled;
+				this.helpscout.secretKey = config.helpscout.secretKey;
+			}
 		}
 	}
 	protected loadFromEnv(): void {
@@ -248,6 +259,13 @@ class Config implements IConfig.Main {
 		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE, 10);
+		}
+
+		if (process.env.HELPSCOUT_ENABLED && process.env.HELPSCOUT_ENABLED.toLowerCase() === "true") {
+			this.helpscout.enabled = true;
+			if (process.env.HELPSCOUT_SECRET_KEY) {
+				this.helpscout.secretKey = process.env.HELPSCOUT_SECRET_KEY;
+			}
 		}
 	}
 }

@@ -42,6 +42,11 @@ export namespace IConfig {
 		favicon: string;
 	}
 
+	export interface Helpscout {
+		enabled: boolean;
+		secretKey: string;
+	}
+
 	export interface Main {
 		secrets: Secrets;
 		email: Email;
@@ -58,6 +63,7 @@ export namespace IConfig {
 			options: any;
 		};
 		maxTeamSize: number;
+		helpscout: Helpscout;
 	}
 }
 
