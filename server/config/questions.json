@@ -2211,7 +2211,7 @@
                 "label": "What skills and topics do you feel comfortable mentoring in? Select all that apply. List additional skills or topics by selecting 'other'.",
                 "type": "checkbox",
                 "options": [
-                    "JAVA",
+                    "Java",
                     "Python",
                     "C",
                     "C++",
