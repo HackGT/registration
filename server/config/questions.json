@@ -729,7 +729,7 @@
             }
         ]
     },
-    {      
+    {
         "name": "Participant-General",
         "text": [
             {
@@ -2208,10 +2208,43 @@
             },
             {
                 "name": "skills",
-                "label": "What skills and topics do you feel comfortable mentoring in?",
-                "type": "text",
+                "label": "What skills and topics do you feel comfortable mentoring in? Select all that apply. List additional skills or topics by selecting 'other'.",
+                "type": "checkbox",
+                "options": [
+                    "JAVA",
+                    "Python",
+                    "C",
+                    "C++",
+                    "Web Development",
+                    "HTML/CSS",
+                    "Javascript",
+                    "Node.js",
+                    "React",
+                    "Angular",
+                    "PHP",
+                    "Flask",
+                    "Ruby",
+                    "Django",
+                    "App Development",
+                    "iOS"
+                    "Android"
+                    "Databases"
+                    "MongoDB",
+                    "MySQL",
+                    "Data Science",
+                    "Data Visualization",
+                    "R",
+                    "Tableau",
+                    "Machine Learning",
+                    "Computer Vision",
+                    "Game development",
+                    "Unity",
+                    "Virtual/Augmented Reality",
+                    "Cloud",
+                    "Cybersecurity",
+                ],
                 "hasOther": true,
-                "required": true
+                "required": false
             },
             {
                 "name": "who-mentor",
@@ -2324,7 +2357,7 @@
                     ],
                     "required": false,
                     "hasOther": false
-                },  
+                },
                 {
                     "name": "additional-info",
                     "type": "textarea",
