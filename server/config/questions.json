@@ -2266,7 +2266,7 @@
             },
             {
                 "name": "help-hackers",
-                "label": "(1) Many hackers stop hacking when they get stuck on problems they do not know how to solve. As a mentor, what is your approach to (1) guide hackers to a solution and (2) encourage them to keep hacking?<br>(2) Describe a time you taught something technical to someone with no/very little experience with the topic (can be in informal setting).",
+                "label": "Many hackers stop hacking when they get stuck on problems they do not know how to solve. As a mentor, what is your approach to (1) guide hackers to a solution and (2) encourage them to keep hacking?",
                 "type": "textarea",
                 "required": true,
                 "maxWordCount": 150
