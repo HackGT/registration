@@ -64,7 +64,7 @@ class Config implements IConfig.Main {
 	public helpscout: IConfig.Helpscout = {
 		enabled: false,
 		secretKey: ""
-	}
+	};
 
 	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
 

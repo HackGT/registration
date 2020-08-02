@@ -298,12 +298,13 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 	console.log(JSON.stringify(metricsEvent));
 }
 
-export function isHelpscoutIntegrationEnabled(request: express.Request, response: express.Response, next: express.NextFunction) {
+export function isHelpScoutIntegrationEnabled(request: express.Request, response: express.Response, next: express.NextFunction) {
 	const enabled = config.helpscout.enabled;
-
-	if (enabled) {
+	if (!enabled) {
+		const message = "Helpscout integration functionality is currently disabled";
+		console.error(message);
 		response.status(403).json({
-			"error": "Helpscout integration functionality is currently disabled"
+			"error": message
 		});
 		return;
 	}
@@ -311,26 +312,29 @@ export function isHelpscoutIntegrationEnabled(request: express.Request, response
 	next();
 }
 
-export function validateHelpscoutSignature(request: express.Request, response: express.Response, next: express.NextFunction) {
+export function validateHelpScoutSignature(request: express.Request, response: express.Response, next: express.NextFunction) {
 	const secret = config.helpscout.secretKey;
 	const hsSignature = request.header('X-HelpScout-Signature');
-	console.log("hsSignature was:", hsSignature);
-	// TODO: test me
 	if (hsSignature) {
-		const hashSlingingSlasher = crypto.createHmac('sha1', secret);
-		const stringifiedBody = '{}';
-		hashSlingingSlasher.update(stringifiedBody);
-		const computedReqBodyHash = hashSlingingSlasher.digest('base64');
-		if (hsSignature === computedReqBodyHash) {
+		const stringifiedBody = JSON.stringify(request.body);
+		const computedHash = crypto.createHmac('sha1', secret)
+			.update(Buffer.from(stringifiedBody))
+			.digest('base64');
+
+		console.log("hsSignature:", hsSignature);
+		console.log("computedBodyHash:", computedHash);
+
+		// Prevents timing attacks with HMAC hashes https://stackoverflow.com/a/51489494
+		if (crypto.timingSafeEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
 			next();
 			return;
 		} else {
 			console.warn("Rejecting request for Helpscout integration due to incorrect signature (check that " +
-				"the secret key is correct in local config and in Helpscout app config)")
+				"the secret key is correct in local config and in Helpscout app config)");
 		}
 	} else {
 		console.warn("Rejecting request for Helpscout integration - missing required X-HelpScout-Signature " +
-			"header")
+			"header");
 	}
 
 	response.status(400).json({

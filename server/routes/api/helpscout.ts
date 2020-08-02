@@ -1,16 +1,44 @@
 import * as express from "express";
-import {isHelpscoutIntegrationEnabled} from "../../middleware";
+import {isHelpScoutIntegrationEnabled, validateHelpScoutSignature} from "../../middleware";
+import {IUser, User} from "../../schema";
+import bodyParser = require("body-parser");
 
-export const helpscoutRoutes = express.Router({ "mergeParams": true });
+export const helpScoutRoutes = express.Router({ "mergeParams": true });
 
-helpscoutRoutes.route("/userInfo").post(
-	isHelpscoutIntegrationEnabled,
-	helpscoutUserInfoHandler
-)
+helpScoutRoutes.route("/userInfo").post(
+	isHelpScoutIntegrationEnabled,
+	bodyParser.json(),
+	validateHelpScoutSignature,
+	helpScoutUserInfoHandler
+);
 
-async function helpscoutUserInfoHandler(request: express.Request, response: express.Response) {
-	response.status(200).json({
-		"success": true,
-		"message": "Hello, World!"
-	})
+async function findUserByEmail(email: string) {
+	return User.findOne({
+		email
+	});
+}
+
+async function helpScoutUserInfoHandler(request: express.Request, response: express.Response) {
+	const user: IUser|null = await findUserByEmail(request.body.customer.email);
+	console.log(user);
+	console.log(request.body);
+
+	if (!user) {
+		response.status(404).json({
+			error: "User not found"
+		});
+	} else {
+		response.status(200).json({
+			"success": true,
+			"user": {
+				email: user.email,
+				uuid: user.uuid,
+				applied: user.applied,
+				accepted: user.accepted,
+				confirmed: user.confirmed,
+				applicationBranch: user.applicationBranch || "n/a",
+				confirmationBranch: user?.confirmationBranch || "n/a"
+			}
+		});
+	}
 }

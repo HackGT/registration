@@ -105,6 +105,8 @@ apiRouter.use("/user/:uuid", userRoutes);
 apiRouter.use("/registration", registrationRoutes);
 import {settingsRoutes} from "./routes/api/settings";
 apiRouter.use("/settings", settingsRoutes);
+import {helpScoutRoutes} from "./routes/api/helpscout";
+apiRouter.use("/helpscout", helpScoutRoutes);
 
 app.use("/api", apiRouter);
 
