@@ -314,6 +314,7 @@ export function isHelpScoutIntegrationEnabled(request: express.Request, response
 
 export function validateHelpScoutSignature(request: express.Request, response: express.Response, next: express.NextFunction) {
 	const secret = config.helpscout.secretKey;
+	console.log("Secret key length:", secret.length);
 	const hsSignature = request.header('X-HelpScout-Signature');
 	if (hsSignature) {
 		const stringifiedBody = JSON.stringify(request.body);

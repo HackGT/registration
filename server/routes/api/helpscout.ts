@@ -29,16 +29,7 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 		});
 	} else {
 		response.status(200).json({
-			"success": true,
-			"user": {
-				email: user.email,
-				uuid: user.uuid,
-				applied: user.applied,
-				accepted: user.accepted,
-				confirmed: user.confirmed,
-				applicationBranch: user.applicationBranch || "n/a",
-				confirmationBranch: user?.confirmationBranch || "n/a"
-			}
+			"html": "<p>Hello, World! 2020</p>"
 		});
 	}
 }
