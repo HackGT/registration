@@ -662,7 +662,7 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true
             },
             {
                 "name": "marketing",
@@ -1393,7 +1393,7 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true
             },
             {
                 "name": "marketing",
@@ -1889,7 +1889,7 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true
             },
             {
                 "name": "country",
