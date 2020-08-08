@@ -315,8 +315,6 @@ export function isHelpScoutIntegrationEnabled(request: express.Request, response
 
 export function validateHelpScoutSignature(request: RequestWithRawBody, response: express.Response, next: express.NextFunction) {
 	const secret = config.helpscout.secretKey;
-	console.log("Secret key length:", secret.length);
-	console.log("Request body: ", request.rawBody);
 	const hsSignature = request.header('X-HelpScout-Signature')?.trim();
 
 	if (hsSignature) {
@@ -325,17 +323,18 @@ export function validateHelpScoutSignature(request: RequestWithRawBody, response
 			.digest('base64');
 
 		console.log("hsSignature:", hsSignature);
+		console.log("Calculated signature: ", computedHash);
 
 		// Prevents timing attacks with HMAC hashes https://stackoverflow.com/a/51489494
 		if (crypto.timingSafeEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
 			next();
 			return;
 		} else {
-			console.warn("Rejecting request for Helpscout integration due to incorrect signature (check that " +
+			console.warn("Rejecting request for Help Scout integration due to incorrect signature (check that " +
 				"the secret key is correct in local config and in Helpscout app config)");
 		}
 	} else {
-		console.warn("Rejecting request for Helpscout integration - missing required X-HelpScout-Signature " +
+		console.warn("Rejecting request for Help Scout integration: missing required X-HelpScout-Signature " +
 			"header");
 	}
 
