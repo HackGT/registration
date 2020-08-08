@@ -5,9 +5,16 @@ import bodyParser = require("body-parser");
 
 export const helpScoutRoutes = express.Router({ "mergeParams": true });
 
+export type RequestWithRawBody = express.Request & { rawBody: string };
+
 helpScoutRoutes.route("/userInfo").post(
 	isHelpScoutIntegrationEnabled,
-	bodyParser.json(),
+	bodyParser.json({
+		verify: (req: RequestWithRawBody, res, buffer, encoding) => {
+			if (buffer && buffer.length) {
+				req.rawBody = buffer.toString(encoding || 'utf-8');
+			}
+		}}),
 	validateHelpScoutSignature,
 	helpScoutUserInfoHandler
 );

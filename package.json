@@ -109,6 +109,6 @@
     "supertest": "^3.1.0",
     "tslint": "^5.14.0",
     "tslint-language-service-ts3": "^1.0.0",
-    "typescript": "^3.3.0"
+    "typescript": "^3.9.7"
   }
 }

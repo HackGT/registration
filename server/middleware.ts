@@ -19,6 +19,7 @@ export let postParser = bodyParser.urlencoded({
 import * as multer from "multer";
 import {QuestionBranches} from "./config/questions.schema";
 import * as crypto from "crypto";
+import {RequestWithRawBody} from "./routes/api/helpscout";
 
 export const MAX_FILE_SIZE = 50000000; // 50 MB
 export let uploadHandler = multer({
@@ -312,20 +313,18 @@ export function isHelpScoutIntegrationEnabled(request: express.Request, response
 	next();
 }
 
-export function validateHelpScoutSignature(request: express.Request, response: express.Response, next: express.NextFunction) {
+export function validateHelpScoutSignature(request: RequestWithRawBody, response: express.Response, next: express.NextFunction) {
 	const secret = config.helpscout.secretKey;
 	console.log("Secret key length:", secret.length);
-	console.log("Request body: ", request.body);
-	console.log("Stringified request body:", JSON.stringify(request.body));
-	const hsSignature = request.header('X-HelpScout-Signature');
+	console.log("Request body: ", request.rawBody);
+	const hsSignature = request.header('X-HelpScout-Signature')?.trim();
+
 	if (hsSignature) {
-		const stringifiedBody = JSON.stringify(request.body);
 		const computedHash = crypto.createHmac('sha1', secret)
-			.update(Buffer.from(stringifiedBody))
+			.update(request.rawBody)
 			.digest('base64');
 
 		console.log("hsSignature:", hsSignature);
-		console.log("computedBodyHash:", computedHash);
 
 		// Prevents timing attacks with HMAC hashes https://stackoverflow.com/a/51489494
 		if (crypto.timingSafeEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
