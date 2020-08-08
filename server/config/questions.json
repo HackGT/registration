@@ -1898,7 +1898,7 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true
             },
             {
                 "name": "country",
