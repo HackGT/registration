@@ -1,6 +1,11 @@
 p {
 	text-align: center;
 }
+
+strong {
+    text-align: center;
+}
+
 .selection {
 	display: flex;
 	flex-wrap: wrap;
