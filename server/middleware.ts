@@ -317,7 +317,10 @@ export function validateHelpScoutSignature(request: RequestWithRawBody, response
 	const secret = config.helpscout.secretKey;
 	const hsSignature = request.header('X-HelpScout-Signature')?.trim();
 
-	if (hsSignature) {
+	if (!request.rawBody) {
+		console.warn("Rejecting request for Help Scout integration: missing rawBody attribute on request " +
+			"(must be added by middleware)");
+	} else if (hsSignature) {
 		const computedHash = crypto.createHmac('sha1', secret)
 			.update(request.rawBody)
 			.digest('base64');
