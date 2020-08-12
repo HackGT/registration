@@ -10,7 +10,6 @@
     "start": "node server/app.js",
     "build-start": "npm run build && npm start",
     "qb-start": "npm run quickbuild && npm start",
-    "qb-w10": "bash ./node_modules/typescript/bin/tsc -p server/ && ./node_modules/typescript/bin/tsc -p client/",
     "debug": "node --nolazy --inspect=9230 server/app.js"
   },
   "author": {
