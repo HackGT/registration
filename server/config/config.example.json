@@ -31,5 +31,16 @@
 			"uploadDirectory": "uploads"
 		}
 	},
-	"maxTeamSize": 4
+	"maxTeamSize": 4,
+	"helpscout": {
+		"integration": {
+			"enabled": false,
+			"secretKey": "<generate a random 40-char string>"
+		},
+		"beacon": {
+			"enabled": false,
+			"beaconId": "<obtain from Help Scout Beacon installation page",
+			"supportHistorySecretKey": "<provided by Help Scout when you turn on the Support history security Beacon setting"
+		}
+	}
 }

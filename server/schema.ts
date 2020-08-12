@@ -42,9 +42,20 @@ export namespace IConfig {
 		favicon: string;
 	}
 
-	export interface Helpscout {
+	export interface HelpScout {
+		integration: HelpScoutIntegrationOptions;
+		beacon: HelpScoutBeaconOptions;
+	}
+
+	export interface HelpScoutIntegrationOptions {
 		enabled: boolean;
 		secretKey: string;
+	}
+
+	export interface HelpScoutBeaconOptions {
+		enabled: boolean;
+		beaconId: string;
+		supportHistorySecretKey: string;
 	}
 
 	export interface Main {
@@ -63,7 +74,7 @@ export namespace IConfig {
 			options: any;
 		};
 		maxTeamSize: number;
-		helpscout: Helpscout;
+		helpscout: HelpScout;
 	}
 }
 
@@ -241,6 +252,11 @@ export const QuestionBranchConfig = mongoose.model<Model<IQuestionBranchConfig>>
 export interface ICommonTemplate {
 	siteTitle: string;
 	user: IUser;
+	helpscout: {
+		beaconEnabled: boolean;
+		beaconId?: string;
+		signature?: string;
+	};
 	settings: {
 		teamsEnabled: boolean;
 		qrEnabled: boolean;

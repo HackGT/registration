@@ -61,9 +61,16 @@ class Config implements IConfig.Main {
 		favicon: path.resolve(__dirname, "../client/favicon.ico")
 	};
 
-	public helpscout: IConfig.Helpscout = {
-		enabled: false,
-		secretKey: ""
+	public helpscout: IConfig.HelpScout = {
+		integration: {
+			enabled: false,
+			secretKey: ""
+		},
+		beacon: {
+			enabled: false,
+			beaconId: "",
+			supportHistorySecretKey: ""
+		}
 	};
 
 	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
@@ -135,9 +142,15 @@ class Config implements IConfig.Main {
 			this.style = config.style;
 		}
 		if (config.helpscout) {
-			if (config.helpscout.enabled) {
-				this.helpscout.enabled = config.helpscout.enabled;
-				this.helpscout.secretKey = config.helpscout.secretKey;
+			if (config.helpscout.integration.enabled) {
+				this.helpscout.integration.enabled = config.helpscout.integration.enabled;
+				this.helpscout.integration.secretKey = config.helpscout.integration.secretKey;
+			}
+
+			if (config.helpscout.beacon.enabled) {
+				this.helpscout.beacon.enabled = config.helpscout.beacon.enabled;
+				this.helpscout.beacon.beaconId = config.helpscout.beacon.beaconId;
+				this.helpscout.beacon.supportHistorySecretKey = config.helpscout.beacon.supportHistorySecretKey;
 			}
 		}
 	}
@@ -261,10 +274,20 @@ class Config implements IConfig.Main {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE, 10);
 		}
 
-		if (process.env.HELPSCOUT_ENABLED && process.env.HELPSCOUT_ENABLED.toLowerCase() === "true") {
-			this.helpscout.enabled = true;
-			if (process.env.HELPSCOUT_SECRET_KEY) {
-				this.helpscout.secretKey = process.env.HELPSCOUT_SECRET_KEY;
+		if (process.env.HELPSCOUT_INTEGRATION_ENABLED && process.env.HELPSCOUT_INTEGRATION_ENABLED.toLowerCase() === "true") {
+			this.helpscout.integration.enabled = true;
+			if (process.env.HELPSCOUT_INTEGRATION_SECRET_KEY) {
+				this.helpscout.integration.secretKey = process.env.HELPSCOUT_INTEGRATION_SECRET_KEY;
+			}
+		}
+
+		if (process.env.HELPSCOUT_BEACON_ENABLED && process.env.HELPSCOUT_BEACON_ENABLED.toLowerCase() === "true") {
+			this.helpscout.beacon.enabled = true;
+			if (process.env.HELPSCOUT_BEACON_ID) {
+				this.helpscout.beacon.beaconId = process.env.HELPSCOUT_BEACON_ID;
+			}
+			if (process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY) {
+				this.helpscout.beacon.supportHistorySecretKey = process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY;
 			}
 		}
 	}
