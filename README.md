@@ -86,6 +86,12 @@ QUESTIONS_FILE | Specify a path for the `questions.json` file. (default: ./serve
 THEME_FILE | Specify a path for the `theme.css` file, which will be loaded last at every page.
 FAVICON_FILE | Path to the favicon file (default is no favicon).
 FAVICON_FILE_BASE64 | Same as `FAVICON_FILE_BASE64` but the file is base64 encoded.
+HELPSCOUT_INTEGRATION_ENABLED | Whether to enable the backend API endpoint that can provide a dynamic app for Help Scout (default: false)
+HELPSCOUT_INTEGRATION_SECRET_KEY | A random, 40-character long string of letters, numbers, and symbols.  Must also be entered in Help Scout; see the Setting Up Help Scout integration section for more information.  (required if Help Scout integration is enabled)
+HELPSCOUT_BEACON_ENABLED | Whether to show the Help Scout Beacon on certain frontend pages (default: false)
+HELPSCOUT_BEACON_ID | Unique ID for the Beacon provided by Help Scout (required if Beacon functionality is enabled)
+HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY | Secret key provided by Help Scout for the Beacon Support History option (required if Beacon functionality is enabled)
+
 
 
 ## Contributing
@@ -106,4 +112,48 @@ If you have some time and want to help us out with development, thank you! You c
 
 ## License
 
-Copyright &copy; 2019 HackGT. Released under the MIT license. See [LICENSE](LICENSE) for more information.
+Copyright &copy; 2020 HackGT. Released under the MIT license. See [LICENSE](LICENSE) for more information.
+
+## Help Scout
+
+Registration includes two features to enable deep integration with Help Scout, a service desk solution, allowing us to
+provide better support to users requesting support.
+
+- The **Help Scout Integration** allows registration to serve a Dynamic App for Help Scout to show additional information
+about a user's application to a specific event, based on the email address they sent the email from.
+- The **Help Scout Beacon** adds a small widget to user-facing pages requiring authentication making it super easy to
+send an email asking for help, engage in live chat support (if enabled), or view knowledge base articles (if enabled).
+
+### Help Scout Integration
+(Note: The Help Scout dynamic app integration will not work if registration is being hosted from `localhost`.  In other
+words, you can't test local changes to the Help Scout integration functionality in registration and view them in Help Scout.)
+
+To setup Help Scout integration:
+
+1. Configure the 2 required environment variables for Help Scout integration, starting with `HELPSCOUT_INTEGRATION`
+2. Create a new custom app in Help Scout
+3. For **Content Type**, choose **Dynamic Content**
+4. For **Callback Url**, enter `<URL to your registration instance>/api/helpscout/userInfo`
+5. For **Secret Key**, enter the exact same value as set in the `HELPSCOUT_INTEGRATION_SECRET_KEY` environment variable
+6. Once you get the integration working, turn off **Debug Mode** in Help Scout.
+7. Pick the mailboxes you want the registration integration to appear in.
+
+### Help Scout Beacon
+To setup the Help Scout Beacon:
+
+1. Make sure the `HELPSCOUT_BEACON_ENABLED` environment variable is set to `true`.
+2. In Help Scout, go to Manage > Beacons and find or create a new Beacon.
+3. First, find the Beacon ID.  Go to the Installation tab of the Beacon settings and look for the part of the code (near the bottom)
+that looks like `window.Beacon('init', '<THIS IS THE BEACON ID>')`.
+4. Set the `HELPSCOUT_BEACON_ID` environment variable to the Beacon ID you just found.
+5. Now go to the Contact settings page for your Beacon.
+6. In the Contact Form setting, turn on the **Support history security** setting.
+7. A **secure key** will appear.  Set the `HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY` to this value.
+8. That's all the required configuration on registration's end.  However, make sure you check out all of the available customization
+options for Beacons available in Help Scout.  You can change the settings remotely through Help Scout without changing 
+any code or configuration in registration!
+
+(Note: If you set the secure key environment variable but do not enable the **Support history security** setting for the Beacon
+in Help Scout, the Beacon **will not** work and you'll see a network error in the console when you try to send a message through the Beacon.)
+
+
