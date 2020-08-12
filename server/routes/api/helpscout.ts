@@ -89,7 +89,17 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 			acceptedText = user.accepted ? badge("success", "Accepted") : badge("error", "Rejected");
 			acceptedBlock = createListBlock("Accepted?", acceptedText);
 
-			const confirmationText = user.confirmed ? badge("success", "Confirmed") : "No";
+			let confirmedDate = "";
+			let confirmedColor = "pending";
+			if (user.accepted) {
+				confirmedColor = "success";
+				if (user.confirmationSubmitTime) {
+					confirmedDate = moment(user.confirmationSubmitTime)
+						.format("DD-MMM-YYYY h:mm a");
+				}
+			}
+
+			const confirmationText = user.confirmed ? `${badge(confirmedColor, "Confirmed")} ${confirmedDate}` : "No";
 			confirmationBlock = createListBlock("Confirmed?", confirmationText);
 		}
 

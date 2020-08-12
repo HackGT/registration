@@ -300,7 +300,7 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 }
 
 export function isHelpScoutIntegrationEnabled(request: express.Request, response: express.Response, next: express.NextFunction) {
-	const enabled = config.helpscout.enabled;
+	const enabled = config.helpscout.integration.enabled;
 	if (!enabled) {
 		const message = "Helpscout integration functionality is currently disabled";
 		console.error(message);
@@ -314,7 +314,7 @@ export function isHelpScoutIntegrationEnabled(request: express.Request, response
 }
 
 export function validateHelpScoutSignature(request: RequestWithRawBody, response: express.Response, next: express.NextFunction) {
-	const secret = config.helpscout.secretKey;
+	const secret = config.helpscout.integration.secretKey;
 	const hsSignature = request.header('X-HelpScout-Signature')?.trim();
 
 	if (!request.rawBody) {
