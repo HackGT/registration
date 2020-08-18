@@ -1236,21 +1236,21 @@
                 "name": "why-mentor",
                 "label": "What motivates you to mentor participants at this event?",
                 "type": "textarea",
-                "required": true,
+                "required": false,
                 "maxWordCount": 150
             },
             {
                 "name": "help-hackers",
                 "label": "Many hackers stop hacking when they get stuck on problems they do not know how to solve. As a mentor, what is your approach to (1) guide hackers to a solution and (2) encourage them to keep hacking?",
                 "type": "textarea",
-                "required": true,
+                "required": false,
                 "maxWordCount": 150
             },
             {
                 "name": "teach",
                 "label": "Describe a time you taught something technical to someone with no/very little experience with the topic (can be in informal setting).",
                 "type": "textarea",
-                "required": true,
+                "required": false,
                 "maxWordCount": 150
             },
             {
