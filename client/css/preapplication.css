@@ -16,21 +16,6 @@ strong {
 	min-width: 25%;
 }
 
-#box {
-	border: white solid;
-    border-radius: 15px;
-    border-width: 2px;
-    align-items: center;
-    align-content: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin: 20px;
-    max-width: 40%;
-    min-width: 25%;
-    padding: 5px 10px 15px 10px;
-}
-
 @media only screen and (max-width: 768px) {
     .selection {
         display: block;
