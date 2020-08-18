@@ -13,7 +13,7 @@ label {
     line-height: 2;
     letter-spacing: 0;
     font-weight: 300;
-    font-family: "Quicksand";
+    font-family: 'Baloo 2', sans-serif;
 }
 .required::after {
     content: " *";
@@ -44,7 +44,7 @@ form > h6 {
     text-align: center;
 }
 form > p {
-    font-family: "Quicksand";
+    font-family: 'Baloo 2', sans-serif;
 }
 form > p.file {
     text-align: center;

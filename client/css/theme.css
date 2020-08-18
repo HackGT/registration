@@ -1,20 +1,11 @@
-
-@font-face {
-    font-family: Bavro;
-    src: url(/css/Bavro-Regular.ttf);
-}
-
-@font-face {
-    font-family: Quicksand;
-    src: url(/css/Quicksand-VariableFont_wght.ttf);
-}
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap');
 
 /* CSS variables for colors */
 :root {
-    --bg-color: rgba(255, 255, 255, 0.1);
-    --input-color:rgba(255, 255, 255, 0.1);
+    --bg-color: #AB9CE6;
+    --input-color:white;
     --text-color: #e6e6e6;
-    --dark-blue: rgba(255, 255, 255, 0.3);
+    --dark-blue: #634CBA;
     --light-blue: white;
 }
 
@@ -30,7 +21,6 @@ html::before {
     height: 100%;
     width: 100%;
     z-index: -1;
-    background: url(/css/registration.png);
     background-repeat: no-repeat;
     background-size: cover;
     
@@ -44,7 +34,7 @@ html::before {
 
 html, body, #sidebar-nav, section.main {
     color: var(--text-color);
-    font-family: "Quicksand";
+    font-family: 'Baloo 2', sans-serif;
 }
 
 /* Hide text and use image instead in the header */
@@ -70,7 +60,7 @@ html, body, #sidebar-nav, section.main {
     color: var(--text-color);
     border: none;
     text-decoration: initial;
-    font-family: "Quicksand";
+    font-family: 'Baloo 2', sans-serif;
     font-weight: 800;
 }
 .editor-toolbar > a {
@@ -112,7 +102,7 @@ fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Bavro";
+    font-family: 'Baloo 2', sans-serif;
     font-weight: 800;
 }
 
@@ -142,7 +132,7 @@ option {
 
 input, label {
     font-variant-ligatures: none;
-    font-family: "Quicksand";
+    font-family: 'Baloo 2', sans-serif;
 }
 label {
     font-weight: bold;
@@ -167,30 +157,4 @@ input:disabled, textarea:disabled {
 input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
-}
-
-@media only screen and (min-width: 1000px) {
-    html::before {
-        background: url(/css/registration.png);
-        background-repeat: no-repeat;
-        background-size: cover;
-        
-    }
-}
-
-/* Extra large devices (large laptops and desktops, 1200px and up) */
-@media only screen and (min-width: 1400px) {
-    html::before {
-        background: url(/css/registration.png);
-        background-repeat: no-repeat;
-        background-size: cover;
-        will-change: transform;
-    }
-}
-
-@media only screen and (max-width: 1400px) {
-    html::before {
-        background-color: #BD4F6C;
-        background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
-    }
 }
