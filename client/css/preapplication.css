@@ -1,27 +1,11 @@
 p {
 	text-align: center;
 }
-
-strong {
-    text-align: center;
-}
-
-.selection {
+#selection {
 	display: flex;
 	flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-around;
+	justify-content: space-around;
 }
-.selection > a {
+#selection > a {
 	min-width: 25%;
-}
-
-@media only screen and (max-width: 768px) {
-    .selection {
-        display: block;
-	}
-	
-	#box {
-		max-width: 100%;
-	}
 }
