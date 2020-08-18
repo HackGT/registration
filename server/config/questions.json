@@ -1179,6 +1179,13 @@
                 "required": true
             },
             {
+                "name": "which-track",
+                "label": "Which track would you like to help mentor in?",
+                "type": "radio",
+                "options": ["Android App Development", "iOS App Development", "Web Development", "Gaming", "Data Science"],
+                "required": true
+            },
+            {
                 "name": "applied-hackgt7",
                 "label": "Have you applied to HackGT 7 [2020.hack.gt](https://2020.hack.gt) as a mentor already? If yes, you can submit your application as is. If not, please fill out the remaining questions.",
                 "type": "radio",
