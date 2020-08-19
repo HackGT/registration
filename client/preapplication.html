@@ -13,11 +13,54 @@
 	<body>
 		{{#> sidebar}}
 			<h1 class="center">Apply</h1>
-
 			<p>Choose what you want to apply as:</p>
-			<section id="selection">
+			<p><strong>This year, you can participate in one of our four tracks or as a Mentor.</strong></p>
+			<p>
+				You can also find more detailed descriptions of all the available options at 
+				<a href="https://teeny.hack.gt">teeny.hack.gt</a>.
+			</p>
+			<section class="selection">
 				{{#each branches}}
-					<a href="/apply/{{slug this}}" class="btn">{{this}}</a>
+					<div id="box">
+						<h5>{{this}}</h5>
+						{{#ifCond this "participant-web development"}}
+							<p>
+								The Web Development track for Emerging Hackers will bring you into the world of building 
+								full-stack web applications. We will step through the entire process of creating a blog 
+								site using JavaScript. Soon, you will be able to not only show off your technical skills, 
+								but also publish your accomplishments online, on your very own blog site!
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-android/ios"}}
+							<p>
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-gaming and graphics"}}
+							<p>
+								The Gaming and Graphics track for Emerging Hackers will bring them into the exciting 
+								realm of game design to create projects that are personally interesting and engaging. 
+								We will step through the entire game development process from start to finish and create 
+								a custom version of Flappy Bird using Unity!
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-data science"}}
+							<p>
+								The Data Science track for Emerging Hackers will bring you into the world of data-driven 
+								decision making and advanced analytics. We will step through the entire data science process 
+								from A to Z, beginning with data analytics and ending with a machine learning model that will 
+								be able to predict housing prices using Python!
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "mentor"}}
+							<p>
+								We are looking for mentors for HackGTeeny, students or industry professionals, who are patient, 
+								knowledgeable, and have a passion for at least one of the tracks. You will help participants 
+								during the workshops to answer questions, and we will have training sessions and more information
+								 about how to prepare. 
+							</p>
+						{{/ifCond}}
+						<a href="/apply/{{slug this}}" class="btn">Apply!</a>
+					</div>
 				{{/each}}
 			</section>
 		{{/sidebar}}
