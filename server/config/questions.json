@@ -30,7 +30,7 @@
                 "type": "radio",
                 "label": "Do you attend Georgia Tech?",
                 "options": ["Yes", "No"],
-                "hasOther": true,
+                "hasOther": false,
                 "required": true
             },
             {
@@ -495,7 +495,7 @@
                 "type": "radio",
                 "label": "Do you attend Georgia Tech?",
                 "options": ["Yes", "No"],
-                "hasOther": true,
+                "hasOther": false,
                 "required": true
             },
             {
@@ -960,7 +960,7 @@
                 "type": "radio",
                 "label": "Do you attend Georgia Tech?",
                 "options": ["Yes", "No"],
-                "hasOther": true,
+                "hasOther": false,
                 "required": true
             },
             {
@@ -1425,7 +1425,7 @@
                 "type": "radio",
                 "label": "Do you attend Georgia Tech?",
                 "options": ["Yes", "No"],
-                "hasOther": true,
+                "hasOther": false,
                 "required": true
             },
             {
