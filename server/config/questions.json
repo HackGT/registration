@@ -465,7 +465,7 @@
         ]
     },
     {
-        "name": "Participant-Android/iOS",
+        "name": "Participant-Android",
         "text": [
             {
                 "for": "18-and-gt-student",
@@ -2332,7 +2332,7 @@
                 "name": "which-track",
                 "label": "Which track would you like to help mentor in?",
                 "type": "radio",
-                "options": ["Android App Development", "iOS App Development", "Web Development", "Gaming", "Data Science"],
+                "options": ["Android App Development", "Web Development", "Gaming", "Data Science"],
                 "required": true
             },
             {
@@ -2368,7 +2368,6 @@
                     "Ruby",
                     "Django",
                     "App Development",
-                    "iOS",
                     "Android",
                     "Databases",
                     "MongoDB",
