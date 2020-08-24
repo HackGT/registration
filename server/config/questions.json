@@ -35,7 +35,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -380,7 +380,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -500,7 +500,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -845,7 +845,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -965,7 +965,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -1310,7 +1310,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -1430,7 +1430,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -1775,7 +1775,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -2251,7 +2251,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (September 19)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
