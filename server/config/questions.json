@@ -5,7 +5,7 @@
             {
                 "for": "18-and-gt-student",
                 "type": "p",
-                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGTeeny 2020."
             }
         ],
         "questions": [
@@ -35,7 +35,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -380,7 +380,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -470,7 +470,7 @@
             {
                 "for": "18-and-gt-student",
                 "type": "p",
-                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGTeeny 2020."
             }
         ],
         "questions": [
@@ -500,7 +500,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -845,7 +845,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -935,7 +935,7 @@
             {
                 "for": "18-and-gt-student",
                 "type": "p",
-                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGTeeny 2020."
             }
         ],
         "questions": [
@@ -965,7 +965,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -1310,7 +1310,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -1400,7 +1400,7 @@
             {
                 "for": "18-and-gt-student",
                 "type": "p",
-                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGTeeny 2020."
             }
         ],
         "questions": [
@@ -1430,7 +1430,7 @@
             },
             {
                 "name": "country",
-                "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What country do you anticipate residing in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "United States",
@@ -1775,7 +1775,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -1865,7 +1865,7 @@
             {
                 "for": "18-and-gt-student",
                 "type": "p",
-                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGTeeny 2020."
             },
             {
                 "for": "help-hackers",
@@ -2251,7 +2251,7 @@
             },
             {
                 "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+                "label": "What time zone will you be located in during HackGTeeny 2020 (Oct 16th-18th)?",
                 "type": "select",
                 "options": [
                     "Eastern Daylight Time",
@@ -2337,7 +2337,7 @@
             },
             {
                 "name": "applied-hackgt7",
-                "label": "Have you applied to HackGT 7 [2020.hack.gt](https://2020.hack.gt) as a mentor already? If yes, you can submit your application as is. If not, please fill out the remaining questions.",
+                "label": "Have you applied to HackGTeeny 2020 [2020.hack.gt](https://2020.hack.gt) as a mentor already? If yes, you can submit your application as is. If not, please fill out the remaining questions.",
                 "type": "radio",
                 "options": ["Yes", "No"],
                 "required": true
@@ -2411,7 +2411,7 @@
             },
             {
                 "name": "attended-hackgt-mentor",
-                "label": "Are you interested in Mentoring at HackGT 7? Visit [2020.hack.gt/mentor.html](https://2020.hack.gt/mentor.html) for more information. If you mentor at HackGTeeny, you are automatically eligible for mentoring at HackGT 7, and you do not need to apply for mentoring for HackGT 7.",
+                "label": "Are you interested in Mentoring at HackGTeeny 2020? Visit [2020.hack.gt/mentor.html](https://2020.hack.gt/mentor.html) for more information. If you mentor at HackGTeeny, you are automatically eligible for mentoring at HackGTeeny 2020, and you do not need to apply for mentoring for HackGTeeny 2020.",
                 "type": "radio",
                 "options": ["Yes", "No"],
                 "required": false
@@ -2444,7 +2444,7 @@
                 {
                     "for": "additional-info",
                     "type": "p",
-                    "content": "Thank your confirming your attendance to HackGT 7!"
+                    "content": "Thank your confirming your attendance to HackGTeeny 2020!"
                 },
                 {
                     "for": "gdpr",
@@ -2455,7 +2455,7 @@
           "questions": [
                 {
                     "name": "gdpr",
-                    "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+                    "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGTeeny 2020, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
                     "type": "checkbox",
                     "options": [
                         "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
@@ -2477,7 +2477,7 @@
               {
                   "for": "additional-info",
                   "type": "p",
-                  "content": "Thank your confirming your attendance to HackGT 7!"
+                  "content": "Thank your confirming your attendance to HackGTeeny 2020!"
               }
           ],
           "questions": [
