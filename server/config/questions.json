@@ -2486,6 +2486,12 @@
                 }
           ],
           "questions": [
+		{
+                "name": "gt-email",
+                "label": "What is your Georgia Tech email address?  (ending in @gatech.edu)",
+                "type": "email",
+                "required": true
+		},
                 {
                     "name": "gdpr",
                     "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
@@ -2519,6 +2525,12 @@
                 }
           ],
           "questions": [
+		{
+                "name": "gt-email",
+                "label": "What is your Georgia Tech email address?  (ending in @gatech.edu)",
+                "type": "email",
+                "required": true
+		},
                 {
                     "name": "gdpr",
                     "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
@@ -2552,6 +2564,12 @@
                 }
           ],
           "questions": [
+		  {
+                "name": "gt-email",
+                "label": "What is your Georgia Tech email address?  (ending in @gatech.edu)",
+                "type": "email",
+                "required": true
+		},
                 {
                     "name": "gdpr",
                     "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
@@ -2585,6 +2603,12 @@
                 }
           ],
           "questions": [
+		{
+                "name": "gt-email",
+                "label": "What is your Georgia Tech email address?  (ending in @gatech.edu)",
+                "type": "email",
+                "required": true
+		},
                 {
                     "name": "gdpr",
                     "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
