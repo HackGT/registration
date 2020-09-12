@@ -2549,7 +2549,7 @@
          {
             "name":"gt-email",
             "label":"What is your Georgia Tech email address?  (ending in @gatech.edu)",
-            "type":"email",
+            "type":"text",
             "required":true
          },
          {
@@ -2588,7 +2588,7 @@
          {
             "name":"gt-email",
             "label":"What is your Georgia Tech email address?  (ending in @gatech.edu)",
-            "type":"email",
+            "type":"text",
             "required":true
          },
          {
@@ -2627,7 +2627,7 @@
          {
             "name":"gt-email",
             "label":"What is your Georgia Tech email address?  (ending in @gatech.edu)",
-            "type":"email",
+            "type":"text",
             "required":true
          },
          {
@@ -2666,7 +2666,7 @@
          {
             "name":"gt-email",
             "label":"What is your Georgia Tech email address?  (ending in @gatech.edu)",
-            "type":"email",
+            "type":"text",
             "required":true
          },
          {
