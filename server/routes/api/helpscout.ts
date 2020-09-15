@@ -1,8 +1,10 @@
 import * as express from "express";
 import {isHelpScoutIntegrationEnabled, validateHelpScoutSignature} from "../../middleware";
-import {IFormItem, IUser, User} from "../../schema";
+import {IHelpScoutEmailNotFoundTemplate, IHelpScoutMainTemplate, IUser, User} from "../../schema";
 import bodyParser = require("body-parser");
 import * as moment from "moment-timezone";
+import {Template} from "../templates";
+import * as Handlebars from "handlebars";
 
 export const helpScoutRoutes = express.Router({"mergeParams": true});
 
@@ -27,100 +29,38 @@ async function findUserByEmail(email: string) {
 	});
 }
 
-function findApplicationQuestion(applicationData: IFormItem[], questionName: string) {
-	const result = applicationData.find((item: IFormItem) => item.name === questionName);
-	return result ? result.value : "";
+function safe(text: string) {
+	return Handlebars.Utils.escapeExpression(text);
 }
 
-function createListBlock(title: string, content: string | string[] | Express.Multer.File | null) {
-	return `<li class="c-sb-list-item">
-			<span class="c-sb-list-item__label">${title}<span class="c-sb-list-item__text">${content}</span>
-		</span>
-	</li>`;
-}
-
-function badge(type: string, text: string) {
-	return `<span class="badge ${type}">${text}</span>`;
-}
+const EmailNotFoundTemplate = new Template<IHelpScoutEmailNotFoundTemplate>("helpscout/email_not_found.html");
+const MainHelpScoutTemplate = new Template<IHelpScoutMainTemplate>("helpscout/main.html");
 
 async function helpScoutUserInfoHandler(request: express.Request, response: express.Response) {
-	const email = request.body.customer.email;
+	// TODO: validate signature here?
+	const email = safe(request.body.customer.email);
 	const user: IUser | null = await findUserByEmail(email);
 
 	if (!user) {
 		response.status(200).json({
-			html: `<h4><a href="mailto:${email}">${email}</a></h4>
-				<h4>There are no users in registration with this email</h4>`.replace(/[\n\t]/g, "")
+			html: EmailNotFoundTemplate.render({ email }).replace(/[\r\n\t]/g, "")
 		});
 	} else {
-		let affiliationName: string;
-		if (user.applicationBranch === "Mentor") {
-			affiliationName = "Affiliation";
-		} else {
-			affiliationName = "University";
-		}
-		let affiliationBlock: string;
-		let cellphoneBlock: string;
-		if (user.applicationData) {
-			affiliationBlock = createListBlock(affiliationName, findApplicationQuestion(user.applicationData, affiliationName.toLowerCase()));
-			cellphoneBlock = createListBlock("Cell Phone", findApplicationQuestion(user.applicationData, "phone-number"));
-
-		} else {
-			affiliationBlock = createListBlock(affiliationName, "");
-			cellphoneBlock = createListBlock("Cell Phone", "");
-		}
-
-		let appliedBlock: string;
-		if (user.applicationSubmitTime) {
-			appliedBlock = createListBlock("Applied?",
-				moment(user.applicationSubmitTime)
-					.format("DD-MMM-YYYY h:mm a"));
-		} else {
-			appliedBlock = createListBlock("Applied?",
-				"No application");
-		}
-
-		let acceptedText = badge("pending", "No decision");
-		let acceptedBlock = "";
-
-		let confirmationBlock = "";
-
-		if (user.confirmationBranch) {
-			acceptedText = user.accepted ? badge("success", "Accepted") : badge("error", "Rejected");
-			acceptedBlock = createListBlock("Accepted?", acceptedText);
-
-			let confirmedDate = "";
-			let confirmedColor = "pending";
-			if (user.accepted) {
-				confirmedColor = "success";
-				if (user.confirmationSubmitTime) {
-					confirmedDate = moment(user.confirmationSubmitTime)
-						.format("DD-MMM-YYYY h:mm a");
-				}
-			}
-
-			const confirmationText = user.confirmed ? `${badge(confirmedColor, "Confirmed")} ${confirmedDate}` : "No";
-			confirmationBlock = createListBlock("Confirmed?", confirmationText);
-		}
-
 		response.status(200).json({
-			"html": `
-				<h4>
-					<a href="mailto:${user.email}">${user.email}</a>
-				</h4>
-				<h4>${user.applicationBranch || "Has not applied"}</h4>
-				<ul class="c-sb-list c-sb-list--two-line">
-					${user.applicationData ? affiliationBlock : ""}
-					${user.applicationData ? cellphoneBlock : ""}
-					${appliedBlock}
-					${acceptedBlock}
-					${confirmationBlock}
-					<li class="c-sb-list-item">
-						<span class="c-sb-list-item__label">Ground Truth UUID<span class="c-sb-list-item__text">${user.uuid}</span>
-						</span>
-					</li>
-				</ul>
-			`.replace(/[\n\t]/g, "")
+			"html": MainHelpScoutTemplate.render({
+				name: user.name,
+				email: user.email,
+				uuid: user.uuid,
+				applicationSubmitTime: user.applicationSubmitTime ? moment(user.applicationSubmitTime)
+					.format("DD-MMM-YYYY h:mm a") : undefined,
+				applied: user.applied,
+				accepted: user.accepted,
+				confirmed: user.confirmed,
+				applicationBranch: user.applicationBranch,
+				confirmationBranch: user.confirmationBranch,
+				confirmationSubmitTime: user.confirmationSubmitTime ? moment(user.confirmationSubmitTime)
+					.format("DD-MMM-YYYY h:mm a") : undefined
+			}).replace(/[\r\n\t]/g, "")
 		});
 	}
 }

@@ -1749,7 +1749,8 @@
 					"Yeshiva University"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "year",

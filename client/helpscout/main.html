@@ -1,0 +1,74 @@
+{{#*inline "listBlock"}}
+<li class="c-sb-list-item">
+    <span class="c-sb-list-item__label">{{title}}
+        <span class="c-sb-list-item__text">{{> @partial-block}}</span>
+    </span>
+</li>
+{{/inline}}
+
+{{#*inline "badge"}}
+<span class="badge {{type}}">{{> @partial-block}}</span>
+{{/inline}}
+
+<h4>
+    <a href="mailto:{{email}}">{{email}}</a>
+</h4>
+
+<h4>{{applicationBranch}}</h4>
+
+<ul class="c-sb-list c-sb-list--two-line">
+    {{#if applicationSubmitTime}}
+        {{#> listBlock title="Applied?"}}
+            To {{applicationBranch}} on {{applicationSubmitTime}}
+        {{/listBlock}}
+    {{else}}
+        {{#> listBlock title="Applied?"}}
+            No application
+         {{/listBlock}}
+    {{/if}}
+
+    {{#if confirmationBranch}}
+        {{#> listBlock title="Accepted?"}}
+            {{#if accepted}}
+                {{#> badge type="success"}}
+                    Accepted ({{confirmationBranch}})
+                {{/badge}}
+            {{else}}
+                {{#> badge type="error"}}
+                    Rejected ({{confirmationBranch}})
+                {{/badge}}
+            {{/if}}
+        {{/listBlock}}
+
+        {{#> listBlock title="Confirmed?"}}
+            {{#if confirmed}}
+                {{#if accepted}}
+                    {{#> badge type="success"}}
+                        Confirmed
+                    {{/badge}}
+                    {{confirmationSubmitTime}}
+                {{else}}
+                    {{#> badge type="pending"}}
+                        Confirmed
+                    {{/badge}}
+                {{/if}}
+            {{else}}
+                No
+            {{/if}}
+        {{/listBlock}}
+    {{else}}
+        {{#> listBlock title="Accepted?"}}
+            {{#> badge type="pending"}}
+                No decision
+            {{/badge}}
+        {{/listBlock}}
+    {{/if}}
+
+    {{#> listBlock title="Ground Truth UUID"}}
+        {{uuid}}
+    {{/listBlock}}
+</ul>
+
+{{#if confirmed}}
+User is confirmed
+{{/if}}

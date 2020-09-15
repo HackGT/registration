@@ -399,3 +399,21 @@ export interface HackGTMetrics {
 	values: object;
 	hackgtmetricsversion: number;
 }
+
+export interface IHelpScoutEmailNotFoundTemplate {
+	email: string;
+}
+
+export interface IHelpScoutMainTemplate {
+	name: string;
+	email: string;
+	questions?: IFormItem[];
+	applied: boolean;
+	accepted: boolean;
+	confirmed: boolean;
+	applicationSubmitTime: string | undefined;
+	applicationBranch: string | undefined;
+	confirmationBranch: string | undefined;
+	confirmationSubmitTime: string | undefined;
+	uuid: string;
+}
