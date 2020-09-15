@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { URL } from "url";
 import * as express from "express";
-import * as Handlebars from "handlebars";
+import * as HandlebarsImport from "handlebars";
 import * as moment from "moment-timezone";
 import * as bowser from "bowser";
 import * as uuid from "uuid/v4";
@@ -26,6 +26,10 @@ import {
 } from "../schema";
 import * as Branches from "../branch";
 import * as crypto from "crypto";
+
+import {allowInsecurePrototypeAccess} from "@handlebars/allow-prototype-access";
+
+const Handlebars = allowInsecurePrototypeAccess(HandlebarsImport);
 
 export let templateRoutes = express.Router();
 
