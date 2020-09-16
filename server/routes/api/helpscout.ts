@@ -17,19 +17,16 @@ import * as Branches from "../../branch";
 export const helpScoutRoutes = express.Router({"mergeParams": true});
 
 export type RequestWithRawBody = express.Request & { rawBody: string };
-
-helpScoutRoutes.route("/userInfo").post(
-	isHelpScoutIntegrationEnabled,
-	bodyParser.json({
-		verify: (req: RequestWithRawBody, res, buffer, encoding) => {
-			if (buffer && buffer.length) {
-				req.rawBody = buffer.toString(encoding || 'utf-8');
-			}
+helpScoutRoutes.use(isHelpScoutIntegrationEnabled);
+helpScoutRoutes.use(bodyParser.json({
+	verify: (req: RequestWithRawBody, res, buffer, encoding) => {
+		if (buffer && buffer.length) {
+			req.rawBody = buffer.toString(encoding || 'utf-8');
 		}
-	}),
-	validateHelpScoutSignature,
-	helpScoutUserInfoHandler
-);
+	}
+}));
+helpScoutRoutes.use(validateHelpScoutSignature);
+helpScoutRoutes.route("/userInfo").post(helpScoutUserInfoHandler);
 
 async function findUserByEmail(email: string) {
 	return User.findOne({
@@ -83,7 +80,8 @@ async function getFormAnswers(userData: IFormItem[], branch: string): Promise<IH
 }
 
 async function helpScoutUserInfoHandler(request: express.Request, response: express.Response) {
-	// TODO: validate signature here?
+
+
 	const email = safe(request.body.customer.email);
 	const user: IUser | null = await findUserByEmail(email);
 

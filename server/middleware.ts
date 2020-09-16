@@ -302,15 +302,23 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 export function isHelpScoutIntegrationEnabled(request: express.Request, response: express.Response, next: express.NextFunction) {
 	const enabled = config.helpscout.integration.enabled;
 	if (!enabled) {
-		const message = "Helpscout integration functionality is currently disabled";
-		console.error(message);
-		response.status(403).json({
-			"error": message
+		console.error("Error while responding to Help Scout API request: Help Scout integration functionality is currently disabled");
+		response.status(404).json({
+			error: "Not found"
 		});
 		return;
 	}
 
 	next();
+}
+
+// Inspired by https://github.com/suryagh/tsscmp/blob/master/lib/index.js#L11
+function bufferEqual(a: Buffer, b: Buffer) {
+	if (a.length !== b.length) {
+		return false;
+	}
+
+	return crypto.timingSafeEqual(a, b);
 }
 
 export function validateHelpScoutSignature(request: RequestWithRawBody, response: express.Response, next: express.NextFunction) {
@@ -329,7 +337,7 @@ export function validateHelpScoutSignature(request: RequestWithRawBody, response
 		console.log("Calculated signature: ", computedHash);
 
 		// Prevents timing attacks with HMAC hashes https://stackoverflow.com/a/51489494
-		if (crypto.timingSafeEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
+		if (bufferEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
 			next();
 			return;
 		} else {
@@ -342,6 +350,6 @@ export function validateHelpScoutSignature(request: RequestWithRawBody, response
 	}
 
 	response.status(400).json({
-		"error": "Request validation failed; check server logs for details"
+		"error": "Unable to process request"
 	});
 }
