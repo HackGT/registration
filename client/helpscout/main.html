@@ -10,6 +10,22 @@
 <span class="badge {{type}}">{{> @partial-block}}</span>
 {{/inline}}
 
+{{#*inline "applicationQuestionListBlock"}}
+<li class="c-sb-list-item">
+    <span class="c-sb-list-item__label">App: {{title}}
+        <span class="c-sb-list-item__text">{{> @partial-block}}</span>
+    </span>
+</li>
+{{/inline}}
+
+{{#*inline "confirmationQuestionListBlock"}}
+<li class="c-sb-list-item">
+    <span class="c-sb-list-item__label">Confirmation: {{title}}
+        <span class="c-sb-list-item__text">{{> @partial-block}}</span>
+    </span>
+</li>
+{{/inline}}
+
 <h4>
     <a href="mailto:{{email}}">{{email}}</a>
 </h4>
@@ -17,7 +33,7 @@
 <h4>{{applicationBranch}}</h4>
 
 <ul class="c-sb-list c-sb-list--two-line">
-    {{#if applicationSubmitTime}}
+    {{#if applied}}
         {{#> listBlock title="Applied?"}}
             To {{applicationBranch}} on {{applicationSubmitTime}}
         {{/listBlock}}
@@ -31,12 +47,12 @@
         {{#> listBlock title="Accepted?"}}
             {{#if accepted}}
                 {{#> badge type="success"}}
-                    Accepted ({{confirmationBranch}})
-                {{/badge}}
+                    Accepted
+                {{/badge}} ({{confirmationBranch}})
             {{else}}
                 {{#> badge type="error"}}
-                    Rejected ({{confirmationBranch}})
-                {{/badge}}
+                    Rejected
+                {{/badge}} ({{confirmationBranch}})
             {{/if}}
         {{/listBlock}}
 
@@ -45,8 +61,7 @@
                 {{#if accepted}}
                     {{#> badge type="success"}}
                         Confirmed
-                    {{/badge}}
-                    {{confirmationSubmitTime}}
+                    {{/badge}} on {{confirmationSubmitTime}}
                 {{else}}
                     {{#> badge type="pending"}}
                         Confirmed
@@ -57,18 +72,29 @@
             {{/if}}
         {{/listBlock}}
     {{else}}
-        {{#> listBlock title="Accepted?"}}
-            {{#> badge type="pending"}}
-                No decision
-            {{/badge}}
-        {{/listBlock}}
+        {{#if applied}}
+            {{#> listBlock title="Accepted?"}}
+                {{#> badge type="pending"}}
+                    No decision
+                {{/badge}}
+            {{/listBlock}}
+        {{/if}}
     {{/if}}
 
     {{#> listBlock title="Ground Truth UUID"}}
         {{uuid}}
     {{/listBlock}}
+
+    {{#each applicationQuestionsToShow}}
+        {{#> applicationQuestionListBlock title=this.name}}
+            {{this.prettyValue}}
+        {{/applicationQuestionListBlock}}
+    {{/each}}
+
+    {{#each confirmationQuestionsToShow}}
+        {{#> confirmationQuestionListBlock title=this.name}}
+            {{this.prettyValue}}
+        {{/confirmationQuestionListBlock}}
+    {{/each}}
 </ul>
 
-{{#if confirmed}}
-User is confirmed
-{{/if}}

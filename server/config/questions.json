@@ -23,7 +23,8 @@
 				"name": "phone-number",
 				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
 				"type": "tel",
-				"required": true
+				"required": true,
+                "showInHelpScout": true
 			},
             {
                 "name": "university",
@@ -276,7 +277,8 @@
 					"Yeshiva University"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "country",
@@ -679,13 +681,15 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "passion",
@@ -726,7 +730,8 @@
                 "name": "other",
                 "label": "Anything else you'd like us to know?",
                 "type": "textarea",
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             }
         ]
     },
@@ -1410,20 +1415,23 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "past-project",
                 "type": "textarea",
                 "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it?",
                 "required": true,
-                "maxWordCount": 150
+                "maxWordCount": 150,
+                "showInHelpScout": true
             },
             {
                 "name": "past-project-link",
@@ -2451,7 +2459,8 @@
                   "name": "additional-info",
                   "type": "textarea",
                   "label": "Is there anything you'd like us to know?",
-                  "required": false
+                  "required": false,
+                  "showInHelpScout": true
               }
           ]
       },

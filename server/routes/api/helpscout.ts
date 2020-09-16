@@ -1,10 +1,18 @@
 import * as express from "express";
 import {isHelpScoutIntegrationEnabled, validateHelpScoutSignature} from "../../middleware";
-import {IHelpScoutEmailNotFoundTemplate, IHelpScoutMainTemplate, IUser, User} from "../../schema";
+import {
+	IFormItem,
+	IHelpScoutEmailNotFoundTemplate,
+	IHelpScoutFormItem,
+	IHelpScoutMainTemplate,
+	IUser,
+	User
+} from "../../schema";
 import bodyParser = require("body-parser");
 import * as moment from "moment-timezone";
 import {Template} from "../templates";
 import * as Handlebars from "handlebars";
+import * as Branches from "../../branch";
 
 export const helpScoutRoutes = express.Router({"mergeParams": true});
 
@@ -36,6 +44,44 @@ function safe(text: string) {
 const EmailNotFoundTemplate = new Template<IHelpScoutEmailNotFoundTemplate>("helpscout/email_not_found.html");
 const MainHelpScoutTemplate = new Template<IHelpScoutMainTemplate>("helpscout/main.html");
 
+async function getFormAnswers(userData: IFormItem[], branch: string): Promise<IHelpScoutFormItem[]> {
+	let branchName = await Branches.BranchConfig.getCanonicalName(branch);
+	let questionBranch = branchName ? await Branches.BranchConfig.loadBranchFromDB(branchName) : null;
+	if (questionBranch) {
+		const hsQuestionNames = questionBranch?.questions
+			.filter(question => question.showInHelpScout)
+			.map(question => question.name);
+
+		return userData
+			.filter(question => hsQuestionNames.includes(question.name))
+			.map((question: IFormItem): IHelpScoutFormItem => {
+				let name = question.name.replace("-", " ");
+				name = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+
+				let prettyValue: string = "";
+
+				if (!question.value) {
+					prettyValue = "";
+				} else if (question.type === "file") {
+					const file = question.value as Express.Multer.File;
+					prettyValue = file.path;
+				} else if (question.value instanceof Array) {
+					prettyValue = question.value.join(", ");
+				} else {
+					prettyValue = question.value as string;
+				}
+
+				return {
+					...question,
+					prettyValue,
+					name
+				};
+			});
+	}
+
+	return [];
+}
+
 async function helpScoutUserInfoHandler(request: express.Request, response: express.Response) {
 	// TODO: validate signature here?
 	const email = safe(request.body.customer.email);
@@ -46,21 +92,33 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 			html: EmailNotFoundTemplate.render({ email }).replace(/[\r\n\t]/g, "")
 		});
 	} else {
+		const helpScoutInput: IHelpScoutMainTemplate = {
+			name: user.name,
+			email: user.email,
+			uuid: user.uuid,
+			applicationSubmitTime: user.applicationSubmitTime ? moment(user.applicationSubmitTime)
+				.format("DD-MMM-YYYY h:mm a") : undefined,
+			applicationQuestionsToShow: [],
+			confirmationQuestionsToShow: [],
+			applied: user.applied,
+			accepted: user.accepted,
+			confirmed: user.confirmed,
+			applicationBranch: user.applicationBranch,
+			confirmationBranch: user.confirmationBranch,
+			confirmationSubmitTime: user.confirmationSubmitTime ? moment(user.confirmationSubmitTime)
+				.format("DD-MMM-YYYY h:mm a") : undefined
+		};
+
+		if (user.applicationBranch && user.applicationData) {
+			helpScoutInput.applicationQuestionsToShow = await getFormAnswers(user.applicationData, user.applicationBranch);
+		}
+
+		if (user.confirmationBranch && user.confirmationData) {
+			helpScoutInput.confirmationQuestionsToShow = await getFormAnswers(user.confirmationData, user.confirmationBranch);
+		}
+
 		response.status(200).json({
-			"html": MainHelpScoutTemplate.render({
-				name: user.name,
-				email: user.email,
-				uuid: user.uuid,
-				applicationSubmitTime: user.applicationSubmitTime ? moment(user.applicationSubmitTime)
-					.format("DD-MMM-YYYY h:mm a") : undefined,
-				applied: user.applied,
-				accepted: user.accepted,
-				confirmed: user.confirmed,
-				applicationBranch: user.applicationBranch,
-				confirmationBranch: user.confirmationBranch,
-				confirmationSubmitTime: user.confirmationSubmitTime ? moment(user.confirmationSubmitTime)
-					.format("DD-MMM-YYYY h:mm a") : undefined
-			}).replace(/[\r\n\t]/g, "")
+			"html": MainHelpScoutTemplate.render(helpScoutInput).replace(/[\r\n\t]/g, "")
 		});
 	}
 }

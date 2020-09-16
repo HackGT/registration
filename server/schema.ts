@@ -404,10 +404,15 @@ export interface IHelpScoutEmailNotFoundTemplate {
 	email: string;
 }
 
+export interface IHelpScoutFormItem extends IFormItem {
+	prettyValue: string;
+}
+
 export interface IHelpScoutMainTemplate {
 	name: string;
 	email: string;
-	questions?: IFormItem[];
+	applicationQuestionsToShow: IHelpScoutFormItem[];
+	confirmationQuestionsToShow: IHelpScoutFormItem[];
 	applied: boolean;
 	accepted: boolean;
 	confirmed: boolean;
