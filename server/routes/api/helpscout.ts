@@ -80,8 +80,6 @@ async function getFormAnswers(userData: IFormItem[], branch: string): Promise<IH
 }
 
 async function helpScoutUserInfoHandler(request: express.Request, response: express.Response) {
-
-
 	const email = safe(request.body.customer.email);
 	const user: IUser | null = await findUserByEmail(email);
 
