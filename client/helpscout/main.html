@@ -61,7 +61,7 @@
                 {{#if accepted}}
                     {{#> badge type="success"}}
                         Confirmed
-                    {{/badge}} on {{confirmationSubmitTime}}
+                    {{/badge}}{{#if confirmationSubmitTime}} on {{confirmationSubmitTime}}{{/if}}
                 {{else}}
                     {{#> badge type="pending"}}
                         Confirmed
@@ -81,13 +81,13 @@
         {{/if}}
     {{/if}}
 
-    {{#> listBlock title="Ground Truth UUID"}}
-        {{uuid}}
-    {{/listBlock}}
-
     {{#each applicationQuestionsToShow}}
         {{#> applicationQuestionListBlock title=this.name}}
-            {{this.prettyValue}}
+            {{#ifCond this.type "file"}}
+                <a href="/{{this.prettyValue}}">{{this.prettyValue}}</a>
+            {{else}}
+                {{this.prettyValue}}
+            {{/ifCond}}
         {{/applicationQuestionListBlock}}
     {{/each}}
 
@@ -96,5 +96,9 @@
             {{this.prettyValue}}
         {{/confirmationQuestionListBlock}}
     {{/each}}
+
+    {{#> listBlock title="Ground Truth UUID"}}
+        {{uuid}}
+    {{/listBlock}}
 </ul>
 

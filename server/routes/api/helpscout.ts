@@ -52,13 +52,13 @@ async function getFormAnswers(userData: IFormItem[], branch: string): Promise<IH
 		return userData
 			.filter(question => hsQuestionNames.includes(question.name))
 			.map((question: IFormItem): IHelpScoutFormItem => {
-				let name = question.name.replace("-", " ");
+				let name = question.name.replace(/-/g, " ");
 				name = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 
 				let prettyValue: string = "";
 
 				if (!question.value) {
-					prettyValue = "";
+					prettyValue = "No response";
 				} else if (question.type === "file") {
 					const file = question.value as Express.Multer.File;
 					prettyValue = file.path;
@@ -85,7 +85,7 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 
 	if (!user) {
 		response.status(200).json({
-			html: EmailNotFoundTemplate.render({ email }).replace(/[\r\n\t]/g, "")
+			html: EmailNotFoundTemplate.render({ email })
 		});
 	} else {
 		const helpScoutInput: IHelpScoutMainTemplate = {
@@ -114,7 +114,7 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 		}
 
 		response.status(200).json({
-			"html": MainHelpScoutTemplate.render(helpScoutInput).replace(/[\r\n\t]/g, "")
+			"html": MainHelpScoutTemplate.render(helpScoutInput)
 		});
 	}
 }

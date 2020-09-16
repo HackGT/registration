@@ -145,12 +145,22 @@ class Config implements IConfig.Main {
 			if (config.helpscout.integration.enabled) {
 				this.helpscout.integration.enabled = config.helpscout.integration.enabled;
 				this.helpscout.integration.secretKey = config.helpscout.integration.secretKey;
+				if (!config.helpscout.integration.secretKey) {
+					console.warn("Disabling Help Scout integration because it is set to be enabled but " +
+						"integration secret key is empty");
+					this.helpscout.integration.enabled = false;
+				}
 			}
 
 			if (config.helpscout.beacon.enabled) {
 				this.helpscout.beacon.enabled = config.helpscout.beacon.enabled;
 				this.helpscout.beacon.beaconId = config.helpscout.beacon.beaconId;
 				this.helpscout.beacon.supportHistorySecretKey = config.helpscout.beacon.supportHistorySecretKey;
+				if (!config.helpscout.beacon.beaconId || !config.helpscout.beacon.supportHistorySecretKey) {
+					console.log("Disabling Help Scout Beacon because it is set to be enabled but Beacon ID or " +
+						"support history secret key is missing");
+					this.helpscout.beacon.enabled = false;
+				}
 			}
 		}
 	}
@@ -278,6 +288,10 @@ class Config implements IConfig.Main {
 			this.helpscout.integration.enabled = true;
 			if (process.env.HELPSCOUT_INTEGRATION_SECRET_KEY) {
 				this.helpscout.integration.secretKey = process.env.HELPSCOUT_INTEGRATION_SECRET_KEY;
+			} else {
+				console.warn("Disabling Help Scout integration because it is set to be enabled but " +
+					"integration secret key is empty");
+				this.helpscout.integration.enabled = false;
 			}
 		}
 
@@ -288,6 +302,11 @@ class Config implements IConfig.Main {
 			}
 			if (process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY) {
 				this.helpscout.beacon.supportHistorySecretKey = process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY;
+			}
+			if (!process.env.HELPSCOUT_BEACON_ID || !process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY) {
+				console.log("Disabling Help Scout Beacon because of missing Beacon ID or support history " +
+					"secret key");
+				this.helpscout.beacon.enabled = false;
 			}
 		}
 	}

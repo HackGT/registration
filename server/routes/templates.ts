@@ -252,8 +252,8 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		beaconEnabled: config.helpscout.beacon.enabled,
 		beaconId: config.helpscout.beacon.beaconId,
 		signature: crypto.createHmac('sha256', config.helpscout.beacon.supportHistorySecretKey)
-		.update(user.email)
-		.digest('hex')
+			.update(user.email)
+			.digest('hex')
 	};
 
 	let templateData: IIndexTemplate = {

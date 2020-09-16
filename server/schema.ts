@@ -416,9 +416,9 @@ export interface IHelpScoutMainTemplate {
 	applied: boolean;
 	accepted: boolean;
 	confirmed: boolean;
-	applicationSubmitTime: string | undefined;
-	applicationBranch: string | undefined;
-	confirmationBranch: string | undefined;
-	confirmationSubmitTime: string | undefined;
+	applicationSubmitTime?: string;
+	applicationBranch?: string;
+	confirmationBranch?: string;
+	confirmationSubmitTime?: string;
 	uuid: string;
 }
