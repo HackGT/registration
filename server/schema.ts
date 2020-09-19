@@ -36,6 +36,7 @@ export namespace IConfig {
 		cookieSecureOnly: boolean;
 		mongoURL: string;
 		defaultTimezone: string;
+		rootURL: string;
 	}
 	export interface Style {
 		theme: string;
@@ -421,5 +422,5 @@ export interface IHelpScoutMainTemplate {
 	confirmationBranch?: string;
 	confirmationSubmitTime?: string;
 	uuid: string;
-	rootUrl: string;
+	rootURL: string;
 }

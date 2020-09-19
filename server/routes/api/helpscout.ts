@@ -13,6 +13,7 @@ import * as moment from "moment-timezone";
 import {Template} from "../templates";
 import * as Handlebars from "handlebars";
 import * as Branches from "../../branch";
+import {config} from "../../common";
 
 export const helpScoutRoutes = express.Router({"mergeParams": true});
 
@@ -88,11 +89,12 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 			html: EmailNotFoundTemplate.render({ email })
 		});
 	} else {
+		console.log("root url:", config.server.rootURL);
 		const helpScoutInput: IHelpScoutMainTemplate = {
 			name: user.name,
 			email: user.email,
 			uuid: user.uuid,
-			rootUrl: process.env.ROOT_URL || "",
+			rootURL: config.server.rootURL,
 			applicationSubmitTime: user.applicationSubmitTime ? moment(user.applicationSubmitTime)
 				.format("DD-MMM-YYYY h:mm a") : undefined,
 			applicationQuestionsToShow: [],

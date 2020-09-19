@@ -1425,7 +1425,8 @@
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "past-project",

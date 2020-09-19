@@ -39,7 +39,8 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/registration",
-		defaultTimezone: "America/New_York"
+		defaultTimezone: "America/New_York",
+		rootURL: "http://localhost:3000"
 	};
 	public admins = {
 		domains: [] as string[],
@@ -308,6 +309,10 @@ class Config implements IConfig.Main {
 					"secret key");
 				this.helpscout.beacon.enabled = false;
 			}
+		}
+
+		if (process.env.ROOT_URL) {
+			this.server.rootURL = process.env.ROOT_URL;
 		}
 	}
 }
