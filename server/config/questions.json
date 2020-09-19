@@ -536,7 +536,8 @@
                     "Åland Islands"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "year",
@@ -664,7 +665,8 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "marketing",
@@ -681,8 +683,7 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
-                "required": false,
-                "showInHelpScout": true
+                "required": false
             },
             {
                 "name": "resume",
@@ -730,8 +731,7 @@
                 "name": "other",
                 "label": "Anything else you'd like us to know?",
                 "type": "textarea",
-                "required": false,
-                "showInHelpScout": true
+                "required": false
             }
         ]
     },
@@ -759,7 +759,8 @@
 				"name": "phone-number",
 				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
 				"type": "tel",
-				"required": true
+				"required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "university",
@@ -1012,7 +1013,8 @@
 					"Yeshiva University"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "country",
@@ -1270,7 +1272,8 @@
                     "Åland Islands"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "year",
@@ -1398,7 +1401,8 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "marketing",
@@ -1415,23 +1419,20 @@
                     "Corporate Sponsor"
                 ],
                 "hasOther": true,
-                "required": false,
-                "showInHelpScout": true
+                "required": false
             },
             {
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true,
-                "showInHelpScout": true
+                "required": true
             },
             {
                 "name": "past-project",
                 "type": "textarea",
                 "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it?",
                 "required": true,
-                "maxWordCount": 150,
-                "showInHelpScout": true
+                "maxWordCount": 150
             },
             {
                 "name": "past-project-link",
@@ -1497,14 +1498,16 @@
 				"name": "phone-number",
 				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
 				"type": "tel",
-				"required": true
+				"required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "is-student",
                 "label": "Are you a student?",
                 "type": "radio",
                 "options": ["Yes", "No"],
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "school",
@@ -1825,13 +1828,15 @@
                 "name": "current-job",
                 "label": "If you are not a student, what is your current occupation? (eg. software engineer)",
                 "type": "text",
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "affiliation",
                 "label": "If you are not a student, what is your affiliation (e.g. company)",
                 "type": "text",
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "gender",
@@ -1898,7 +1903,8 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "country",
@@ -2156,73 +2162,8 @@
                     "Åland Islands"
                 ],
                 "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "gender",
-                "label": "I identify as ...",
-                "type": "radio",
-                "options": ["Male", "Female", "Non-binary/third gender", "Prefer not to answer"],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "race",
-                "label": "What is your race/ethnicity?",
-                "type": "checkbox",
-                "options": [
-                    "Non-Hispanic Caucasian",
-                    "Black or African American",
-                    "Latinx or Hispanic American",
-                    "South Asian or Indian American",
-                    "East Asian or Asian American",
-                    "Middle Eastern or Arab American",
-                    "Native American or Alaskan Native",
-                    "Hawaiian or Pacific Islander"
-                ],
-                "hasOther": true,
-                "required": false
-            },
-            {
-                "name": "timezone",
-                "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
-                "type": "select",
-                "options": [
-                    "Eastern Daylight Time",
-                    "Greenwich Mean Time",
-                    "Universal Coordinated Time",
-                    "European Central Time",
-                    "Eastern European Time",
-                    "(Arabic) Egypt Daylight Time",
-                    "Eastern African Time",
-                    "Middle East Time",
-                    "Near East Time",
-                    "Pakistan Lahore Time",
-                    "India Daylight Time",
-                    "Bangladesh Daylight Time",
-                    "Vietnam Daylight Time",
-                    "China Taiwan Time",
-                    "Japan Daylight Time",
-                    "Australia Central Time",
-                    "Australia Eastern Time",
-                    "Solomon Daylight Time",
-                    "New Zealand Daylight Time",
-                    "Midway Islands Time",
-                    "Hawaii Daylight Time",
-                    "Alaska Daylight Time",
-                    "Pacific Daylight Time",
-                    "Phoenix Daylight Time",
-                    "Mountain Daylight Time",
-                    "Central Daylight Time",
-                    "Indiana Eastern Daylight Time",
-                    "Puerto Rico and US Virgin Islands Time",
-                    "Canada Newfoundland Time",
-                    "Argentina Daylight Time",
-                    "Brazil Eastern Time",
-                    "Central African Time"
-                ],
-                "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "t-shirt",
@@ -2459,8 +2400,7 @@
                   "name": "additional-info",
                   "type": "textarea",
                   "label": "Is there anything you'd like us to know?",
-                  "required": false,
-                  "showInHelpScout": true
+                  "required": false
               }
           ]
       },
