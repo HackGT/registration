@@ -92,6 +92,7 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 			name: user.name,
 			email: user.email,
 			uuid: user.uuid,
+			rootUrl: process.env.ROOT_URL || "",
 			applicationSubmitTime: user.applicationSubmitTime ? moment(user.applicationSubmitTime)
 				.format("DD-MMM-YYYY h:mm a") : undefined,
 			applicationQuestionsToShow: [],

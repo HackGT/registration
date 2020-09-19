@@ -84,7 +84,7 @@
     {{#each applicationQuestionsToShow}}
         {{#> applicationQuestionListBlock title=this.name}}
             {{#ifCond this.type "file"}}
-                <a href="/{{this.prettyValue}}">{{this.prettyValue}}</a>
+                <a href="{{rootUrl}}/{{this.prettyValue}}">{{this.prettyValue}}</a>
             {{else}}
                 {{this.prettyValue}}
             {{/ifCond}}

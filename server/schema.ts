@@ -421,4 +421,5 @@ export interface IHelpScoutMainTemplate {
 	confirmationBranch?: string;
 	confirmationSubmitTime?: string;
 	uuid: string;
+	rootUrl: string;
 }
