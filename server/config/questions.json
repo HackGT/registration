@@ -2649,6 +2649,60 @@
       ]
    },
    {
+      "name":"Mentor (Day-of)",
+      "text":[
+         {
+            "for":"18-and-gt-student",
+            "type":"p",
+            "content":"Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGTeeny 2020."
+         }
+      ],
+      "questions":[
+         {
+            "name":"18-and-gt-student",
+            "label":"Are you over 18 or a student at Georgia Tech?",
+            "type":"radio",
+            "options":[
+               "I am 18 or older.",
+               "I am under 18 and a Georgia Tech student."
+            ],
+            "required":true
+         },
+         {
+            "name":"which-track",
+            "label":"Which track were you a mentor for?",
+            "type":"radio",
+            "options":[
+               "Android App Development",
+               "Web Development",
+               "Gaming",
+               "Data Science"
+            ],
+            "required":true
+         },
+         {
+            "name":"required-items",
+            "label":"Please confirm the following:",
+            "type":"checkbox",
+            "options":[
+               "I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
+               "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/10-5FDcvhY1Thgk5hayYRmaxRai1xM_dK/view?usp=sharing)",
+               "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1lU5C_BMFYWBRestPELWVuiKK_0dqVo4S/view?usp=sharing)",
+               "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
+               "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails."
+            ],
+            "required":true,
+            "hasOther":false
+         },
+         {
+            "name":"other",
+            "label":"Anything else you'd like us to know?",
+            "type":"textarea",
+            "required":false
+         }
+      ]
+   },
+   {
       "name":"Participant-Data Science Confirmation",
       "text":[
          {
