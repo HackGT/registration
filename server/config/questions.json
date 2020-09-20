@@ -23,7 +23,8 @@
 				"name": "phone-number",
 				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
 				"type": "tel",
-				"required": true
+				"required": true,
+                "showInHelpScout": true
 			},
             {
                 "name": "university",
@@ -276,7 +277,8 @@
 					"Yeshiva University"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "country",
@@ -534,7 +536,8 @@
                     "Åland Islands"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "year",
@@ -662,7 +665,8 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "marketing",
@@ -685,7 +689,8 @@
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "passion",
@@ -754,7 +759,8 @@
 				"name": "phone-number",
 				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
 				"type": "tel",
-				"required": true
+				"required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "university",
@@ -1007,7 +1013,8 @@
 					"Yeshiva University"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "country",
@@ -1265,7 +1272,8 @@
                     "Åland Islands"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "year",
@@ -1393,7 +1401,8 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "marketing",
@@ -1416,7 +1425,8 @@
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "past-project",
@@ -1489,14 +1499,16 @@
 				"name": "phone-number",
 				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
 				"type": "tel",
-				"required": true
+				"required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "is-student",
                 "label": "Are you a student?",
                 "type": "radio",
                 "options": ["Yes", "No"],
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "school",
@@ -1749,7 +1761,8 @@
 					"Yeshiva University"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "year",
@@ -1816,13 +1829,15 @@
                 "name": "current-job",
                 "label": "If you are not a student, what is your current occupation? (eg. software engineer)",
                 "type": "text",
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "affiliation",
                 "label": "If you are not a student, what is your affiliation (e.g. company)",
                 "type": "text",
-                "required": false
+                "required": false,
+                "showInHelpScout": true
             },
             {
                 "name": "gender",
@@ -1889,7 +1904,8 @@
                     "Central African Time"
                 ],
                 "hasOther": true,
-                "required": false
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "country",
@@ -2147,7 +2163,8 @@
                     "Åland Islands"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "t-shirt",
