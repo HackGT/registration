@@ -22,7 +22,9 @@
 		"port": 3000,
 		"cookieMaxAge": 15552000000,
 		"cookieSecureOnly": true,
-		"mongoURL": "mongodb://localhost/registration"
+		"mongoURL": "mongodb://localhost/registration",
+		"rootURL": "http://localhost:3000"
+
 	},
 	"eventName": "My Hackathon",
 	"storageEngine": {
@@ -40,7 +42,7 @@
 		"beacon": {
 			"enabled": false,
 			"beaconId": "<obtain from Help Scout Beacon installation page",
-			"supportHistorySecretKey": "<provided by Help Scout when you turn on the Support history security Beacon setting"
+			"supportHistorySecretKey": "<provided by Help Scout when you turn on the support history security Beacon setting"
 		}
 	}
 }
