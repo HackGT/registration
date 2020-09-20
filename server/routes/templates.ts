@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { URL } from "url";
 import * as express from "express";
-import * as Handlebars from "handlebars";
+import * as HandlebarsImport from "handlebars";
 import * as moment from "moment-timezone";
 import * as bowser from "bowser";
 import * as uuid from "uuid/v4";
@@ -25,6 +25,11 @@ import {
 	IFormItem
 } from "../schema";
 import * as Branches from "../branch";
+import * as crypto from "crypto";
+
+import {allowInsecurePrototypeAccess} from "@handlebars/allow-prototype-access";
+
+const Handlebars = allowInsecurePrototypeAccess(HandlebarsImport);
 
 export let templateRoutes = express.Router();
 
@@ -190,7 +195,7 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 	}
 
 	function formatMoment(date: moment.Moment | null): string {
-		const FORMAT = "dddd, MMMM Do YYYY [at] h:mm a z";
+		const FORMAT = "dddd, MMMM Do, YYYY, [at] h:mm a z";
 		if (date) {
 			return date.tz(config.server.defaultTimezone).format(FORMAT);
 		}
@@ -243,9 +248,18 @@ templateRoutes.route("/").get(authenticateWithRedirect, async (request, response
 		autoConfirm = confirmBranches[0].autoConfirm;
 	}
 
+	const helpscout = {
+		beaconEnabled: config.helpscout.beacon.enabled,
+		beaconId: config.helpscout.beacon.beaconId,
+		signature: crypto.createHmac('sha256', config.helpscout.beacon.supportHistorySecretKey)
+			.update(user.email)
+			.digest('hex')
+	};
+
 	let templateData: IIndexTemplate = {
 		siteTitle: config.eventName,
 		user,
+		helpscout,
 		timeline: {
 			application: "",
 			decision: "",
@@ -365,9 +379,18 @@ templateRoutes.route("/team").get(authenticateWithRedirect, async (request, resp
 		}
 	}
 
+	const helpscout = {
+		beaconEnabled: config.helpscout.beacon.enabled,
+		beaconId: config.helpscout.beacon.beaconId,
+		signature: crypto.createHmac('sha256', config.helpscout.beacon.supportHistorySecretKey)
+			.update(request.user.email)
+			.digest('hex')
+	};
+
 	let templateData: ITeamTemplate = {
 		siteTitle: config.eventName,
 		user: request.user as IUser,
+		helpscout,
 		team,
 		membersAsUsers,
 		teamLeaderAsUser,
@@ -418,9 +441,18 @@ function applicationHandler(requestType: ApplicationType): (request: express.Req
 			}
 		}
 
+		const helpscout = {
+			beaconEnabled: config.helpscout.beacon.enabled,
+			beaconId: config.helpscout.beacon.beaconId,
+			signature: crypto.createHmac('sha256', config.helpscout.beacon.supportHistorySecretKey)
+				.update(user.email)
+				.digest('hex')
+		};
+
 		let templateData: IRegisterBranchChoiceTemplate = {
 			siteTitle: config.eventName,
 			user,
+			helpscout,
 			settings: {
 				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 				qrEnabled: await getSetting<boolean>("qrEnabled")
@@ -471,6 +503,13 @@ function interstitialPostHandler(request: express.Request, response: express.Res
 function applicationBranchHandler(requestType: ApplicationType, anonymous: boolean): (request: express.Request, response: express.Response) => Promise<void> {
 	return async (request, response) => {
 		let user: IUser;
+
+		const helpscout = {
+			beaconEnabled: config.helpscout.beacon.enabled,
+			beaconId: config.helpscout.beacon.beaconId,
+			signature: ""
+		};
+
 		if (anonymous) {
 			user = new User({
 				uuid: uuid(),
@@ -478,6 +517,9 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 			});
 		} else {
 			user = request.user as IUser;
+			helpscout.signature = crypto.createHmac('sha256', config.helpscout.beacon.supportHistorySecretKey)
+				.update(user.email)
+				.digest('hex');
 		}
 
 		let branchName = request.params.branch as string;
@@ -510,6 +552,7 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 			response.send(InterstitialTemplate.render({
 				siteTitle: config.eventName,
 				user,
+				helpscout,
 				settings: {
 					teamsEnabled: await getSetting<boolean>("teamsEnabled"),
 					qrEnabled: await getSetting<boolean>("qrEnabled")
@@ -601,11 +644,16 @@ function applicationBranchHandler(requestType: ApplicationType, anonymous: boole
 				thisUser.confirmationStartTime = new Date();
 			}
 			await thisUser.save();
+
+			helpscout.signature = crypto.createHmac('sha256', config.helpscout.beacon.supportHistorySecretKey)
+				.update(user.email)
+				.digest('hex');
 		}
 
 		let templateData: IRegisterTemplate = {
 			siteTitle: config.eventName,
 			unauthenticated: anonymous,
+			helpscout,
 			user: request.user as IUser,
 			settings: {
 				teamsEnabled: await getSetting<boolean>("teamsEnabled"),
@@ -651,6 +699,9 @@ templateRoutes.route("/admin").get(authenticateWithRedirect, async (request, res
 	let templateData: IAdminTemplate = {
 		siteTitle: config.eventName,
 		user,
+		helpscout: {
+			beaconEnabled: false // No need to show Help Scout Beacon on admin screens
+		},
 		applicationStatistics: {
 			totalUsers: await User.find().count(),
 			appliedUsers: await User.find({ "applied": true }).count(),

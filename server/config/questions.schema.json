@@ -89,6 +89,9 @@
                                 },
                                 "minCharacterCount": {
                                     "type": "number"
+                                },
+                                "showInHelpScout": {
+                                    "type": "boolean"
                                 }
                             },
                             "required": [
@@ -124,6 +127,9 @@
                                     "type": "boolean"
                                 },
                                 "required": {
+                                    "type": "boolean"
+                                },
+                                "showInHelpScout": {
                                     "type": "boolean"
                                 }
                             },

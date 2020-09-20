@@ -18,6 +18,8 @@ export let postParser = bodyParser.urlencoded({
 
 import * as multer from "multer";
 import {QuestionBranches} from "./config/questions.schema";
+import * as crypto from "crypto";
+import {RequestWithRawBody} from "./routes/api/helpscout";
 
 export const MAX_FILE_SIZE = 50000000; // 50 MB
 export let uploadHandler = multer({
@@ -295,4 +297,56 @@ export function trackEvent(action: string, request: express.Request, user?: stri
 		tags
 	};
 	console.log(JSON.stringify(metricsEvent));
+}
+
+export function isHelpScoutIntegrationEnabled(request: express.Request, response: express.Response, next: express.NextFunction) {
+	const enabled = config.helpscout.integration.enabled;
+	if (!enabled) {
+		console.error("Error while responding to Help Scout API request: Help Scout integration functionality is currently disabled");
+		response.status(404).json({
+			error: "Not found"
+		});
+		return;
+	}
+
+	next();
+}
+
+// Inspired by https://github.com/suryagh/tsscmp/blob/master/lib/index.js#L11
+function bufferEqual(a: Buffer, b: Buffer) {
+	if (a.length !== b.length) {
+		return false;
+	}
+
+	return crypto.timingSafeEqual(a, b);
+}
+
+export function validateHelpScoutSignature(request: RequestWithRawBody, response: express.Response, next: express.NextFunction) {
+	const secret = config.helpscout.integration.secretKey;
+	const hsSignature = request.header('X-HelpScout-Signature')?.trim();
+
+	if (!request.rawBody) {
+		console.warn("Rejecting request for Help Scout integration: missing rawBody attribute on request " +
+			"(must be added by middleware)");
+	} else if (hsSignature) {
+		const computedHash = crypto.createHmac('sha1', secret)
+			.update(request.rawBody)
+			.digest('base64');
+
+		// Prevents timing attacks with HMAC hashes https://stackoverflow.com/a/51489494
+		if (bufferEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
+			next();
+			return;
+		} else {
+			console.warn("Rejecting request for Help Scout integration due to incorrect signature (check that " +
+				"the secret key is correct in local config and in Helpscout app config)");
+		}
+	} else {
+		console.warn("Rejecting request for Help Scout integration: missing required X-HelpScout-Signature " +
+			"header");
+	}
+
+	response.status(400).json({
+		"error": "Unable to process request"
+	});
 }
