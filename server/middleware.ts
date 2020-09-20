@@ -333,9 +333,6 @@ export function validateHelpScoutSignature(request: RequestWithRawBody, response
 			.update(request.rawBody)
 			.digest('base64');
 
-		console.log("hsSignature:", hsSignature);
-		console.log("Calculated signature: ", computedHash);
-
 		// Prevents timing attacks with HMAC hashes https://stackoverflow.com/a/51489494
 		if (bufferEqual(Buffer.from(hsSignature), Buffer.from(computedHash))) {
 			next();

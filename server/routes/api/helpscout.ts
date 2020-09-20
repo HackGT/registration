@@ -89,7 +89,6 @@ async function helpScoutUserInfoHandler(request: express.Request, response: expr
 			html: EmailNotFoundTemplate.render({ email })
 		});
 	} else {
-		console.log("root url:", config.server.rootURL);
 		const helpScoutInput: IHelpScoutMainTemplate = {
 			name: user.name,
 			email: user.email,
