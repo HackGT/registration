@@ -598,6 +598,7 @@ const interstitialTypeSelect = document.getElementById("interstitial-type") as H
 
 let emailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("email-rendered") as HTMLElement;
 let interstitialRenderedArea: HTMLElement | ShadowRoot = document.getElementById("interstitial-rendered") as HTMLElement;
+// @ts-ignore
 if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
 	emailRenderedArea = emailRenderedArea.attachShadow({ mode: "open" });
@@ -991,6 +992,7 @@ let sendEmailButton = document.getElementById("sendEmail") as HTMLButtonElement;
 let batchEmailSubject = document.getElementById("batch-email-subject") as HTMLInputElement;
 let batchEmailEditor = new EasyMDE({ element: document.getElementById("batch-email-content")! });
 let batchEmailRenderedArea: HTMLElement | ShadowRoot = document.getElementById("batch-email-rendered") as HTMLElement;
+// @ts-ignore
 if (document.head.attachShadow) {
 	// Browser supports Shadow DOM
 	batchEmailRenderedArea = batchEmailRenderedArea.attachShadow({ mode: "open" });
