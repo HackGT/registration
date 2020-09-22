@@ -8,8 +8,8 @@
 		}
 	},
 	"admins": {
-		"domains": ["gatech.edu", "hack.gt"],
-		"emails": ["george.p@burdell.com", "buzz@gatech.edu"]
+		"domains": ["gatech.edu.invalid", "hack.gt.invalid"],
+		"emails": ["george.p@burdell.com.invalid", "buzz@gatech.edu.invalid"]
 	},
 	"email": {
 		"from": "HackGT Team <hello@hackgt.com>",
