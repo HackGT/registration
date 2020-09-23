@@ -138,6 +138,9 @@ To setup Help Scout integration:
 6. Once you get the integration working, turn off **Debug Mode** in Help Scout.
 7. Pick the mailboxes you want the registration integration to appear in.
 
+Note: If the Integration Secret Key is missing or empty but Help Scout Integration is enabled,
+the feature will be disabled automatically.
+
 The Help Scout Integration can optionally show selected answers to questions from a user's application or confirmation
 forms.  You can indicate which questions to show in Help Scout using by adding `showInHelpScout: true` to any question
 in your `questions.json` file (see example in the `question.json` included in this repo).
@@ -157,7 +160,5 @@ that looks like `window.Beacon('init', '<THIS IS THE BEACON ID>')`.
 options for Beacons available in Help Scout.  You can change the settings remotely through Help Scout without changing 
 any code or configuration in registration!
 
-(Note: If you set the secure key environment variable but do not enable the **Support history security** setting for the Beacon
-in Help Scout, the Beacon **will not** work and you'll see a network error in the console when you try to send a message through the Beacon.)
-
-
+Note: if either of the required Beacon settings is missing or empty, the Beacon functionality
+will be automatically disabled.
