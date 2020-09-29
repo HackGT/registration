@@ -51,6 +51,12 @@
 								information about the program and eligibility.
 							</p>
 						{{/ifCond}}
+						{{#ifCond this "sponsor"}}
+						<p>
+							If your company is a sponsor of HackGT 7 and you've been directed to this site, please
+							apply to this branch!
+						</p>
+						{{/ifCond}}
 						<a href="/apply/{{slug this}}" class="btn">Apply!</a>
 					</div>
 				{{/each}}

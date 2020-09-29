@@ -1,5 +1,12 @@
 # HackGT Registration
 
+## Special Branch for HackGT 7
+
+:warning: **This branch of Registration contains auto-accept logic for some branches.  Branch off of the `master` branch
+instead** :warning:
+
+# About
+
 **Powerful and extensible registration system for hackathons and other large events**
 
 [Check it out running in production](https://registration.hack.gt) for HackGT 4: New Heights!
