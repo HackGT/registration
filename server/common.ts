@@ -330,10 +330,12 @@ class Config implements IConfig.Main {
 
 		if (process.env.HACKGT7_SPONSOR_EMAILS) {
 			this.hackgt7.sponsorEmailWhitelist = JSON.parse(process.env.HACKGT7_SPONSOR_EMAILS);
+			console.log("The HackGT 7 sponsor email whitelist is:", this.hackgt7.sponsorEmailWhitelist);
 		}
 
 		if (process.env.HACKGT7_SPONSOR_DOMAINS) {
 			this.hackgt7.sponsorDomainWhitelist = JSON.parse(process.env.HACKGT7_SPONSOR_DOMAINS);
+			console.log("The HackGT 7 sponsor email domain whitelist is:", this.hackgt7.sponsorDomainWhitelist);
 		}
 	}
 }
