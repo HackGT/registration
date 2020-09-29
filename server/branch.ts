@@ -7,7 +7,7 @@ import { QuestionBranchConfig, QuestionBranchSettings, IUser } from "./schema";
 import { config, readFileAsync, renderMarkdown } from "./common";
 import { QuestionBranches, Questions, TextBlocks } from "./config/questions.schema";
 
-// TODO: take adjvantage of this frontloading
+// TODO: take advantage of this frontloading
 export const QuestionsConfig: QuestionBranches = JSON.parse(fs.readFileSync(config.questionsLocation, "utf8"));
 
 export const Branches: string[] = QuestionsConfig.map(branch => branch.name);

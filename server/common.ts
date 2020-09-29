@@ -74,6 +74,11 @@ class Config implements IConfig.Main {
 		}
 	};
 
+	public hackgt7: IConfig.HackGT7 = {
+		sponsorDomainWhitelist: [],
+		sponsorEmailWhitelist: []
+	};
+
 	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
 
 	constructor(fileName: string = "config.json") {
@@ -162,6 +167,14 @@ class Config implements IConfig.Main {
 						"support history secret key is missing");
 					this.helpscout.beacon.enabled = false;
 				}
+			}
+		}
+		if (config.hackgt7) {
+			if (config.hackgt7.sponsorEmailWhitelist) {
+				this.hackgt7.sponsorEmailWhitelist = config.hackgt7.sponsorEmailWhitelist;
+			}
+			if (config.hackgt7.sponsorDomainWhitelist) {
+				this.hackgt7.sponsorDomainWhitelist = config.hackgt7.sponsorDomainWhitelist;
 			}
 		}
 	}
@@ -313,6 +326,14 @@ class Config implements IConfig.Main {
 
 		if (process.env.ROOT_URL) {
 			this.server.rootURL = process.env.ROOT_URL;
+		}
+
+		if (process.env.HACKGT7_SPONSOR_EMAILS) {
+			this.hackgt7.sponsorEmailWhitelist = JSON.parse(process.env.HACKGT7_SPONSOR_EMAILS);
+		}
+
+		if (process.env.HACKGT7_SPONSOR_DOMAINS) {
+			this.hackgt7.sponsorDomainWhitelist = JSON.parse(process.env.HACKGT7_SPONSOR_DOMAINS);
 		}
 	}
 }
