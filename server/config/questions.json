@@ -2401,7 +2401,7 @@
           "Wayfair"
         ],
         "required": true,
-        "hasOther": false,
+        "hasOther": true,
         "showInHelpScout": true
       },
       {
