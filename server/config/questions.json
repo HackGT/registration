@@ -2891,19 +2891,10 @@
         "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
         "type": "checkbox",
         "options": [
-          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
         ],
         "required": false,
         "hasOther": false
-      },
-      {
-        "name": "microsoft",
-        "label": "Please confirm the following:",
-        "type": "checkbox",
-        "options": [
-          "INSERT MICROSOFT DISCLAIMER"
-        ],
-        "required": true
       },
       {
         "name": "required-items",
@@ -2954,19 +2945,10 @@
         "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
         "type": "checkbox",
         "options": [
-          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
         ],
         "required": false,
         "hasOther": false
-      },
-      {
-        "name": "microsoft",
-        "label": "Please confirm the following:",
-        "type": "checkbox",
-        "options": [
-          "INSERT MICROSOFT DISCLAIMER"
-        ],
-        "required": true
       },
       {
         "name": "required-items",
@@ -3004,7 +2986,7 @@
         "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
         "type": "checkbox",
         "options": [
-          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
         ],
         "required": false,
         "hasOther": false
@@ -3030,15 +3012,6 @@
         "label": "Github profile",
         "type": "text",
         "required": false
-      },
-      {
-        "name": "microsoft",
-        "label": "Please confirm the following:",
-        "type": "checkbox",
-        "options": [
-          "INSERT MICROSOFT DISCLAIMER"
-        ],
-        "required": true
       },
       {
         "name": "additional-info",
@@ -3068,19 +3041,10 @@
         "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
         "type": "checkbox",
         "options": [
-          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
         ],
         "required": false,
         "hasOther": false
-      },
-      {
-        "name": "microsoft",
-        "label": "Please confirm the following:",
-        "type": "checkbox",
-        "options": [
-          "INSERT MICROSOFT DISCLAIMER"
-        ],
-        "required": true
       },
       {
         "name": "github",
@@ -3121,19 +3085,10 @@
         "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
         "type": "checkbox",
         "options": [
-          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."
+          "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
         ],
         "required": false,
         "hasOther": false
-      },
-      {
-        "name": "microsoft",
-        "label": "Please confirm the following:",
-        "type": "checkbox",
-        "options": [
-          "INSERT MICROSOFT DISCLAIMER"
-        ],
-        "required": true
       },
       {
         "name": "resume",
