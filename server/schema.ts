@@ -59,11 +59,6 @@ export namespace IConfig {
 		supportHistorySecretKey: string;
 	}
 
-	export interface HackGT7 {
-		sponsorEmailWhitelist: string[];
-		sponsorDomainWhitelist: string[];
-	}
-
 	export interface Main {
 		secrets: Secrets;
 		email: Email;
@@ -81,7 +76,6 @@ export namespace IConfig {
 		};
 		maxTeamSize: number;
 		helpscout: HelpScout;
-		hackgt7: HackGT7;
 	}
 }
 
