@@ -694,8 +694,7 @@
         "name": "resume",
         "label": "Please upload your resume or a skill sheet",
         "type": "file",
-        "required": true,
-        "showInHelpScout": true
+        "required": true
       },
       {
         "name": "passion",
@@ -1435,8 +1434,7 @@
         "name": "resume",
         "label": "Please upload your resume or a skill sheet",
         "type": "file",
-        "required": true,
-        "showInHelpScout": true
+        "required": true
       },
       {
         "name": "past-project",
@@ -2779,15 +2777,15 @@
             "options": [
                 "Speaker", "Workshop Instructor"
             ],
-            "required": true
+            "required": true,
+            "showInHelpScout": true
         },
         {
             "name": "resume",
             "label": "Please upload your resume or a skill sheet",
             "type": "file",
-            "required": true,
-            "showInHelpScout": true
-          },
+            "required": true
+        },
         {
             "name": "t-shirt",
             "label": "What is your T-Shirt size?",
@@ -2895,8 +2893,7 @@
             "name": "resume",
             "label": "Please upload your resume or a skill sheet",
             "type": "file",
-            "required": true,
-            "showInHelpScout": true
+            "required": true
           },
           {
             "name": "github",
@@ -3091,8 +3088,7 @@
             "name": "resume",
             "label": "Please upload your resume or a skill sheet",
             "type": "file",
-            "required": true,
-            "showInHelpScout": true
+            "required": true
           },
           {
             "name": "t-shirt",
