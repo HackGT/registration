@@ -2744,7 +2744,7 @@
         "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
       },
       {
-        "for": "street1",
+        "for": "t-shirt",
         "type": "h4",
         "content": "You are eligible to receive the top tier swag pack! If you are interested in receiving one, please include your address. Unfortunately we cannot ship internationally."
       },
@@ -2783,9 +2783,25 @@
       },
       {
         "name": "resume",
-        "label": "Please upload your resume or a skill sheet",
+        "label": "(Optional) Please upload your resume or a skill sheet",
         "type": "file",
-        "required": true
+        "required": false
+      },
+      {
+        "name": "t-shirt",
+        "label": "What is your T-Shirt size?",
+        "type": "select",
+        "options": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "2XL",
+          "3XL"
+        ],
+        "hasOther": true,
+        "required": false
       },
       {
         "name": "street1",
@@ -3058,7 +3074,7 @@
         "content": "Authorization to Share Data with Sponsors"
       },
       {
-        "for": "t-shirt",
+        "for": "street1",
         "type": "h4",
         "content": "You are eligible to receive the top tier swag pack! If you are interested in receiving one, please include your address. Unfortunately we cannot ship internationally."
       }
@@ -3079,22 +3095,6 @@
         "label": "Please upload your resume or a skill sheet",
         "type": "file",
         "required": true
-      },
-      {
-        "name": "t-shirt",
-        "label": "What is your T-Shirt size?",
-        "type": "select",
-        "options": [
-          "XS",
-          "S",
-          "M",
-          "L",
-          "XL",
-          "2XL",
-          "3XL"
-        ],
-        "hasOther": true,
-        "required": false
       },
       {
         "name": "street1",
