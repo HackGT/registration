@@ -57,6 +57,19 @@
 							apply to this branch!
 						</p>
 						{{/ifCond}}
+
+						{{#ifCond this "partner"}}
+						<p>
+							If you will be a speaker or workshop presenter at HackGT 7 and you've been directed to this site, please
+							apply to this branch!
+						</p>
+						{{/ifCond}}
+
+						{{#ifCond this "staff"}}
+						<p>
+							This is an internal branch intended only for members of the HackGT Team.
+						</p>
+						{{/ifCond}}
 						<a href="/apply/{{slug this}}" class="btn">Apply!</a>
 					</div>
 				{{/each}}
