@@ -3920,13 +3920,6 @@
         "required": false
       },
       {
-        "name": "past-project",
-        "type": "textarea",
-        "label": "Describe a current or past project that you are proud of. Why did you enjoy creating it?",
-        "required": false,
-        "maxWordCount": 100
-      },
-      {
         "name": "creativity",
         "type": "textarea",
         "label": "Now, let’s depart from reality. If you could live in any fantasy or imaginary world, which one would it be and why?",
