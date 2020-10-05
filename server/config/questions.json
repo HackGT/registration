@@ -2812,15 +2812,10 @@
         "options": [
           "Speaker",
           "Workshop Instructor"
+          "Judge"
         ],
         "required": true,
         "showInHelpScout": true
-      },
-      {
-        "name": "resume",
-        "label": "(Optional) Please upload your resume or a skill sheet",
-        "type": "file",
-        "required": false
       },
       {
         "name": "t-shirt",
@@ -2930,6 +2925,12 @@
         ],
         "required": false,
         "hasOther": false
+      },
+      {
+        "name": "resume",
+        "label": "(Optional) Please upload your resume or a skill sheet",
+        "type": "file",
+        "required": false
       },
       {
         "name": "required-items",
