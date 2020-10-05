@@ -28,6 +28,12 @@
 				{{#each branches}}
 					<div id="box">
 						<h5>{{this}}</h5>
+						{{#ifCond this "participant walk-in"}}
+						<p>
+							If you haven't previously applied to HackGT 7 and want to attend as a general participant, please apply
+							to this branch!
+						</p>
+						{{/ifCond}}
 						{{#ifCond this "participant-emerging"}}
 							<p>
 								New to hackathons and unsure of how to start building a technology project? 
