@@ -51,6 +51,31 @@
 								information about the program and eligibility.
 							</p>
 						{{/ifCond}}
+						{{#ifCond this "sponsor"}}
+						<p>
+							If your company is a sponsor of HackGT 7 and you've been directed to this site, please
+							apply to this branch!
+						</p>
+						{{/ifCond}}
+
+						{{#ifCond this "partner"}}
+						<p>
+							If you will be a speaker or workshop presenter at HackGT 7 and you've been directed to this site, please
+							apply to this branch!
+						</p>
+						{{/ifCond}}
+
+						{{#ifCond this "staff"}}
+						<p>
+							This is an internal branch intended only for members of the HackGT Team.
+						</p>
+						{{/ifCond}}
+						{{#ifCond this "walk-in"}}
+						<p>
+							If you haven't previously applied to HackGT 7 and want to attend as a general participant, please apply
+							to this branch!
+						</p>
+						{{/ifCond}}
 						<a href="/apply/{{slug this}}" class="btn">Apply!</a>
 					</div>
 				{{/each}}

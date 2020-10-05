@@ -36,10 +36,32 @@ export namespace IConfig {
 		cookieSecureOnly: boolean;
 		mongoURL: string;
 		defaultTimezone: string;
+		rootURL: string;
 	}
 	export interface Style {
 		theme: string;
 		favicon: string;
+	}
+
+	export interface HelpScout {
+		integration: HelpScoutIntegrationOptions;
+		beacon: HelpScoutBeaconOptions;
+	}
+
+	export interface HelpScoutIntegrationOptions {
+		enabled: boolean;
+		secretKey: string;
+	}
+
+	export interface HelpScoutBeaconOptions {
+		enabled: boolean;
+		beaconId: string;
+		supportHistorySecretKey: string;
+	}
+
+	export interface HackGT7 {
+		sponsorEmailWhitelist: string[];
+		sponsorDomainWhitelist: string[];
 	}
 
 	export interface Main {
@@ -58,6 +80,8 @@ export namespace IConfig {
 			options: any;
 		};
 		maxTeamSize: number;
+		helpscout: HelpScout;
+		hackgt7: HackGT7;
 	}
 }
 
@@ -235,6 +259,11 @@ export const QuestionBranchConfig = mongoose.model<Model<IQuestionBranchConfig>>
 export interface ICommonTemplate {
 	siteTitle: string;
 	user: IUser;
+	helpscout: {
+		beaconEnabled: boolean;
+		beaconId?: string;
+		signature?: string;
+	};
 	settings: {
 		teamsEnabled: boolean;
 		qrEnabled: boolean;
@@ -376,4 +405,28 @@ export interface HackGTMetrics {
 	serviceName: string;
 	values: object;
 	hackgtmetricsversion: number;
+}
+
+export interface IHelpScoutEmailNotFoundTemplate {
+	email: string;
+}
+
+export interface IHelpScoutFormItem extends IFormItem {
+	prettyValue: string;
+}
+
+export interface IHelpScoutMainTemplate {
+	name: string;
+	email: string;
+	applicationQuestionsToShow: IHelpScoutFormItem[];
+	confirmationQuestionsToShow: IHelpScoutFormItem[];
+	applied: boolean;
+	accepted: boolean;
+	confirmed: boolean;
+	applicationSubmitTime?: string;
+	applicationBranch?: string;
+	confirmationBranch?: string;
+	confirmationSubmitTime?: string;
+	uuid: string;
+	rootURL: string;
 }
