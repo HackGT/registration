@@ -3930,7 +3930,7 @@
         "name": "creativity",
         "type": "textarea",
         "label": "Now, let’s depart from reality. If you could live in any fantasy or imaginary world, which one would it be and why?",
-        "required": true,
+        "required": false,
         "maxWordCount": 100
       },
       {
