@@ -2811,7 +2811,7 @@
         "type": "radio",
         "options": [
           "Speaker",
-          "Workshop Instructor"
+          "Workshop Instructor",
           "Judge"
         ],
         "required": true,
