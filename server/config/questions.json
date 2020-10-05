@@ -2355,9 +2355,34 @@
         "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
       },
       {
-        "for": "sponsor-extras",
+        "for": "mentor",
+        "type": "h4",
+        "content": "Mentoring at HackGT 7"
+      },
+      {
+        "for": "mentor",
         "type": "p",
-        "content": "In the next question, please let us know if you will be mentoring or judging at HackGT 7. If you're unsure what to select, please ask the employee at your company who is coordinating your participation in HackGT 7 for more information or click the question mark in the bottom right corner of this page to contact us."
+        "content": "All sponsor representatives can mentor at HackGT 7!"
+      },
+      {
+        "for": "judge",
+        "type": "h4",
+        "content": "Judging at HackGT 7"
+      },
+      {
+        "for": "judge",
+        "type": "p",
+        "content": "If you would like to judge at HackGT 7, please ensure you will be available from 9:30 AM until 1:00 PM EDT on Sunday, October 18, 2020."
+      },
+      {
+        "for": "judge",
+        "type": "p",
+        "content": "If you're affiliated with one of the following companies, then you can sign up to judge your company's sponsor challenge: Anthem Insurance Companies, Inc., BlackRock, Inc., Capital One, Create-X, Clinton Global Initiative, Facebook, General Motors, GT Engineering for Social Innovation, Hacks/Hackers, IBM, Microsoft, NCR, News Hacks, NewsQ, NSIN, and the Tow-Knight Center for Entrepreneurial Journalism."
+      },
+      {
+        "for": "judge",
+        "type": "p",
+        "content": "Additionally, representatives from these companies can judge the HackGT 7 Overall awards: Anthem Insurance Companies, Inc., BlackRock, Inc., Create-X, Clinton Global Initiative, General Motors, GT Engineering for Social Innovation, IBM, Microsoft, NCR, NSIN, and Wayfair."
       },
       {
         "for": "other",
@@ -2381,7 +2406,6 @@
         "label": "Which of our sponsors are you affiliated with?",
         "type": "select",
         "options": [
-          "The Aerospace Corporation",
           "Anthem Insurance Companies, Inc.",
           "BlackRock, Inc.",
           "Ciena",
@@ -2405,15 +2429,27 @@
         "showInHelpScout": true
       },
       {
-        "name": "sponsor-extras",
-        "label": "Are you scheduled to do any of the following at HackGT 7? (Select all that apply.)",
-        "type": "checkbox",
+        "name": "mentor",
+        "label": "Would you like to be a mentor at HackGT 7?",
+        "type": "radio",
         "options": [
-          "Mentor",
-          "Judge <strong>my company's</strong> sponsor challenge entries (not applicable to all companies)",
-          "Judge for the HackGT 7 Overall prizes (not applicable to all companies)"
+          "Yes, and I would also like to be part of the <a href='https://2020.hack.gt/mentor.html'>Emerging Hacker Mentorship Program</a>",
+          "Yes, I would like to be a mentor",
+          "No"
         ],
-        "required": false,
+        "required": true,
+        "hasOther": false
+      },
+      {
+        "name": "judge",
+        "label": "If applicable to your company (see above), would you like to judge either your company's sponsor challenge or the HackGT 7 Overall awards?",
+        "type": "radio",
+        "options": [
+          "Yes, I plan to judge for my company's sponsor challenge",
+          "Yes, I plan to judge for the HackGT 7 Overall awards",
+          "No, I do not plan to judge at HackGT 7"
+        ],
+        "required": true,
         "hasOther": false
       },
       {
