@@ -3223,7 +3223,7 @@
     ]
   },
   {
-    "name": "Walk-in",
+    "name": "Participant Walk-in",
     "text": [
       {
         "for": "18-and-gt-student",
@@ -4001,7 +4001,7 @@
     "text": []
   },
   {
-    "name": "Walk-in Confirmation",
+    "name": "Participant Walk-in Confirmation",
     "questions": [],
     "text": []
   },
