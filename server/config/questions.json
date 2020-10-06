@@ -3146,7 +3146,7 @@
       },
       {
         "name": "affiliation",
-        "label": "Which of our sponsors are you affiliated with?<em>test</em>",
+        "label": "Which of our sponsors are you affiliated with?",
         "type": "select",
         "options": [
           "Anthem Insurance Companies, Inc.",
