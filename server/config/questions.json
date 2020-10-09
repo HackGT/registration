@@ -3882,6 +3882,12 @@
         "required": true
       },
       {
+        "name": "github",
+        "label": "Github profile (optional)",
+        "type": "text",
+        "required": false
+      },
+      {
         "name": "street1",
         "label": "Street 1",
         "type": "text",
