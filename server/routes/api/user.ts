@@ -275,10 +275,10 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 					if ((userEmailDomain && config.hackgt7.sponsorDomainWhitelist.map(x => x.toLowerCase()).includes(userEmailDomain))
 						|| config.hackgt7.sponsorEmailWhitelist.map(x => x.toLowerCase()).includes(user.email.toLowerCase())) {
 						await updateUserStatus(user, "Sponsor Confirmation");
-						//await sendPreConfirmNotification(user);
+						await sendPreConfirmNotification(user);
 					} else {
 						await updateUserStatus(user, "Denied Admission / Sponsor");
-						//await sendPreConfirmNotification(user);
+						await sendPreConfirmNotification(user);
 					}
 				} else if (questionBranch.autoAccept && questionBranch.autoAccept !== "disabled") {
 					await updateUserStatus(user, questionBranch.autoAccept);
