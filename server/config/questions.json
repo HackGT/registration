@@ -111,7 +111,8 @@
                     "Georgia Tech University"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": true,
+                "showInHelpScout": true
             },
             {
                 "name": "school-2",

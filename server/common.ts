@@ -39,7 +39,8 @@ class Config implements IConfig.Main {
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
 		mongoURL: "mongodb://localhost/registration",
-		defaultTimezone: "America/New_York"
+		defaultTimezone: "America/New_York",
+		rootURL: "http://localhost:3000"
 	};
 	public admins = {
 		domains: [] as string[],
@@ -59,6 +60,18 @@ class Config implements IConfig.Main {
 	public style: IConfig.Style = {
 		theme: path.resolve(__dirname, "../client/css/theme.css"),
 		favicon: path.resolve(__dirname, "../client/favicon.ico")
+	};
+
+	public helpscout: IConfig.HelpScout = {
+		integration: {
+			enabled: false,
+			secretKey: ""
+		},
+		beacon: {
+			enabled: false,
+			beaconId: "",
+			supportHistorySecretKey: ""
+		}
 	};
 
 	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
@@ -128,6 +141,28 @@ class Config implements IConfig.Main {
 		}
 		if (config.style) {
 			this.style = config.style;
+		}
+		if (config.helpscout) {
+			if (config.helpscout.integration.enabled) {
+				this.helpscout.integration.enabled = config.helpscout.integration.enabled;
+				this.helpscout.integration.secretKey = config.helpscout.integration.secretKey;
+				if (!config.helpscout.integration.secretKey) {
+					console.warn("Disabling Help Scout integration because it is set to be enabled but " +
+						"integration secret key is empty");
+					this.helpscout.integration.enabled = false;
+				}
+			}
+
+			if (config.helpscout.beacon.enabled) {
+				this.helpscout.beacon.enabled = config.helpscout.beacon.enabled;
+				this.helpscout.beacon.beaconId = config.helpscout.beacon.beaconId;
+				this.helpscout.beacon.supportHistorySecretKey = config.helpscout.beacon.supportHistorySecretKey;
+				if (!config.helpscout.beacon.beaconId || !config.helpscout.beacon.supportHistorySecretKey) {
+					console.log("Disabling Help Scout Beacon because it is set to be enabled but Beacon ID or " +
+						"support history secret key is missing");
+					this.helpscout.beacon.enabled = false;
+				}
+			}
 		}
 	}
 	protected loadFromEnv(): void {
@@ -248,6 +283,36 @@ class Config implements IConfig.Main {
 		// Team size
 		if (process.env.MAX_TEAM_SIZE) {
 			this.maxTeamSize = parseInt(process.env.MAX_TEAM_SIZE, 10);
+		}
+
+		if (process.env.HELPSCOUT_INTEGRATION_ENABLED && process.env.HELPSCOUT_INTEGRATION_ENABLED.toLowerCase() === "true") {
+			this.helpscout.integration.enabled = true;
+			if (process.env.HELPSCOUT_INTEGRATION_SECRET_KEY) {
+				this.helpscout.integration.secretKey = process.env.HELPSCOUT_INTEGRATION_SECRET_KEY;
+			} else {
+				console.warn("Disabling Help Scout integration because it is set to be enabled but " +
+					"integration secret key is empty");
+				this.helpscout.integration.enabled = false;
+			}
+		}
+
+		if (process.env.HELPSCOUT_BEACON_ENABLED && process.env.HELPSCOUT_BEACON_ENABLED.toLowerCase() === "true") {
+			this.helpscout.beacon.enabled = true;
+			if (process.env.HELPSCOUT_BEACON_ID) {
+				this.helpscout.beacon.beaconId = process.env.HELPSCOUT_BEACON_ID;
+			}
+			if (process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY) {
+				this.helpscout.beacon.supportHistorySecretKey = process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY;
+			}
+			if (!process.env.HELPSCOUT_BEACON_ID || !process.env.HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY) {
+				console.log("Disabling Help Scout Beacon because of missing Beacon ID or support history " +
+					"secret key");
+				this.helpscout.beacon.enabled = false;
+			}
+		}
+
+		if (process.env.ROOT_URL) {
+			this.server.rootURL = process.env.ROOT_URL;
 		}
 	}
 }
@@ -577,6 +642,7 @@ export async function isBranchOpen(rawBranchName: string, user: IUser, requestTy
 import * as Agenda from "agenda";
 export const agenda = new Agenda({db: {address: config.server.mongoURL}});
 import { User } from "./schema";
+import {MarkedOptions} from "marked";
 agenda.define("send_templated_email", async (job, done) => {
 	try {
 		let user = await User.findOne({uuid: job.attrs.data.id});
