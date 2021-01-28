@@ -481,6 +481,12 @@
                 "required": true
             },
             {
+                "name": "resume",
+                "label": "Please upload your resume or a skill sheet",
+                "type": "file",
+                "required": true
+            },
+            {
                 "name": "other",
                 "label": "Anything else you'd like us to know?",
                 "type": "textarea",
