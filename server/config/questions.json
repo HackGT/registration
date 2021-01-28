@@ -399,6 +399,32 @@
                 "required": true
             },
             {
+                "name": "preference",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). What is your first preference for mentoring a certain track?",
+                "type": "radio",
+                "options": [
+                    "Web Development",
+                    "UI/UX and Graphic Design",
+                    "Cybersecurity",
+                    "Product Development and Entrepreneurship",
+                    "No preference"
+                ],
+                "required": true
+            },
+            {
+                "name": "preference",
+                "label": "What is your second preference?",
+                "type": "radio",
+                "options": [
+                    "Web Development",
+                    "UI/UX and Graphic Design",
+                    "Cybersecurity",
+                    "Product Development and Entrepreneurship",
+                    "No preference"
+                ],
+                "required": true
+            },
+            {
                 "name": "race",
                 "label": "Race / Ethnicity",
                 "type": "checkbox",
@@ -449,7 +475,7 @@
                 "type": "checkbox",
                 "options": [
                     "I consent to a background check (cost covered by HackGT)",
-                    "I can attend a 1.5 hour training session on the evening of March 17th, 18th and 19th.",
+                    "I can attend a 1.5 hour training session on the evening of March 17th, 18th or 19th.",
                     "I can stay from 9am - 3pm EST on Saturday, March 27th (to assist students with their projects throughout the day and give advice about college aspirations)"
                 ],
                 "required": true
