@@ -432,8 +432,7 @@
                     "M",
                     "L",
                     "XL",
-                    "2XL",
-                    "3XL"
+                    "2XL"
                 ],
                 "required": true
             },
