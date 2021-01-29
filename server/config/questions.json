@@ -309,17 +309,12 @@
             {
                 "for": "name",
                 "type": "p",
-                "content": "We will be offering four tracks to high school students:\n\n* Info Security\n\n* Gaming\n\n* Robotics\n\n* Music Technology"
+                "content": "We will be offering four tracks to high school students:\n\n* Web Development\n\n* UI/UX and Graphic Design\n\n* Cybersecurity (more advanced)\n\n* Product Development and Entrepreneurship"
             },
             {
                 "for": "name",
                 "type": "p",
-                "content": "In addition to facilitating learning in these tracks, mentor responsibilities also include:\n\n* Co-leading a student cohort of up to 12 students\n\n* Encouraging mentees to network within cohorts\n\n* Encouraging mentees to learn throughout the day\n\n* Encouraging mentees to learn after Catalyst is over\n\n* Arriving on-time and staying throughout the entire duration of the event"
-            },
-            {
-                "for": "name",
-                "type": "p",
-                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of eight to ten students. The goal of these cohorts is to directly connect participants with each other and mentors. All mentors are required to attend a 1.5 hour training session. Several sessions will be offered with a variety of dates and times."
+                "content": "Mentors will be leading student cohorts. You will be responsible for assisting students with their projects and engaging the group. There will be two mentors for a group of ten to twelve students. The goal of these cohorts is to directly connect participants with each other and mentors."
             },
             {
                 "for": "name",
@@ -334,7 +329,7 @@
             {
                 "for": "name",
                 "type": "p",
-                "content": "Upon completion of this registration form, we will submit a request to initiate a background check on your behalf. Within the next few days, you will receive an email asking you to complete your background screening information. THIS MUST BE FILLED OUT WHEN YOU RECEIVE THIS EMAIL. If this is not completed by the deadline, your background check will not clear in time for Catalyst. **If OHR already has a background check completed for you from the past 4 years, we will get those results and a new background check will not be initiated.**"
+                "content": "Upon completion of this registration form, we will submit a request to initiate a background check on your behalf. Within the next few days, you will receive an email asking you to complete your background screening information. THIS MUST BE FILLED OUT WHEN YOU RECEIVE THIS EMAIL. If this is not completed by the deadline, your background check will not clear in time for Catalyst.**"
             }
         ],
         "questions": [
@@ -345,6 +340,12 @@
                 "required": true
             },
             {
+                "name": "prefered name",
+                "type": "text",
+                "label": "Preferred Name",
+                "required": false
+            },
+            {
                 "name": "phone",
                 "type": "tel",
                 "label": "Phone Number",
@@ -353,7 +354,13 @@
             {
                 "name": "email",
                 "type": "email",
-                "label": "Email",
+                "label": "Preferred Email",
+                "required": true
+            },
+            {
+                "name": "address",
+                "type": "textarea",
+                "label": "Address",
                 "required": true
             },
             {
@@ -379,20 +386,27 @@
                 "required": true
             },
             {
-                "name": "essay-2",
-                "type": "textarea",
-                "label": "Describe (briefly) a time when you taught someone something new.",
+                "name": "preference",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). What is your first preference for mentoring a certain track?",
+                "type": "radio",
+                "options": [
+                    "Web Development",
+                    "UI/UX and Graphic Design",
+                    "Cybersecurity",
+                    "Product Development and Entrepreneurship",
+                    "No preference"
+                ],
                 "required": true
             },
             {
                 "name": "preference",
-                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Do you have a preference for mentoring a certain track?",
+                "label": "What is your second preference?",
                 "type": "radio",
                 "options": [
-                    "Info Security",
-                    "Gaming",
-                    "Robotics",
-                    "Music Technology",
+                    "Web Development",
+                    "UI/UX and Graphic Design",
+                    "Cybersecurity",
+                    "Product Development and Entrepreneurship",
                     "No preference"
                 ],
                 "required": true
@@ -415,10 +429,15 @@
                 "hasOther": true
             },
             {
-                "name": "gender",
-                "label": "Gender",
+                "name": "pronouns",
+                "label": "Pronouns",
                 "type": "radio",
-                "options": ["Male", "Female"],
+                "options": [
+                    "he/him",
+                    "she/her",
+                    "they/them",
+                    "xe/xem/xyr"
+                ],
                 "hasOther": true,
                 "required": true
             },
@@ -438,28 +457,20 @@
                 "required": true
             },
             {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
-                "required": false
-            },
-            {
                 "name": "confirmation",
                 "label": "We need you to confirm a few things",
                 "type": "checkbox",
                 "options": [
                     "I consent to a background check (cost covered by HackGT)",
-                    "I can attend a 1.5 hour training session (several sessions will be offered with a variety of dates and times)",
-                    "I can stay for all or most of the event from 9 am to 8 pm on March 28th (to assist students with their projects throughout the day and give advice about future aspirations)"
+                    "I can attend a 1.5 hour training session on the evening of March 17th, 18th or 19th.",
+                    "I can stay from 9am - 3pm EST on Saturday, March 27th (to assist students with their projects throughout the day and give advice about college aspirations)"
                 ],
+                "required": true
+            },
+            {
+                "name": "resume",
+                "label": "Please upload your resume or a skill sheet",
+                "type": "file",
                 "required": true
             },
             {
@@ -863,7 +874,7 @@
     },
     {
         "name": "Denied Admission / Mentor",
-        "questions":[],
-        "text": []
+        "text": [],
+        "questions": []
     }
 ]
