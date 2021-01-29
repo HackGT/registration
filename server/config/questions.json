@@ -358,31 +358,25 @@
                 "required": true
             },
             {
-                "name": "address",
-                "type": "textarea",
-                "label": "Address",
-                "required": true
-            },
-            {
-                "name": "address-1",
-                "type": "p",
+                "name": "address-line-1",
+                "type": "text",
                 "label": "US Address Line 1",
                 "required": true
             },
             {
-                "name": "address",
+                "name": "address-line-2",
                 "type": "text",
                 "label": "US Address Line 2",
                 "required": true
             },
             {
-                "name": "address",
+                "name": "address-city",
                 "type": "text",
                 "label": "City",
                 "required": true
             },
             {
-                "name": "address",
+                "name": "address-state",
                 "type": "select",
                 "label": "State/Province/Region",
                 "type": "select",
@@ -441,13 +435,7 @@
                 "required": true
             },
             {
-                "name": "address-country",
-                "type": "text",
-                "label": "Country",
-                "required": true
-            },
-            {
-                "name": "address-zip",
+                "name": "address-zipcode",
                 "type": "text",
                 "label": "Zip Code",
                 "required": true
