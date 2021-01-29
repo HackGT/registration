@@ -548,7 +548,7 @@
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
                 "type": "file",
-                "required": true
+                "required": false
             },
             {
                 "name": "other",
