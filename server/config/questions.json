@@ -367,7 +367,7 @@
                 "name": "address-line-2",
                 "type": "text",
                 "label": "US Address Line 2",
-                "required": true
+                "required": false
             },
             {
                 "name": "address-city",
@@ -463,7 +463,7 @@
                 "required": true
             },
             {
-                "name": "preference",
+                "name": "preference-1",
                 "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). What is your first preference for mentoring a certain track?",
                 "type": "radio",
                 "options": [
@@ -476,7 +476,7 @@
                 "required": true
             },
             {
-                "name": "preference",
+                "name": "preference-2",
                 "label": "What is your second preference?",
                 "type": "radio",
                 "options": [
