@@ -53,7 +53,7 @@
             },
             {
                 "name": "job",
-                "label": "If you are graduating in Spring or Fall 2020, are you already committed to a full time job?",
+                "label": "If you are graduating in Spring or Fall 2021, are you already committed to a full time job?",
                 "type": "radio",
                 "options": ["Yes", "No", "Not Graduating"],
                 "required": true
@@ -159,19 +159,89 @@
                 "required": true
             },
             {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
+                "name": "street-address",
+                "label": "Street Address",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-line2",
+                "label": "Address Line 2",
+                "type": "text",
                 "required": false
-            }, 
+            },
+            {
+                "name": "addres-city",
+                "label": "City",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-state",
+                "type": "select",
+                "label": "State/Province/Region",
+                "type": "select",
+                "options": [
+                    "Alabama",
+                    "Alaska",
+                    "Arizona",
+                    "Arkansas",
+                    "California",
+                    "Colorado",
+                    "Connecticut",
+                    "Delaware",
+                    "Florida",
+                    "Georgia",
+                    "Hawaii",
+                    "Idaho",
+                    "Illinois",
+                    "Indiana",
+                    "Iowa",
+                    "Kansas",
+                    "Kentucky",
+                    "Louisiana",
+                    "Maine",
+                    "Maryland",
+                    "Massachusetts",
+                    "Michigan",
+                    "Minnesota",
+                    "Mississippi",
+                    "Missouri",
+                    "Montana",
+                    "Nebraska",
+                    "Nevada",
+                    "New Hampshire",
+                    "New Jersey",
+                    "New Mexico",
+                    "New York",
+                    "North Carolina",
+                    "North Dakota",
+                    "Ohio",
+                    "Oklahoma",
+                    "Oregon",
+                    "Pennsylvania",
+                    "Rhode Island",
+                    "South Carolina",
+                    "South Dakota",
+                    "Tennessee",
+                    "Texas",
+                    "Utah",
+                    "Vermont",
+                    "Virginia",
+                    "Washington",
+                    "West Virginia",
+                    "Wisconsin",
+                    "Wyoming"
+                ],
+                "required": true
+            },
+            {
+                "name": "address-zipcode",
+                "type": "text",
+                "label": "Zip Code",
+                "required": true
+            },
+            
             {
                 "name": "resume",
                 "label": "Please upload your resume or a skill sheet",
@@ -182,21 +252,15 @@
                 "name": "biggest-issue",
                 "type": "textarea",
                 "label": "What area of healthcare are you most interested in learning more about?",
-                "required": true,
+                "required": false,
                 "maxWordCount": 150
             },
             {
                 "name": "impactful-org",
                 "type": "textarea",
                 "label": "Talk about an organization that you think is making a positive impact in the healthcare industry.",
-                "required": true,
+                "required": false,
                 "maxWordCount": 150
-            },
-            {
-                "name": "hardware",
-                "type": "textarea",
-                "label": "Is there any hardware/materials you would like to see at the event?",
-                "required": false
             },
             {
                 "name": "required-items",
