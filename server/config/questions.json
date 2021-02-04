@@ -241,13 +241,6 @@
                 "label": "Zip Code",
                 "required": true
             },
-            
-            // {
-            //     "name": "resume",
-            //     "label": "Please upload your resume or a skill sheet",
-            //     "type": "file",
-            //     "required": true
-            // },
             {
                 "name": "biggest-issue",
                 "type": "textarea",
