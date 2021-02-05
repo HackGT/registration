@@ -45,10 +45,23 @@
                 "hasOther": true,
                 "required": true
             },
+
             {
                 "name": "gradterm",
                 "label": "When do you plan on graduating?",
-                "type": "text",
+                "type": "select",
+                "options": [
+                    "Spring 2020",
+                    "Fall 2020",
+                    "Spring 2021",
+                    "Fall 2021",
+                    "Spring  2022",
+                    "Fall 2022",
+                    "Spring 2023",
+                    "Fall 2023",
+                    "Spring 2024",
+                    "Fall 2024+",
+                ],
                 "required": true
             },
             {
@@ -160,7 +173,7 @@
             },
             {
                 "name": "street-address",
-                "label": "Street Address",
+                "label": "Please enter your US Street Address <br> Address Line 1",
                 "type": "text",
                 "required":true
             },
@@ -179,7 +192,7 @@
             {
                 "name": "address-state",
                 "type": "select",
-                "label": "State/Province/Region",
+                "label": "State",
                 "type": "select",
                 "options": [
                     "Alabama",
@@ -248,9 +261,6 @@
                 "type": "file",
                 "required": true
             },
-
-
-
 
 
 
