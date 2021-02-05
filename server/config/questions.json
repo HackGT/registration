@@ -171,7 +171,7 @@
                 "required": false
             },
             {
-                "name": "addres-city",
+                "name": "address-city",
                 "label": "City",
                 "type": "text",
                 "required":true
@@ -435,20 +435,6 @@
                 "required": true
             },
             {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
-                "required": false
-            }, 
-            {
                 "name": "why-mentor",
                 "type": "textarea",
                 "label": "What drives you to teach?",
@@ -672,20 +658,7 @@
                 ],
                 "required": true
             },
-            {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
-                "required": false
-            },
+            
             {
                 "name": "volunteer-commit",
                 "label": "Have you ever volunteered at a HackGT event before? If so, which one(s)?",
@@ -736,20 +709,11 @@
               {
                   "for": "parking",
                   "type": "p",
-                  "content": "Thank your confirming your attendance to HealthTech 2020!"
+                  "content": "Thank your confirming your attendance to HealthTech 2021!"
               }
           ],
           "questions": [
-              {
-                  "name": "parking",
-                  "type": "radio",
-                  "label": "Will you need parking validation for the event?",
-                  "options": [
-                      "Yes",
-                      "No"
-                  ],
-                  "required": true
-              }
+              
           ]
       },
       {
