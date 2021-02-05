@@ -16,7 +16,7 @@
         "questions": [
             {
                 "name": "name",
-                "label": "Name",
+                "label": "Legal Name",
                 "type": "text",
                 "required": true
             },
@@ -171,7 +171,7 @@
                 "required": false
             },
             {
-                "name": "addres-city",
+                "name": "address-city",
                 "label": "City",
                 "type": "text",
                 "required":true
@@ -249,17 +249,10 @@
                 "required": true
             },
             {
-                "name": "biggest-issue",
+                "name": "essay-question",
                 "type": "textarea",
-                "label": "Fill out one the following questions: What area of healthcare are you most interested in learning more about?",
-                "required": false,
-                "maxWordCount": 150
-            },
-            {
-                "name": "impactful-org",
-                "type": "textarea",
-                "label": "Talk about an organization that you think is making a positive impact in the healthcare industry.",
-                "required": false,
+                "label": "Fill out ONE of the following questions:    What area of healthcare are you most interested in learning more about?    Talk about an organization that you think is making a positive impact in the healthcare industry.",
+                "required": true,
                 "maxWordCount": 150
             },
             {
@@ -435,20 +428,6 @@
                 "required": true
             },
             {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
-                "required": false
-            }, 
-            {
                 "name": "why-mentor",
                 "type": "textarea",
                 "label": "What drives you to teach?",
@@ -518,16 +497,16 @@
         "name": "Volunteer",
         "text": [
             {
-				"for": "18-and-gt-student",
-				"type": "p",
-				"content": "Due to institute policy, minors (under 18) that are not students at Georgia Tech may not attend HackGT."
+                "for": "18-and-gt-student",
+                "type": "p",
+                "content": "Due to institute policy, minors (under 18) that are not students at Georgia Tech may not attend HackGT."
             },
             {
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
             }
-		],
+        ],
         "questions": [
             {
                 "name": "name",
@@ -546,11 +525,11 @@
                 "required": true
             },
             {
-				"name": "phone-number",
-				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
-				"type": "tel",
-				"required": true
-			},
+                "name": "phone-number",
+                "label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
+                "type": "tel",
+                "required": true
+            },
             {
                 "name": "year",
                 "label": "Year",
@@ -672,20 +651,7 @@
                 ],
                 "required": true
             },
-            {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
-                "required": false
-            },
+            
             {
                 "name": "volunteer-commit",
                 "label": "Have you ever volunteered at a HackGT event before? If so, which one(s)?",
@@ -693,11 +659,11 @@
                 "required": true
             },
             {
-				"name": "gain",
-				"label": "Why do you want to volunteer at HealthTech?",
-				"type": "textarea",
-				"required": true,
-				"maxWordCount": 150
+                "name": "gain",
+                "label": "Why do you want to volunteer at HealthTech?",
+                "type": "textarea",
+                "required": true,
+                "maxWordCount": 150
             },
             {
                 "name": "commitment",
@@ -736,20 +702,11 @@
               {
                   "for": "parking",
                   "type": "p",
-                  "content": "Thank your confirming your attendance to HealthTech 2020!"
+                  "content": "Thank your confirming your attendance to HealthTech 2021!"
               }
           ],
           "questions": [
-              {
-                  "name": "parking",
-                  "type": "radio",
-                  "label": "Will you need parking validation for the event?",
-                  "options": [
-                      "Yes",
-                      "No"
-                  ],
-                  "required": true
-              }
+              
           ]
       },
       {
