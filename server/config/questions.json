@@ -16,7 +16,7 @@
         "questions": [
             {
                 "name": "name",
-                "label": "Name",
+                "label": "Legal Name",
                 "type": "text",
                 "required": true
             },
@@ -248,18 +248,12 @@
                 "type": "file",
                 "required": true
             },
+
             {
-                "name": "biggest-issue",
+                "name": "essay-question",
                 "type": "textarea",
-                "label": "Fill out one the following questions: What area of healthcare are you most interested in learning more about?",
-                "required": false,
-                "maxWordCount": 150
-            },
-            {
-                "name": "impactful-org",
-                "type": "textarea",
-                "label": "Talk about an organization that you think is making a positive impact in the healthcare industry.",
-                "required": false,
+                "label": "Fill out ONE of the following questions: <ul><li>What area of healthcare are you most interested in learning more about?</li><li>Talk about an organization that you think is making a positive impact in the healthcare industry.</li></ul>",
+                "required": true,
                 "maxWordCount": 150
             },
             {
@@ -504,16 +498,16 @@
         "name": "Volunteer",
         "text": [
             {
-				"for": "18-and-gt-student",
-				"type": "p",
-				"content": "Due to institute policy, minors (under 18) that are not students at Georgia Tech may not attend HackGT."
+                "for": "18-and-gt-student",
+                "type": "p",
+                "content": "Due to institute policy, minors (under 18) that are not students at Georgia Tech may not attend HackGT."
             },
             {
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
             }
-		],
+        ],
         "questions": [
             {
                 "name": "name",
@@ -532,11 +526,11 @@
                 "required": true
             },
             {
-				"name": "phone-number",
-				"label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
-				"type": "tel",
-				"required": true
-			},
+                "name": "phone-number",
+                "label": "What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
+                "type": "tel",
+                "required": true
+            },
             {
                 "name": "year",
                 "label": "Year",
@@ -666,11 +660,11 @@
                 "required": true
             },
             {
-				"name": "gain",
-				"label": "Why do you want to volunteer at HealthTech?",
-				"type": "textarea",
-				"required": true,
-				"maxWordCount": 150
+                "name": "gain",
+                "label": "Why do you want to volunteer at HealthTech?",
+                "type": "textarea",
+                "required": true,
+                "maxWordCount": 150
             },
             {
                 "name": "commitment",
