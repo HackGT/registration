@@ -252,7 +252,7 @@
             {
                 "name": "essay-question",
                 "type": "textarea",
-                "label": "Fill out ONE of the following questions: <ul><li>What area of healthcare are you most interested in learning more about?</li><li>Talk about an organization that you think is making a positive impact in the healthcare industry.</li></ul>",
+                "label": "Answer out ONE of the following questions: <ul><li>What area of healthcare are you most interested in learning more about?</li><li>Talk about an organization that you think is making a positive impact in the healthcare industry.</li></ul>",
                 "required": true,
                 "maxWordCount": 150
             },
