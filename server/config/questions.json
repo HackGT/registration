@@ -251,7 +251,7 @@
             {
                 "name": "biggest-issue",
                 "type": "textarea",
-                "label": "Fill out one the following: \n What area of healthcare are you most interested in learning more about?",
+                "label": "Fill out one the following questions: What area of healthcare are you most interested in learning more about?",
                 "required": false,
                 "maxWordCount": 150
             },
