@@ -191,7 +191,7 @@
                 "options": [
                     "American Indian or Alaska Native", 
                     "Asian",
-                    "Black or African American"
+                    "Black or African American",
                     "Hispanic or Latino", 
                     "Native Hawaiian or Other Pacific Islander",
                     "White"
@@ -297,7 +297,7 @@
                 "name": "AP",
                 "label": "How many AP classes are you taking or plan to take?",
                 "type": "text",
-                "required": true,
+                "required": true
             },
 
             {
@@ -336,7 +336,7 @@
 
                 ],
                 "required": true
-            },
+            }
         ]
     },
     {
