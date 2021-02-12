@@ -179,7 +179,7 @@
                     "Friend",
                     "Family",
                     "I attended Catalyst before",
-                    "Social Media",
+                    "Social Media"
                 ],
                 "hasOther": true,
                 "required": true
@@ -264,7 +264,7 @@
                 "options": [
                     "Macbook",
                     "PC",
-                    "Chromebook",
+                    "Chromebook"
                 ],
                 "required": true,
                 "hasOther": true
@@ -276,8 +276,7 @@
                 "type": "radio",
                 "options": [
                     "Yes",
-                    "No",
-
+                    "No"
                 ],
                 "required": true
             },
@@ -307,8 +306,7 @@
                 "type": "radio",
                 "options": [
                     "Yes",
-                    "No",
-
+                    "No"
                 ],
                 "required": true
             },
