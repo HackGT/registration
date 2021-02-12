@@ -183,9 +183,8 @@
                     "Teacher / Counselor",
                     "Friend",
                     "Family",
-                    "I attended last year",
-                    "Snapchat",
-                    "Facebook"
+                    "I attended Catalyst before",
+                    "Social Media",
                 ],
                 "hasOther": true,
                 "required": true
@@ -195,40 +194,30 @@
                 "label": "Race / Ethnicity",
                 "type": "checkbox",
                 "options": [
-                    "African-American/Black", 
-                    "Hispanic/Latino", 
-                    "Caucasian", 
-                    "Middle Eastern", 
-                    "East Asian", 
-                    "South Asian", 
-                    "Southeast Asian", 
-                    "Pacific Islander", 
-                    "Native American"
+                    "American Indian or Alaska Native", 
+                    "Asian",
+                    "Black or African American"
+                    "Hispanic or Latino", 
+                    "Native Hawaiian or Other Pacific Islander",
+                    "White"
                 ],
                 "hasOther": true
             },
+
             {
-                "name": "gender",
-                "label": "Gender",
+                "name": "pronouns",
+                "label": "Pronouns",
                 "type": "radio",
-                "options": ["Male", "Female"],
+                "options": [
+                    "he/him",
+                    "she/her",
+                    "they/them",
+                    "xe/xem/xyr"
+                ],
                 "hasOther": true,
                 "required": true
             },
-            {
-                "name": "dietary-restrictions",
-                "label": "Do you have any dietary restrictions?",
-                "type": "checkbox",
-                "options": [
-                    "Vegetarian",
-                    "Vegan",
-                    "No beef",
-                    "No pork",
-                    "Gluten-free"
-                ],
-                "hasOther": true,
-                "required": false
-            },
+
             {
                 "name": "tshirt-size",
                 "label": "What is your T-shirt size? (In adult sizes)",
@@ -244,53 +233,117 @@
                 ],
                 "required": true
             },
-            {
-                "name": "preference",
-                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). Which track do you prefer?",
+
+
+           {
+                "name": "preference-1",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). What is your first preference for mentoring a certain track?",
                 "type": "radio",
                 "options": [
-                    "Info Security",
-                    "Gaming",
-                    "Robotics",
-                    "Music Technology"
+                    "Web Development",
+                    "UI/UX and Graphic Design",
+                    "Cybersecurity",
+                    "Product Development and Entrepreneurship",
+                    "No preference"
                 ],
                 "required": true
             },
             {
-                "name": "session",
-                "label": "Which session do you prefer?",
+                "name": "preference-2",
+                "label": "What is your second preference?",
                 "type": "radio",
                 "options": [
-                    "Session A: 9 AM - 7 PM",
-                    "Session B: 10 AM - 8 PM"
+                    "Web Development",
+                    "UI/UX and Graphic Design",
+                    "Cybersecurity",
+                    "Product Development and Entrepreneurship",
+                    "No preference"
                 ],
                 "required": true
             },
+
             {
-                "name": "transportation",
-                "label": "If there was a bus to Catalyst from your local high school would that be something you are interested in? Disclaimer: As of now this is just something that is being considered. If it becomes available then you will be notified. ",
+                "name": "computer-type",
+                "label": "What type of computer will you be using for the event?",
+                "type": "radio",
+                "options": [
+                    "Macbook",
+                    "PC",
+                    "Chromebook",
+                ],
+                "required": true,
+                "hasOther": true,
+            },
+
+            {
+                "name": "club",
+                "label": "Does your high school have a CS club?",
                 "type": "radio",
                 "options": [
                     "Yes",
-                    "No"
+                    "No",
+
                 ],
-                "required": true
+                "required": true,
             },
+
             {
-                "name": "agreement",
-                "label": "In order to participate at Catalyst, there are a few forms (such as Liability and Photo Release forms) that will be sent out after decisions have been made. Please check this box to indicate you understand you have to complete forms in order to attend Catalyst or you will not be allowed to enter the event.",
+                "name": "courses",
+                "label": "Which of these courses does your school have?",
                 "type": "checkbox",
                 "options": [
-                    "Yes, I agree."
+                    "AP Computer Science A",
+                    "AP Computer Science Principles",
+                    "Additional Computer Science class",
+                    "Introductionary Computer Science class"
                 ],
-                "required": true
             },
+
             {
-                "name": "other",
-                "label": "Anything else you'd like us to know?",
-                "type": "textarea",
-                "required": false
-            }
+                "name": "AP",
+                "label": "How many AP classes are you taking or plan to take?",
+                "type": "text",
+                "required": true,
+            },
+
+            {
+                "name": "counseling",
+                "label": "Does your school offer college counseling? ",
+                "type": "radio",
+                "options": [
+                    "Yes",
+                    "No",
+
+                ],
+                "required": true,
+            },
+
+            {
+                "name": "stem-composure",
+                "label": "Have you had any exposure to STEM (science, technology, engineering, and math) in the past in any of these environments? (check those that apply)",
+                "type": "checkbox",
+                "options": [
+                    "During school",
+                    "During an extracurriculum connected to your school",
+                    "During an extracurriculur not no connected to your school",
+                    "At a summer camp, internship, or summer school program"
+                ],
+                "required": false,
+            }, 
+
+            {
+                "name": "stemincollege",
+                "label": "At this point in time would you major in STEM in college or want to go into STEM fields as a career? (select one)",
+                "type": "radio",
+                "options": [
+                    "Yes",
+                    "No  I want to major in something else",
+                    "No I don't know what I want to major in",
+                    "No I don't understand what STEM is and therefore need to learn more"
+
+                ],
+                "required": true,
+            },
         ]
     },
     {
