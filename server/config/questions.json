@@ -17,11 +17,6 @@
                 "type": "p",
                 "content": "Don't worry if you are not sure! You won't officially select a track until the beginning of the event."
             },
-            // {
-            //     "for": "session",
-            //     "type": "p",
-            //     "content": "This year Catalyst will have two sessions. Students in both sessions will receive the same instructional curriculum, but morning and afternoon break-out activities will differ. Please note that students being picked up or dropped off together should register for the same session. More information can be found in the FAQ section of the [Catalyst website](https://catalyst.hack.gt/#faq)."
-            // }
         ],
         "questions": [
             {
@@ -272,7 +267,7 @@
                     "Chromebook",
                 ],
                 "required": true,
-                "hasOther": true,
+                "hasOther": true
             },
 
             {
@@ -284,7 +279,7 @@
                     "No",
 
                 ],
-                "required": true,
+                "required": true
             },
 
             {
@@ -296,7 +291,7 @@
                     "AP Computer Science Principles",
                     "Additional Computer Science class",
                     "Introductionary Computer Science class"
-                ],
+                ]
             },
 
             {
@@ -315,7 +310,7 @@
                     "No",
 
                 ],
-                "required": true,
+                "required": true
             },
 
             {
@@ -328,7 +323,7 @@
                     "During an extracurriculur not no connected to your school",
                     "At a summer camp, internship, or summer school program"
                 ],
-                "required": false,
+                "required": false
             }, 
 
             {
@@ -342,7 +337,7 @@
                     "No I don't understand what STEM is and therefore need to learn more"
 
                 ],
-                "required": true,
+                "required": true
             },
         ]
     },
