@@ -932,6 +932,12 @@
                 "required": true
             },
             {
+                "name": "referral",
+                "type":"text",
+                "label":"Were you referred by anyone? If so, what was their full name put in their application?",
+                "required":false
+            },
+            {
                 "name": "race",
                 "label": "Race / Ethnicity",
                 "type": "checkbox",
