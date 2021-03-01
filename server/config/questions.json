@@ -11,6 +11,11 @@
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+                "for": "street-address",
+                "type": "h2",
+                "content": "Please enter your US street address"
             }
         ],
         "questions": [
@@ -173,7 +178,7 @@
             },
             {
                 "name": "street-address",
-                "label": "Please enter your US Street Address <br> Address Line 1",
+                "label": "Address Line 1",
                 "type": "text",
                 "required":true
             },
@@ -306,7 +311,7 @@
             },
             {
                 "for": "street-address",
-                "type": "p",
+                "type": "h2",
                 "content": "Please enter your US street address"
             }
         ],
