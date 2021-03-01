@@ -303,6 +303,11 @@
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+                "for": "street-address",
+                "type": "p",
+                "content": "Please enter your US street address"
             }
         ],
         "questions": [
@@ -444,6 +449,89 @@
                 "required": true
             },
             {
+                "name": "street-address",
+                "label": "Street Address",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-line2",
+                "label": "Address Line 2",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "address-city",
+                "label": "City",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-state",
+                "type": "select",
+                "label": "State",
+                "type": "select",
+                "options": [
+                    "Alabama",
+                    "Alaska",
+                    "Arizona",
+                    "Arkansas",
+                    "California",
+                    "Colorado",
+                    "Connecticut",
+                    "Delaware",
+                    "Florida",
+                    "Georgia",
+                    "Hawaii",
+                    "Idaho",
+                    "Illinois",
+                    "Indiana",
+                    "Iowa",
+                    "Kansas",
+                    "Kentucky",
+                    "Louisiana",
+                    "Maine",
+                    "Maryland",
+                    "Massachusetts",
+                    "Michigan",
+                    "Minnesota",
+                    "Mississippi",
+                    "Missouri",
+                    "Montana",
+                    "Nebraska",
+                    "Nevada",
+                    "New Hampshire",
+                    "New Jersey",
+                    "New Mexico",
+                    "New York",
+                    "North Carolina",
+                    "North Dakota",
+                    "Ohio",
+                    "Oklahoma",
+                    "Oregon",
+                    "Pennsylvania",
+                    "Rhode Island",
+                    "South Carolina",
+                    "South Dakota",
+                    "Tennessee",
+                    "Texas",
+                    "Utah",
+                    "Vermont",
+                    "Virginia",
+                    "Washington",
+                    "West Virginia",
+                    "Wisconsin",
+                    "Wyoming"
+                ],
+                "required": true
+            },
+            {
+                "name": "address-zipcode",
+                "type": "text",
+                "label": "Zip Code",
+                "required": true
+            },
+            {
                 "name": "why-mentor",
                 "type": "textarea",
                 "label": "What drives you to teach?",
@@ -451,7 +539,7 @@
                 "maxWordCount": 150
             },
             {
-                "name": "what-mentor",
+                "name": "tools/materials",
                 "type": "checkbox",
                 "label": "What tools do you feel comfortable mentoring in?",
                 "options": [
@@ -463,11 +551,10 @@
                     "Flask",
                     "iOS",
                     "Android",
-                    "Raspberry Pi/Arduino",
-                    "Circuits",
-                    "Sensors",
-                    "Motors",
-                    "N/A" 
+                    "Chemistry",
+                    "Biology",
+                    "Nutrition",
+                    "Medicine"
                 ],
                 "hasOther": true,
                 "required": true
