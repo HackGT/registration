@@ -15,7 +15,7 @@
             {
                 "for": "street-address",
                 "type": "p",
-                "content": "<b>Please enter your US street address</b>"
+                "content": "Please enter your US street address"
             }
         ],
         "questions": [
@@ -312,7 +312,7 @@
             {
                 "for": "street-address",
                 "type": "p",
-                "content": "<b>Please enter your US street address</b>"
+                "content": "Please enter your US street address"
             }
         ],
         "questions": [
