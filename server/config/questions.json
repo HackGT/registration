@@ -14,8 +14,8 @@
             },
             {
                 "for": "street-address",
-                "type": "h5",
-                "content": "Please enter your US street address"
+                "type": "p",
+                "content": "<b>Please enter your US street address</b>"
             }
         ],
         "questions": [
@@ -311,8 +311,8 @@
             },
             {
                 "for": "street-address",
-                "type": "h5",
-                "content": "Please enter your US street address"
+                "type": "p",
+                "content": "<b>Please enter your US street address</b>"
             }
         ],
         "questions": [
