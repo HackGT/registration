@@ -267,8 +267,6 @@
                 "required": true
             },
 
-
-
             {
                 "name": "essay-question",
                 "type": "textarea",
@@ -340,6 +338,12 @@
                     "Hawaiian or Pacific Islander"
                 ],
                 "hasOther": true,
+                "required": false
+            },
+            {
+                "name": "organization",
+                "label": "What organization are you affiliated with, if any?",
+                "type": "text",
                 "required": false
             },
             {
@@ -459,7 +463,7 @@
                     "Medicine"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": false
             }, 
             {
                 "name": "what-tracks",
@@ -474,7 +478,7 @@
                     "N/A"
                 ],
                 "hasOther": false,
-                "required": true
+                "required": false
             }, 
             {
                 "name": "required-items",
