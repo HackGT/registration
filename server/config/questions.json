@@ -11,6 +11,11 @@
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+                "for": "street-address",
+                "type": "p",
+                "content": "Please enter your US street address"
             }
         ],
         "questions": [
@@ -45,10 +50,23 @@
                 "hasOther": true,
                 "required": true
             },
+
             {
                 "name": "gradterm",
                 "label": "When do you plan on graduating?",
-                "type": "text",
+                "type": "select",
+                "options": [
+                    "Spring 2020",
+                    "Fall 2020",
+                    "Spring 2021",
+                    "Fall 2021",
+                    "Spring  2022",
+                    "Fall 2022",
+                    "Spring 2023",
+                    "Fall 2023",
+                    "Spring 2024",
+                    "Fall 2024+"
+                ],
                 "required": true
             },
             {
@@ -160,7 +178,7 @@
             },
             {
                 "name": "street-address",
-                "label": "Street Address",
+                "label": "Address Line 1",
                 "type": "text",
                 "required":true
             },
@@ -179,7 +197,7 @@
             {
                 "name": "address-state",
                 "type": "select",
-                "label": "State/Province/Region",
+                "label": "State",
                 "type": "select",
                 "options": [
                     "Alabama",
@@ -252,7 +270,7 @@
             {
                 "name": "essay-question",
                 "type": "textarea",
-                "label": "Answer ONE of the following questions: <ul><li>What area of healthcare are you most interested in learning more about?</li><li>Talk about an organization that you think is making a positive impact in the healthcare industry.</li></ul>",
+                "label": "Fill out ONE of the following questions: <ul><li>What area of healthcare are you most interested in learning more about?</li><li>Talk about an organization that you think is making a positive impact in the healthcare industry.</li></ul>",
                 "required": true,
                 "maxWordCount": 150
             },
@@ -280,14 +298,14 @@
         "name": "Mentor",
         "text": [
             {
-                "for": "18-and-gt-student",
-                "type": "p",
-                "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HealthTech."
-            },
-            {
                 "for": "end",
                 "type": "p",
                 "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+                "for": "street-address",
+                "type": "p",
+                "content": "Please enter your US street address"
             }
         ],
         "questions": [
@@ -295,82 +313,6 @@
                 "name": "name",
                 "label": "Name",
                 "type": "text",
-                "required": true
-            },
-            {
-                "name": "18-and-gt-student",
-                "label": "Are you over 18 or a student at Georgia Tech?",
-                "type": "radio",
-                "options": [
-                    "I am 18 or older.",
-                    "I am under 18 and a Georgia Tech student."
-                ],
-                "required": true
-            },
-            {
-                "name": "year",
-                "label": "Year",
-                "type": "radio",
-                "options": [
-                    "1st year",
-                    "2nd year",
-                    "3rd year",
-                    "4th year",
-                    "5th year+",
-                    "Graduate Student"
-                ],
-                "hasOther": true,
-                "required": true
-            },
-            {
-                "name": "gradterm",
-                "label": "When do you plan on graduating?",
-                "type": "text",
-                "required": true
-            },
-            {
-                "name": "major",
-                "label": "Major",
-                "type": "select",
-                "options": [
-                    "Aerospace Engineering",
-                    "Applied Language and Intercultural Studies",
-                    "Applied Physics",
-                    "Architecture",
-                    "Biochemistry",
-                    "Biology",
-                    "Biomedical Engineering",
-                    "Business Administration",
-                    "Chemical and Biomolecular Engineering",
-                    "Chemistry",
-                    "Civil Engineering",
-                    "Computer Engineering",
-                    "Computational Media",
-                    "Computer Science",
-                    "Earth and Atmospheric Sciences",
-                    "Economics",
-                    "Economics and International Affairs",
-                    "Electrical Engineering",
-                    "Environmental Engineering",
-                    "Global Economics and Modern Languages",
-                    "History, Technology, and Society",
-                    "Industrial Design",
-                    "Industrial Engineering",
-                    "International Affairs",
-                    "International Affairs and Modern Language",
-                    "Literature, Media, and Communication",
-                    "Literature, Media, and Communication & Digital Media",
-                    "Materials Science and Engineering",
-                    "Mathematics",
-                    "Mechanical Engineering",
-                    "Music Technology",
-                    "Neuroscience",
-                    "Nuclear and Radiological Engineering",
-                    "Physics",
-                    "Psychology",
-                    "Public Policy"
-                ],
-                "hasOther": true,
                 "required": true
             },
             {
@@ -399,19 +341,10 @@
                 "required": false
             },
             {
-                "name": "university",
-                "type": "select",
-                "label": "What university do you go to?",
-                "options": [
-                    "Georgia Institute of Technology",
-                    "Georgia State University",
-                    "Emory University",
-                    "University of Georgia",
-                    "Clark Atlanta University",
-                    "Kennesaw State University"
-                ],
-                "hasOther": true,
-                "required": true
+                "name": "organization",
+                "label": "What organization are you affiliated with, if any?",
+                "type": "text",
+                "required": false
             },
             {
                 "name": "tshirt-size",
@@ -429,14 +362,90 @@
                 "required": true
             },
             {
-                "name": "why-mentor",
-                "type": "textarea",
-                "label": "What drives you to teach?",
-                "required": true,
-                "maxWordCount": 150
+                "name": "street-address",
+                "label": "Street Address",
+                "type": "text",
+                "required":true
             },
             {
-                "name": "what-mentor",
+                "name": "address-line2",
+                "label": "Address Line 2",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "address-city",
+                "label": "City",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-state",
+                "type": "select",
+                "label": "State",
+                "type": "select",
+                "options": [
+                    "Alabama",
+                    "Alaska",
+                    "Arizona",
+                    "Arkansas",
+                    "California",
+                    "Colorado",
+                    "Connecticut",
+                    "Delaware",
+                    "Florida",
+                    "Georgia",
+                    "Hawaii",
+                    "Idaho",
+                    "Illinois",
+                    "Indiana",
+                    "Iowa",
+                    "Kansas",
+                    "Kentucky",
+                    "Louisiana",
+                    "Maine",
+                    "Maryland",
+                    "Massachusetts",
+                    "Michigan",
+                    "Minnesota",
+                    "Mississippi",
+                    "Missouri",
+                    "Montana",
+                    "Nebraska",
+                    "Nevada",
+                    "New Hampshire",
+                    "New Jersey",
+                    "New Mexico",
+                    "New York",
+                    "North Carolina",
+                    "North Dakota",
+                    "Ohio",
+                    "Oklahoma",
+                    "Oregon",
+                    "Pennsylvania",
+                    "Rhode Island",
+                    "South Carolina",
+                    "South Dakota",
+                    "Tennessee",
+                    "Texas",
+                    "Utah",
+                    "Vermont",
+                    "Virginia",
+                    "Washington",
+                    "West Virginia",
+                    "Wisconsin",
+                    "Wyoming"
+                ],
+                "required": true
+            },
+            {
+                "name": "address-zipcode",
+                "type": "text",
+                "label": "Zip Code",
+                "required": true
+            },
+            {
+                "name": "tools/materials",
                 "type": "checkbox",
                 "label": "What tools do you feel comfortable mentoring in?",
                 "options": [
@@ -448,14 +457,13 @@
                     "Flask",
                     "iOS",
                     "Android",
-                    "Raspberry Pi/Arduino",
-                    "Circuits",
-                    "Sensors",
-                    "Motors",
-                    "N/A" 
+                    "Chemistry",
+                    "Biology",
+                    "Nutrition",
+                    "Medicine"
                 ],
                 "hasOther": true,
-                "required": true
+                "required": false
             }, 
             {
                 "name": "what-tracks",
@@ -470,7 +478,7 @@
                     "N/A"
                 ],
                 "hasOther": false,
-                "required": true
+                "required": false
             }, 
             {
                 "name": "required-items",
