@@ -777,7 +777,7 @@
             {
                 "name": "questions",
                 "type": "radio",
-                "label": "Have you completed the Docusign and the Mandated Reporter Training course? Please confirm your acceptance only after you have completed these items!",
+                "label": "By accepting this confirmation, you acknowledge that you will need to still complete the Mandated Mandated Reporter Training course and Docusign.",
                 "options": [
                     "Yes",
                     "No"
