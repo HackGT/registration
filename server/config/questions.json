@@ -764,8 +764,28 @@
     },
     {
         "name": "Mentor Confirmation",
-        "text": [],
-        "questions": []
+        "text": [
+             {
+                "for": "finished",
+                "type": "p",
+                "content": "Thank your confirming your attendance to Catalyst 2020!"
+            }
+
+
+        ],
+        "questions": [
+            {
+                "name": "questions",
+                "type": "radio",
+                "label": "Have you completed the Docusign and the Mandated Reporter Training course? Please confirm your acceptance only after you have completed these items!",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            }
+
+        ]
     },
     {
         "name": "Participant Walk-up",
