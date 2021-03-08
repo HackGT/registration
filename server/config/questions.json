@@ -238,7 +238,7 @@
 
            {
                 "name": "preference-1",
-                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). What is your first preference for mentoring a certain track?",
+                "label": "Please review the tracks descriptions on the [event website](https://catalyst.hack.gt/#tracks). What is your first preference for particpation in a certain track?",
                 "type": "radio",
                 "options": [
                     "Web Development",
