@@ -900,14 +900,13 @@
             {
                 "name": "questions",
                 "type": "radio",
-                "label": "Have you completed the Docusign and the Mandated Reporter Training course? Please confirm your acceptance only after you have completed these items!",
+                "label": "By confirming your acceptance, you acknowledge that you will need to still RSVP and attend one mandatory training session and complete the Mandated Mandated Reporter Training course and the Docusign in order to participate as a mentor.",
                 "options": [
                     "Yes",
                     "No"
                 ],
                 "required": true
             }
-
         ]
       },
       {
