@@ -877,14 +877,34 @@
     {
         "name": "Participant Confirmation",
         "text": [
-              {
-                  "for": "parking",
-                  "type": "p",
-                  "content": "Thank your confirming your attendance to HealthTech 2021!"
-              }
+             
           ],
           "questions": [
-              
+              {
+                  "name": "pant size",
+                  "label": "What is your pant (pajama) size?",
+                  "type": "radio",
+                  "options": [
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true 
+              },
+              {
+                "name": "confirm",
+                "type": "radio",
+                "label": "Do you accept your invitation to participate in HealthTech 2021?",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            }
           ]
       },
       {
