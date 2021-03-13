@@ -271,8 +271,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
                                 if (questionBranch.name === "Volunteer") {
 					const userEmailRegex = user.email.match(/@([\w.]+)/);
 					const userEmailDomain = userEmailRegex ? userEmailRegex[1].toLowerCase() : null;
-					if ((userEmailDomain && userEmailDomain==="hack.gt")
-						|| config.hackgt7.sponsorEmailWhitelist.map(x => x.toLowerCase()).includes(user.email.toLowerCase())) {
+					if ((userEmailDomain && userEmailDomain==="hack.gt")) {
 						await updateUserStatus(user, "Volunteer Confirmation");
 						await sendPreConfirmNotification(user);
 					} else {
