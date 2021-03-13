@@ -268,10 +268,21 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 					}
 				}
 				trackEvent("submitted application", request, user.email, tags);
-
-				if (questionBranch.autoAccept && questionBranch.autoAccept !== "disabled") {
+                                if (questionBranch.name === "Volunteer") {
+					const userEmailRegex = user.email.match(/@([\w.]+)/);
+					const userEmailDomain = userEmailRegex ? userEmailRegex[1].toLowerCase() : null;
+					if ((userEmailDomain && userEmailDomain==="hack.gt")
+						|| config.hackgt7.sponsorEmailWhitelist.map(x => x.toLowerCase()).includes(user.email.toLowerCase())) {
+						await updateUserStatus(user, "Volunteer Confirmation");
+						await sendPreConfirmNotification(user);
+					} else {
+						await updateUserStatus(user, "Denied Admission / Volunteer");
+						await sendPreConfirmNotification(user);
+					}
+				} else if (questionBranch.autoAccept && questionBranch.autoAccept !== "disabled") {
 					await updateUserStatus(user, questionBranch.autoAccept);
 				}
+				
 
 			} else if (questionBranch instanceof Branches.ConfirmationBranch) {
 				if (!user.confirmed) {
