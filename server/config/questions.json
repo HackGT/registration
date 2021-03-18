@@ -600,6 +600,160 @@
             }
         ]
     },
+    {      
+        "name": "Partner Auto-Confirm",
+        "text": [
+            {
+                "for": "end",
+                "type": "p",
+                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
+            },
+            {
+                "for": "street-address",
+                "type": "p",
+                "content": "Please enter your US street address"
+            }
+        ],
+        "questions": [
+            {
+                "name": "name",
+                "label": "Name",
+                "type": "text",
+                "required": true
+            },
+            {
+                "name": "organization",
+                "label": "What organization are you affiliated with, if any?",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "tshirt-size",
+                "label": "What is your T-shirt size?",
+                "type": "radio",
+                "options": [
+                    "XS",
+                    "S",
+                    "M",
+                    "L",
+                    "XL",
+                    "2XL",
+                    "3XL"
+                ],
+                "required": true
+            },
+            {
+                "name": "street-address",
+                "label": "Street Address",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-line2",
+                "label": "Address Line 2",
+                "type": "text",
+                "required": false
+            },
+            {
+                "name": "address-city",
+                "label": "City",
+                "type": "text",
+                "required":true
+            },
+            {
+                "name": "address-state",
+                "type": "select",
+                "label": "State",
+                "type": "select",
+                "options": [
+                    "Alabama",
+                    "Alaska",
+                    "Arizona",
+                    "Arkansas",
+                    "California",
+                    "Colorado",
+                    "Connecticut",
+                    "Delaware",
+                    "Florida",
+                    "Georgia",
+                    "Hawaii",
+                    "Idaho",
+                    "Illinois",
+                    "Indiana",
+                    "Iowa",
+                    "Kansas",
+                    "Kentucky",
+                    "Louisiana",
+                    "Maine",
+                    "Maryland",
+                    "Massachusetts",
+                    "Michigan",
+                    "Minnesota",
+                    "Mississippi",
+                    "Missouri",
+                    "Montana",
+                    "Nebraska",
+                    "Nevada",
+                    "New Hampshire",
+                    "New Jersey",
+                    "New Mexico",
+                    "New York",
+                    "North Carolina",
+                    "North Dakota",
+                    "Ohio",
+                    "Oklahoma",
+                    "Oregon",
+                    "Pennsylvania",
+                    "Rhode Island",
+                    "South Carolina",
+                    "South Dakota",
+                    "Tennessee",
+                    "Texas",
+                    "Utah",
+                    "Vermont",
+                    "Virginia",
+                    "Washington",
+                    "West Virginia",
+                    "Wisconsin",
+                    "Wyoming"
+                ],
+                "required": true
+            },
+            {
+                "name": "address-zipcode",
+                "type": "text",
+                "label": "Zip Code",
+                "required": true
+            },
+            {
+                "name": "Specialty/Area of Expertise",
+                "type": "text",
+                "label": "What are you signed up to work on?",
+                "required": true
+            }, 
+            {
+                "name": "required-items",
+                "label": "Please confirm the following:",
+                "type": "checkbox",
+                "options": [
+                    "I have read and agree to adhere to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
+                    "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ANN4waxYj2jl3PxHpONcJr250a2Ektvq/view)",
+                    "I agree to the [HackGT Photo Release](https://drive.google.com/file/d/1swEJBCMoASk7w3BbbOj9coatPQL8P_64/view)"
+                ],
+                "required": true,
+                "hasOther": false
+            },
+            {
+                "name": "other",
+                "label": "Anything else you'd like us to know?",
+                "type": "textarea",
+                "required": false
+            }
+        ]
+    },
+    
+    
+    
     {
         "name": "Chaperone",
         "questions": [
