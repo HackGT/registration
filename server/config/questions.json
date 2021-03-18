@@ -601,7 +601,7 @@
         ]
     },
     {      
-        "name": "Partner Auto-Confirm",
+        "name": "Partner",
         "text": [
             {
                 "for": "end",
@@ -1151,9 +1151,22 @@
         ]
     },
     {
-        "name": "Partner Walk-up",
-        "text": [],
-        "questions": []
+        "name": "Partner Confirmation",
+        "text": [
+             
+          ],
+          "questions": [
+              {
+                "name": "confirm",
+                "type": "radio",
+                "label": "Do you accept your invitation to participate as a Partner at Catalyst 2021?",
+                "options": [
+                    "Yes",
+                    "No"
+                ],
+                "required": true
+            }
+          ]
     },
     {
         "name": "Walk-up Auto-confirm",
