@@ -726,10 +726,21 @@
                 "required": true
             },
             {
-                "name": "Specialty/Area of Expertise",
-                "type": "text",
-                "label": "What are you signed up to work on?",
-                "required": true
+                "name": "which-panel",
+                "type": "checkbox",
+                "label": "Which panel(s) and fair(s) are you signed up to work on?",
+                "options": [
+                    "Road to College Panel",
+                    "Facebook Panel",
+                    "Why Choose STEM Panel",
+                    "Entrepreneurship Panel",
+                    "Facebook - Opportunities Fair",
+                    "GWC - Opportunities Fair",
+                    "STEM Academy - Opportunities Fair",
+                    "CEISMIC - Opportunities Fair"
+                ],
+                "required": true,
+                "hasOther":true
             }, 
             {
                 "name": "required-items",
