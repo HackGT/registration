@@ -604,11 +604,6 @@
         "name": "Partner",
         "text": [
             {
-                "for": "end",
-                "type": "p",
-                "content": "By submitting your application, you agree to allow HackGT to share your registration information with our sponsors."
-            },
-            {
                 "for": "street-address",
                 "type": "p",
                 "content": "Please enter your US street address"
@@ -739,7 +734,7 @@
                     "STEM Academy - Opportunities Fair",
                     "CEISMIC - Opportunities Fair"
                 ],
-                "required": true,
+                "required": false,
                 "hasOther":true
             }, 
             {
