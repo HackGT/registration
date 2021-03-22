@@ -619,13 +619,13 @@
             {
                 "name": "parent-email",
                 "type": "email",
-                "label": "Parent/Guardian Contact Email",
+                "label": "Email",
                 "required": true
             },
             {
                 "name": "phone",
                 "type": "tel",
-                "label": "Parent/Guardian Contact Phone Number",
+                "label": "Phone Number",
                 "required": true
             },
             {
