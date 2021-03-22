@@ -913,97 +913,12 @@
         ]
     },
     {
-     "name": "Participant Confirmation Web-Dev",
+     "name": "Participant Confirmation",
      "text": [
              {
                 "for": "school-email",
                 "type": "p",
-                "content": "Thank your confirming your attendance to the Web Development track for Catalyst 2021!"
-            }
-        ],
-        "questions": [
-            {
-                "name": "school-email",
-                "label": "School Email",
-                "type": "text",
-                "required": false
-            },
-             {
-                "name": "questions",
-                "type": "radio",
-                "label": "I will be able to be attend Catalyst 2021 virtually on Saturday, March 27th from 9-4.",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            }
-        ]
-    },
-   
-    {
-     "name": "Participant Confirmation Cybersecurity",
-     "text": [
-             {
-                "for": "school-email",
-                "type": "p",
-                "content": "Thank your confirming your attendance to the Cybersecurity track for Catalyst 2021!"
-            }
-        ],
-        "questions": [
-            {
-                "name": "school-email",
-                "label": "School Email",
-                "type": "text",
-                "required": false
-            },
-             {
-                "name": "questions",
-                "type": "radio",
-                "label": "I will be able to be attend Catalyst 2021 virtually on Saturday, March 27th from 9-4.",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            }
-        ]
-    },
-   {
-     "name": "Participant Confirmation Design",
-     "text": [
-             {
-                "for": "school-email",
-                "type": "p",
-                "content": "Thank your confirming your attendance to the UI/UX and Graphic Design track for Catalyst 2021!"
-            }
-        ],
-        "questions": [
-            {
-                "name": "school-email",
-                "label": "School Email",
-                "type": "text",
-                "required": false
-            },
-             {
-                "name": "questions",
-                "type": "radio",
-                "label": "I will be able to be attend Catalyst 2021 virtually on Saturday, March 27th from 9-4.",
-                "options": [
-                    "Yes",
-                    "No"
-                ],
-                "required": true
-            }
-        ]
-    },
-    {
-     "name": "Participant Confirmation Entrepreneurship",
-     "text": [
-             {
-                "for": "school-email",
-                "type": "p",
-                "content": "Thank your confirming your attendance to the Product Development and Entrepreneurship track for Catalyst 2021!"
+                "content": "Thank your confirming your attendance for Catalyst 2021!"
             }
         ],
         "questions": [
