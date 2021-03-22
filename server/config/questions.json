@@ -617,6 +617,18 @@
                 "required": true
             },
             {
+                "name": "parent-email",
+                "type": "email",
+                "label": "Parent/Guardian Contact Email",
+                "required": true
+            },
+            {
+                "name": "phone",
+                "type": "tel",
+                "label": "Parent/Guardian Contact Phone Number",
+                "required": true
+            },
+            {
                 "name": "organization",
                 "label": "What organization are you affiliated with, if any?",
                 "type": "text",
