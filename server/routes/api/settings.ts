@@ -1,13 +1,14 @@
 import * as express from "express";
 
 import {
-	getSetting, updateSetting, renderEmailHTML, renderEmailText, renderPageHTML, defaultEmailSubjects, agenda
+	getSetting, updateSetting, renderEmailHTML, renderEmailText, renderPageHTML, defaultEmailSubjects
 } from "../../common";
 import {
 	isAdmin, uploadHandler
 } from "../../middleware";
 import * as Branches from "../../branch";
 import { IUser, User } from "../../schema";
+import { agenda } from "../../jobs";
 
 export let settingsRoutes = express.Router();
 

@@ -7,7 +7,7 @@ import * as uuid from "uuid/v4";
 import {
 	STORAGE_ENGINE,
 	formatSize,
-	config, getSetting, defaultEmailSubjects, agenda
+	config, getSetting, defaultEmailSubjects
 } from "../../common";
 import {
 	MAX_FILE_SIZE, postParser, uploadHandler,
@@ -22,6 +22,7 @@ import {
 } from "../../schema";
 import * as Branches from "../../branch";
 import { GroundTruthStrategy } from "../strategies";
+import { agenda } from "../../jobs";
 
 export let userRoutes = express.Router({ "mergeParams": true });
 export let registrationRoutes = express.Router({ "mergeParams": true });

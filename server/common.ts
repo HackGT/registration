@@ -444,6 +444,7 @@ export function unbase64File(filename: string): string {
 import * as sendgrid from "@sendgrid/mail";
 sendgrid.setApiKey(config.email.key);
 import * as marked from "marked";
+import {MarkedOptions} from "marked";
 // tslint:disable-next-line:no-var-requires
 const striptags = require("striptags");
 import { IUser, Team, IFormItem } from "./schema";
@@ -635,39 +636,3 @@ export async function isBranchOpen(rawBranchName: string, user: IUser, requestTy
 
 	return false;
 }
-
-//
-// Agenda Async Queue
-//
-import * as Agenda from "agenda";
-export const agenda = new Agenda({db: {address: config.server.mongoURL}});
-import { User } from "./schema";
-import {MarkedOptions} from "marked";
-agenda.define("send_templated_email", async (job, done) => {
-	try {
-		let user = await User.findOne({uuid: job.attrs.data.id});
-		if (user) {
-			let emailHTML = await renderEmailHTML(job.attrs.data.markdown, user);
-			let emailText = await renderEmailText(job.attrs.data.markdown, user);
-			let emailDetails = {
-				from: config.email.from,
-				to: user.email,
-				subject: job.attrs.data.subject,
-				html: emailHTML,
-				text: emailText
-			};
-			await sendgrid.send(emailDetails);
-			await done();
-		} else {
-			await done(new Error("No such user"));
-		}
-	}
-	catch(err) {
-		console.error(err);
-		await done(err);
-	}
-});
-
-agenda.start().catch((err) => {
-	console.error("Unable to start agenda worker: ", err);
-});
