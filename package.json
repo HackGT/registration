@@ -67,7 +67,7 @@
     "qr-image": "^3.2.0",
     "request": "^2.88.0",
     "serve-static": "^1.13.2",
-    "striptags": "^3.1.1",
+    "striptags": "^3.2.0",
     "sweetalert2": "^6.11.5",
     "tmp": "0.0.33",
     "uuid": "^3.2.1",
