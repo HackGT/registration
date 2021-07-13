@@ -1,28 +1,28 @@
 @import url("https://use.typekit.net/djq6mbs.css");
 @font-face {
     font-family: "ServiceStation";
-    src: url("assets/fonts/service-station-display/ServiceStation-Regular.woff")
+    src: url("css/ServiceStation-Regular.woff")
       format("woff");
     font-weight: normal;
 }
   
 @font-face {
     font-family: "ServiceStation";
-    src: url("assets/fonts/service-station-display/ServiceStation-RegularItalic.woff")
+    src: url("css/ServiceStation-RegularItalic.woff")
         format("woff");
     font-style: italic;
 }
 
 @font-face {
     font-family: "ServiceStation";
-    src: url("assets/fonts/service-station-display/ServiceStation-Rough.woff")
+    src: url("css/ServiceStation-Rough.woff")
         format("woff");
     font-weight: bold;
 }
 
 @font-face {
     font-family: "ServiceStation";
-    src: url("assets/fonts/service-station-display/ServiceStation-RoughItalic.woff")
+    src: url("csss/ServiceStation-RoughItalic.woff")
         format("woff");
     font-style: italic;
     font-weight: bold;
@@ -64,7 +64,7 @@ html::before {
 
 html, body, #sidebar-nav, section.main {
     color: var(--text-color);
-    font-family: "ServiceSation";
+    font-family: "Futura";
 }
 
 /* Hide text and use image instead in the header */
@@ -90,7 +90,7 @@ html, body, #sidebar-nav, section.main {
     color: var(--text-color);
     border: none;
     text-decoration: initial;
-    font-family: "ServiceStation";
+    font-family: "Futura";
     font-weight: 800;
 }
 .editor-toolbar > a {
@@ -132,7 +132,7 @@ fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Futura";
+    font-family: "ServiceStation, sans serif";
     font-weight: 800;
 }
 
@@ -162,7 +162,7 @@ option {
 
 input, label {
     font-variant-ligatures: none;
-    font-family: "ServiceStation";
+    font-family: "Futura";
 }
 label {
     font-weight: bold;
