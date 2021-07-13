@@ -1,17 +1,36 @@
 
 @font-face {
-    font-family: Bavro;
-    src: url(/css/Bavro-Regular.ttf);
+    font-family: "ServiceStation";
+    src: url("assets/fonts/service-station-display/ServiceStation-Regular.woff")
+      format("woff");
+    font-weight: normal;
+}
+  
+@font-face {
+    font-family: "ServiceStation";
+    src: url("assets/fonts/service-station-display/ServiceStation-RegularItalic.woff")
+        format("woff");
+    font-style: italic;
 }
 
 @font-face {
-    font-family: Quicksand;
-    src: url(/css/Quicksand-VariableFont_wght.ttf);
+    font-family: "ServiceStation";
+    src: url("assets/fonts/service-station-display/ServiceStation-Rough.woff")
+        format("woff");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "ServiceStation";
+    src: url("assets/fonts/service-station-display/ServiceStation-RoughItalic.woff")
+        format("woff");
+    font-style: italic;
+    font-weight: bold;
 }
 
 /* CSS variables for colors */
 :root {
-    --bg-color: rgba(255, 255, 255, 0.1);
+    --bg-color: #455483;
     --input-color:rgba(255, 255, 255, 0.1);
     --text-color: #e6e6e6;
     --dark-blue: rgba(255, 255, 255, 0.3);
@@ -30,7 +49,7 @@ html::before {
     height: 100%;
     width: 100%;
     z-index: -1;
-    background: url(/css/registration.png);
+    /* background: url(/css/registration.png); */
     background-repeat: no-repeat;
     background-size: cover;
     
@@ -171,7 +190,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 
 @media only screen and (min-width: 1000px) {
     html::before {
-        background: url(/css/registration.png);
+        /* background: url(/css/registration.png); */
         background-repeat: no-repeat;
         background-size: cover;
         
@@ -181,7 +200,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1400px) {
     html::before {
-        background: url(/css/registration.png);
+        /* background: url(/css/registration.png); */
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
@@ -190,7 +209,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 
 @media only screen and (max-width: 1400px) {
     html::before {
-        background-color: #BD4F6C;
-        background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
+        background-color: #455483;
+        /* background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%); */
     }
 }
