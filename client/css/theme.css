@@ -49,6 +49,7 @@ html::before {
     height: 100%;
     width: 100%;
     z-index: -1;
+    background-color: #455483;
     /* background: url(/css/registration.png); */
     background-repeat: no-repeat;
     background-size: cover;
@@ -191,6 +192,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 @media only screen and (min-width: 1000px) {
     html::before {
         /* background: url(/css/registration.png); */
+        background-color: #455483;
         background-repeat: no-repeat;
         background-size: cover;
         
@@ -201,6 +203,7 @@ input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=pa
 @media only screen and (min-width: 1400px) {
     html::before {
         /* background: url(/css/registration.png); */
+        background-color: #455483;
         background-repeat: no-repeat;
         background-size: cover;
         will-change: transform;
