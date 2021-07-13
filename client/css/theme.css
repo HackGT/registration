@@ -1,0 +1,196 @@
+
+@font-face {
+    font-family: Bavro;
+    src: url(/css/Bavro-Regular.ttf);
+}
+
+@font-face {
+    font-family: Quicksand;
+    src: url(/css/Quicksand-VariableFont_wght.ttf);
+}
+
+/* CSS variables for colors */
+:root {
+    --bg-color: rgba(255, 255, 255, 0.1);
+    --input-color:rgba(255, 255, 255, 0.1);
+    --text-color: #e6e6e6;
+    --dark-blue: rgba(255, 255, 255, 0.3);
+    --light-blue: white;
+}
+
+/* Set backgrounds */
+html::before {
+    /* background-color: var(--bg-color); */
+    /* opacity: 0.8; */
+
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+    background: url(/css/registration.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+}
+#sidebar-nav {
+    background: none;
+}
+/* section.main {
+    background-color: var(--blur);
+} */
+
+html, body, #sidebar-nav, section.main {
+    color: var(--text-color);
+    font-family: "Quicksand";
+}
+
+/* Hide text and use image instead in the header */
+/* #sidebar > h1, .container > h1:first-child {
+    display: block;
+    background-image: url("https://build.hack.gt/assets/logo.svg");
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
+    height: 75px;
+
+    color: rgba(0, 0, 0, 0);
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+} */
+#sidebar > h1 {
+    margin-bottom: -10px;
+}
+
+#sidebar-nav > a, #sidebar, .editor-toolbar > a {
+    color: var(--text-color);
+    border: none;
+    text-decoration: initial;
+    font-family: "Quicksand";
+    font-weight: 800;
+}
+.editor-toolbar > a {
+    color: var(--text-color) !important;
+}
+
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
+}
+#sidebar-nav > span.divider, section.main, table thead {
+    border-color: var(--light-blue);
+}
+a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+}
+a:hover {
+    border-bottom-style: solid;
+}
+
+#email-rendered {
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
+}
+
+/* Buttons */
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: var(--dark-blue);
+}
+.editor-toolbar > button {
+    color: var(--light-blue);
+}
+
+fieldset > div > label {
+    font-size: 90%;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Bavro";
+    font-weight: 800;
+}
+
+code {
+    color: var(--text-color);
+}
+
+ul {
+    padding-left: 0;
+}
+
+section.main > div > p:first-of-type {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+/* Form elements */
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):not([type=text]):not([type=email]):not([type=password]):not([type=tel]):not([type=date]), select, fieldset {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--light-blue);
+}
+
+option {
+    color: black;
+}
+
+input, label {
+    font-variant-ligatures: none;
+    font-family: "Quicksand";
+}
+label {
+    font-weight: bold;
+}
+fieldset > div > label {
+    font-weight: normal;
+}
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: var(--dark-blue);
+}
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, rgba(255, 255, 255, 0.35) 10px, rgba(255, 255, 255, 0.35) 20px );
+    color: white !important;
+    font-weight: 700;
+}
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--bg-color);
+}
+::placeholder {
+    color: var(--bg-color);
+}
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+@media only screen and (min-width: 1000px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        
+    }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1400px) {
+    html::before {
+        background: url(/css/registration.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        will-change: transform;
+    }
+}
+
+@media only screen and (max-width: 1400px) {
+    html::before {
+        background-color: #BD4F6C;
+        background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%);
+    }
+}
