@@ -245,7 +245,7 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 			}
 
 			if (questionBranch instanceof Branches.ApplicationBranch) {
-				if (!user.applied) {
+				if (!user.applied && questionBranch.name !== "Sponsor") {
 					await agenda.now("send_templated_email", {
 						id: user.uuid,
 						subject: emailSubject || defaultEmailSubjects.apply,
@@ -269,7 +269,18 @@ function postApplicationBranchHandler(anonymous: boolean): (request: express.Req
 				}
 				trackEvent("submitted application", request, user.email, tags);
 
-				if (questionBranch.autoAccept && questionBranch.autoAccept !== "disabled") {
+				if (questionBranch.name === "Sponsor") {
+					const userEmailRegex = user.email.match(/@([\w.]+)/);
+					const userEmailDomain = userEmailRegex ? userEmailRegex[1].toLowerCase() : null;
+					if ((userEmailDomain && config.hackgt7.sponsorDomainWhitelist.map(x => x.toLowerCase()).includes(userEmailDomain))
+						|| config.hackgt7.sponsorEmailWhitelist.map(x => x.toLowerCase()).includes(user.email.toLowerCase())) {
+						await updateUserStatus(user, "Sponsor Confirmation");
+						await sendPreConfirmNotification(user);
+					} else {
+						await updateUserStatus(user, "Denied Admission / Sponsor");
+						await sendPreConfirmNotification(user);
+					}
+				} else if (questionBranch.autoAccept && questionBranch.autoAccept !== "disabled") {
 					await updateUserStatus(user, questionBranch.autoAccept);
 				}
 
@@ -434,34 +445,36 @@ async function updateUserStatus(user: Model<IUser>, status: string): Promise<voi
 	}
 }
 
+async function sendPreConfirmNotification(user: any) {
+	// Email the applicant about their acceptance
+	let emailSubject: string | null;
+	try {
+		emailSubject = await getSetting<string>(`${user.confirmationBranch}-pre-confirm-email-subject`, false);
+	} catch {
+		emailSubject = null;
+	}
+	let emailMarkdown: string;
+	try {
+		emailMarkdown = await getSetting<string>(`${user.confirmationBranch}-pre-confirm-email`, false);
+	} catch {
+		// Content not set yet
+		emailMarkdown = "";
+	}
+
+	user.preConfirmEmailSent = true;
+	await agenda.now("send_templated_email", {
+		id: user.uuid,
+		subject: emailSubject || defaultEmailSubjects.preConfirm,
+		markdown: emailMarkdown
+	});
+	await user.save();
+}
+
 userRoutes.route("/send_acceptances").post(isAdmin, async (request, response): Promise<void> => {
 	try {
 		let users = await User.find({ "confirmationBranch": {$exists: true}, "preConfirmEmailSent": { $ne: true } });
 		for (let user of users) {
-			// Email the applicant about their acceptance
-			let emailSubject: string | null;
-			try {
-				emailSubject = await getSetting<string>(`${user.confirmationBranch}-pre-confirm-email-subject`, false);
-			}
-			catch {
-				emailSubject = null;
-			}
-			let emailMarkdown: string;
-			try {
-				emailMarkdown = await getSetting<string>(`${user.confirmationBranch}-pre-confirm-email`, false);
-			}
-			catch {
-				// Content not set yet
-				emailMarkdown = "";
-			}
-
-			user.preConfirmEmailSent = true;
-			await agenda.now("send_templated_email", {
-				id: user.uuid,
-				subject: emailSubject || defaultEmailSubjects.preConfirm,
-				markdown: emailMarkdown
-			});
-			await user.save();
+			await sendPreConfirmNotification(user);
 		}
 
 		response.json({

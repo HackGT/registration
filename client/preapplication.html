@@ -13,11 +13,71 @@
 	<body>
 		{{#> sidebar}}
 			<h1 class="center">Apply</h1>
-
 			<p>Choose what you want to apply as:</p>
-			<section id="selection">
+			<p><strong>This year, you can participate in one of our two tracks or as a Mentor.</strong></p>
+			<p>
+				We are introducing two tracks for participants with focused resources to target your specific 
+				those goals: the Emerging Track and the General Track. Apply to the branch that you think is most 
+				fitting for you—most people will fit into the General track.
+			</p>
+			<p>
+				You can also find more detailed descriptions of all the available options at 
+				<a href="https://2020.hack.gt">2020.hack.gt</a>.
+			</p>
+			<section class="selection">
 				{{#each branches}}
-					<a href="/apply/{{slug this}}" class="btn">{{this}}</a>
+					<div id="box">
+						<h5>{{this}}</h5>
+						{{#ifCond this "participant walk-in"}}
+						<p>
+							If you haven't previously applied to HackGT 7 and want to attend as a general participant, please apply
+							to this branch!
+						</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-emerging"}}
+							<p>
+								New to hackathons and unsure of how to start building a technology project? 
+								This track is for you! The Emerging Hacker Track is here to provide you with 
+								guidance into introductory technology and how to ace a hackathon.
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-general"}}
+							<p>
+								Already know the drill and feel comfortable building a technology project? 
+								General is the right place for you! The General Hacker Track is the conventional 
+								hacker experience, giving you full creative control and offering supplemental 
+								resources as necessary.
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "mentor"}}
+							<p>
+								Apply here if you want to mentor at HackGT 7! Mentors will help both emerging and general 
+								hackers, and can take part in a new program to match mentors with emerging hacker teams. 
+								Visit <a href="https://2020.hack.gt/mentor.html">2020.hack.gt/mentor.html</a> for more 
+								information about the program and eligibility.
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "sponsor"}}
+						<p>
+							If your company is a sponsor of HackGT 7 and you've been directed to this site, please
+							apply to this branch!
+						</p>
+						{{/ifCond}}
+
+						{{#ifCond this "partner"}}
+						<p>
+							If you will be a speaker or workshop presenter at HackGT 7 and you've been directed to this site, please
+							apply to this branch!
+						</p>
+						{{/ifCond}}
+
+						{{#ifCond this "staff"}}
+						<p>
+							This is an internal branch intended only for members of the HackGT Team.
+						</p>
+						{{/ifCond}}
+						<a href="/apply/{{slug this}}" class="btn">Apply!</a>
+					</div>
 				{{/each}}
 			</section>
 		{{/sidebar}}

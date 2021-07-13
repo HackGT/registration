@@ -56,7 +56,10 @@
     "html-to-text": "^5.1.1",
     "json-schema-to-typescript": "^4.6.5",
     "json2csv": "^3.11.5",
+<<<<<<< HEAD
     "marked": "^1.1.1",
+=======
+>>>>>>> hackgt7
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.17",
     "mongoose": "^5.4.19",

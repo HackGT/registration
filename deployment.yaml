@@ -17,6 +17,8 @@ secrets:
   - STORAGE_ENGINE_OPTIONS
   - HELPSCOUT_INTEGRATION_SECRET_KEY
   - HELPSCOUT_BEACON_SUPPORT_HISTORY_SECRET_KEY
+  - HACKGT7_SPONSOR_DOMAINS
+  - HACKGT7_SPONSOR_EMAILS
 
 env:
   STORAGE_ENGINE: gcs
@@ -24,7 +26,7 @@ env:
   EMAIL_FROM: "HackGT Team <hello@hackgt.com>"
   PRODUCTION: true
   ADMIN_EMAILS:
-    - ehsan@hack.gt
-    - ryan@hack.gt
-    - julian@hack.gt
+    - stephanie@hack.gt
+    - claudia@hack.gt
+    - evan@hack.gt
 

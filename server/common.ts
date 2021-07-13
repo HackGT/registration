@@ -74,6 +74,11 @@ class Config implements IConfig.Main {
 		}
 	};
 
+	public hackgt7: IConfig.HackGT7 = {
+		sponsorDomainWhitelist: [],
+		sponsorEmailWhitelist: []
+	};
+
 	public questionsLocation: string = path.resolve(__dirname, "./config/questions.json");
 
 	constructor(fileName: string = "config.json") {
@@ -164,6 +169,17 @@ class Config implements IConfig.Main {
 				}
 			}
 		}
+<<<<<<< HEAD
+=======
+		if (config.hackgt7) {
+			if (config.hackgt7.sponsorEmailWhitelist) {
+				this.hackgt7.sponsorEmailWhitelist = config.hackgt7.sponsorEmailWhitelist;
+			}
+			if (config.hackgt7.sponsorDomainWhitelist) {
+				this.hackgt7.sponsorDomainWhitelist = config.hackgt7.sponsorDomainWhitelist;
+			}
+		}
+>>>>>>> hackgt7
 	}
 	protected loadFromEnv(): void {
 		// Secrets
@@ -314,6 +330,19 @@ class Config implements IConfig.Main {
 		if (process.env.ROOT_URL) {
 			this.server.rootURL = process.env.ROOT_URL;
 		}
+<<<<<<< HEAD
+=======
+
+		if (process.env.HACKGT7_SPONSOR_EMAILS) {
+			this.hackgt7.sponsorEmailWhitelist = JSON.parse(process.env.HACKGT7_SPONSOR_EMAILS);
+			console.log("The HackGT 7 sponsor email whitelist is:", this.hackgt7.sponsorEmailWhitelist);
+		}
+
+		if (process.env.HACKGT7_SPONSOR_DOMAINS) {
+			this.hackgt7.sponsorDomainWhitelist = JSON.parse(process.env.HACKGT7_SPONSOR_DOMAINS);
+			console.log("The HackGT 7 sponsor email domain whitelist is:", this.hackgt7.sponsorDomainWhitelist);
+		}
+>>>>>>> hackgt7
 	}
 }
 export let config = new Config();
