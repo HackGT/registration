@@ -1,28 +1,28 @@
 @import url("https://use.typekit.net/djq6mbs.css");
 @font-face {
     font-family: "ServiceStation";
-    src: url("css/ServiceStation-Regular.woff")
+    src: url("/css/ServiceStation-Regular.woff")
       format("woff");
     font-weight: normal;
 }
   
 @font-face {
     font-family: "ServiceStation";
-    src: url("css/ServiceStation-RegularItalic.woff")
+    src: url("/css/ServiceStation-RegularItalic.woff")
         format("woff");
     font-style: italic;
 }
 
 @font-face {
     font-family: "ServiceStation";
-    src: url("css/ServiceStation-Rough.woff")
+    src: url("/css/ServiceStation-Rough.woff")
         format("woff");
     font-weight: bold;
 }
 
 @font-face {
     font-family: "ServiceStation";
-    src: url("csss/ServiceStation-RoughItalic.woff")
+    src: url("/css/ServiceStation-RoughItalic.woff")
         format("woff");
     font-style: italic;
     font-weight: bold;
