@@ -26,9 +26,9 @@ class Config implements IConfig.Main {
 		from: "HackGT Team <hello@hackgt.com>",
 		key: "",
 		headerImage: "",
-		twitterHandle: "TheHackGT",
-		facebookHandle: "thehackgt",
-		contactAddress: "hello@hack.gt"
+		twitterHandle: "thehexlabs",
+		facebookHandle: "TheHexLabs",
+		contactAddress: "hello@hexlabs.org"
 	};
 	public server: IConfig.Server = {
 		isProduction: false,

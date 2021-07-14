@@ -281,6 +281,13 @@
           "showInHelpScout": true
         },
         {
+          "name": "school-email",
+          "label": "What is your school email?",
+          "type": "text",
+          "required": true,
+          "showInHelpScout": true
+        },
+        {
           "name": "country",
           "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
@@ -1024,6 +1031,13 @@
             "Yeshiva University"
           ],
           "hasOther": true,
+          "required": true,
+          "showInHelpScout": true
+        },
+        {
+          "name": "school-email",
+          "label": "What is your school email?",
+          "type": "text",
           "required": true,
           "showInHelpScout": true
         },
@@ -1775,6 +1789,13 @@
           "showInHelpScout": true
         },
         {
+          "name": "school-email",
+          "label": "What is your school email?",
+          "type": "text",
+          "required": true,
+          "showInHelpScout": true
+        },
+        {
           "name": "country",
           "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
@@ -2518,6 +2539,13 @@
             "Yeshiva University"
           ],
           "hasOther": true,
+          "required": true,
+          "showInHelpScout": true
+        },
+        {
+          "name": "school-email",
+          "label": "What is your school email?",
+          "type": "text",
           "required": true,
           "showInHelpScout": true
         },
@@ -3849,7 +3877,7 @@
         },
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
             "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
@@ -3891,7 +3919,7 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
             "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
@@ -3946,7 +3974,7 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
             "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
@@ -4001,7 +4029,7 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
             "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
@@ -4040,7 +4068,7 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
             "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
@@ -4084,7 +4112,7 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
             "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
