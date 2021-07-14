@@ -22,7 +22,7 @@
 			</p>
 			<p>
 				You can also find more detailed descriptions of all the available options at 
-				<a href="https://2020.hack.gt">2020.hack.gt</a>.
+				<a href="https://2021.hack.gt">2021.hack.gt</a>.
 			</p>
 			<section class="selection">
 				{{#each branches}}
@@ -30,46 +30,63 @@
 						<h5>{{this}}</h5>
 						{{#ifCond this "participant walk-in"}}
 						<p>
-							If you haven't previously applied to HackGT 7 and want to attend as a general participant, please apply
+							If you haven't previously applied to HackGT 8 and want to attend as a general participant, please apply
 							to this branch!
 						</p>
 						{{/ifCond}}
-						{{#ifCond this "participant-emerging"}}
+						{{#ifCond this "participant-emerging in-person"}}
 							<p>
 								New to hackathons and unsure of how to start building a technology project? 
 								This track is for you! The Emerging Hacker Track is here to provide you with 
-								guidance into introductory technology and how to ace a hackathon.
+								guidance into introductory technology and how to ace a hackathon. Only apply
+								to this branch if you plan on attending in-person!
 							</p>
 						{{/ifCond}}
-						{{#ifCond this "participant-general"}}
+						{{#ifCond this "participant-emerging virtual"}}
+							<p>
+								New to hackathons and unsure of how to start building a technology project? 
+								This track is for you! The Emerging Hacker Track is here to provide you with 
+								guidance into introductory technology and how to ace a hackathon. Only apply
+								to this branch if you plan on attending virtually!
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-general in-person"}}
 							<p>
 								Already know the drill and feel comfortable building a technology project? 
 								General is the right place for you! The General Hacker Track is the conventional 
 								hacker experience, giving you full creative control and offering supplemental 
-								resources as necessary.
+								resources as necessary. Only apply to this branch if you plan on attending
+								in-person!
+							</p>
+						{{/ifCond}}
+						{{#ifCond this "participant-general virtual"}}
+							<p>
+								Already know the drill and feel comfortable building a technology project? 
+								General is the right place for you! The General Hacker Track is the conventional 
+								hacker experience, giving you full creative control and offering supplemental 
+								resources as necessary. Only apply to this branch if you plan on attending
+								virtually!
 							</p>
 						{{/ifCond}}
 						{{#ifCond this "mentor"}}
 							<p>
-								Apply here if you want to mentor at HackGT 7! Mentors will help both emerging and general 
-								hackers, and can take part in a new program to match mentors with emerging hacker teams. 
-								Visit <a href="https://2020.hack.gt/mentor.html">2020.hack.gt/mentor.html</a> for more 
-								information about the program and eligibility.
+								Apply here if you want to mentor at HackGT 8! Mentors will help both emerging and general 
+								hackers develop their projects.
 							</p>
 						{{/ifCond}}
-						{{#ifCond this "sponsor"}}
+						<!-- {{#ifCond this "sponsor"}}
 						<p>
-							If your company is a sponsor of HackGT 7 and you've been directed to this site, please
+							If your company is a sponsor of HackGT 8 and you've been directed to this site, please
 							apply to this branch!
 						</p>
-						{{/ifCond}}
+						{{/ifCond}} -->
 
-						{{#ifCond this "partner"}}
+						<!-- {{#ifCond this "partner"}}
 						<p>
-							If you will be a speaker or workshop presenter at HackGT 7 and you've been directed to this site, please
+							If you will be a speaker or workshop presenter at HackGT 8 and you've been directed to this site, please
 							apply to this branch!
 						</p>
-						{{/ifCond}}
+						{{/ifCond}} -->
 
 						{{#ifCond this "staff"}}
 						<p>

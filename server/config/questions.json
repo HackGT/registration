@@ -1,11 +1,11 @@
 [
     {
-      "name": "Participant-Emerging-InPerson",
+      "name": "Participant-Emerging In-Person",
       "text": [
         {
           "for": "18-and-gt-student",
           "type": "p",
-          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 8."
         }
       ],
       "questions": [
@@ -282,7 +282,7 @@
         },
         {
           "name": "country",
-          "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "United States",
@@ -633,7 +633,7 @@
         },
         {
           "name": "timezone",
-          "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What time zone will you be located in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "Eastern Daylight Time",
@@ -691,6 +691,12 @@
           "required": false
         },
         {
+          "name": "referral",
+          "type": "text",
+          "label": "Were you referred by anyone? If so, what is their full name?",
+          "required": false
+        },
+        {
           "name": "resume",
           "label": "Please upload your resume or a skill sheet",
           "type": "file",
@@ -726,7 +732,8 @@
             "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZsC1kABkAiut1C-16UiuIqxiJ2XTSWIN/view?usp=sharing)",
             "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1gLMUiSMDEDFvgibvYSojRsohr65L9TzB/view?usp=sharing)",
             "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy)",
-            "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails."
+            "I authorize Major League Hacking to send me occasional messages about hackathons including pre- and post-event informational emails.",
+            "I agree to the [HackGT Privacy Policy]()"
           ],
           "required": true,
           "hasOther": false
@@ -740,12 +747,12 @@
       ]
     },
     {
-      "name": "Participant-Emerging-Virtual",
+      "name": "Participant-Emerging Virtual",
       "text": [
         {
           "for": "18-and-gt-student",
           "type": "p",
-          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 8."
         }
       ],
       "questions": [
@@ -1022,7 +1029,7 @@
         },
         {
           "name": "country",
-          "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "United States",
@@ -1373,7 +1380,7 @@
         },
         {
           "name": "timezone",
-          "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What time zone will you be located in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "Eastern Daylight Time",
@@ -1431,6 +1438,12 @@
           "required": false
         },
         {
+          "name": "referral",
+          "type": "text",
+          "label": "Were you referred by anyone? If so, what is their full name?",
+          "required": false
+        },
+        {
           "name": "resume",
           "label": "Please upload your resume or a skill sheet",
           "type": "file",
@@ -1480,12 +1493,12 @@
       ]
     },
     {
-      "name": "Participant-General-InPerson",
+      "name": "Participant-General In-Person",
       "text": [
         {
           "for": "18-and-gt-student",
           "type": "p",
-          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 8."
         }
       ],
       "questions": [
@@ -1762,7 +1775,7 @@
         },
         {
           "name": "country",
-          "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "United States",
@@ -2113,7 +2126,7 @@
         },
         {
           "name": "timezone",
-          "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What time zone will you be located in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "Eastern Daylight Time",
@@ -2168,6 +2181,12 @@
             "Corporate Sponsor"
           ],
           "hasOther": true,
+          "required": false
+        },
+        {
+          "name": "referral",
+          "type": "text",
+          "label": "Were you referred by anyone? If so, what is their full name?",
           "required": false
         },
         {
@@ -2220,12 +2239,12 @@
       ]
     },
     {
-      "name": "Participant-General-Virtual",
+      "name": "Participant-General Virtual",
       "text": [
         {
           "for": "18-and-gt-student",
           "type": "p",
-          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 7."
+          "content": "Due to Institute policy, minors (under 18) who are not students at Georgia Tech may not attend HackGT 8."
         }
       ],
       "questions": [
@@ -2502,7 +2521,7 @@
         },
         {
           "name": "country",
-          "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "United States",
@@ -2853,7 +2872,7 @@
         },
         {
           "name": "timezone",
-          "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What time zone will you be located in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "Eastern Daylight Time",
@@ -2908,6 +2927,12 @@
             "Corporate Sponsor"
           ],
           "hasOther": true,
+          "required": false
+        },
+        {
+          "name": "referral",
+          "type": "text",
+          "label": "Were you referred by anyone? If so, what is their full name?",
           "required": false
         },
         {
@@ -3359,7 +3384,7 @@
         },
         {
           "name": "timezone",
-          "label": "What time zone will you be located in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What time zone will you be located in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "Eastern Daylight Time",
@@ -3401,7 +3426,7 @@
         },
         {
           "name": "country",
-          "label": "What country do you anticipate residing in during HackGT 7 (Oct 16th-18th)?",
+          "label": "What country do you anticipate residing in during HackGT 8 (Oct 22nd-24th)?",
           "type": "select",
           "options": [
             "United States",
@@ -3820,10 +3845,10 @@
         },
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
+            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
@@ -3861,10 +3886,10 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
+            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
@@ -3916,10 +3941,10 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
+            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
@@ -3960,7 +3985,7 @@
         {
           "for": "additional-info",
           "type": "p",
-          "content": "Thank your confirming your attendance to HackGT 7!"
+          "content": "Thank your confirming your attendance to HackGT 8!"
         },
         {
           "for": "gdpr",
@@ -3971,10 +3996,10 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
+            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
@@ -3999,7 +4024,7 @@
         {
           "for": "additional-info",
           "type": "p",
-          "content": "Thank your confirming your attendance to HackGT 7!"
+          "content": "Thank your confirming your attendance to HackGT 8!"
         },
         {
           "for": "gdpr",
@@ -4010,10 +4035,10 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
+            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
@@ -4054,10 +4079,10 @@
       "questions": [
         {
           "name": "gdpr",
-          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 7, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 7 and other sponsor-related products and services."
+            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
@@ -4205,5 +4230,4 @@
       "questions": [],
       "text": []
     }
-  ]
-  
+  ] 
