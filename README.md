@@ -1,6 +1,6 @@
 # HackGT Registration
 
-## Special Branch for HackGT 7
+## Special Branch for HackGT 8
 
 :warning: **This branch of Registration contains auto-accept logic for some branches.  Branch off of the `master` branch
 instead** :warning:
