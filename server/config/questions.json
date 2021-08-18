@@ -4108,27 +4108,36 @@
         "required": true
       },
       {
+        "name": "race",
+        "label": "What is your race/ethnicity?",
+        "type": "checkbox",
+        "options": [
+          "Non-Hispanic Caucasian",
+          "Black or African American",
+          "Latinx or Hispanic American",
+          "South Asian or South-Asian American",
+          "South-East Asian or South-East Asian American",
+          "East Asian or Asian American",
+          "Middle Eastern or Arab American",
+          "Native American or Alaskan Native",
+          "Hawaiian or Pacific Islander"
+        ],
+        "hasOther": true,
+        "required": false
+      },
+      {
         "name": "affiliation",
         "label": "Which of our sponsors are you affiliated with?",
         "type": "select",
         "options": [
-          "Anthem Insurance Companies, Inc.",
-          "BlackRock, Inc.",
-          "Ciena",
-          "Clinton Global Initiative",
-          "Create-X",
-          "Facebook",
+          "BlackRock",
+          "NSA",
+          "Walmart",
+          "Praetorian",
           "General Motors",
-          "GT Engineering for Social Innovation Center",
-          "Hacks/Hackers",
-          "IBM",
-          "Microsoft",
-          "NCR",
+          "State Farm",
           "New York Life",
-          "NewsQ",
-          "NSIN",
-          "Tow-Knight Center for Entrepreneurial Journalism",
-          "Wayfair"
+          "U.S. Cyber Command"
         ],
         "required": true,
         "hasOther": true,
@@ -4136,10 +4145,9 @@
       },
       {
         "name": "mentor",
-        "label": "Would you like to be a mentor at HackGT 7?",
+        "label": "Would you like to be a mentor at HackGT 8?",
         "type": "radio",
         "options": [
-          "Yes, and I would also like to be part of the <a href='https://2020.hack.gt/mentor.html'>Emerging Hacker Mentorship Program</a>",
           "Yes, I would like to be a mentor",
           "No"
         ],
@@ -4148,12 +4156,12 @@
       },
       {
         "name": "judge",
-        "label": "If applicable to your company (see above), would you like to judge either your company's sponsor challenge or the HackGT 7 Overall awards?",
+        "label": "If applicable to your company (see above), would you like to judge either your company's sponsor challenge or the HackGT 8 Overall awards?",
         "type": "radio",
         "options": [
           "Yes, I plan to judge for my company's sponsor challenge",
-          "Yes, I plan to judge for the HackGT 7 Overall awards",
-          "No, I do not plan to judge at HackGT 7"
+          "Yes, I plan to judge for the HackGT 8 Overall awards",
+          "No, I do not plan to judge at HackGT 8"
         ],
         "required": true,
         "hasOther": false
