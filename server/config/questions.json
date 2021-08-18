@@ -4480,7 +4480,7 @@
         "required": false
       }
     ]
-  },
+    },
     {
       "name": "Staff",
       "text": [
