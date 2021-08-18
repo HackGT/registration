@@ -50,3 +50,9 @@ server/routes/api/api.graphql.types.ts
 # Editors!
 .nvimlog
 .#*
+
+# Environments
+.env
+
+# OS
+.DS_Store
