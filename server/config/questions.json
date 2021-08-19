@@ -79,6 +79,111 @@
             ],
             "hasOther":false,
             "required":true
+         },
+         {
+          "name": "gt-email",
+          "label": "What is your Georgia Tech email?",
+          "type": "text",
+          "required": true,
+          "showInHelpScout": true
+         },
+         {
+            "name":"phone-number",
+            "label":"What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
+            "type":"tel",
+            "required":true
+         },
+         {
+            "name":"year",
+            "label":"What is your year in school?",
+            "type":"select",
+            "options":[
+               "1st year",
+               "2nd year",
+               "3rd year",
+               "4th year",
+               "5th year+",
+               "Master's",
+               "PhD"
+            ],
+            "hasOther":true,
+            "required":true
+         },
+         {
+            "name":"major",
+            "label":"What is your major?",
+            "type":"select",
+            "options":[
+               "Aerospace Engineering",
+               "Applied Language and Intercultural Studies",
+               "Applied Physics",
+               "Architecture",
+               "Biochemistry",
+               "Biology",
+               "Biomedical Engineering",
+               "Business Administration",
+               "Chemical and Biomolecular Engineering",
+               "Chemistry",
+               "Civil Engineering",
+               "Computer Engineering",
+               "Computational Media",
+               "Computer Science",
+               "Earth and Atmospheric Sciences",
+               "Economics",
+               "Economics and International Affairs",
+               "Electrical Engineering",
+               "Environmental Engineering",
+               "Global Economics and Modern Languages",
+               "History, Technology, and Society",
+               "Industrial Design",
+               "Industrial Engineering",
+               "International Affairs",
+               "International Affairs and Modern Language",
+               "Literature, Media, and Communication",
+               "Literature, Media, and Communication & Digital Media",
+               "Materials Science and Engineering",
+               "Mathematics",
+               "Mechanical Engineering",
+               "Music Technology",
+               "Neuroscience",
+               "Nuclear and Radiological Engineering",
+               "Physics",
+               "Psychology",
+               "Public Policy"
+            ],
+            "hasOther":true,
+            "required":true
+         },
+         {
+            "name":"gender",
+            "label":"I identify as ...",
+            "type":"radio",
+            "options":[
+               "Male",
+               "Female",
+               "Non-binary/Third Gender",
+               "Prefer not to answer"
+            ],
+            "hasOther":true,
+            "required":true
+         },
+         {
+            "name":"race",
+            "label":"What is your race/ethnicity?",
+            "type":"checkbox",
+            "options":[
+               "Non-Hispanic Caucasian",
+               "Black or African American",
+               "Latinx or Hispanic American",
+               "South Asian or South-Asian American",
+               "South-East Asian or South-East Asian American",
+               "East Asian or Asian American",
+               "Middle Eastern or Arab American",
+               "Native American or Alaskan Native",
+               "Hawaiian or Pacific Islander"
+            ],
+            "hasOther":true,
+            "required":false
          }
       ]
    },
