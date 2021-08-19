@@ -2,7 +2,71 @@
    {
       "name":"Participant",
       "text":[
-         
+         {
+            "for":"university",
+            "type":"p",
+            "content":"Note that you must be a student enrolled at Georgia Tech to attend HackGTeeny 2021!"
+         },
+         {
+            "for":"which-track",
+            "type":"h4",
+            "content": "App Development"
+         },
+         {
+          "for":"which-track",
+          "type":"p",
+          "content": "The App Dev Learning Path covers Android, iOS, and web development; you can choose as many of the options as you’d like!  You will be introduced to the basics of Android app development using Android Studio or iOS development to build native mobile apps. We will also step through the entire process of creating a simple full-stack web application using JavaScript. Soon, you will be able to not only show off your technical skills but also publish your accomplishments online, on the Google Play store or your very own website!"
+         },
+         {
+          "for":"which-track",
+          "type":"h4",
+          "content": "Data Science"
+         },
+         {
+          "for":"which-track",
+          "type":"p",
+          "content": "Whether you’re interested in machine learning algorithms or data analytics and visualization, the data science learning path will expose students to the process of collecting, cleaning, and analyzing large sets of data!"
+         },
+         {
+          "for":"which-track",
+          "type":"h4",
+          "content": "Design"
+         },
+         {
+          "for":"which-track",
+          "type":"p",
+          "content": "Whether you’re interested in machine learning algorithms or data analytics and visualization, the data science learning path will expose students to the process of collecting, cleaning, and analyzing large sets of data!"
+         },
+         {
+          "for":"which-track",
+          "type":"h4",
+          "content": "Systems"
+         },
+         {
+          "for":"which-track",
+          "type":"p",
+          "content": "Whether you’re interested in machine learning algorithms or data analytics and visualization, the data science learning path will expose students to the process of collecting, cleaning, and analyzing large sets of data!"
+         },
+         {
+          "for":"which-track",
+          "type":"h4",
+          "content": "Intro to Hackathons"
+         },
+         {
+          "for":"which-track",
+          "type":"p",
+          "content": "New to hackathons and want to learn more about how the experience is? At this workshop, we’ll talk about how a hackathon works and how to work through the event to create a project within 36 hours! We’ll also highlight resources, tips, and tricks to utilize during the event!"
+         },
+         {
+          "for":"which-track",
+          "type":"h4",
+          "content": "Intro to Development"
+         },
+         {
+          "for":"which-track",
+          "type":"p",
+          "content": "For this workshop, we’ll walk through some common technologies and practices that apply to personal projects and in the computer science industry, such as brainstorming, version control, and collaboration! By the end, you’ll be ready to work in a team on any project!"
+         }
       ],
       "questions":[
          {
@@ -15,168 +79,6 @@
             ],
             "hasOther":false,
             "required":true
-         },
-         {
-          "name": "gt-email",
-          "label": "What is your Georgia Tech email?",
-          "type": "text",
-          "required": true,
-          "showInHelpScout": true
-         },
-         {
-            "name":"phone-number",
-            "label":"What’s a cell phone number we can contact you at during the event? (We will only use this for informational and emergency announcements)",
-            "type":"tel",
-            "required":true
-         },
-         {
-            "name":"year",
-            "label":"What is your year in school?",
-            "type":"select",
-            "options":[
-               "1st year",
-               "2nd year",
-               "3rd year",
-               "4th year",
-               "5th year+",
-               "Master's",
-               "PhD"
-            ],
-            "hasOther":true,
-            "required":true
-         },
-         {
-            "name":"major",
-            "label":"What is your major?",
-            "type":"select",
-            "options":[
-               "Aerospace Engineering",
-               "Applied Language and Intercultural Studies",
-               "Applied Physics",
-               "Architecture",
-               "Biochemistry",
-               "Biology",
-               "Biomedical Engineering",
-               "Business Administration",
-               "Chemical and Biomolecular Engineering",
-               "Chemistry",
-               "Civil Engineering",
-               "Computer Engineering",
-               "Computational Media",
-               "Computer Science",
-               "Earth and Atmospheric Sciences",
-               "Economics",
-               "Economics and International Affairs",
-               "Electrical Engineering",
-               "Environmental Engineering",
-               "Global Economics and Modern Languages",
-               "History, Technology, and Society",
-               "Industrial Design",
-               "Industrial Engineering",
-               "International Affairs",
-               "International Affairs and Modern Language",
-               "Literature, Media, and Communication",
-               "Literature, Media, and Communication & Digital Media",
-               "Materials Science and Engineering",
-               "Mathematics",
-               "Mechanical Engineering",
-               "Music Technology",
-               "Neuroscience",
-               "Nuclear and Radiological Engineering",
-               "Physics",
-               "Psychology",
-               "Public Policy"
-            ],
-            "hasOther":true,
-            "required":true
-         },
-         {
-            "name":"gender",
-            "label":"I identify as ...",
-            "type":"radio",
-            "options":[
-               "Male",
-               "Female",
-               "Non-binary/Third Gender",
-               "Prefer not to answer"
-            ],
-            "hasOther":true,
-            "required":true
-         },
-         {
-            "name":"race",
-            "label":"What is your race/ethnicity?",
-            "type":"checkbox",
-            "options":[
-               "Non-Hispanic Caucasian",
-               "Black or African American",
-               "Latinx or Hispanic American",
-               "South Asian or South-Asian American",
-               "South-East Asian or South-East Asian American",
-               "East Asian or Asian American",
-               "Middle Eastern or Arab American",
-               "Native American or Alaskan Native",
-               "Hawaiian or Pacific Islander"
-            ],
-            "hasOther":true,
-            "required":false
-         },
-         {
-          "name":"which-track",
-          "label":"Which track would you like to participate in?",
-          "type":"checkbx",
-          "options":[
-             "App Development",
-             "Data Science",
-             "Systems",
-             "Intro to Hackathons",
-             "Intro to Development"
-          ],
-          "required":true
-         },
-         {
-          "name":"resume",
-          "label":"Please upload your resume or a skill sheet",
-          "type":"file",
-          "required":false
-         },
-         {
-            "name":"marketing",
-            "label":"How did you find us?",
-            "type":"checkbox",
-            "options":[
-               "MLH",
-               "Facebook",
-               "Instagram",
-               "Social Media (Other)",
-               "Friend",
-               "Class/Professor/TA",
-               "University Relations",
-               "Corporate Sponsor"
-            ],
-            "hasOther":true,
-            "required":false
-         },
-         {
-          "name": "required-items",
-          "label": "Please confirm the following:",
-          "type": "checkbox",
-          "options": [
-            "I have read and agree to the [MLH Code of Conduct](https://static.mlh.io/docs/mlh-code-of-conduct.pdf)",
-            "I agree to the [HackGT Liability Waiver](https://drive.google.com/file/d/1ZwO-q1CNDWMi6EaQ2qWQ7BSLHRQjJU6V/view?usp=sharing)",
-            "I agree to the [HackGT Photo Release Waiver](https://drive.google.com/file/d/1fqD6JKk3sRiE8W0FLEGqahfXOfDvQepV/view?usp=sharing)",
-            "I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the [MLH Privacy Policy](https://mlh.io/privacy). I further agree to the terms of both the [MLH Contest Terms and Conditions](https://github.com/MLH/mlh-policies/tree/master/prize-terms-and-conditions) and the [MLH Privacy Policy](https://mlh.io/privacy).",
-            "I authorize MLH to send me pre- and post-event informational emails, which contain free credit and opportunities from their partners",
-            "I agree to the [HexLabs Privacy Policy](https://drive.google.com/file/d/19LoCO4O2AOHpEToQWezFyo_gbyY5c9cG/view?usp=sharing)"
-          ],
-          "required": true,
-          "hasOther": false
-         },
-         {
-            "name":"other",
-            "label":"Anything else you'd like us to know?",
-            "type":"textarea",
-            "required":false
          }
       ]
    },
@@ -273,7 +175,7 @@
          {
             "for":"additional-info",
             "type":"p",
-            "content":"Thank your confirming your attendance to HackGTeeny 2020!"
+            "content":"Thank your confirming your attendance to HackGTeeny 2021!"
          }
       ],
       "questions":[
