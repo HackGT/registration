@@ -3,11 +3,11 @@
 
 /* CSS variables for colors */
 :root {
-    --bg-color: white;
-    --input-color:black;
-    --text-color: black;
+    --bg-color: #33c2ff;
+    --input-color:white;
+    --text-color: white;
     --dark-blue: #33c2ff40;
-    --light-blue: #33c2ff;
+    --light-blue: white;
 }
 
 /* Set backgrounds */
