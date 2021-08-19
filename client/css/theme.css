@@ -98,7 +98,7 @@ a:hover {
     background-color: var(--light-blue);
 }
 .editor-toolbar > button {
-    color: var(--light-blue);
+    color: var(--bg-color);
 }
 
 fieldset > div > label {
