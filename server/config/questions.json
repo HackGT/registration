@@ -546,7 +546,7 @@
       "questions":[
          {
             "name":"gdpr",
-            "label":"If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  You can change your decision later on by emailing us at [hello@hack.gt.](mailto:hello@hack.gt)",
+            "label":"If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
             "type":"checkbox",
             "options":[
                "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners."

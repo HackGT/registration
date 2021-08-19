@@ -79,7 +79,7 @@ html, body, #sidebar-nav, section.main {
     border-color: var(--light-blue);
 }
 a {
-    color: var(--text-color);
+    color: var(--bg-color);
     text-decoration: none;
     border-bottom: 1px dotted;
     cursor: pointer;
