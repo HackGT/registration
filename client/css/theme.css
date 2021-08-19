@@ -135,7 +135,7 @@ option {
 
 input, label {
     font-variant-ligatures: none;
-    font-family: 'Baloo 2', sans-serif;
+    font-family: var(--font-secondary);
 }
 label {
     font-weight: bold;
