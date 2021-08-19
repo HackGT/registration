@@ -2,71 +2,7 @@
    {
       "name":"Participant",
       "text":[
-         {
-            "for":"university",
-            "type":"p",
-            "content":"Note that you must be a student enrolled at Georgia Tech to attend HackGTeeny 2021!"
-         },
-         {
-            "for":"which-track",
-            "type":"h4",
-            "content": "App Development"
-         },
-         {
-          "for":"which-track",
-          "type":"p",
-          "content": "The App Dev Learning Path covers Android, iOS, and web development; you can choose as many of the options as you’d like!  You will be introduced to the basics of Android app development using Android Studio or iOS development to build native mobile apps. We will also step through the entire process of creating a simple full-stack web application using JavaScript. Soon, you will be able to not only show off your technical skills but also publish your accomplishments online, on the Google Play store or your very own website!"
-         },
-         {
-          "for":"which-track",
-          "type":"h4",
-          "content": "Data Science"
-         },
-         {
-          "for":"which-track",
-          "type":"p",
-          "content": "Whether you’re interested in machine learning algorithms or data analytics and visualization, the data science learning path will expose students to the process of collecting, cleaning, and analyzing large sets of data!"
-         },
-         {
-          "for":"which-track",
-          "type":"h4",
-          "content": "Design"
-         },
-         {
-          "for":"which-track",
-          "type":"p",
-          "content": "Whether you’re interested in machine learning algorithms or data analytics and visualization, the data science learning path will expose students to the process of collecting, cleaning, and analyzing large sets of data!"
-         },
-         {
-          "for":"which-track",
-          "type":"h4",
-          "content": "Systems"
-         },
-         {
-          "for":"which-track",
-          "type":"p",
-          "content": "Whether you’re interested in machine learning algorithms or data analytics and visualization, the data science learning path will expose students to the process of collecting, cleaning, and analyzing large sets of data!"
-         },
-         {
-          "for":"which-track",
-          "type":"h4",
-          "content": "Intro to Hackathons"
-         },
-         {
-          "for":"which-track",
-          "type":"p",
-          "content": "New to hackathons and want to learn more about how the experience is? At this workshop, we’ll talk about how a hackathon works and how to work through the event to create a project within 36 hours! We’ll also highlight resources, tips, and tricks to utilize during the event!"
-         },
-         {
-          "for":"which-track",
-          "type":"h4",
-          "content": "Intro to Development"
-         },
-         {
-          "for":"which-track",
-          "type":"p",
-          "content": "For this workshop, we’ll walk through some common technologies and practices that apply to personal projects and in the computer science industry, such as brainstorming, version control, and collaboration! By the end, you’ll be ready to work in a team on any project!"
-         }
+         
       ],
       "questions":[
          {
