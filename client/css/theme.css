@@ -8,6 +8,9 @@
     --text-color: white;
     --dark-blue: #33c2ff40;
     --light-blue: white;
+
+    --font-primary: "DM Sans", sans-serif;
+    --font-secondary: all-round-gothic, sans-serif;
 }
 
 /* Set backgrounds */
@@ -34,7 +37,7 @@ html::before {
 
 html, body, #sidebar-nav, section.main {
     color: var(--text-color);
-    font-family: 'Baloo 2', sans-serif;
+    font-family: var(--font-primary);
 }
 
 /* Hide text and use image instead in the header */
@@ -92,7 +95,7 @@ a:hover {
 
 /* Buttons */
 .btn, [type=submit], button, .accepted-btn-false {
-    background-color: var(--dark-blue);
+    background-color: var(--light-blue);
 }
 .editor-toolbar > button {
     color: var(--light-blue);
@@ -102,7 +105,7 @@ fieldset > div > label {
     font-size: 90%;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Baloo 2', sans-serif;
+    font-family: var(--font-secondary);
     font-weight: 800;
 }
 
