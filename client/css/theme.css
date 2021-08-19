@@ -96,6 +96,7 @@ a:hover {
 /* Buttons */
 .btn, [type=submit], button, .accepted-btn-false {
     background-color: var(--light-blue);
+    color: var(--bg-color);
 }
 .editor-toolbar > button {
     color: var(--bg-color);
