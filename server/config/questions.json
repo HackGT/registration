@@ -196,7 +196,7 @@
              "Intro to Hackathons",
              "Intro to Development"
           ],
-          "required":true
+          "required":false
          },
          {
           "name":"resume",
