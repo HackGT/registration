@@ -1,68 +1,41 @@
-@import url("https://use.typekit.net/djq6mbs.css");
-@font-face {
-  font-family: "ServiceStation";
-  src: url("/css/ServiceStation-Regular.woff") format("woff");
-  font-weight: normal;
-}
-
-@font-face {
-  font-family: "ServiceStation";
-  src: url("/css/ServiceStation-RegularItalic.woff") format("woff");
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "ServiceStation";
-  src: url("/css/ServiceStation-Rough.woff") format("woff");
-  font-weight: bold;
-}
-
-@font-face {
-  font-family: "ServiceStation";
-  src: url("/css/ServiceStation-RoughItalic.woff") format("woff");
-  font-style: italic;
-  font-weight: bold;
-}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@0;400;700;display=swap");
 
 /* CSS variables for colors */
 :root {
-  --bg-color: #455483;
-  --input-color: rgba(255, 255, 255, 0.1);
-  --text-color: #e6e6e6;
-  --dark-blue: rgba(255, 255, 255, 0.3);
-  --light-blue: white;
+    --bg-color: white;
+    --input-color:black;
+    --text-color: #e98c00;
+    --dark-blue: black;
+    --light-blue: white;
+    --font-primary: "Inter", sans-serif;
+    --font-secondary: "Inter", sans-serif;
 }
 
 /* Set backgrounds */
 html::before {
-  /* background-color: var(--bg-color); */
-  /* opacity: 0.8; */
+    /* background-color: var(--bg-color); */
+    /* opacity: 0.8; */
 
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  z-index: -1;
-  background-color: #455483;
-  /* background: url(/css/registration.png); */
-  background-repeat: no-repeat;
-  background-size: cover;
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+    background-color: var(--bg-color);
+    
 }
 #sidebar-nav {
-  background: none;
+    background: none;
 }
 /* section.main {
     background-color: var(--blur);
 } */
 
-html,
-body,
-#sidebar-nav,
-section.main {
-  color: var(--text-color);
-  font-family: "Futura", "futura-pt";
+html, body, #sidebar-nav, section.main {
+    color: var(--text-color);
+    font-family: var(--font-primary);
 }
 
 /* Hide text and use image instead in the header */
@@ -81,166 +54,109 @@ section.main {
     user-select: none;
 } */
 #sidebar > h1 {
-  margin-bottom: -10px;
+    margin-bottom: -10px;
 }
 
-#sidebar-nav > a,
-#sidebar,
-.editor-toolbar > a {
-  color: var(--text-color);
-  border: none;
-  text-decoration: initial;
-  font-family: "Futura";
-  font-weight: 800;
+#sidebar-nav > a, #sidebar, .editor-toolbar > a {
+    color: var(--text-color);
+    border: none;
+    text-decoration: initial;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
 }
 .editor-toolbar > a {
-  color: var(--text-color) !important;
+    color: var(--text-color) !important;
 }
 
-.editor-toolbar a.active,
-.editor-toolbar a:hover {
-  border-color: #4c5d67;
-  background-color: rgba(196, 251, 245, 0.2);
-  outline: none;
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    border-color: #4C5D67;
+    background-color: rgba(196, 251, 245, 0.2);
+    outline: none;
 }
-#sidebar-nav > span.divider,
-section.main,
-table thead {
-  border-color: var(--light-blue);
+#sidebar-nav > span.divider, section.main, table thead {
+    border-color: var(--light-blue);
 }
 a {
-  color: var(--text-color);
-  text-decoration: none;
-  border-bottom: 1px dotted;
-  cursor: pointer;
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    cursor: pointer;
 }
 a:hover {
-  border-bottom-style: solid;
+    border-bottom-style: solid;
 }
 
 #email-rendered {
-  background-color: var(--bg-color);
-  border: 1px solid var(--bg-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--bg-color);
 }
 
 /* Buttons */
-.btn,
-[type="submit"],
-button,
-.accepted-btn-false {
-  background-color: var(--dark-blue);
+.btn, [type=submit], button, .accepted-btn-false {
+    background-color: var(--light-blue);
+    color: var(--bg-color);
 }
 .editor-toolbar > button {
-  color: var(--light-blue);
+    color: var(--bg-color);
 }
 
 fieldset > div > label {
-  font-size: 90%;
+    font-size: 90%;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "ServiceStation";
-  font-weight: 800;
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-secondary);
+    font-weight: 800;
 }
 
 code {
-  color: var(--text-color);
+    color: var(--text-color);
 }
 
 ul {
-  padding-left: 0;
+    padding-left: 0;
 }
 
 section.main > div > p:first-of-type {
-  font-weight: bold;
-  font-size: 1.5em;
+    font-weight: bold;
+    font-size: 1.5em;
 }
 
 /* Form elements */
-input:not([type="submit"]):not([type="radio"]):not([type="checkbox"]):not([type="reset"]):not([type="text"]):not([type="email"]):not([type="password"]):not([type="tel"]):not([type="date"]),
-select,
-fieldset {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  border-color: var(--light-blue);
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):not([type=text]):not([type=email]):not([type=password]):not([type=tel]):not([type=date]), select, fieldset {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--light-blue);
 }
 
 option {
-  color: black;
+    color: black;
 }
 
-input,
-label {
-  font-variant-ligatures: none;
-  font-family: "Futura";
+input, label {
+    font-variant-ligatures: none;
+    font-family: var(--font-secondary);
 }
 label {
-  font-weight: bold;
+    font-weight: bold;
 }
 fieldset > div > label {
-  font-weight: normal;
+    font-weight: normal;
 }
-input:not([type="submit"]):not([type="radio"]):not([type="checkbox"]):not([type="reset"]):focus,
-textarea:focus,
-textarea[type="text"]:focus {
-  border-color: var(--dark-blue);
+input:not([type=submit]):not([type=radio]):not([type=checkbox]):not([type=reset]):focus, textarea:focus, textarea[type=text]:focus {
+    border-color: var(--dark-blue);
 }
-input:disabled,
-textarea:disabled {
-  background: repeating-linear-gradient(
-    45deg,
-    var(--dark-blue),
-    var(--dark-blue) 10px,
-    rgba(255, 255, 255, 0.35) 10px,
-    rgba(255, 255, 255, 0.35) 20px
-  );
-  color: white !important;
-  font-weight: 700;
+input:disabled, textarea:disabled {
+    background: repeating-linear-gradient(45deg, var(--dark-blue), var(--dark-blue) 10px, rgba(255, 255, 255, 0.35) 10px, rgba(255, 255, 255, 0.35) 20px );
+    color: white !important;
+    font-weight: 700;
 }
-::-webkit-input-placeholder {
-  /* WebKit, Blink, Edge */
-  color: var(--bg-color);
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: var(--bg-color);
 }
 ::placeholder {
-  color: var(--bg-color);
+    color: var(--bg-color);
 }
-input[type="text"]:not(:disabled),
-input[type="email"]:not(:disabled),
-input[type="password"]:not(:disabled),
-input[type="tel"]:not(:disabled),
-input[type="date"]:not(:disabled),
-textarea {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-color);
-}
-
-@media only screen and (min-width: 1000px) {
-  html::before {
-    /* background: url(/css/registration.png); */
-    background-color: #455483;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-}
-
-/* Extra large devices (large laptops and desktops, 1200px and up) */
-@media only screen and (min-width: 1400px) {
-  html::before {
-    /* background: url(/css/registration.png); */
-    background-color: #455483;
-    background-repeat: no-repeat;
-    background-size: cover;
-    will-change: transform;
-  }
-}
-
-@media only screen and (max-width: 1400px) {
-  html::before {
-    background-color: #455483;
-    /* background-image: linear-gradient(#BD4F6C 0%, #D7816A 74%); */
-  }
+input[type=text]:not(:disabled), input[type=email]:not(:disabled), input[type=password]:not(:disabled),input[type=tel]:not(:disabled), input[type=date]:not(:disabled), textarea {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
 }
