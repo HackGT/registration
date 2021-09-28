@@ -4049,18 +4049,24 @@
       "text": [
       ],
       "questions": [
-         {
-            "name": "job",
-            "label": "What is your job title?",
-            "type": "text",
-            "required": true
-         },
-         {
-            "name": "company",
-            "label": "What company do you work for?",
-            "type": "text",
-            "required": true
-         },
+        {
+           "name": "job",
+           "label": "What is your job title?",
+           "type": "text",
+           "required": true
+        },
+        {
+           "name": "company",
+           "label": "What company do you work for?",
+           "type": "text",
+           "required": true
+        },
+        {
+          "name": "phone-number",
+          "label": "What’s a cell phone number we can contact you at during the event?",
+          "type": "tel",
+          "required": true
+        },
         {
           "name": "street1",
           "label": "Street 1",
