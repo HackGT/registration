@@ -4861,32 +4861,37 @@
           "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
+            "I authorize HexLabs to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
         },
         {
-          "name": "technology",
-          "label": "What kind of technology or project are you interested in?",
-          "type": "text",
-          "required": true
-        },
-        {
-          "name": "mentor",
-          "label": "Are you interested in the mentor matching program?",
-          "type": "radio",
+          "name": "confirm-gt-student",
+          "label": "Please confirm that you are a student enrolled in Georgia Tech",
+          "type": "checkbox",
           "options": [
-            "Yes",
-            "No"
+            "By checking this box, I certify that I am a current Georgia Tech student. I understand that when I arrive in-person at HackGT 8, I will be denied entry to the in-person portion of the event if HexLabs is unable to confirm this"
           ],
           "required": true
         },
         {
-          "name": "github",
-          "label": "Github profile",
-          "type": "text",
-          "required": false
+          "name": "covid-check",
+          "label": "Please confirm that you will review Georgia Tech's COVID checklist",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I confirm I will review Georgia Tech's [COVID checklist](https://health.gatech.edu/coronavirus/daily-checklist) before attending HackGT 8."
+          ],
+          "required": true
+        },
+        {
+          "name": "recording-check",
+          "label": "Please confirm that you consent to being recorded",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I consent to being recorded in workshops and events."
+          ],
+          "required": true
         },
         {
           "name": "additional-info",
@@ -4916,32 +4921,19 @@
           "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
+            "I authorize HexLabs to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
         },
         {
-          "name": "technology",
-          "label": "What kind of technology or project are you interested in?",
-          "type": "text",
-          "required": true
-        },
-        {
-          "name": "mentor",
-          "label": "Are you interested in the mentor matching program?",
-          "type": "radio",
+          "name": "recording-check",
+          "label": "Please confirm that you consent to being recorded",
+          "type": "checkbox",
           "options": [
-            "Yes",
-            "No"
+            "By checking this box, I consent to being recorded in workshops and events."
           ],
           "required": true
-        },
-        {
-          "name": "github",
-          "label": "Github profile",
-          "type": "text",
-          "required": false
         },
         {
           "name": "additional-info",
@@ -4949,7 +4941,7 @@
           "label": "Is there anything you'd like us to know?",
           "required": false
         }
-      ]
+      ]  
     },
     {
       "name": "General In-Person Participant Confirmation",
@@ -4971,16 +4963,37 @@
           "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
+            "I authorize HexLabs to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
         },
         {
-          "name": "github",
-          "label": "Github profile",
-          "type": "text",
-          "required": false
+          "name": "confirm-gt-student",
+          "label": "Please confirm that you are a student enrolled in Georgia Tech",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I certify that I am a current Georgia Tech student. I understand that when I arrive in-person at HackGT 8, I will be denied entry to the in-person portion of the event if HexLabs is unable to confirm this"
+          ],
+          "required": true
+        },
+        {
+          "name": "covid-check",
+          "label": "Please confirm that you will review Georgia Tech's COVID checklist",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I confirm I will review Georgia Tech's [COVID checklist](https://health.gatech.edu/coronavirus/daily-checklist) before attending HackGT 8."
+          ],
+          "required": true
+        },
+        {
+          "name": "recording-check",
+          "label": "Please confirm that you consent to being recorded",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I consent to being recorded in workshops and events."
+          ],
+          "required": true
         },
         {
           "name": "additional-info",
@@ -5010,16 +5023,19 @@
           "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
           "type": "checkbox",
           "options": [
-            "I authorize HackGT to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
+            "I authorize HexLabs to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
           ],
           "required": false,
           "hasOther": false
         },
         {
-          "name": "github",
-          "label": "Github profile",
-          "type": "text",
-          "required": false
+          "name": "recording-check",
+          "label": "Please confirm that you consent to being recorded",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I consent to being recorded in workshops and events."
+          ],
+          "required": true
         },
         {
           "name": "additional-info",
