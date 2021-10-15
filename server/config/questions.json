@@ -5002,6 +5002,15 @@
           "required": true
         },
         {
+          "name": "certify-hours",
+          "label": "Please confirm that you will be able to volunteer for at least 7 hours during HackGT 8",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I am indicating that I am aware of the minimum 7 hour requirement and will be able to volunteer for a total of 7 hours during HackGT 8."
+          ],
+          "required": true
+        },
+        {
           "name": "additional-info",
           "type": "textarea",
           "label": "Is there anything you'd like us to know?",
@@ -5071,6 +5080,24 @@
         }
       ],
       "questions": [
+        {
+          "name": "hour-req",
+          "label": "Please confirm that you will be able to mentor for at least 6 hours during HackGT 8",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I am indicating that I am aware of the minimum 6 hour requirement and will be able to mentor for a total of 6 hours during HackGT 8. I will also make sure to attend a training session before the event, or reach out to hello@hexlabs.org if I am unable to do so"
+          ],
+          "required": true
+        },
+        {
+          "name": "covid-check",
+          "label": "Please confirm that you will review Georgia Tech's COVID checklist",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I confirm I will review Georgia Tech's [COVID checklist](https://health.gatech.edu/coronavirus/daily-checklist) before attending HackGT 8. (For those not attending in person, you can indicate that on the SignUp Genius)."
+          ],
+          "required": true
+        },
         {
           "name": "gdpr",
           "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
@@ -5221,8 +5248,78 @@
     },
     {
       "name": "Volunteer Confirmation",
-      "questions": [],
-      "text": []
+      "text": [
+        {
+          "for": "additional-info",
+          "type": "p",
+          "content": "Thank your confirming your attendance to HackGT 8!"
+        },
+        {
+          "for": "gdpr",
+          "type": "h4",
+          "content": "Authorization to Share Data with Sponsors"
+        }
+      ],
+      "questions": [
+        {
+          "name": "gdpr",
+          "label": "If you would like us to provide our sponsors with information about you, please opt-in by checking the box below.  This authorization is **required** to participate in certain activities at HackGT 8, including the sponsorship fair. You can change your decision later on by emailing us at [hello@hexlabs.org.](mailto:hello@hexlabs.org)",
+          "type": "checkbox",
+          "options": [
+            "I authorize HexLabs to share my application, registration, and event attendance data with HackGT's corporate sponsors and partners.  I would also like information, tips, and offers about HackGT 8 and other sponsor-related products and services."
+          ],
+          "required": false,
+          "hasOther": false
+        },
+        {
+          "name": "confirm-gt-student",
+          "label": "Please confirm that you are a student enrolled in Georgia Tech",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I certify that I am a current Georgia Tech student. I understand that when I arrive in-person at HackGT 8, I will be denied entry to the in-person portion of the event if HexLabs is unable to confirm this"
+          ],
+          "required": true
+        },
+        {
+          "name": "covid-check",
+          "label": "Please confirm that you will review Georgia Tech's COVID checklist",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I confirm I will review Georgia Tech's [COVID checklist](https://health.gatech.edu/coronavirus/daily-checklist) before attending HackGT 8."
+          ],
+          "required": true
+        },
+        {
+          "name": "recording-check",
+          "label": "Please confirm that you consent to being recorded",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I consent to being recorded in workshops and events."
+          ],
+          "required": true
+        },
+        {
+          "name": "certify-hours",
+          "label": "Please confirm that you will be able to volunteer for at least 7 hours during HackGT 8",
+          "type": "checkbox",
+          "options": [
+            "By checking this box, I am indicating that I am aware of the minimum 7 hour requirement and will be able to volunteer for a total of 7 hours during HackGT 8."
+          ],
+          "required": true
+        },
+        {
+          "name": "resume",
+          "label": "Please upload your resume or a skill sheet",
+          "type": "file",
+          "required": false
+        },
+        {
+          "name": "additional-info",
+          "type": "textarea",
+          "label": "Is there anything you'd like us to know?",
+          "required": false
+        }
+      ]
     },
     {
       "name": "Denied Admission / Volunteer",
