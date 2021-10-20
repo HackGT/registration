@@ -4417,7 +4417,8 @@
           "hasOther": false
         }
       ]
-    },    {
+    },    
+    {
       "name": "Partner",
       "text": [
       ],
@@ -4426,7 +4427,7 @@
            "name": "affiliation",
            "label": "What organization are you affliated with?",
            "type": "select",
-            "options": [
+           "options": [
               "MLH",
               "HexLabs",
               "Invention Studio",
@@ -5713,11 +5714,6 @@
     },
     {
       "name": "Denied Admission / Volunteer",
-      "questions": [],
-      "text": []
-    },
-    {
-      "name": "Denied Admission / Judge",
       "questions": [],
       "text": []
     },
