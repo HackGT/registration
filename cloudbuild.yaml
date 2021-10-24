@@ -1,6 +1,10 @@
-steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'hackgt/$REPO_NAME:$COMMIT_SHA', '-t', 'hackgt/$REPO_NAME:latest', '.']
+steps:   
+- name: 'gcr.io/kaniko-project/executor:latest'
+  args:
+  - --destination=hackgt/$REPO_NAME:$COMMIT_SHA
+  - --cache=true
+  - --cache-ttl=6d
+  
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   args: ['-c', 'docker login --username=hackgt --password=$$DOCKER_PASSWORD']
