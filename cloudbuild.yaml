@@ -3,7 +3,7 @@ steps:
   args:
   - --destination=hackgt/$REPO_NAME:$COMMIT_SHA
   - --cache=true
-  - --cache-ttl=6d
+  - --cache-ttl=144h
   
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
