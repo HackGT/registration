@@ -5,7 +5,6 @@ steps:
   - --cache=true
   - --cache-ttl=144h
   - --insecure=true
-  
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   args: ['-c', 'docker login --username=hackgt --password=$$DOCKER_PASSWORD']
